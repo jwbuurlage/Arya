@@ -1,0 +1,39 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+
+PROJECT(Arya)
+
+SET(
+  PROJECT_NAME
+  "Arya"
+  )
+
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
+SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
+
+SET(
+  CMAKE_CXX_LINK_FLAGS
+  "-lglfw -lGLEW -framework Cocoa -framework OpenGL -framework IOKit"
+  )
+
+SET(
+  CMAKE_CXX_COMPILER
+  "g++"
+  )
+
+SET(
+  PROJECT_SOURCES
+  "../src/main.cpp"
+  "../src/Root.cpp"
+  "../src/Shaders.cpp"
+  "../src/Objects.cpp"
+  )
+
+SET(
+  PROJECT_INCLUDES
+  "../include"
+  )
+
+INCLUDE_DIRECTORIES( ${PROJECT_INCLUDES} )
+ADD_EXECUTABLE( ${PROJECT_NAME} ${PROJECT_SOURCES} )
+TARGET_LINK_LIBRARIES( ${PROJECT_NAME} ${LIB_LIBRARIES} )

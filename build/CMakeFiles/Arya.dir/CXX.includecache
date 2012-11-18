@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/jw/Desktop/Arya/src/../include/Root.h
+
+/Users/jw/Desktop/Arya/src/../include/Shaders.h
+string
+-
+
+/Users/jw/Desktop/Arya/src/Root.cpp
+iostream
+-
+GL/glew.h
+-
+GL/glfw.h
+-
+glm/glm.hpp
+-
+../include/Root.h
+/Users/jw/Desktop/Arya/src/../include/Root.h
+../include/Shaders.h
+/Users/jw/Desktop/Arya/src/../include/Shaders.h
+
