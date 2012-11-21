@@ -1,55 +1,86 @@
 #include <string>
 #include <vector>
+#include <map>
+
+#include "common/Singleton.h"
 
 using std::string;
 using std::vector;
+using std::map;
 
 namespace Arya
 {
-  class AFile;
+    struct File;
 
-  enum ShaderType
-  {
-    VERTEX,
-    FRAGMENT
-  };
+    enum ShaderType
+    {
+        VERTEX,
+        FRAGMENT,
+        GEOMETRY
+    };
 
-  class Shader
-  {
-    public:
-      Shader(ShaderType _type) { type = _type; };
-      ~Shader() { };
+    class Shader
+    {
+        public:
+            Shader(ShaderType type) { this->type = type; };
+            ~Shader() { };
 
-      bool addSourceFile(string f);
-      bool compile();
+            // Adds a source file to the shader
+            bool addSourceFile(string f);
 
-    private:
-      bool compiled;
-      vector<AFile> sources;
-      ShaderType type;
-  };
+            // Compiles the Shader and sets its handle
+            bool compile();
 
-  class ShaderProgram
-  {
-    public:
-      ShaderProgram() { };
-      ~ShaderProgram() { };
+            // Returns the handle
+            GLuint getHandle() { return handle; };
 
-      void attach(Shader shader);
-      bool link();
-      bool use();
+        private:
+            GLuint handle;
+            bool compiled;
 
-    private:
-      int handle;
-      bool linked;
-  };
+            vector<File*> sources;
+            ShaderType type;
+    };
 
-  class ShaderManager
-  {
-    public:
-      ShaderManager() { };
-      ~ShaderManager() { };
+    class ShaderProgram
+    {
+        public:
+            ShaderProgram(string name);
+            ~ShaderProgram();
 
-      bool init();
-  };
+            void attach(Shader* shader);
+            bool link();
+            void use();
+
+            string getName() { return name; };
+
+        private:
+            bool init();
+
+            GLuint handle;
+            bool linked;
+            string name;
+    };
+
+    class ShaderManager : public Singleton<ShaderManager>
+    {
+        public:
+            ShaderManager() { };
+            ~ShaderManager() { };
+
+            void setActiveProgram(string name);
+            ShaderProgram* active();
+
+            bool init();
+
+        private:
+            friend class ShaderProgram;
+
+            void registerProgram(ShaderProgram* prog);
+            void unregisterProgram(ShaderProgram* prog);
+
+            ShaderProgram* activeProgram;
+            typedef map<string, ShaderProgram*> ProgramContainer;
+            ProgramContainer programs;
+    };
 }
