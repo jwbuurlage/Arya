@@ -26,22 +26,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/local/bin/cmake
+CMAKE_COMMAND = /usr/bin/cmake
 
 # The command to remove a file.
-RM = /usr/local/bin/cmake -E remove -f
+RM = /usr/bin/cmake -E remove -f
 
 # Escaping for special characters.
 EQUALS = =
 
-# The program to use to edit the cache.
-CMAKE_EDIT_COMMAND = /usr/local/bin/ccmake
-
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/jw/Desktop/Arya/build
+CMAKE_SOURCE_DIR = /home/jw/Code/Arya/build
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/jw/Desktop/Arya/build
+CMAKE_BINARY_DIR = /home/jw/Code/Arya/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/Arya.dir/depend.make
@@ -52,125 +49,125 @@ include CMakeFiles/Arya.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/Arya.dir/flags.make
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.o: CMakeFiles/Arya.dir/flags.make
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.o: /Users/jw/Desktop/Arya/src/main.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /Users/jw/Desktop/Arya/build/CMakeFiles $(CMAKE_PROGRESS_1)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.o"
-	g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.o -c /Users/jw/Desktop/Arya/src/main.cpp
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.o: CMakeFiles/Arya.dir/flags.make
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.o: /home/jw/Code/Arya/src/main.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/jw/Code/Arya/build/CMakeFiles $(CMAKE_PROGRESS_1)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.o -c /home/jw/Code/Arya/src/main.cpp
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.i"
-	g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /Users/jw/Desktop/Arya/src/main.cpp > CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.i
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/jw/Code/Arya/src/main.cpp > CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.i
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.s"
-	g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /Users/jw/Desktop/Arya/src/main.cpp -o CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.s
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/jw/Code/Arya/src/main.cpp -o CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.s
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.o.requires:
-.PHONY : CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.o.requires
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.o.requires:
+.PHONY : CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.o.requires
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.o.provides: CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.o.requires
-	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.o.provides.build
-.PHONY : CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.o.provides
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.o.provides: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.o.requires
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.o.provides.build
+.PHONY : CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.o.provides
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.o.provides.build: CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.o
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.o.provides.build: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.o
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.o: CMakeFiles/Arya.dir/flags.make
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.o: /Users/jw/Desktop/Arya/src/Root.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /Users/jw/Desktop/Arya/build/CMakeFiles $(CMAKE_PROGRESS_2)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.o"
-	g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.o -c /Users/jw/Desktop/Arya/src/Root.cpp
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o: CMakeFiles/Arya.dir/flags.make
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o: /home/jw/Code/Arya/src/Root.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/jw/Code/Arya/build/CMakeFiles $(CMAKE_PROGRESS_2)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o -c /home/jw/Code/Arya/src/Root.cpp
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.i"
-	g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /Users/jw/Desktop/Arya/src/Root.cpp > CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.i
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/jw/Code/Arya/src/Root.cpp > CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.i
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.s"
-	g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /Users/jw/Desktop/Arya/src/Root.cpp -o CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.s
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/jw/Code/Arya/src/Root.cpp -o CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.s
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.o.requires:
-.PHONY : CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.o.requires
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o.requires:
+.PHONY : CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o.requires
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.o.provides: CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.o.requires
-	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.o.provides.build
-.PHONY : CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.o.provides
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o.provides: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o.requires
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o.provides.build
+.PHONY : CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o.provides
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.o.provides.build: CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.o
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o.provides.build: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.o: CMakeFiles/Arya.dir/flags.make
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.o: /Users/jw/Desktop/Arya/src/Shaders.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /Users/jw/Desktop/Arya/build/CMakeFiles $(CMAKE_PROGRESS_3)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.o"
-	g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.o -c /Users/jw/Desktop/Arya/src/Shaders.cpp
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o: CMakeFiles/Arya.dir/flags.make
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o: /home/jw/Code/Arya/src/Shaders.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/jw/Code/Arya/build/CMakeFiles $(CMAKE_PROGRESS_3)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o -c /home/jw/Code/Arya/src/Shaders.cpp
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.i"
-	g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /Users/jw/Desktop/Arya/src/Shaders.cpp > CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.i
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/jw/Code/Arya/src/Shaders.cpp > CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.i
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.s"
-	g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /Users/jw/Desktop/Arya/src/Shaders.cpp -o CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.s
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/jw/Code/Arya/src/Shaders.cpp -o CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.s
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.o.requires:
-.PHONY : CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.o.requires
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o.requires:
+.PHONY : CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o.requires
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.o.provides: CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.o.requires
-	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.o.provides.build
-.PHONY : CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.o.provides
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o.provides: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o.requires
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o.provides.build
+.PHONY : CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o.provides
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.o.provides.build: CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.o
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o.provides.build: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.o: CMakeFiles/Arya.dir/flags.make
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.o: /Users/jw/Desktop/Arya/src/Objects.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /Users/jw/Desktop/Arya/build/CMakeFiles $(CMAKE_PROGRESS_4)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.o"
-	g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.o -c /Users/jw/Desktop/Arya/src/Objects.cpp
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o: CMakeFiles/Arya.dir/flags.make
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o: /home/jw/Code/Arya/src/Objects.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/jw/Code/Arya/build/CMakeFiles $(CMAKE_PROGRESS_4)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o -c /home/jw/Code/Arya/src/Objects.cpp
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.i"
-	g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /Users/jw/Desktop/Arya/src/Objects.cpp > CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.i
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/jw/Code/Arya/src/Objects.cpp > CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.i
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.s"
-	g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /Users/jw/Desktop/Arya/src/Objects.cpp -o CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.s
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/jw/Code/Arya/src/Objects.cpp -o CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.s
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.o.requires:
-.PHONY : CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.o.requires
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o.requires:
+.PHONY : CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o.requires
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.o.provides: CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.o.requires
-	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.o.provides.build
-.PHONY : CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.o.provides
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o.provides: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o.requires
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o.provides.build
+.PHONY : CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o.provides
 
-CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.o.provides.build: CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.o
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o.provides.build: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o
 
 # Object files for target Arya
 Arya_OBJECTS = \
-"CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.o" \
-"CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.o" \
-"CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.o" \
-"CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.o"
+"CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.o" \
+"CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o" \
+"CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o" \
+"CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o"
 
 # External object files for target Arya
 Arya_EXTERNAL_OBJECTS =
 
-/Users/jw/Desktop/Arya/bin/Arya: CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.o
-/Users/jw/Desktop/Arya/bin/Arya: CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.o
-/Users/jw/Desktop/Arya/bin/Arya: CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.o
-/Users/jw/Desktop/Arya/bin/Arya: CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.o
-/Users/jw/Desktop/Arya/bin/Arya: CMakeFiles/Arya.dir/build.make
-/Users/jw/Desktop/Arya/bin/Arya: CMakeFiles/Arya.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking CXX executable /Users/jw/Desktop/Arya/bin/Arya"
+/home/jw/Code/Arya/bin/Arya: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.o
+/home/jw/Code/Arya/bin/Arya: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o
+/home/jw/Code/Arya/bin/Arya: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o
+/home/jw/Code/Arya/bin/Arya: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o
+/home/jw/Code/Arya/bin/Arya: CMakeFiles/Arya.dir/build.make
+/home/jw/Code/Arya/bin/Arya: CMakeFiles/Arya.dir/link.txt
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking CXX executable /home/jw/Code/Arya/bin/Arya"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Arya.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
-CMakeFiles/Arya.dir/build: /Users/jw/Desktop/Arya/bin/Arya
+CMakeFiles/Arya.dir/build: /home/jw/Code/Arya/bin/Arya
 .PHONY : CMakeFiles/Arya.dir/build
 
-CMakeFiles/Arya.dir/requires: CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.o.requires
-CMakeFiles/Arya.dir/requires: CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.o.requires
-CMakeFiles/Arya.dir/requires: CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.o.requires
-CMakeFiles/Arya.dir/requires: CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.o.requires
+CMakeFiles/Arya.dir/requires: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.o.requires
+CMakeFiles/Arya.dir/requires: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o.requires
+CMakeFiles/Arya.dir/requires: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o.requires
+CMakeFiles/Arya.dir/requires: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o.requires
 .PHONY : CMakeFiles/Arya.dir/requires
 
 CMakeFiles/Arya.dir/clean:
@@ -178,6 +175,6 @@ CMakeFiles/Arya.dir/clean:
 .PHONY : CMakeFiles/Arya.dir/clean
 
 CMakeFiles/Arya.dir/depend:
-	cd /Users/jw/Desktop/Arya/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/jw/Desktop/Arya/build /Users/jw/Desktop/Arya/build /Users/jw/Desktop/Arya/build /Users/jw/Desktop/Arya/build /Users/jw/Desktop/Arya/build/CMakeFiles/Arya.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/jw/Code/Arya/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/jw/Code/Arya/build /home/jw/Code/Arya/build /home/jw/Code/Arya/build /home/jw/Code/Arya/build /home/jw/Code/Arya/build/CMakeFiles/Arya.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/Arya.dir/depend
 

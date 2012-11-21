@@ -30,30 +30,27 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/local/bin/cmake
+CMAKE_COMMAND = /usr/bin/cmake
 
 # The command to remove a file.
-RM = /usr/local/bin/cmake -E remove -f
+RM = /usr/bin/cmake -E remove -f
 
 # Escaping for special characters.
 EQUALS = =
 
-# The program to use to edit the cache.
-CMAKE_EDIT_COMMAND = /usr/local/bin/ccmake
-
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/jw/Desktop/Arya/build
+CMAKE_SOURCE_DIR = /home/jw/Code/Arya/build
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/jw/Desktop/Arya/build
+CMAKE_BINARY_DIR = /home/jw/Code/Arya/build
 
 #=============================================================================
 # Targets provided globally by CMake.
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/usr/local/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running interactive CMake command-line interface..."
+	/usr/bin/cmake -i .
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -63,7 +60,7 @@ edit_cache/fast: edit_cache
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/local/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -72,9 +69,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jw/Desktop/Arya/build/CMakeFiles /Users/jw/Desktop/Arya/build/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/jw/Code/Arya/build/CMakeFiles /home/jw/Code/Arya/build/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jw/Desktop/Arya/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/jw/Code/Arya/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -114,101 +111,101 @@ Arya/fast:
 	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/build
 .PHONY : Arya/fast
 
-Users/jw/Desktop/Arya/src/Objects.o: Users/jw/Desktop/Arya/src/Objects.cpp.o
-.PHONY : Users/jw/Desktop/Arya/src/Objects.o
+home/jw/Code/Arya/src/Objects.o: home/jw/Code/Arya/src/Objects.cpp.o
+.PHONY : home/jw/Code/Arya/src/Objects.o
 
 # target to build an object file
-Users/jw/Desktop/Arya/src/Objects.cpp.o:
-	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.o
-.PHONY : Users/jw/Desktop/Arya/src/Objects.cpp.o
+home/jw/Code/Arya/src/Objects.cpp.o:
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o
+.PHONY : home/jw/Code/Arya/src/Objects.cpp.o
 
-Users/jw/Desktop/Arya/src/Objects.i: Users/jw/Desktop/Arya/src/Objects.cpp.i
-.PHONY : Users/jw/Desktop/Arya/src/Objects.i
+home/jw/Code/Arya/src/Objects.i: home/jw/Code/Arya/src/Objects.cpp.i
+.PHONY : home/jw/Code/Arya/src/Objects.i
 
 # target to preprocess a source file
-Users/jw/Desktop/Arya/src/Objects.cpp.i:
-	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.i
-.PHONY : Users/jw/Desktop/Arya/src/Objects.cpp.i
+home/jw/Code/Arya/src/Objects.cpp.i:
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.i
+.PHONY : home/jw/Code/Arya/src/Objects.cpp.i
 
-Users/jw/Desktop/Arya/src/Objects.s: Users/jw/Desktop/Arya/src/Objects.cpp.s
-.PHONY : Users/jw/Desktop/Arya/src/Objects.s
+home/jw/Code/Arya/src/Objects.s: home/jw/Code/Arya/src/Objects.cpp.s
+.PHONY : home/jw/Code/Arya/src/Objects.s
 
 # target to generate assembly for a file
-Users/jw/Desktop/Arya/src/Objects.cpp.s:
-	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.s
-.PHONY : Users/jw/Desktop/Arya/src/Objects.cpp.s
+home/jw/Code/Arya/src/Objects.cpp.s:
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.s
+.PHONY : home/jw/Code/Arya/src/Objects.cpp.s
 
-Users/jw/Desktop/Arya/src/Root.o: Users/jw/Desktop/Arya/src/Root.cpp.o
-.PHONY : Users/jw/Desktop/Arya/src/Root.o
+home/jw/Code/Arya/src/Root.o: home/jw/Code/Arya/src/Root.cpp.o
+.PHONY : home/jw/Code/Arya/src/Root.o
 
 # target to build an object file
-Users/jw/Desktop/Arya/src/Root.cpp.o:
-	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.o
-.PHONY : Users/jw/Desktop/Arya/src/Root.cpp.o
+home/jw/Code/Arya/src/Root.cpp.o:
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o
+.PHONY : home/jw/Code/Arya/src/Root.cpp.o
 
-Users/jw/Desktop/Arya/src/Root.i: Users/jw/Desktop/Arya/src/Root.cpp.i
-.PHONY : Users/jw/Desktop/Arya/src/Root.i
+home/jw/Code/Arya/src/Root.i: home/jw/Code/Arya/src/Root.cpp.i
+.PHONY : home/jw/Code/Arya/src/Root.i
 
 # target to preprocess a source file
-Users/jw/Desktop/Arya/src/Root.cpp.i:
-	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.i
-.PHONY : Users/jw/Desktop/Arya/src/Root.cpp.i
+home/jw/Code/Arya/src/Root.cpp.i:
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.i
+.PHONY : home/jw/Code/Arya/src/Root.cpp.i
 
-Users/jw/Desktop/Arya/src/Root.s: Users/jw/Desktop/Arya/src/Root.cpp.s
-.PHONY : Users/jw/Desktop/Arya/src/Root.s
+home/jw/Code/Arya/src/Root.s: home/jw/Code/Arya/src/Root.cpp.s
+.PHONY : home/jw/Code/Arya/src/Root.s
 
 # target to generate assembly for a file
-Users/jw/Desktop/Arya/src/Root.cpp.s:
-	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.s
-.PHONY : Users/jw/Desktop/Arya/src/Root.cpp.s
+home/jw/Code/Arya/src/Root.cpp.s:
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.s
+.PHONY : home/jw/Code/Arya/src/Root.cpp.s
 
-Users/jw/Desktop/Arya/src/Shaders.o: Users/jw/Desktop/Arya/src/Shaders.cpp.o
-.PHONY : Users/jw/Desktop/Arya/src/Shaders.o
+home/jw/Code/Arya/src/Shaders.o: home/jw/Code/Arya/src/Shaders.cpp.o
+.PHONY : home/jw/Code/Arya/src/Shaders.o
 
 # target to build an object file
-Users/jw/Desktop/Arya/src/Shaders.cpp.o:
-	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.o
-.PHONY : Users/jw/Desktop/Arya/src/Shaders.cpp.o
+home/jw/Code/Arya/src/Shaders.cpp.o:
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o
+.PHONY : home/jw/Code/Arya/src/Shaders.cpp.o
 
-Users/jw/Desktop/Arya/src/Shaders.i: Users/jw/Desktop/Arya/src/Shaders.cpp.i
-.PHONY : Users/jw/Desktop/Arya/src/Shaders.i
+home/jw/Code/Arya/src/Shaders.i: home/jw/Code/Arya/src/Shaders.cpp.i
+.PHONY : home/jw/Code/Arya/src/Shaders.i
 
 # target to preprocess a source file
-Users/jw/Desktop/Arya/src/Shaders.cpp.i:
-	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.i
-.PHONY : Users/jw/Desktop/Arya/src/Shaders.cpp.i
+home/jw/Code/Arya/src/Shaders.cpp.i:
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.i
+.PHONY : home/jw/Code/Arya/src/Shaders.cpp.i
 
-Users/jw/Desktop/Arya/src/Shaders.s: Users/jw/Desktop/Arya/src/Shaders.cpp.s
-.PHONY : Users/jw/Desktop/Arya/src/Shaders.s
+home/jw/Code/Arya/src/Shaders.s: home/jw/Code/Arya/src/Shaders.cpp.s
+.PHONY : home/jw/Code/Arya/src/Shaders.s
 
 # target to generate assembly for a file
-Users/jw/Desktop/Arya/src/Shaders.cpp.s:
-	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.s
-.PHONY : Users/jw/Desktop/Arya/src/Shaders.cpp.s
+home/jw/Code/Arya/src/Shaders.cpp.s:
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.s
+.PHONY : home/jw/Code/Arya/src/Shaders.cpp.s
 
-Users/jw/Desktop/Arya/src/main.o: Users/jw/Desktop/Arya/src/main.cpp.o
-.PHONY : Users/jw/Desktop/Arya/src/main.o
+home/jw/Code/Arya/src/main.o: home/jw/Code/Arya/src/main.cpp.o
+.PHONY : home/jw/Code/Arya/src/main.o
 
 # target to build an object file
-Users/jw/Desktop/Arya/src/main.cpp.o:
-	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.o
-.PHONY : Users/jw/Desktop/Arya/src/main.cpp.o
+home/jw/Code/Arya/src/main.cpp.o:
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.o
+.PHONY : home/jw/Code/Arya/src/main.cpp.o
 
-Users/jw/Desktop/Arya/src/main.i: Users/jw/Desktop/Arya/src/main.cpp.i
-.PHONY : Users/jw/Desktop/Arya/src/main.i
+home/jw/Code/Arya/src/main.i: home/jw/Code/Arya/src/main.cpp.i
+.PHONY : home/jw/Code/Arya/src/main.i
 
 # target to preprocess a source file
-Users/jw/Desktop/Arya/src/main.cpp.i:
-	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.i
-.PHONY : Users/jw/Desktop/Arya/src/main.cpp.i
+home/jw/Code/Arya/src/main.cpp.i:
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.i
+.PHONY : home/jw/Code/Arya/src/main.cpp.i
 
-Users/jw/Desktop/Arya/src/main.s: Users/jw/Desktop/Arya/src/main.cpp.s
-.PHONY : Users/jw/Desktop/Arya/src/main.s
+home/jw/Code/Arya/src/main.s: home/jw/Code/Arya/src/main.cpp.s
+.PHONY : home/jw/Code/Arya/src/main.s
 
 # target to generate assembly for a file
-Users/jw/Desktop/Arya/src/main.cpp.s:
-	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.s
-.PHONY : Users/jw/Desktop/Arya/src/main.cpp.s
+home/jw/Code/Arya/src/main.cpp.s:
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.s
+.PHONY : home/jw/Code/Arya/src/main.cpp.s
 
 # Help Target
 help:
@@ -219,18 +216,18 @@ help:
 	@echo "... Arya"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... Users/jw/Desktop/Arya/src/Objects.o"
-	@echo "... Users/jw/Desktop/Arya/src/Objects.i"
-	@echo "... Users/jw/Desktop/Arya/src/Objects.s"
-	@echo "... Users/jw/Desktop/Arya/src/Root.o"
-	@echo "... Users/jw/Desktop/Arya/src/Root.i"
-	@echo "... Users/jw/Desktop/Arya/src/Root.s"
-	@echo "... Users/jw/Desktop/Arya/src/Shaders.o"
-	@echo "... Users/jw/Desktop/Arya/src/Shaders.i"
-	@echo "... Users/jw/Desktop/Arya/src/Shaders.s"
-	@echo "... Users/jw/Desktop/Arya/src/main.o"
-	@echo "... Users/jw/Desktop/Arya/src/main.i"
-	@echo "... Users/jw/Desktop/Arya/src/main.s"
+	@echo "... home/jw/Code/Arya/src/Objects.o"
+	@echo "... home/jw/Code/Arya/src/Objects.i"
+	@echo "... home/jw/Code/Arya/src/Objects.s"
+	@echo "... home/jw/Code/Arya/src/Root.o"
+	@echo "... home/jw/Code/Arya/src/Root.i"
+	@echo "... home/jw/Code/Arya/src/Root.s"
+	@echo "... home/jw/Code/Arya/src/Shaders.o"
+	@echo "... home/jw/Code/Arya/src/Shaders.i"
+	@echo "... home/jw/Code/Arya/src/Shaders.s"
+	@echo "... home/jw/Code/Arya/src/main.o"
+	@echo "... home/jw/Code/Arya/src/main.i"
+	@echo "... home/jw/Code/Arya/src/main.s"
 .PHONY : help
 
 

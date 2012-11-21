@@ -1,10 +1,10 @@
 FILE(REMOVE_RECURSE
-  "CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.o"
-  "CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.o"
-  "CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.o"
-  "CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.o"
-  "/Users/jw/Desktop/Arya/bin/Arya.pdb"
-  "/Users/jw/Desktop/Arya/bin/Arya"
+  "CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.o"
+  "CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o"
+  "CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o"
+  "CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o"
+  "/home/jw/Code/Arya/bin/Arya.pdb"
+  "/home/jw/Code/Arya/bin/Arya"
 )
 
 # Per-language clean rules from dependency scanning.

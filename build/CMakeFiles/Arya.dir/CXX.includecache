@@ -6,13 +6,15 @@
 
 #IncludeRegexTransform: 
 
-/Users/jw/Desktop/Arya/src/../include/Root.h
+/home/jw/Code/Arya/src/../include/Root.h
 
-/Users/jw/Desktop/Arya/src/../include/Shaders.h
+/home/jw/Code/Arya/src/../include/Shaders.h
 string
 -
 
-/Users/jw/Desktop/Arya/src/Root.cpp
+/home/jw/Code/Arya/src/Objects.cpp
+
+/home/jw/Code/Arya/src/Root.cpp
 iostream
 -
 GL/glew.h
@@ -22,7 +24,19 @@ GL/glfw.h
 glm/glm.hpp
 -
 ../include/Root.h
-/Users/jw/Desktop/Arya/src/../include/Root.h
+/home/jw/Code/Arya/src/../include/Root.h
 ../include/Shaders.h
-/Users/jw/Desktop/Arya/src/../include/Shaders.h
+/home/jw/Code/Arya/src/../include/Shaders.h
+
+/home/jw/Code/Arya/src/Shaders.cpp
+iostream
+-
+shaders.h
+/home/jw/Code/Arya/src/shaders.h
+
+/home/jw/Code/Arya/src/main.cpp
+iostream
+-
+../include/Root.h
+/home/jw/Code/Arya/src/../include/Root.h
 

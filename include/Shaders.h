@@ -1,8 +1,13 @@
 #include <string>
+#include <vector>
+
 using std::string;
+using std::vector;
 
 namespace Arya
 {
+  class AFile;
+
   enum ShaderType
   {
     VERTEX,
@@ -12,15 +17,15 @@ namespace Arya
   class Shader
   {
     public:
-      Shader() { };
+      Shader(ShaderType _type) { type = _type; };
       ~Shader() { };
 
-      bool loadFromString(string s, ShaderType type);
-      bool loadFromFile(string file, ShaderType type);
+      bool addSourceFile(string f);
       bool compile();
 
     private:
-      string source;
+      bool compiled;
+      vector<AFile> sources;
       ShaderType type;
   };
 

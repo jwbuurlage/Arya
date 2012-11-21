@@ -4,12 +4,12 @@ SET(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 SET(CMAKE_DEPENDS_CHECK_CXX
-  "/Users/jw/Desktop/Arya/src/Objects.cpp" "/Users/jw/Desktop/Arya/build/CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Objects.cpp.o"
-  "/Users/jw/Desktop/Arya/src/Root.cpp" "/Users/jw/Desktop/Arya/build/CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Root.cpp.o"
-  "/Users/jw/Desktop/Arya/src/Shaders.cpp" "/Users/jw/Desktop/Arya/build/CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/Shaders.cpp.o"
-  "/Users/jw/Desktop/Arya/src/main.cpp" "/Users/jw/Desktop/Arya/build/CMakeFiles/Arya.dir/Users/jw/Desktop/Arya/src/main.cpp.o"
+  "/home/jw/Code/Arya/src/Objects.cpp" "/home/jw/Code/Arya/build/CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o"
+  "/home/jw/Code/Arya/src/Root.cpp" "/home/jw/Code/Arya/build/CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o"
+  "/home/jw/Code/Arya/src/Shaders.cpp" "/home/jw/Code/Arya/build/CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o"
+  "/home/jw/Code/Arya/src/main.cpp" "/home/jw/Code/Arya/build/CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.o"
   )
-SET(CMAKE_CXX_COMPILER_ID "Clang")
+SET(CMAKE_CXX_COMPILER_ID "GNU")
 
 # Targets to which this target links.
 SET(CMAKE_TARGET_LINKED_INFO_FILES
