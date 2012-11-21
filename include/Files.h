@@ -24,14 +24,14 @@ namespace Arya
 		char* data;
 		unsigned int size;
 		int refcount;
-		friend class Filesystem;
+		friend class FileSystem;
 	};
 
-	class Filesystem : public Singleton<Filesystem>
+	class FileSystem : public Singleton<FileSystem>
 	{
 	public:
-		Filesystem();
-		~Filesystem();
+		FileSystem();
+		~FileSystem();
 
 		//With / appended
 		string getApplicationPath(){ return applicationPath; }

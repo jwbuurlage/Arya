@@ -6,14 +6,14 @@ using std::ifstream;
 
 namespace Arya
 {
-	template<> Filesystem* Singleton<Filesystem>::singleton = 0;
+	template<> FileSystem* Singleton<FileSystem>::singleton = 0;
 
-	Filesystem::Filesystem()
+	FileSystem::FileSystem()
 	{
 		initApplicationPath();
 	}
 
-	Filesystem::~Filesystem()
+	FileSystem::~FileSystem()
 	{
 		unloadAllFiles();
 	}
@@ -23,7 +23,7 @@ namespace Arya
 	#define WIN32_LEAN_AND_MEAN
 	#include <Windows.h>
 
-	void Filesystem::initApplicationPath()
+	void FileSystem::initApplicationPath()
 	{
 		char ExePath[MAX_PATH] = {0};
 		GetModuleFileName(0, ExePath, MAX_PATH);
@@ -33,7 +33,7 @@ namespace Arya
 	}
 #elif __APPLE__
     #include <mach-o/dyld.h>
-	void Filesystem::initApplicationPath()
+	void FileSystem::initApplicationPath()
 	{
 		char path[1024];
 		uint32_t size = sizeof(path);
@@ -46,7 +46,7 @@ namespace Arya
 	}
 #elif __linux__
 	#include <unistd.h>
-	void Filesystem::initApplicationPath()
+	void FileSystem::initApplicationPath()
 	{
 		char path[1024] = {0};
 		if( readlink("/proc/self/exe", path, 1024) > 0 ){
@@ -57,14 +57,14 @@ namespace Arya
 		return;
 	}
 #else
-	void Filesystem::initApplicationPath()
+	void FileSystem::initApplicationPath()
 	{
 		applicationPath = "./";
 		return;
 	}
 #endif
 
-	File* Filesystem::getFile(string filename)
+	File* FileSystem::getFile(string filename)
 	{
 		string formattedFilename(filename);
 		//Note: only works for ascii strings:
@@ -111,13 +111,13 @@ namespace Arya
 		return newFile;
 	}
 
-	void Filesystem::releaseFile(File* file)
+	void FileSystem::releaseFile(File* file)
 	{
 		file->refcount--;
 		if( file->refcount <= 0 ) unloadFile(file);
 	}
 
-	void Filesystem::unloadFile(File* file)
+	void FileSystem::unloadFile(File* file)
 	{
 		for( fileIterator fileIter = loadedFiles.begin(); fileIter != loadedFiles.end(); ++fileIter ){
 			if( file == fileIter->second ){
@@ -129,7 +129,7 @@ namespace Arya
 		}
 	}
 
-	void Filesystem::unloadAllFiles()
+	void FileSystem::unloadAllFiles()
 	{
 		for( fileIterator file = loadedFiles.begin(); file != loadedFiles.end(); ++file ){
 			if( file->second->data ) delete[] file->second->data;
