@@ -1,22 +1,22 @@
 namespace Arya
 {
-  class ShaderManager;
+    class ShaderManager;
 
-  class Root
-  {
-    public:
-      Root() { };
-      ~Root() { };
+    class Root
+    {
+        public:
+            Root() { };
+            ~Root() { };
 
-      bool init();
-      void render();
+            bool init();
+            void render();
 
-    private:
-      bool initGLFW();
-      bool initGLEW();
-      bool initShaders();
-      bool initObjects();
+        private:
+            bool initGLFW();
+            bool initGLEW();
+            bool initShaders();
+            bool initObjects();
 
-      ShaderManager* shaders;
-  };
+            ShaderManager* shaders;
+    };
 }

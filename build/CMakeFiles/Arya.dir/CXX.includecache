@@ -6,13 +6,39 @@
 
 #IncludeRegexTransform: 
 
+../include/Files.h
+common/Singleton.h
+../include/common/Singleton.h
+string
+-
+map
+-
+
+../include/Shaders.h
+string
+-
+vector
+-
+map
+-
+common/Singleton.h
+../include/common/Singleton.h
+
+../include/common/Singleton.h
+
 /home/jw/Code/Arya/src/../include/Root.h
 
 /home/jw/Code/Arya/src/../include/Shaders.h
 string
 -
+vector
+-
+map
+-
+common/Singleton.h
+/home/jw/Code/Arya/src/../include/common/Singleton.h
 
-/home/jw/Code/Arya/src/Objects.cpp
+/home/jw/Code/Arya/src/../include/common/Singleton.h
 
 /home/jw/Code/Arya/src/Root.cpp
 iostream
@@ -31,12 +57,12 @@ glm/glm.hpp
 /home/jw/Code/Arya/src/Shaders.cpp
 iostream
 -
-shaders.h
-/home/jw/Code/Arya/src/shaders.h
-
-/home/jw/Code/Arya/src/main.cpp
-iostream
+string.h
 -
-../include/Root.h
-/home/jw/Code/Arya/src/../include/Root.h
+GL/glew.h
+-
+Shaders.h
+/home/jw/Code/Arya/src/Shaders.h
+Files.h
+/home/jw/Code/Arya/src/Files.h
 

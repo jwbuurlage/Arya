@@ -1,8 +1,12 @@
 #include <string>
 #include <vector>
+#include <map>
+
+#include "common/Singleton.h"
 
 using std::string;
 using std::vector;
+using std::map;
 
 namespace Arya
 {
@@ -18,7 +22,7 @@ namespace Arya
     class Shader
     {
         public:
-            Shader(ShaderType _type) { type = _type; };
+            Shader(ShaderType type) { this->type = type; };
             ~Shader() { };
 
             // Adds a source file to the shader
@@ -41,25 +45,42 @@ namespace Arya
     class ShaderProgram
     {
         public:
-            ShaderProgram() { };
-            ~ShaderProgram() { };
+            ShaderProgram(string name);
+            ~ShaderProgram();
 
-            bool init();
             void attach(Shader* shader);
             bool link();
-            bool use();
+            void use();
+
+            string getName() { return name; };
 
         private:
+            bool init();
+
             GLuint handle;
             bool linked;
+            string name;
     };
 
-    class ShaderManager
+    class ShaderManager : public Singleton<ShaderManager>
     {
         public:
             ShaderManager() { };
             ~ShaderManager() { };
 
+            void setActiveProgram(string name);
+            ShaderProgram* active();
+
             bool init();
+
+        private:
+            friend class ShaderProgram;
+
+            void registerProgram(ShaderProgram* prog);
+            void unregisterProgram(ShaderProgram* prog);
+
+            ShaderProgram* activeProgram;
+            typedef map<string, ShaderProgram*> ProgramContainer;
+            ProgramContainer programs;
     };
 }

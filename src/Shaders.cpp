@@ -10,14 +10,16 @@ using std::cerr;
 using std::endl;
 
 namespace Arya
-{    
+{	
+    template<> ShaderManager* Singleton<ShaderManager>::singleton = 0;
+
     //---------------------------------------------------------
     // SHADER
     //---------------------------------------------------------
 
     bool Shader::addSourceFile(string f)
     {
-        File* source = FileSystem::shared()->getFile(f);
+        File* source = FileSystem::shared().getFile(f);
         if(!source) return false;
         sources.push_back(source);
         return true;
@@ -34,7 +36,7 @@ namespace Arya
         {
             GLchar** gl_sources = new GLchar*[sources.size()];
             for(int i = 0; i < sources.size(); ++i)
-                gl_sources[i] = sources[i]->data;
+                gl_sources[i] = sources[i]->getData();
 
             GLuint shaderHandle;
             switch(type)
@@ -77,6 +79,18 @@ namespace Arya
     // SHADERPROGRAM
     //---------------------------------------------------------
 
+    ShaderProgram::ShaderProgram(string name)
+    {
+        init();
+        ShaderManager::shared().registerProgram(this);
+        this->name = name;
+    }
+
+    ShaderProgram::~ShaderProgram()
+    {
+        ShaderManager::shared().unregisterProgram(this);
+    }
+
     bool ShaderProgram::init()
     {
         GLuint programHandle = glCreateProgram();
@@ -95,12 +109,32 @@ namespace Arya
 
     bool ShaderProgram::link()
     {
+        glLinkProgram(handle);
+
+        GLint result;
+        glGetShaderiv(handle, GL_COMPILE_STATUS, &result);
+        if(result == GL_FALSE)
+        {
+            cerr << "Error linking program, log:" << endl;
+            GLint logLength;
+            glGetProgramiv(handle, GL_INFO_LOG_LENGTH, &logLength);
+            if(logLength > 0)
+            {
+                char* log = new char[logLength];
+                GLsizei written;
+                glGetProgramInfoLog(handle, logLength, &written, log);
+                cerr << log << endl;
+                delete[] log;
+            }
+
+            return false;
+        }
         return false;
     }
 
-    bool ShaderProgram::use()
+    void ShaderProgram::use()
     {
-        return false;
+        glUseProgram(handle);
     }
 
     //---------------------------------------------------------
@@ -110,5 +144,30 @@ namespace Arya
     bool ShaderManager::init()
     {
         return true;
+    }
+
+    void ShaderManager::setActiveProgram(string name)
+    {
+        ProgramContainer::iterator it  = programs.find(name);
+        if(it == programs.end()) return;
+
+        activeProgram = it->second;
+        activeProgram->use();
+    }
+
+    void ShaderManager::registerProgram(ShaderProgram* prog)
+    {
+        ProgramContainer::iterator it  = programs.find(prog->getName());
+        if(it == programs.end())
+            programs[prog->getName()] = prog;
+        else 
+            cerr << "Already know a program named " << prog->getName() << endl;
+    }
+
+    void ShaderManager::unregisterProgram(ShaderProgram* prog)
+    {
+        ProgramContainer::iterator it  = programs.find(prog->getName());
+        if(it != programs.end())
+            programs.erase(it);
     }
 }

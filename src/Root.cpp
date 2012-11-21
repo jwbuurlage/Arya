@@ -13,68 +13,68 @@ using std::endl;
 
 namespace Arya
 {
-  bool Root::init()
-  {
-
-    if(!initGLFW()) return false;
-    if(!initGLEW()) return false;
-
-    if(!initShaders()) return false;
-    if(!initObjects()) return false;
-
-    bool running = true;
-    while(running)
+    bool Root::init()
     {
-      render();
-      running = (!glfwGetKey(GLFW_KEY_ESC) && glfwGetWindowParam(GLFW_OPENED));
+
+        if(!initGLFW()) return false;
+        if(!initGLEW()) return false;
+
+        if(!initShaders()) return false;
+        if(!initObjects()) return false;
+
+        bool running = true;
+        while(running)
+        {
+            render();
+            running = (!glfwGetKey(GLFW_KEY_ESC) && glfwGetWindowParam(GLFW_OPENED));
+        }
+
+        glfwTerminate();
+
+        return true;
     }
 
-    glfwTerminate();
-
-    return true;
-  }
-
-  bool Root::initGLFW()
-  {
-    if(!glfwInit())
+    bool Root::initGLFW()
     {
-      cerr << "Could not init *glfw*" << endl;
-      return false;
+        if(!glfwInit())
+        {
+            cerr << "Could not init *glfw*" << endl;
+            return false;
+        }
+
+        if(!glfwOpenWindow(1024, 768, 0, 0, 0, 0, 0, 0, GLFW_WINDOW))
+        {
+            glfwTerminate();
+            return false;
+        }
+
+        return true;
     }
 
-    if(!glfwOpenWindow(1024, 768, 0, 0, 0, 0, 0, 0, GLFW_WINDOW))
+    bool Root::initGLEW()
     {
-      glfwTerminate();
-      return false;
+        glewInit();
+        return true;
     }
 
-    return true;
-  }
+    bool Root::initShaders()
+    {
+        shaders = new ShaderManager();
+        if(!(shaders->init()))
+            return false;
+        return true;
+    }
 
-  bool Root::initGLEW()
-  {
-    glewInit();
-    return true;
-  }
+    bool Root::initObjects()
+    {
+        return true;
+    }
 
-  bool Root::initShaders()
-  {
-    shaders = new ShaderManager();
-    if(!(shaders->init()))
-      return false;
-    return true;
-  }
+    void Root::render()
+    {
+        glClearColor(0.0, 1.0, 0.0, 1.0);
+        glClear(GL_COLOR_BUFFER_BIT);
 
-  bool Root::initObjects()
-  {
-    return true;
-  }
-
-  void Root::render()
-  {
-    glClearColor(0.0, 1.0, 0.0, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glfwSwapBuffers();
-  }
+        glfwSwapBuffers();
+    }
 }

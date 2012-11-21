@@ -6,8 +6,12 @@ CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o
 CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o
  /home/jw/Code/Arya/src/../include/Root.h
  /home/jw/Code/Arya/src/../include/Shaders.h
+ /home/jw/Code/Arya/src/../include/common/Singleton.h
  /home/jw/Code/Arya/src/Root.cpp
 CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o
+ ../include/Files.h
+ ../include/Shaders.h
+ ../include/common/Singleton.h
  /home/jw/Code/Arya/src/Shaders.cpp
 CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.o
  /home/jw/Code/Arya/src/../include/Root.h
