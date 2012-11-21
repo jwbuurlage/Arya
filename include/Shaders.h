@@ -6,50 +6,60 @@ using std::vector;
 
 namespace Arya
 {
-  class AFile;
+    struct File;
 
-  enum ShaderType
-  {
-    VERTEX,
-    FRAGMENT
-  };
+    enum ShaderType
+    {
+        VERTEX,
+        FRAGMENT,
+        GEOMETRY
+    };
 
-  class Shader
-  {
-    public:
-      Shader(ShaderType _type) { type = _type; };
-      ~Shader() { };
+    class Shader
+    {
+        public:
+            Shader(ShaderType _type) { type = _type; };
+            ~Shader() { };
 
-      bool addSourceFile(string f);
-      bool compile();
+            // Adds a source file to the shader
+            bool addSourceFile(string f);
 
-    private:
-      bool compiled;
-      vector<AFile> sources;
-      ShaderType type;
-  };
+            // Compiles the Shader and sets its handle
+            bool compile();
 
-  class ShaderProgram
-  {
-    public:
-      ShaderProgram() { };
-      ~ShaderProgram() { };
+            // Returns the handle
+            GLuint getHandle() { return handle; };
 
-      void attach(Shader shader);
-      bool link();
-      bool use();
+        private:
+            GLuint handle;
+            bool compiled;
 
-    private:
-      int handle;
-      bool linked;
-  };
+            vector<File*> sources;
+            ShaderType type;
+    };
 
-  class ShaderManager
-  {
-    public:
-      ShaderManager() { };
-      ~ShaderManager() { };
+    class ShaderProgram
+    {
+        public:
+            ShaderProgram() { };
+            ~ShaderProgram() { };
 
-      bool init();
-  };
+            bool init();
+            void attach(Shader* shader);
+            bool link();
+            bool use();
+
+        private:
+            GLuint handle;
+            bool linked;
+    };
+
+    class ShaderManager
+    {
+        public:
+            ShaderManager() { };
+            ~ShaderManager() { };
+
+            bool init();
+    };
 }
