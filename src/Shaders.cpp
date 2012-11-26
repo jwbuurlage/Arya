@@ -49,6 +49,8 @@ namespace Arya
             const GLint pSize  = sources[0]->getSize();
             glShaderSource(shaderHandle, 1, &pFile, &pSize);
 
+            glCompileShader(shaderHandle);
+
             GLint result;
             glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &result);
             if(result == GL_FALSE)
@@ -100,10 +102,13 @@ namespace Arya
     bool ShaderProgram::init()
     {
         GLuint programHandle = glCreateProgram();
-        if(programHandle == 0)
-        {
-            cerr << "Error creating program" << endl; return false;
+        if(programHandle == 0) { 
+            cerr << "Error creating program" << endl; 
+            return false;
         }
+
+        handle = programHandle;
+
 
         return true;
     }
@@ -118,7 +123,7 @@ namespace Arya
         glLinkProgram(handle);
 
         GLint result;
-        glGetShaderiv(handle, GL_COMPILE_STATUS, &result);
+        glGetProgramiv(handle, GL_LINK_STATUS, &result);
         if(result == GL_FALSE)
         {
             cerr << "Error linking program, log:" << endl;
@@ -135,7 +140,7 @@ namespace Arya
 
             return false;
         }
-        return false;
+        return true;
     }
 
     void ShaderProgram::use()
