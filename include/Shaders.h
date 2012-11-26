@@ -61,26 +61,4 @@ namespace Arya
             bool linked;
             string name;
     };
-
-    class ShaderManager : public Singleton<ShaderManager>
-    {
-        public:
-            ShaderManager() { };
-            ~ShaderManager() { };
-
-            void setActiveProgram(string name);
-            ShaderProgram* active();
-
-            bool init();
-
-        private:
-            friend class ShaderProgram;
-
-            void registerProgram(ShaderProgram* prog);
-            void unregisterProgram(ShaderProgram* prog);
-
-            ShaderProgram* activeProgram;
-            typedef map<string, ShaderProgram*> ProgramContainer;
-            ProgramContainer programs;
-    };
 }

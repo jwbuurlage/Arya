@@ -141,12 +141,84 @@ CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o.provides: CMakeFiles/Ary
 
 CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o.provides.build: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o
 
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.o: CMakeFiles/Arya.dir/flags.make
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.o: /home/jw/Code/Arya/src/Scene.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/jw/Code/Arya/build/CMakeFiles $(CMAKE_PROGRESS_5)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.o -c /home/jw/Code/Arya/src/Scene.cpp
+
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/jw/Code/Arya/src/Scene.cpp > CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.i
+
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/jw/Code/Arya/src/Scene.cpp -o CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.s
+
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.o.requires:
+.PHONY : CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.o.requires
+
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.o.provides: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.o.requires
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.o.provides.build
+.PHONY : CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.o.provides
+
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.o.provides.build: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.o
+
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.o: CMakeFiles/Arya.dir/flags.make
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.o: /home/jw/Code/Arya/src/Files.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/jw/Code/Arya/build/CMakeFiles $(CMAKE_PROGRESS_6)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.o -c /home/jw/Code/Arya/src/Files.cpp
+
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/jw/Code/Arya/src/Files.cpp > CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.i
+
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/jw/Code/Arya/src/Files.cpp -o CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.s
+
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.o.requires:
+.PHONY : CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.o.requires
+
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.o.provides: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.o.requires
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.o.provides.build
+.PHONY : CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.o.provides
+
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.o.provides.build: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.o
+
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.o: CMakeFiles/Arya.dir/flags.make
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.o: /home/jw/Code/Arya/src/common/Logger.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/jw/Code/Arya/build/CMakeFiles $(CMAKE_PROGRESS_7)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.o -c /home/jw/Code/Arya/src/common/Logger.cpp
+
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/jw/Code/Arya/src/common/Logger.cpp > CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.i
+
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/jw/Code/Arya/src/common/Logger.cpp -o CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.s
+
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.o.requires:
+.PHONY : CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.o.requires
+
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.o.provides: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.o.requires
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.o.provides.build
+.PHONY : CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.o.provides
+
+CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.o.provides.build: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.o
+
 # Object files for target Arya
 Arya_OBJECTS = \
 "CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp.o" \
 "CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o" \
 "CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o" \
-"CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o"
+"CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o" \
+"CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.o" \
+"CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.o" \
+"CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.o"
 
 # External object files for target Arya
 Arya_EXTERNAL_OBJECTS =
@@ -155,6 +227,9 @@ Arya_EXTERNAL_OBJECTS =
 /home/jw/Code/Arya/bin/Arya: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o
 /home/jw/Code/Arya/bin/Arya: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o
 /home/jw/Code/Arya/bin/Arya: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o
+/home/jw/Code/Arya/bin/Arya: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.o
+/home/jw/Code/Arya/bin/Arya: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.o
+/home/jw/Code/Arya/bin/Arya: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.o
 /home/jw/Code/Arya/bin/Arya: CMakeFiles/Arya.dir/build.make
 /home/jw/Code/Arya/bin/Arya: CMakeFiles/Arya.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking CXX executable /home/jw/Code/Arya/bin/Arya"
@@ -168,6 +243,9 @@ CMakeFiles/Arya.dir/requires: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/main.cpp
 CMakeFiles/Arya.dir/requires: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o.requires
 CMakeFiles/Arya.dir/requires: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o.requires
 CMakeFiles/Arya.dir/requires: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o.requires
+CMakeFiles/Arya.dir/requires: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.o.requires
+CMakeFiles/Arya.dir/requires: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.o.requires
+CMakeFiles/Arya.dir/requires: CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.o.requires
 .PHONY : CMakeFiles/Arya.dir/requires
 
 CMakeFiles/Arya.dir/clean:

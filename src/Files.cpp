@@ -1,6 +1,8 @@
 #include "Files.h"
 #include <fstream>
 #include <algorithm>
+#include <iostream>
+#include "common/Logger.h"
 
 using std::ifstream;
 
@@ -66,6 +68,7 @@ namespace Arya
 
 	File* FileSystem::getFile(string filename)
 	{
+        LOG_INFO("Loading file: " << filename);
 		string formattedFilename(filename);
 		//Note: only works for ascii strings:
 		//Unix filenames are case-sensitive
@@ -88,6 +91,7 @@ namespace Arya
 		ifstream filestream;
 		filestream.open( path.c_str(), std::ios::binary );
 		if( filestream.is_open() == false ){
+            LOG_WARNING("File: " << path << " not found!");
 			return 0;
 		}
 

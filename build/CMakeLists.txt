@@ -24,6 +24,9 @@ SET(
   "../src/Root.cpp"
   "../src/Shaders.cpp"
   "../src/Objects.cpp"
+  "../src/Scene.cpp"
+  "../src/Files.cpp"
+  "../src/common/Logger.cpp"
   )
 
 SET(

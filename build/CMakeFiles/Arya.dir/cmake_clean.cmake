@@ -3,6 +3,9 @@ FILE(REMOVE_RECURSE
   "CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.o"
   "CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.o"
   "CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Objects.cpp.o"
+  "CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.o"
+  "CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.o"
+  "CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.o"
   "/home/jw/Code/Arya/bin/Arya.pdb"
   "/home/jw/Code/Arya/bin/Arya"
 )

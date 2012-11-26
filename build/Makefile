@@ -111,6 +111,30 @@ Arya/fast:
 	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/build
 .PHONY : Arya/fast
 
+home/jw/Code/Arya/src/Files.o: home/jw/Code/Arya/src/Files.cpp.o
+.PHONY : home/jw/Code/Arya/src/Files.o
+
+# target to build an object file
+home/jw/Code/Arya/src/Files.cpp.o:
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.o
+.PHONY : home/jw/Code/Arya/src/Files.cpp.o
+
+home/jw/Code/Arya/src/Files.i: home/jw/Code/Arya/src/Files.cpp.i
+.PHONY : home/jw/Code/Arya/src/Files.i
+
+# target to preprocess a source file
+home/jw/Code/Arya/src/Files.cpp.i:
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.i
+.PHONY : home/jw/Code/Arya/src/Files.cpp.i
+
+home/jw/Code/Arya/src/Files.s: home/jw/Code/Arya/src/Files.cpp.s
+.PHONY : home/jw/Code/Arya/src/Files.s
+
+# target to generate assembly for a file
+home/jw/Code/Arya/src/Files.cpp.s:
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Files.cpp.s
+.PHONY : home/jw/Code/Arya/src/Files.cpp.s
+
 home/jw/Code/Arya/src/Objects.o: home/jw/Code/Arya/src/Objects.cpp.o
 .PHONY : home/jw/Code/Arya/src/Objects.o
 
@@ -159,6 +183,30 @@ home/jw/Code/Arya/src/Root.cpp.s:
 	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Root.cpp.s
 .PHONY : home/jw/Code/Arya/src/Root.cpp.s
 
+home/jw/Code/Arya/src/Scene.o: home/jw/Code/Arya/src/Scene.cpp.o
+.PHONY : home/jw/Code/Arya/src/Scene.o
+
+# target to build an object file
+home/jw/Code/Arya/src/Scene.cpp.o:
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.o
+.PHONY : home/jw/Code/Arya/src/Scene.cpp.o
+
+home/jw/Code/Arya/src/Scene.i: home/jw/Code/Arya/src/Scene.cpp.i
+.PHONY : home/jw/Code/Arya/src/Scene.i
+
+# target to preprocess a source file
+home/jw/Code/Arya/src/Scene.cpp.i:
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.i
+.PHONY : home/jw/Code/Arya/src/Scene.cpp.i
+
+home/jw/Code/Arya/src/Scene.s: home/jw/Code/Arya/src/Scene.cpp.s
+.PHONY : home/jw/Code/Arya/src/Scene.s
+
+# target to generate assembly for a file
+home/jw/Code/Arya/src/Scene.cpp.s:
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Scene.cpp.s
+.PHONY : home/jw/Code/Arya/src/Scene.cpp.s
+
 home/jw/Code/Arya/src/Shaders.o: home/jw/Code/Arya/src/Shaders.cpp.o
 .PHONY : home/jw/Code/Arya/src/Shaders.o
 
@@ -182,6 +230,30 @@ home/jw/Code/Arya/src/Shaders.s: home/jw/Code/Arya/src/Shaders.cpp.s
 home/jw/Code/Arya/src/Shaders.cpp.s:
 	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/Shaders.cpp.s
 .PHONY : home/jw/Code/Arya/src/Shaders.cpp.s
+
+home/jw/Code/Arya/src/common/Logger.o: home/jw/Code/Arya/src/common/Logger.cpp.o
+.PHONY : home/jw/Code/Arya/src/common/Logger.o
+
+# target to build an object file
+home/jw/Code/Arya/src/common/Logger.cpp.o:
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.o
+.PHONY : home/jw/Code/Arya/src/common/Logger.cpp.o
+
+home/jw/Code/Arya/src/common/Logger.i: home/jw/Code/Arya/src/common/Logger.cpp.i
+.PHONY : home/jw/Code/Arya/src/common/Logger.i
+
+# target to preprocess a source file
+home/jw/Code/Arya/src/common/Logger.cpp.i:
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.i
+.PHONY : home/jw/Code/Arya/src/common/Logger.cpp.i
+
+home/jw/Code/Arya/src/common/Logger.s: home/jw/Code/Arya/src/common/Logger.cpp.s
+.PHONY : home/jw/Code/Arya/src/common/Logger.s
+
+# target to generate assembly for a file
+home/jw/Code/Arya/src/common/Logger.cpp.s:
+	$(MAKE) -f CMakeFiles/Arya.dir/build.make CMakeFiles/Arya.dir/home/jw/Code/Arya/src/common/Logger.cpp.s
+.PHONY : home/jw/Code/Arya/src/common/Logger.cpp.s
 
 home/jw/Code/Arya/src/main.o: home/jw/Code/Arya/src/main.cpp.o
 .PHONY : home/jw/Code/Arya/src/main.o
@@ -216,15 +288,24 @@ help:
 	@echo "... Arya"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... home/jw/Code/Arya/src/Files.o"
+	@echo "... home/jw/Code/Arya/src/Files.i"
+	@echo "... home/jw/Code/Arya/src/Files.s"
 	@echo "... home/jw/Code/Arya/src/Objects.o"
 	@echo "... home/jw/Code/Arya/src/Objects.i"
 	@echo "... home/jw/Code/Arya/src/Objects.s"
 	@echo "... home/jw/Code/Arya/src/Root.o"
 	@echo "... home/jw/Code/Arya/src/Root.i"
 	@echo "... home/jw/Code/Arya/src/Root.s"
+	@echo "... home/jw/Code/Arya/src/Scene.o"
+	@echo "... home/jw/Code/Arya/src/Scene.i"
+	@echo "... home/jw/Code/Arya/src/Scene.s"
 	@echo "... home/jw/Code/Arya/src/Shaders.o"
 	@echo "... home/jw/Code/Arya/src/Shaders.i"
 	@echo "... home/jw/Code/Arya/src/Shaders.s"
+	@echo "... home/jw/Code/Arya/src/common/Logger.o"
+	@echo "... home/jw/Code/Arya/src/common/Logger.i"
+	@echo "... home/jw/Code/Arya/src/common/Logger.s"
 	@echo "... home/jw/Code/Arya/src/main.o"
 	@echo "... home/jw/Code/Arya/src/main.i"
 	@echo "... home/jw/Code/Arya/src/main.s"

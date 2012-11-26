@@ -26,34 +26,6 @@ common/Singleton.h
 
 ../include/common/Singleton.h
 
-/home/jw/Code/Arya/src/../include/Root.h
-
-/home/jw/Code/Arya/src/../include/Shaders.h
-string
--
-vector
--
-map
--
-common/Singleton.h
-/home/jw/Code/Arya/src/../include/common/Singleton.h
-
-/home/jw/Code/Arya/src/../include/common/Singleton.h
-
-/home/jw/Code/Arya/src/Root.cpp
-iostream
--
-GL/glew.h
--
-GL/glfw.h
--
-glm/glm.hpp
--
-../include/Root.h
-/home/jw/Code/Arya/src/../include/Root.h
-../include/Shaders.h
-/home/jw/Code/Arya/src/../include/Shaders.h
-
 /home/jw/Code/Arya/src/Shaders.cpp
 iostream
 -

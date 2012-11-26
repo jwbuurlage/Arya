@@ -11,8 +11,6 @@ using std::endl;
 
 namespace Arya
 {	
-    template<> ShaderManager* Singleton<ShaderManager>::singleton = 0;
-
     //---------------------------------------------------------
     // SHADER
     //---------------------------------------------------------
@@ -47,7 +45,9 @@ namespace Arya
                 default: cerr << "Error compiling shader: Invalid type." << endl; break;
             }
 
-            glShaderSource(shaderHandle, sources.size(), (const GLchar**)gl_sources, NULL);
+            const GLchar* pFile = sources[0]->getData();
+            const GLint pSize  = sources[0]->getSize();
+            glShaderSource(shaderHandle, 1, &pFile, &pSize);
 
             GLint result;
             glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &result);
@@ -64,6 +64,14 @@ namespace Arya
                     cerr << log << endl;
                     delete[] log;
                 }
+                else 
+                {
+                    cerr << "No Log available.." << endl;
+                }
+
+                glDeleteShader(shaderHandle);
+                compiled = false;
+                handle = 0;
 
                 return false;
             }
@@ -82,13 +90,11 @@ namespace Arya
     ShaderProgram::ShaderProgram(string name)
     {
         init();
-        ShaderManager::shared().registerProgram(this);
         this->name = name;
     }
 
-    ShaderProgram::~ShaderProgram()
-    {
-        ShaderManager::shared().unregisterProgram(this);
+    ShaderProgram::~ShaderProgram() { 
+        glDeleteShader(handle);
     }
 
     bool ShaderProgram::init()
@@ -135,39 +141,5 @@ namespace Arya
     void ShaderProgram::use()
     {
         glUseProgram(handle);
-    }
-
-    //---------------------------------------------------------
-    // SHADERMANAGER
-    //---------------------------------------------------------
-
-    bool ShaderManager::init()
-    {
-        return true;
-    }
-
-    void ShaderManager::setActiveProgram(string name)
-    {
-        ProgramContainer::iterator it  = programs.find(name);
-        if(it == programs.end()) return;
-
-        activeProgram = it->second;
-        activeProgram->use();
-    }
-
-    void ShaderManager::registerProgram(ShaderProgram* prog)
-    {
-        ProgramContainer::iterator it  = programs.find(prog->getName());
-        if(it == programs.end())
-            programs[prog->getName()] = prog;
-        else 
-            cerr << "Already know a program named " << prog->getName() << endl;
-    }
-
-    void ShaderManager::unregisterProgram(ShaderProgram* prog)
-    {
-        ProgramContainer::iterator it  = programs.find(prog->getName());
-        if(it != programs.end())
-            programs.erase(it);
     }
 }

@@ -1,6 +1,9 @@
+#pragma once
+
+
 namespace Arya
 {
-    class ShaderManager;
+    class Scene;
 
     class Root
     {
@@ -16,7 +19,6 @@ namespace Arya
             bool initGLEW();
             bool initShaders();
             bool initObjects();
-
-            ShaderManager* shaders;
+            Scene* scene;
     };
 }

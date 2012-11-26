@@ -16,11 +16,11 @@
 #endif
 
 //Note: the ; at the end is left out so that you can use this as a function with a ; at the end:  LOG_WARNING("Hello");
-#define LOG_WARNING(MSG)		Arya::Logger::getSingleton() << Arya::Logger::WARNING		<< MSG << Arya::endLog
-#define LOG_ERROR(MSG)			Arya::Logger::getSingleton() << Arya::Logger::ERROR		<< MSG << Arya::endLog
-#define LOG_CRITICALERROR(MSG)	Arya::Logger::getSingleton() << Arya::Logger::CRITICALERROR	<< MSG << Arya::endLog
-#define LOG_INFO(MSG)			Arya::Logger::getSingleton() << Arya::Logger::INFO		<< MSG << Arya::endLog
-#define LOG_DEBUG(MSG)			Arya::Logger::getSingleton() << Arya::Logger::DEBUG		<< MSG << Arya::endLog
+#define LOG_WARNING(MSG)		Arya::Logger::shared() << Arya::Logger::WARNING		<< MSG << Arya::endLog
+#define LOG_ERROR(MSG)			Arya::Logger::shared() << Arya::Logger::ERROR		<< MSG << Arya::endLog
+#define LOG_CRITICALERROR(MSG)	Arya::Logger::shared() << Arya::Logger::CRITICALERROR	<< MSG << Arya::endLog
+#define LOG_INFO(MSG)			Arya::Logger::shared() << Arya::Logger::INFO		<< MSG << Arya::endLog
+#define LOG_DEBUG(MSG)			Arya::Logger::shared() << Arya::Logger::DEBUG		<< MSG << Arya::endLog
 
 namespace Arya
 {
