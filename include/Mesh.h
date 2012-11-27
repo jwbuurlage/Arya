@@ -1,3 +1,5 @@
+#pragma once
+
 #include <GL/glew.h>
 
 namespace Arya
@@ -6,13 +8,19 @@ namespace Arya
     {
         public:
             Mesh();
-            ~Mesh();
+            ~Mesh() { };
 
-            GLfloat* getVertexData() { return vertexData; }
-            GLuint getVertexDataSize() { return vertexDataSize; }
+            GLuint getVertexBuffer() { return vertexBuffer; }
+            GLuint getColorBuffer() { return colorBuffer; }
+            GLsizei getVertexCount() { return vertexCount; }
+            GLenum getPrimitiveType() { return primitiveType; }
 
-        private:
-            GLfloat* vertexData;
-            GLuint vertexDataSize;
+        protected:
+            GLuint vertexBuffer;
+            GLuint colorBuffer;
+            GLsizei vertexCount;
+            GLenum primitiveType;
+
+            bool hasColor;
     };
 }

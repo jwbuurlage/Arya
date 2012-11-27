@@ -26,6 +26,8 @@ SET(
   "../src/Objects.cpp"
   "../src/Scene.cpp"
   "../src/Files.cpp"
+  "../src/Primitives.cpp"
+  "../src/Mesh.cpp"
   "../src/common/Logger.cpp"
   )
 

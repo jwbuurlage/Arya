@@ -4,7 +4,11 @@ namespace Arya
 {
     Mesh::Mesh()
     {
-        vertexData = 0;
-        vertexDataSize = 0;
+        vertexBuffer = 0;
+        colorBuffer = 0;
+        vertexCount = 0;
+        primitiveType = 0;
+
+        hasColor = false;
     }
 }

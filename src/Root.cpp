@@ -66,7 +66,6 @@ namespace Arya
 
     bool Root::initShaders()
     {
-        cerr << "loading shaders" << endl;
         Shader* vertex = new Shader(VERTEX);
         if(!(vertex->addSourceFile("../shaders/basic.vert"))) return false;
         if(!(vertex->compile())) return false;
@@ -80,7 +79,6 @@ namespace Arya
         basicProgram->attach(fragment);
         if(!(basicProgram->link())) return false;
         basicProgram->use();
-        cerr << "finished loading shaders" << endl;
 
         return true;
     }
@@ -92,7 +90,7 @@ namespace Arya
 
     void Root::render()
     {
-        glClearColor(0.0, 1.0, 0.0, 1.0);
+        glClearColor(0.0, 0.0, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
         scene->render();

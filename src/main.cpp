@@ -7,9 +7,12 @@ using Arya::Root;
 
 int main()
 {
-  Root* root = new Root;
-  if(!(root->init()))
-    cerr << "Could not init *root*, closing" << endl; 
+    Root* root = new Root;
+    if(!(root->init())) {
+        cerr << "Could not init *root*, closing" << endl; 
+    }
 
-  return 0;
+    delete root;
+
+    return 0;
 }
