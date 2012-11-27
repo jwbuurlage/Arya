@@ -1,6 +1,8 @@
+#version 400
+
 in vec3 Color;
 
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 void main()
 {

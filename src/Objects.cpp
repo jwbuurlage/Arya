@@ -2,13 +2,5 @@
 
 namespace Arya
 {
-    StaticObject::StaticObject() : Object()
-    {
 
-    }
-
-    StaticObject::~StaticObject() 
-    {
-
-    }
 }
