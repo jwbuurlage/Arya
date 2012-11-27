@@ -20,10 +20,5 @@ namespace Arya
             GLuint vaoHandle;
     };
 
-    class StaticObject : public Object
-    {
-        public:
-            StaticObject();
-            ~StaticObject();
-    };
+    typedef Object StaticObject;
 }

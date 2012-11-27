@@ -15,18 +15,18 @@ namespace Arya
     {
         // Vertices
         GLfloat triangleVertices[] = {
-            -1.0f, 0.0f, 0.0f,
+            1.0f, -1.0f, 0.0f,
             0.0f, 1.0f, 0.0f,
-            1.0f, 0.0f, 0.0f
+            -1.0f, -1.0f, 0.0f
         };
 
-        vertexCount = 9;
+        vertexCount = 3;
         primitiveType = GL_TRIANGLES;
 
         glGenBuffers(1, &vertexBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
         glBufferData(GL_ARRAY_BUFFER,
-                vertexCount * sizeof(GLfloat),
+                vertexCount * 3 * sizeof(GLfloat),
                 triangleVertices,
                 GL_STATIC_DRAW);
 
@@ -40,7 +40,7 @@ namespace Arya
         glGenBuffers(1, &colorBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
         glBufferData(GL_ARRAY_BUFFER,
-                vertexCount * sizeof(GLfloat),
+                vertexCount * 3 * sizeof(GLfloat),
                 triangleColors,
                 GL_STATIC_DRAW);
 
@@ -61,6 +61,8 @@ namespace Arya
     void ColoredTriangle::makeVAO()
     {
         glGenVertexArrays(1, &vaoHandle);
+        glBindVertexArray(vaoHandle);
+
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
 
@@ -68,5 +70,6 @@ namespace Arya
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLubyte*)NULL);
 
         glBindBuffer(GL_ARRAY_BUFFER, meshes[0]->getColorBuffer());
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLubyte*)NULL);   }
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLubyte*)NULL);   
+    }
 }
