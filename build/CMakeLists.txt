@@ -28,6 +28,7 @@ SET(
   "../src/Files.cpp"
   "../src/Primitives.cpp"
   "../src/Mesh.cpp"
+  "../src/Camera.cpp"
   "../src/common/Logger.cpp"
   )
 
