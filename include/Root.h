@@ -54,8 +54,6 @@ namespace Arya
         private:
             bool initGLFW();
             bool initGLEW();
-            bool initShaders();
-            bool initObjects();
             Scene* scene;
 
             int desktopWidth, desktopHeight;

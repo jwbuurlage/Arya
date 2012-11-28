@@ -13,6 +13,7 @@ namespace Arya
     class Object;
     class Terrain;
     class Camera;
+    class ShaderProgram;
 
     class Scene
     {
@@ -21,6 +22,7 @@ namespace Arya
             ~Scene();
 
             bool init();
+            bool initShaders();
             void cleanup();
             void render();
             Camera* getCamera() { return camera; };
@@ -29,5 +31,7 @@ namespace Arya
             vector<Object*> objects;
             Terrain* terrain;
             Camera* camera;
+
+            ShaderProgram* basicProgram;
     };
 }

@@ -8,6 +8,7 @@
 #include "Terrain.h"
 #include "Textures.h"
 #include "Camera.h"
+#include "Shaders.h"
 
 using std::string;
 using std::cerr;
@@ -29,6 +30,8 @@ namespace Arya
 
     bool Scene::init()
     {
+        if(!initShaders()) return false;
+
         ColoredTriangle* cTri = new ColoredTriangle;
         objects.push_back(cTri);
 
@@ -46,6 +49,24 @@ namespace Arya
         return true;
     }
 
+    bool Scene::initShaders()
+    {
+        Shader* vertex = new Shader(VERTEX);
+        if(!(vertex->addSourceFile("../shaders/basic.vert"))) return false;
+        if(!(vertex->compile())) return false;
+
+        Shader* fragment = new Shader(FRAGMENT);
+        if(!(fragment->addSourceFile("../shaders/basic.frag"))) return false;
+        if(!(fragment->compile())) return false;
+
+        basicProgram = new ShaderProgram("basic");
+        basicProgram->attach(vertex);
+        basicProgram->attach(fragment);
+        if(!(basicProgram->link())) return false;
+
+        return true;
+    }
+
     void Scene::cleanup()
     {
         if(camera) delete camera;
@@ -56,12 +77,14 @@ namespace Arya
 
     void Scene::render()
     {
+        basicProgram->use();
+
         for(int i = 0; i < objects.size(); ++i)
         {
             glBindVertexArray(objects[i]->getVAO());
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
 
-        terrain->render();
+        // terrain->render();
     }
 }

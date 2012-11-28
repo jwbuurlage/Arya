@@ -45,12 +45,9 @@ namespace Arya
 
     bool Root::init(bool fullscr)
     {
-        fullscreen = fullscr;
+        fullscreen = fullscr; //lol
         if(!initGLFW()) return false;
         if(!initGLEW()) return false;
-
-        if(!initShaders()) return false;
-        if(!initObjects()) return false;
 
         scene = new Scene();
 
@@ -135,30 +132,6 @@ namespace Arya
     bool Root::initGLEW()
     {
         glewInit();
-        return true;
-    }
-
-    bool Root::initShaders()
-    {
-        Shader* vertex = new Shader(VERTEX);
-        if(!(vertex->addSourceFile("../shaders/basic.vert"))) return false;
-        if(!(vertex->compile())) return false;
-
-        Shader* fragment = new Shader(FRAGMENT);
-        if(!(fragment->addSourceFile("../shaders/basic.frag"))) return false;
-        if(!(fragment->compile())) return false;
-
-        ShaderProgram* basicProgram = new ShaderProgram("basic");
-        basicProgram->attach(vertex);
-        basicProgram->attach(fragment);
-        if(!(basicProgram->link())) return false;
-        basicProgram->use();
-
-        return true;
-    }
-
-    bool Root::initObjects()
-    {
         return true;
     }
 
