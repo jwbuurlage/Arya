@@ -8,18 +8,20 @@ using std::string;
 using std::vector;
 using std::map;
 
-class Object;
-class Terrain;
-
 namespace Arya
 {
+    class Object;
+    class Terrain;
+    class Camera;
+
     class Scene
     {
         public:
             Scene();
-            ~Scene() { };
+            ~Scene();
 
             bool init();
+            void cleanup();
             void render();
             Camera* getCamera() { return camera; };
 
