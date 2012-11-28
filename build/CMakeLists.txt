@@ -30,6 +30,8 @@ SET(
     "../src/Primitives.cpp"
     "../src/Mesh.cpp"
     "../src/Camera.cpp"
+    "../src/Terrain.cpp"
+    "../src/Textures.cpp"
     "../src/common/Logger.cpp"
     )
 

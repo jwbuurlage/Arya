@@ -5,6 +5,7 @@
 #include "Primitives.h"
 #include "Scene.h"
 #include "Terrain.h"
+#include "Textures.h"
 #include "Camera.h"
 
 using std::string;
@@ -30,10 +31,10 @@ namespace Arya
         ColoredTriangle* cTri = new ColoredTriangle;
         objects.push_back(cTri);
 
-        if( terrain ) delete terrain;
-        terrain = new Terrain(0,0,0);
+        if(terrain) delete terrain;
+        terrain = new Terrain(TextureManager::shared().getTexture("heightmap.tga"),0,0);
 
-        if( camera ) delete camera;
+        if(camera) delete camera;
         camera = new Camera;
 
         return true;
@@ -41,9 +42,9 @@ namespace Arya
 
     void Scene::cleanup()
     {
-        if( camera ) delete camera;
+        if(camera) delete camera;
         camera = 0;
-        if( terrain ) delete terrain;
+        if(terrain) delete terrain;
         terrain = 0;
     }
 
@@ -55,6 +56,6 @@ namespace Arya
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
 
-        terrain->render();
+        //terrain->render();
     }
 }

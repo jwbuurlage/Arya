@@ -3,8 +3,9 @@
 #include <GL/glew.h>
 #include <GL/glfw.h>
 
-#include "../include/Root.h"
-#include "../include/Shaders.h"
+#include "Root.h"
+#include "Shaders.h"
+#include "Textures.h"
 #include "Scene.h"
 #include "Files.h"
 #include "common/Logger.h"
@@ -28,6 +29,7 @@ namespace Arya
     {
         Logger* log = new Logger();
         FileSystem* files = new FileSystem();
+        TextureManager* tex = new TextureManager();
     }
 
     Root::~Root()
@@ -38,6 +40,7 @@ namespace Arya
 
         delete &FileSystem::shared();
         delete &Logger::shared();
+        delete &TextureManager::shared();
     }
 
     bool Root::init(bool fullscr)

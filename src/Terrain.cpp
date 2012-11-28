@@ -7,6 +7,7 @@
 #include "Shaders.h"
 #include "Scene.h"
 #include "Camera.h"
+#include "Textures.h"
 
 using glm::log;
 using glm::vec3;
@@ -66,14 +67,14 @@ namespace Arya
         patchCount = 16; // 16 x 16 grid
         patchSizeMax = (w-1)/patchCount + 1; // default: 1024/16 + 1 = 65x65
 
-        GLfloat* vertexData = new GLfloat(patchSizeMax*patchSizeMax * 2);
+        GLfloat* vertexData = new GLfloat[patchSizeMax*patchSizeMax * 2];
 
         float perVertex = 1.0f / (patchSizeMax - 1);
 
         for(int i = 0; i < patchSizeMax; ++i) 
             for(int j = 0; j < patchSizeMax; ++j) {
-                vertexData[2*i + 0] = i*perVertex;
-                vertexData[2*i + 1] = j*perVertex;
+                vertexData[2*i*patchSizeMax + 2*j + 0] = i*perVertex;
+                vertexData[2*i*patchSizeMax + 2*j + 1] = j*perVertex;
             }
 
         glGenBuffers(1, &vertexBuffer);
@@ -89,8 +90,8 @@ namespace Arya
         for(int i = 0; i < patchCount; ++i)
             for(int j = 0; j < patchCount; ++j) {
                 Patch p;
-                p.position = vec2(-w/2, -h/2);
                 p.offset = vec2(j*(patchCount - 1), i*(patchCount - 1));
+                p.position = vec2(-w/2 + (w-1)/patchCount*j, -h/2+ (h-1)/patchCount*j);
                 p.lod = 0;
                 patches.push_back(p);
             }
@@ -104,13 +105,14 @@ namespace Arya
         // level 0: patchSizeMax^2
         // ...
         // level levels: 1^2
-        int levels = log(patchSizeMax-1, 2);
+
+        int levels = log((float)(patchSizeMax-1), 2.0f);
         LOG_INFO("levels: " << levels);
 
-        GLuint* indexBuffers = new GLuint(levels);
-        GLuint* indexCount = new GLuint(levels);
+        GLuint* indexBuffers = new GLuint[levels];
+        GLuint* indexCount = new GLuint[levels];
 
-        GLuint* indices = new GLuint(patchSizeMax * patchSizeMax * 2);
+        GLuint* indices = new GLuint[patchSizeMax * patchSizeMax * 2];
 
         for(int l = 0; l < levels; ++l)
         {
@@ -151,7 +153,7 @@ namespace Arya
                 p.lod = 0;
             else if(distance(pPos, camPos) < 40.0f)
                 p.lod = 1;
-            else 
+            else
                 p.lod = 2;
         }
     }
@@ -163,10 +165,19 @@ namespace Arya
     void Terrain::render()
     {
         terrainProgram->use();
+        terrainProgram->setUniform1i("heightMap", 0);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, heightMap->handle);
+
         glBindVertexArray(vertexBuffer);
         for(int i = 0; i < patches.size(); ++i) {
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[patches[i].lod]);
-            glDrawElements(GL_TRIANGLE_STRIP, indexCount[patches[i].lod], GL_UNSIGNED_INT, (void*)0);
+            Patch p = patches[i];
+            terrainProgram->setUniform2fv("patchOffset", p.offset);
+            terrainProgram->setUniform2fv("patchPosition", p.position);
+
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[i]);
+            glDrawElements(GL_TRIANGLE_STRIP, indexCount[p.lod], GL_UNSIGNED_INT, (void*)0);
         }
     }
 }
