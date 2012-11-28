@@ -113,6 +113,8 @@ namespace Arya
         GLuint* indexBuffers = new GLuint[levels];
         GLuint* indexCount = new GLuint[levels];
 
+        glGenBuffers(levels, indexBuffers);
+
         GLuint* indices = new GLuint[patchSizeMax * (patchSizeMax-1) * 2];
 
         for(int l = 0; l < levels; ++l)
