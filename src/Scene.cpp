@@ -5,6 +5,7 @@
 #include "Primitives.h"
 #include "Scene.h"
 #include "Terrain.h"
+#include "Camera.h"
 
 using std::string;
 using std::cerr;
@@ -14,7 +15,14 @@ namespace Arya
 {	
     Scene::Scene()
     {
+        terrain = 0;
+        camera = 0;
         init();
+    }
+
+    Scene::~Scene()
+    {
+        cleanup();
     }
 
     bool Scene::init()
@@ -22,8 +30,21 @@ namespace Arya
         ColoredTriangle* cTri = new ColoredTriangle;
         objects.push_back(cTri);
 
-        terrain = new Terrain(, , );
+        if( terrain ) delete terrain;
+        terrain = new Terrain(0,0,0);
+
+        if( camera ) delete camera;
+        camera = new Camera;
+
         return true;
+    }
+
+    void Scene::cleanup()
+    {
+        if( camera ) delete camera;
+        camera = 0;
+        if( terrain ) delete terrain;
+        terrain = 0;
     }
 
     void Scene::render()

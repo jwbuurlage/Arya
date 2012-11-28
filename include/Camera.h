@@ -46,7 +46,8 @@ namespace Arya
 
             //called by Renderer every frame
             //it will generate a new matrix if it changed
-            //if nothing changed it will not change outMatrix
+            //the matrix will be copied to outMatrix
+            //if the argument is not zero
             //returns if it updated
             bool updateViewMatrix(mat4* outMatrix);
             bool updateMatrix;
@@ -57,6 +58,7 @@ namespace Arya
 
         private:
             vec3 position; //look-at-position. Actual camera is 'zoomed out' from here
+            mat4 viewMatrix;
             float yaw, pitch;
             float camDist; //Zoom. Higher means further away
             float minCamDist;
