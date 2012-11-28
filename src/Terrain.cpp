@@ -107,31 +107,32 @@ namespace Arya
         // ...
         // level levels: 1^2
 
-        int levels = log((float)(patchSizeMax-1), 2.0f);
+        int levels = log((float)(patchSizeMax-1), 2.0f) + 1;
         LOG_INFO("levels: " << levels);
 
         GLuint* indexBuffers = new GLuint[levels];
         GLuint* indexCount = new GLuint[levels];
 
-        GLuint* indices = new GLuint[patchSizeMax * patchSizeMax * 2];
+        GLuint* indices = new GLuint[patchSizeMax * (patchSizeMax-1) * 2];
 
         for(int l = 0; l < levels; ++l)
         {
             int c = 0;
             int levelSize = (patchSizeMax-1)/(1 << l) + 1;
-            indexCount[l] = levelSize * levelSize * 2;
+            indexCount[l] = levelSize * (levelSize-1) * 2;
             // level l
-            for(int j = 0; j < levelSize; j += 1 << l)
-                if(j % 2 == 0)
-                    for(int i = 0; i < levelSize; i += 1 << l) {
-                        indices[c++] = j*levelSize + i;
-                        indices[c++] = (j+1)*levelSize + i;
+            int row = 0;
+            for(int j = 0; j < patchSizeMax - 1; j += 1 << l)
+                if(row++ % 2 == 0)
+                    for(int i = 0; i < patchSizeMax; i += 1 << l) {
+                        indices[c++] = j*patchSizeMax + i;
+                        indices[c++] = (j+(1 << l))*patchSizeMax + i;
                     }
                 else
-                    for(int i = 0; i < levelSize; i += 1 << l) {
-                        indices[c++] = j*levelSize + levelSize - i;
-                        indices[c++] = (j+1)*levelSize + levelSize - i;
-                    }
+                    for(int i = 0; i < patchSizeMax; i += 1 << l) {
+                        indices[c++] = j*patchSizeMax + patchSizeMax - 1 - i;
+                        indices[c++] = (j+(1 << l))*patchSizeMax + patchSizeMax - 1 - i;
+                   }
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[l]);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER,
@@ -179,7 +180,7 @@ namespace Arya
             terrainProgram->setUniform2fv("patchOffset", p.offset);
             terrainProgram->setUniform2fv("patchPosition", p.position);
 
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[i]);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[p.lod]);
             glDrawElements(GL_TRIANGLE_STRIP, indexCount[p.lod], GL_UNSIGNED_INT, (void*)0);
         }
     }
