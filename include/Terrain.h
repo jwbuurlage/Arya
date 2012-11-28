@@ -14,7 +14,7 @@ namespace Arya
 
     typedef struct
     {
-        vec3 position;
+        vec2 position;
         vec2 offset;
         int lod;
     } Patch;

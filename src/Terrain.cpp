@@ -1,9 +1,12 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+#include <glm/gtx/log_base.hpp>
 
 #include "common/Logger.h"
 #include "Terrain.h"
 #include "Shaders.h"
+
+using glm::log;
 
 namespace Arya
 {
@@ -56,18 +59,43 @@ namespace Arya
         }
 
         patchCount = 16; // 16 x 16 grid
-        int perPatch = (w-1)/patchCount + 1; // default: 1024/16 + 1 = 65x65
+        patchSizeMax = (w-1)/patchCount + 1; // default: 1024/16 + 1 = 65x65
 
-        GLfloat* vertexData = new GLfloat(perPatch*perPatch * 2);
+        GLfloat* vertexData = new GLfloat(patchSizeMax*patchSizeMax * 2);
 
-        for(int i = 0; i < perPatch; ++i) {
-            vertexData[2*i + 0] = 0.0;
-            vertexData[2*i + 1] = 0.0;
-        }
+        float perVertex = 1.0f / (patchSizeMax - 1);
+
+        for(int i = 0; i < patchSizeMax; ++i) 
+            for(int j = 0; j < patchSizeMax; ++j) {
+                vertexData[2*i + 0] = i*perVertex;
+                vertexData[2*i + 1] = j*perVertex;
+            }
+
+        glGenBuffers(1, &vertexBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+        glBufferData(GL_ARRAY_BUFFER, 
+                sizeof(GLfloat) * patchSizeMax*patchSizeMax * 2, 
+                vertexData,
+                GL_STATIC_DRAW);
+
+        delete[] vertexData;
+
+        // patches
+        for(int i = 0; i < patchCount; ++i)
+            for(int j = 0; j < patchCount; ++j) {
+                Patch p;
+                p.position = vec2(0.0, 0.0);
+                p.offset = vec2(0.0, 0.0);
+                p.lod = 0;
+                patches.push_back(p);
+            }
+
+        generateIndices();
     }
 
     void Terrain::generateIndices()
     {
         // make indices for all possibilities
+        int levels = log(patchSizeMax-1, 2);
     }
 }
