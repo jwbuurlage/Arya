@@ -42,7 +42,7 @@ namespace Arya
             void rotateCamera(float Yaw, float Pitch); //Add yaw/pitch to current angle
             void setCameraAngle(float Yaw, float Pitch);
 
-            //vec3 GetRealCameraPosition();
+            vec3 getRealCameraPosition();
 
             //called by Renderer every frame
             //it will generate a new matrix if it changed

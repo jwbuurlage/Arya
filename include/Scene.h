@@ -9,6 +9,7 @@ using std::vector;
 using std::map;
 
 class Object;
+class Terrain;
 
 namespace Arya
 {
@@ -20,8 +21,11 @@ namespace Arya
 
             bool init();
             void render();
+            Camera* getCamera() { return camera; };
 
         private:
             vector<Object*> objects;
+            Terrain* terrain;
+            Camera* camera;
     };
 }
