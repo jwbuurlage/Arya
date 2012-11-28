@@ -4,6 +4,7 @@
 
 #include "Primitives.h"
 #include "Scene.h"
+#include "Terrain.h"
 
 using std::string;
 using std::cerr;
@@ -20,6 +21,8 @@ namespace Arya
     {
         ColoredTriangle* cTri = new ColoredTriangle;
         objects.push_back(cTri);
+
+        terrain = new Terrain(, , );
         return true;
     }
 
@@ -30,5 +33,7 @@ namespace Arya
             glBindVertexArray(objects[i]->getVAO());
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
+
+        terrain->render();
     }
 }

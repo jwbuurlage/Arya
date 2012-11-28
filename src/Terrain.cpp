@@ -5,8 +5,12 @@
 #include "common/Logger.h"
 #include "Terrain.h"
 #include "Shaders.h"
+#include "Scene.h"
+#include "Camera.h"
 
 using glm::log;
+using glm::vec3;
+using glm::distance;
 
 namespace Arya
 {
@@ -40,7 +44,6 @@ namespace Arya
         terrainProgram->attach(terrainVertex);
         terrainProgram->attach(terrainFragment);
         if(!(terrainProgram->link())) return false;
-        terrainProgram->use();
 
         return true;
     }
@@ -96,6 +99,73 @@ namespace Arya
     void Terrain::generateIndices()
     {
         // make indices for all possibilities
+        // level 0: patchSizeMax^2
+        // ...
+        // level levels: 1^2
         int levels = log(patchSizeMax-1, 2);
+        LOG_INFO("levels: " << levels);
+
+        GLuint* indexBuffers = new GLuint(levels);
+        GLuint* indexCount = new GLuint(levels);
+
+        GLuint* indices = new GLuint(patchSizeMax * patchSizeMax * 2);
+
+        for(int l = 0; l < levels; ++l)
+        {
+            int c = 0;
+            int levelSize = (patchSizeMax-1)/(1 << l) + 1;
+            indexCount[l] = levelSize * levelSize * 2;
+            // level l
+            for(int j = 0; j < levelSize; j += 1 << l)
+                if(j % 2 == 0)
+                    for(int i = 0; i < levelSize; i += 1 << l) {
+                        indices[c++] = j*levelSize + i;
+                        indices[c++] = (j+1)*levelSize + i;
+                    }
+                else
+                    for(int i = 0; i < levelSize; i += 1 << l) {
+                        indices[c++] = j*levelSize + levelSize - i;
+                        indices[c++] = (j+1)*levelSize + levelSize - i;
+                    }
+
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[l]);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                    sizeof(GLuint) * indexCount[l],
+                    indices,
+                    GL_STATIC_DRAW);
+        }
+
+        delete[] indices;
+    }
+
+    void Terrain::update(float dt, Scene* curScene)
+    {
+        // update patches LOD
+        vec3 camPos = curScene->getCamera()->getRealCameraPosition();
+        for(int i = 0; i < patches.size(); ++i) {
+            Patch p = patches[i];
+            vec3 pPos = vec3(p.position, 0.0);
+            if(distance(pPos, camPos) < 20.0f)
+                p.lod = 0;
+            else if(distance(pPos, camPos) < 40.0f)
+                p.lod = 1;
+            else 
+                p.lod = 2;
+        }
+
+    }
+
+    //---------------------------------------
+    // RENDER
+    //---------------------------------------
+
+    void Terrain::render()
+    {
+        terrainProgram->use();
+        glBindVertexArray(vertexBuffer);
+        for(int i = 0; i < patches.size(); ++i) {
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[0]);
+            glDrawElements(GL_TRIANGLE_STRIP, indexCount[0], GL_UNSIGNED_INT, (void*)0);
+        }
     }
 }

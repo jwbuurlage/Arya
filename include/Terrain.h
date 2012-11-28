@@ -11,6 +11,7 @@ namespace Arya
 {
     class Texture;
     class ShaderProgram;
+    class Scene;
 
     typedef struct
     {
@@ -26,6 +27,7 @@ namespace Arya
             ~Terrain(); 
 
             void render();
+            void update(float dt, Scene* curScene);
 
         private:
             bool init();
