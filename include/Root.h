@@ -49,6 +49,8 @@ namespace Arya
             void addFrameListener(FrameListener* listener);
             void removeFrameListener(FrameListener* listener);
 
+            Scene* getScene() const { return scene; }
+
         private:
             bool initGLFW();
             bool initGLEW();

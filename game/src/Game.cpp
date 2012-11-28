@@ -6,6 +6,7 @@ Game::Game()
     root = 0;
     goingForward = goingBackward = goingLeft = goingRight = goingUp = goingDown = false;
     forceDirection = vec3(0,0,0);
+    specMovement = vec3(0,0,0);
     specPos = vec3(0,0,0);
 }
 
@@ -32,37 +33,31 @@ void Game::run()
 
 void Game::onFrame(float elapsedTime)
 {
-//    if( spectatorNode )
-//    {
-//        Motor::Camera* cam = motorRoot->getScene()->getCamera();
-//        const Vector3& specPos = spectatorNode->getPosition();
-//
-//        //For normal speeds, friction force proportional to the speed
-//        if( spectatorMovement.squaredLength() > 1.0f ){
-//            Vector3 frictionVec( - 3.0f * spectatorMovement );
-//            spectatorMovement += frictionVec * elapsedTime;
-//        }else{ //For low speeds, constant friction force
-//            Vector3 frictionVec( - 3.0f * spectatorMovement.normalisedCopy() );
-//            spectatorMovement += frictionVec * elapsedTime;
-//        }
-//
-//        if( cam != 0 )
-//        {
-//            cam->setTargetLocation(specPos, false);
-//
-//            if( rotatingLeft && !rotatingRight )
-//                cam->rotateCamera( 1.2f * elapsedTime , 0.0f );
-//            else if( rotatingRight && !rotatingLeft )
-//                cam->rotateCamera( -1.2f * elapsedTime , 0.0f );
-//
-//            spectatorNode->setYaw( cam->getYaw() );
-//            Vector3 force(forceDirection);
-//            force.rotateY(cam->getYaw());
-//            spectatorMovement += force * (usingTurbo ? 150.0f : 70.0f) * elapsedTime;
-//        }
-//        spectatorNode->setPosition( specPos + spectatorMovement * elapsedTime );
-//    }
-//
+    Camera* cam = root->getScene()->getCamera();
+
+    //For normal speeds, friction force proportional to the speed
+    if( glm::length2(specMovement) > 1.0f ){
+        vec3 frictionVec( - 3.0f * specMovement );
+        specMovement += frictionVec * elapsedTime;
+    }else{ //For low speeds, constant friction force
+        vec3 frictionVec( - 3.0f * glm::normalize(specMovement) );
+        specMovement += frictionVec * elapsedTime;
+    }
+
+    if( cam != 0 )
+    {
+        cam->setTargetLocation(specPos, false);
+
+        if( rotatingLeft && !rotatingRight )
+            cam->rotateCamera( 1.2f * elapsedTime , 0.0f );
+        else if( rotatingRight && !rotatingLeft )
+            cam->rotateCamera( -1.2f * elapsedTime , 0.0f );
+
+        vec3 force(forceDirection);
+        force = glm::rotateY(force, cam->getYaw());
+        specMovement += force * 100.0f * elapsedTime;
+    }
+    specPos += specMovement * elapsedTime;
     return;
 }
 

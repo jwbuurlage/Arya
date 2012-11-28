@@ -1,6 +1,7 @@
 #include "Arya.h"
 
 using Arya::Root;
+using Arya::Camera;
 
 class Game : public Arya::InputListener, public Arya::FrameListener
 {
@@ -18,5 +19,6 @@ class Game : public Arya::InputListener, public Arya::FrameListener
         //For key movement
         bool goingForward, goingBackward, goingLeft, goingRight, goingUp, goingDown, rotatingLeft, rotatingRight;
         vec3 forceDirection;
+        vec3 specMovement;
         vec3 specPos;
 };
