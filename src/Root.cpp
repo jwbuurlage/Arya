@@ -2,7 +2,6 @@
 
 #include <GL/glew.h>
 #include <GL/glfw.h>
-#include <glm/glm.hpp>
 
 #include "../include/Root.h"
 #include "../include/Shaders.h"
