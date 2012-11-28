@@ -13,6 +13,7 @@ using std::vector;
 using std::map;
 
 using glm::mat4;
+using glm::vec2;
 
 namespace Arya
 {
@@ -62,6 +63,7 @@ namespace Arya
 
             GLuint getUniformLocation(const char* name);
             void setUniform1i(const char* name, int val);
+            void setUniform2fv(const char* name, vec2 values);
             void setUniformMatrix4fv(const char* name, mat4 matrix);
 
         private:
