@@ -27,7 +27,9 @@ namespace Arya
 
     Terrain::~Terrain()
     {
-
+        delete[] indexBuffer;
+        delete[] indexCount;
+        delete terrainProgram;
     }
 
     bool Terrain::init()
@@ -87,8 +89,8 @@ namespace Arya
         for(int i = 0; i < patchCount; ++i)
             for(int j = 0; j < patchCount; ++j) {
                 Patch p;
-                p.position = vec2(0.0, 0.0);
-                p.offset = vec2(0.0, 0.0);
+                p.position = vec2(-w/2, -h/2);
+                p.offset = vec2(j*(patchCount - 1), i*(patchCount - 1));
                 p.lod = 0;
                 patches.push_back(p);
             }
@@ -152,7 +154,6 @@ namespace Arya
             else 
                 p.lod = 2;
         }
-
     }
 
     //---------------------------------------
@@ -164,8 +165,8 @@ namespace Arya
         terrainProgram->use();
         glBindVertexArray(vertexBuffer);
         for(int i = 0; i < patches.size(); ++i) {
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[0]);
-            glDrawElements(GL_TRIANGLE_STRIP, indexCount[0], GL_UNSIGNED_INT, (void*)0);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[patches[i].lod]);
+            glDrawElements(GL_TRIANGLE_STRIP, indexCount[patches[i].lod], GL_UNSIGNED_INT, (void*)0);
         }
     }
 }
