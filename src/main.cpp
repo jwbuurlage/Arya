@@ -9,7 +9,17 @@ Root* root;
 
 class Closer : public Arya::InputListener
 {
-    bool keyDown(int key, bool keyDown){ if( keyDown && key == GLFW_KEY_ESC ){ root->stopRendering(); } return false; };
+    bool keyDown(int key, bool keyDown)
+    {
+        if( keyDown )
+        {
+            if( key == GLFW_KEY_ESC )
+                root->stopRendering();
+            else if( key == GLFW_KEY_F11 )
+                root->setFullscreen(!root->getFullscreen());
+        }
+        return false;
+    }
 };
 
 Closer closer;
@@ -17,7 +27,7 @@ Closer closer;
 int main()
 {
     root = new Root;
-    if(!(root->init())) {
+    if(!(root->init(false))) {
         cerr << "Could not init *root*, closing" << endl; 
     }
     else

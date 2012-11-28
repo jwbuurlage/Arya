@@ -17,7 +17,7 @@ using std::endl;
 namespace Arya
 {
 
-	template<> Root* Singleton<Root>::singleton = 0;
+    template<> Root* Singleton<Root>::singleton = 0;
 
     //glfw callback functions
     void GLFWCALL keyCallback(int key, int action);
@@ -41,8 +41,9 @@ namespace Arya
         delete &Logger::shared();
     }
 
-    bool Root::init()
+    bool Root::init(bool fullscr)
     {
+        fullscreen = fullscr;
         if(!initGLFW()) return false;
         if(!initGLEW()) return false;
 
@@ -70,6 +71,34 @@ namespace Arya
         running = false;
     }
 
+    void Root::setFullscreen(bool fullscr)
+    {
+        if( fullscreen == fullscr ) return; //no difference
+        fullscreen = fullscr;
+
+        glfwCloseWindow();
+
+        int width = desktopWidth, height = desktopHeight;
+
+        if( fullscreen == false ) //use 3/4 of desktop res
+        {
+            width = height;
+            height = (height*3)/4;
+        }
+
+        if(!glfwOpenWindow(width, height, 0, 0, 0, 0, 0, 0, (fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW)))
+        {
+            LOG_ERROR("Could not re-create window. Closing now.");
+            stopRendering();
+            return;
+        }
+
+        glfwSetKeyCallback(keyCallback);
+        glfwSetMouseButtonCallback(mouseButtonCallback);
+        glfwSetMousePosCallback(mousePosCallback);
+        glfwSetMouseWheelCallback(mouseWheelCallback);
+    }
+
     bool Root::initGLFW()
     {
         if(!glfwInit())
@@ -78,9 +107,18 @@ namespace Arya
             return false;
         }
 
-        if(!glfwOpenWindow(1024, 768, 0, 0, 0, 0, 0, 0, GLFW_WINDOW))
+        GLFWvidmode mode;
+        glfwGetDesktopMode(&mode);
+        desktopWidth = mode.Width;
+        desktopHeight = mode.Height;
+        if( fullscreen == false ) //use 3/4 of desktop res
         {
-            glfwTerminate();
+            mode.Width = mode.Height; //the aspect ratio is then 3:4
+            mode.Height = (mode.Height*3)/4;
+        }
+
+        if(!glfwOpenWindow(mode.Width, mode.Height, 0, 0, 0, 0, 0, 0, (fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW)))
+        {
             return false;
         }
 
@@ -132,60 +170,60 @@ namespace Arya
         glfwSwapBuffers();
     }
 
-	void Root::addInputListener(InputListener* listener)
-	{
-		inputListeners.push_back(listener);
-	}
-
-	void Root::removeInputListener(InputListener* listener)
-	{
-		for( std::vector<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ){
-			if( *it == listener ) it = inputListeners.erase(it);
-			else ++it;
-		}
-	}
-
-	void Root::addFrameListener(FrameListener* listener)
-	{
-		frameListeners.push_back(listener);
-	}
-
-	void Root::removeFrameListener(FrameListener* listener)
-	{
-		for( std::vector<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end(); ){
-			if( *it == listener ) it = frameListeners.erase(it);
-			else ++it;
-		}
-	}
-
-	void Root::keyDown(int key, int action)
+    void Root::addInputListener(InputListener* listener)
     {
-		for( std::vector<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
-			if( (*it)->keyDown(key, action == GLFW_PRESS) == true ) break;
+        inputListeners.push_back(listener);
+    }
 
-	}
-
-	void Root::mouseDown(int button, int action)
+    void Root::removeInputListener(InputListener* listener)
     {
-		for( std::vector<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
-			if( (*it)->mouseDown((MOUSEBUTTON)button, action == GLFW_PRESS, mouseX, mouseY) == true ) break;
-	}
+        for( std::vector<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ){
+            if( *it == listener ) it = inputListeners.erase(it);
+            else ++it;
+        }
+    }
 
-	void Root::mouseWheelMoved(int pos)
+    void Root::addFrameListener(FrameListener* listener)
+    {
+        frameListeners.push_back(listener);
+    }
+
+    void Root::removeFrameListener(FrameListener* listener)
+    {
+        for( std::vector<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end(); ){
+            if( *it == listener ) it = frameListeners.erase(it);
+            else ++it;
+        }
+    }
+
+    void Root::keyDown(int key, int action)
+    {
+        for( std::vector<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
+            if( (*it)->keyDown(key, action == GLFW_PRESS) == true ) break;
+
+    }
+
+    void Root::mouseDown(int button, int action)
+    {
+        for( std::vector<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
+            if( (*it)->mouseDown((MOUSEBUTTON)button, action == GLFW_PRESS, mouseX, mouseY) == true ) break;
+    }
+
+    void Root::mouseWheelMoved(int pos)
     {
         int delta = pos - mouseWheelPos;
         mouseWheelPos = pos;
-		for( std::vector<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
-			if( (*it)->mouseWheelMoved(delta) == true ) break;
-	}
+        for( std::vector<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
+            if( (*it)->mouseWheelMoved(delta) == true ) break;
+    }
 
-	void Root::mouseMoved(int x, int y)
+    void Root::mouseMoved(int x, int y)
     {
-		int dx = x - mouseX, dy = y - mouseY;
-		mouseX = x; mouseY = y;
-		for( std::vector<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
-			if( (*it)->mouseMoved(x,y, dx, dy) == true ) break;
-	}
+        int dx = x - mouseX, dy = y - mouseY;
+        mouseX = x; mouseY = y;
+        for( std::vector<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
+            if( (*it)->mouseMoved(x,y, dx, dy) == true ) break;
+    }
 
     void GLFWCALL keyCallback(int key, int action)
     {
