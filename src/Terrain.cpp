@@ -110,10 +110,10 @@ namespace Arya
         int levels = log((float)(patchSizeMax-1), 2.0f) + 1;
         LOG_INFO("levels: " << levels);
 
-        GLuint* indexBuffers = new GLuint[levels];
-        GLuint* indexCount = new GLuint[levels];
+        indexBuffer = new GLuint[levels];
+        indexCount = new GLuint[levels];
 
-        glGenBuffers(levels, indexBuffers);
+        glGenBuffers(levels, indexBuffer);
 
         GLuint* indices = new GLuint[patchSizeMax * (patchSizeMax-1) * 2];
 
@@ -182,8 +182,8 @@ namespace Arya
             terrainProgram->setUniform2fv("patchOffset", p.offset);
             terrainProgram->setUniform2fv("patchPosition", p.position);
 
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[p.lod]);
-            glDrawElements(GL_TRIANGLE_STRIP, indexCount[p.lod], GL_UNSIGNED_INT, (void*)0);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[3]);
+            glDrawElements(GL_TRIANGLE_STRIP, indexCount[3], GL_UNSIGNED_INT, (void*)0);
         }
     }
 }
