@@ -2,6 +2,7 @@
 #include <string.h>
 #include <GL/glew.h>
 
+#include "common/Logger.h"
 #include "Primitives.h"
 #include "Scene.h"
 #include "Terrain.h"
@@ -33,6 +34,11 @@ namespace Arya
 
         if(terrain) delete terrain;
         terrain = new Terrain(TextureManager::shared().getTexture("heightmap.tga"),0,0);
+
+        if(!terrain->init()) {
+            LOG_WARNING("Could not load terrain");
+            return false;
+        }
 
         if(camera) delete camera;
         camera = new Camera;

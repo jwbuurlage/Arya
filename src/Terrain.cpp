@@ -20,10 +20,6 @@ namespace Arya
         heightMap = hm;
         tileSet = ts;
         splatMap = sm;
-
-        if(!init())
-            LOG_WARNING("Could not load terrain shaders");
-        generate();
     }
 
     Terrain::~Terrain()
@@ -35,6 +31,9 @@ namespace Arya
 
     bool Terrain::init()
     {
+        if(heightMap == 0) return false;
+        if(!generate()) return false;
+
         Shader* terrainVertex = new Shader(VERTEX);
         if(!(terrainVertex->addSourceFile("../shaders/terrain.vert"))) return false;
         if(!(terrainVertex->compile())) return false;
@@ -51,7 +50,7 @@ namespace Arya
         return true;
     }
 
-    void Terrain::generate()
+    bool Terrain::generate()
     {
         int w, h;
         w = 1025; //heightMap->width;
@@ -97,9 +96,11 @@ namespace Arya
             }
 
         generateIndices();
+
+        return true;
     }
 
-    void Terrain::generateIndices()
+    bool Terrain::generateIndices()
     {
         // make indices for all possibilities
         // level 0: patchSizeMax^2
@@ -140,6 +141,8 @@ namespace Arya
         }
 
         delete[] indices;
+
+        return true;
     }
 
     void Terrain::update(float dt, Scene* curScene)

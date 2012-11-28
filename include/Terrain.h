@@ -29,10 +29,11 @@ namespace Arya
             void render();
             void update(float dt, Scene* curScene);
 
-        private:
             bool init();
-            void generate();
-            void generateIndices();
+
+        private:
+            bool generate();
+            bool generateIndices();
 
             Texture* heightMap;
             Texture* tileSet;
