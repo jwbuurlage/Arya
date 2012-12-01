@@ -70,7 +70,7 @@ namespace Arya
 
         float perVertex = 1.0f / (patchSizeMax - 1);
 
-        for(int i = 0; i < patchSizeMax; ++i) 
+        for(int i = 0; i < patchSizeMax; ++i)
             for(int j = 0; j < patchSizeMax; ++j) {
                 vertexData[2*i*patchSizeMax + 2*j + 0] = i*perVertex;
                 vertexData[2*i*patchSizeMax + 2*j + 1] = j*perVertex;
@@ -90,8 +90,8 @@ namespace Arya
             for(int j = 0; j < patchCount; ++j) {
                 Patch p;
                 p.offset = vec2(j*(patchCount - 1), i*(patchCount - 1));
-                p.position = vec2(-w/2 + (w-1)/patchCount*j, -h/2+ (h-1)/patchCount*j);
-                p.lod = 0;
+                p.position = vec2(-w/2 + (w-1)/patchSizeMax*j, -h/2 + (h-1)/patchSizeMax*j);
+                p.lod = log((float)(patchSizeMax-1), 2.0f) + 1;
                 patches.push_back(p);
             }
 
