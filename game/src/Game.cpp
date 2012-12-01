@@ -12,6 +12,7 @@ Game::Game()
 
 Game::~Game()
 {
+
 }
 
 void Game::run()
@@ -36,15 +37,15 @@ void Game::onFrame(float elapsedTime)
     Camera* cam = root->getScene()->getCamera();
 
     //For normal speeds, friction force proportional to the speed
-    if( glm::length2(specMovement) > 1.0f ){
+    if(glm::length2(specMovement) > 1.0f) {
         vec3 frictionVec( - 3.0f * specMovement );
         specMovement += frictionVec * elapsedTime;
-    }else{ //For low speeds, constant friction force
+    } else { //For low speeds, constant friction force
         vec3 frictionVec( - 3.0f * glm::normalize(specMovement) );
         specMovement += frictionVec * elapsedTime;
     }
 
-    if( cam != 0 )
+    if(cam != 0)
     {
         cam->setTargetLocation(specPos, false);
 
@@ -67,7 +68,7 @@ bool Game::keyDown(int key, bool keyDown)
 
     bool DirectionChanged = false;
 
-    switch( key ){
+    switch(key) {
         case 'W': goingForward = keyDown;	DirectionChanged = true; break;
         case 'S': goingBackward = keyDown;	DirectionChanged = true; break;
         case 'A': rotatingLeft = keyDown;	break;
@@ -82,13 +83,13 @@ bool Game::keyDown(int key, bool keyDown)
     }
 
     if( DirectionChanged ){
-        forceDirection.x = forceDirection.y = forceDirection.z = 0.0f;
-        if( goingForward ) forceDirection.z -= 1.0f;
-        if( goingBackward ) forceDirection.z += 1.0f;
-        if( goingLeft ) forceDirection.x -= 1.0f;
-        if( goingRight ) forceDirection.x  = 1.0f;
-        if( goingUp ) forceDirection.y  = 1.0f;
-        if( goingDown ) forceDirection.y -= 1.0f;
+        forceDirection.x =  forceDirection.y = forceDirection.z = 0.0f;
+        if(goingForward)    forceDirection.z -= 1.0f;
+        if(goingBackward)   forceDirection.z += 1.0f;
+        if(goingLeft)       forceDirection.x -= 1.0f;
+        if(goingRight)      forceDirection.x  = 1.0f;
+        if(goingUp)         forceDirection.y  = 1.0f;
+        if(goingDown)       forceDirection.y -= 1.0f;
         forceDirection = glm::normalize(forceDirection);
     }
     return keyHandled;

@@ -5,6 +5,7 @@
 
 using glm::vec2;
 using glm::vec3;
+using glm::mat4;
 using std::vector;
 
 namespace Arya
@@ -12,6 +13,7 @@ namespace Arya
     class Texture;
     class ShaderProgram;
     class Scene;
+    class Camera;
 
     typedef struct
     {
@@ -23,10 +25,11 @@ namespace Arya
     class Terrain
     {
         public:
-            Terrain(Texture* hm, Texture* ts, Texture* sm);
+            // Tileset needs to have 4 elements
+            Terrain(Texture* hm, vector<Texture*> ts, Texture* sm);
             ~Terrain(); 
 
-            void render();
+            void render(Camera* cam);
             void update(float dt, Scene* curScene);
 
             bool init();
@@ -36,8 +39,10 @@ namespace Arya
             bool generateIndices();
 
             Texture* heightMap;
-            Texture* tileSet;
+            vector<Texture*> tileSet;
             Texture* splatMap;
+
+            mat4 scaleMatrix;
 
             GLuint vertexBuffer;
             GLuint* indexBuffer;

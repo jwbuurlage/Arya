@@ -27,6 +27,8 @@ namespace Arya
 
     Root::Root()
     {
+        oldTime = 0.0;
+
         Logger* log = new Logger();
         FileSystem* files = new FileSystem();
         TextureManager* tex = new TextureManager();
@@ -59,6 +61,15 @@ namespace Arya
         running = true;
         while(running)
         {
+            if(!oldTime)
+                oldTime = glfwGetTime();
+            double pollTime = glfwGetTime();
+            double elapsed = oldTime - pollTime;
+            oldTime = pollTime;
+
+            for(std::vector<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();)
+                (*it)->onFrame((float)elapsed);
+ 
             render();
             glfwPollEvents();
             if( glfwGetWindowParam(GLFW_OPENED) == 0 ) running = false;

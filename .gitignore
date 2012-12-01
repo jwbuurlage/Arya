@@ -3,5 +3,7 @@ game/build/*
 obj/
 bin/*
 
+*.DS_Store
+
 !/build/CMakeLists.txt
 !/game/build/CMakeLists.txt

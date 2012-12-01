@@ -62,6 +62,8 @@ namespace Arya
             bool running;
             void render();
 
+            double oldTime;
+
             std::vector<FrameListener*> frameListeners;
             std::vector<InputListener*> inputListeners;
             void keyDown(int key, int action);
