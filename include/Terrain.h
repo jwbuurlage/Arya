@@ -24,7 +24,8 @@ namespace Arya
     class Terrain
     {
         public:
-            Terrain(Texture* hm, Texture* ts, Texture* sm);
+            // Tileset needs to have 4 elements
+            Terrain(Texture* hm, vector<Texture*> ts, Texture* sm);
             ~Terrain(); 
 
             void render(Camera* cam);
@@ -37,7 +38,7 @@ namespace Arya
             bool generateIndices();
 
             Texture* heightMap;
-            Texture* tileSet;
+            vector<Texture*> tileSet;
             Texture* splatMap;
 
             GLuint vertexBuffer;

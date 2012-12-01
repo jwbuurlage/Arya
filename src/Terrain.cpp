@@ -15,10 +15,12 @@ using glm::distance;
 
 namespace Arya
 {
-    Terrain::Terrain(Texture* hm, Texture* ts, Texture* sm) 
+    Terrain::Terrain(Texture* hm, vector<Texture*> ts, Texture* sm) 
     {
         heightMap = hm;
         tileSet = ts;
+        if(!tileSet.size() == 4)
+            LOG_WARNING("Tileset is of wrong size");
         splatMap = sm;
     }
 
@@ -171,12 +173,36 @@ namespace Arya
     void Terrain::render(Camera* cam)
     {
         terrainProgram->use();
-        terrainProgram->setUniform1i("heightMap", 0);
         terrainProgram->setUniformMatrix4fv("vpMatrix", cam->getVPMatrix());
 
+        // heightmap
+        terrainProgram->setUniform1i("heightMap", 0);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, heightMap->handle);
 
+        // splatmap
+        terrainProgram->setUniform1i("splatTexture", 1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, splatMap->handle);
+
+        // texture 1 to 4
+        terrainProgram->setUniform1i("texture1", 2);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, tileSet[0]->handle);
+
+        terrainProgram->setUniform1i("texture2", 3);
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, tileSet[1]->handle);
+
+        terrainProgram->setUniform1i("texture3", 4);
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, tileSet[2]->handle);
+
+        terrainProgram->setUniform1i("texture4", 5);
+        glActiveTexture(GL_TEXTURE5);
+        glBindTexture(GL_TEXTURE_2D, tileSet[3]->handle);
+
+        // render patches
         glBindVertexArray(vertexBuffer);
         for(int i = 0; i < patches.size(); ++i) {
             Patch p = patches[i];
