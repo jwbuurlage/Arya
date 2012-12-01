@@ -13,6 +13,7 @@
 using std::string;
 using std::cerr;
 using std::endl;
+using std::vector;
 
 namespace Arya
 {	
@@ -36,7 +37,12 @@ namespace Arya
         objects.push_back(cTri);
 
         if(terrain) delete terrain;
-        terrain = new Terrain(TextureManager::shared().getTexture("heightmap.tga"),0,0);
+        vector<Texture*> tiles;
+        tiles.push_back(TextureManager::shared().getTexture("grass.tga"));
+        tiles.push_back(TextureManager::shared().getTexture("rock.tga"));
+        tiles.push_back(TextureManager::shared().getTexture("dirt.tga"));
+        tiles.push_back(TextureManager::shared().getTexture("snow.tga"));
+        terrain = new Terrain(TextureManager::shared().getTexture("heightmap.tga"),tiles,0);
 
         if(!terrain->init()) {
             LOG_WARNING("Could not load terrain");
