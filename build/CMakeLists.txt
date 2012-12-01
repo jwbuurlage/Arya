@@ -13,47 +13,46 @@ SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
 IF(APPLE)
-  SET(
-    PROJECT_LIBRARIES
-    "GLEW"
-    "glfw"
-    ) 
-  SET(
-    CMAKE_CXX_LINK_FLAGS
-    "-Wall -framework Cocoa -framework OpenGL -framework IOKit"
-    )
+    SET(
+        LIB_LIBRARIES
+        "GLEW"
+        "glfw"
+        ) 
+    SET(
+        CMAKE_CXX_LINK_FLAGS
+        "-Wall -framework Cocoa -framework OpenGL -framework IOKit"
+        )
 ELSE()
-  SET(
-    PROJECT_LIBRARIES
-    ${PROJECT_LIBRARIES}
-    "GL"
-    "GLU"
-    "GLEW"
-    "glfw"
-    )
+    SET(
+        LIB_LIBRARIES
+        "GL"
+        "GLU"
+        "GLEW"
+        "glfw"
+        )
 ENDIF()
 
 SET(LIB_NAME "arya")
 
 SET(
-  LIB_SOURCES
-  "../src/Root.cpp"
-  "../src/Shaders.cpp"
-  "../src/Objects.cpp"
-  "../src/Scene.cpp"
-  "../src/Files.cpp"
-  "../src/Primitives.cpp"
-  "../src/Mesh.cpp"
-  "../src/Camera.cpp"
-  "../src/Terrain.cpp"
-  "../src/Textures.cpp"
-  "../src/common/Logger.cpp"
-  )
+    LIB_SOURCES
+    "../src/Root.cpp"
+    "../src/Shaders.cpp"
+    "../src/Objects.cpp"
+    "../src/Scene.cpp"
+    "../src/Files.cpp"
+    "../src/Primitives.cpp"
+    "../src/Mesh.cpp"
+    "../src/Camera.cpp"
+    "../src/Terrain.cpp"
+    "../src/Textures.cpp"
+    "../src/common/Logger.cpp"
+    )
 
 SET(
-  LIB_INCLUDES
-  "../include"
-  )
+    LIB_INCLUDES
+    "../include"
+    )
 
 INCLUDE_DIRECTORIES( ${LIB_INCLUDES} )
 ADD_LIBRARY( ${LIB_NAME} STATIC ${LIB_SOURCES} )

@@ -65,6 +65,7 @@ namespace Arya
             vec3 position; //look-at-position. Actual camera is 'zoomed out' from here
             mat4 viewMatrix;
             mat4 projectionMatrix;
+            mat4 vpMatrix;
             float yaw, pitch;
             float camDist; //Zoom. Higher means further away
             float minCamDist;

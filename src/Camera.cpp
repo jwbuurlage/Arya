@@ -18,7 +18,7 @@ namespace Arya
         position.x = position.y = position.z = 0.0f;
         yaw = 0.0f;
         pitch = 0.0f;
-
+        projectionMatrix = glm::perspective(45.0f, 1.6f, 0.1f, 50.0f);
     }
 
     Camera::~Camera(){
@@ -136,8 +136,7 @@ namespace Arya
             viewMatrix = glm::rotate( viewMatrix, -yaw, vec3(0.0, 1.0, 0.0) );
             viewMatrix = glm::rotate( viewMatrix, -pitch, vec3(1.0, 0.0, 0.0) );
             viewMatrix = glm::translate( viewMatrix, vec3(0, 0, -camDist) );
-
-            if( outMatrix ) *outMatrix = projectionMatrix * viewMatrix;
+            vpMatrix = projectionMatrix * viewMatrix;
 
             //if( inverseViewMatrix ){
             //	mat zoomMat, rotateMat, translateMat;
@@ -147,16 +146,20 @@ namespace Arya
             //	translateMat.setTranslation(position);
             //	*inverseViewMatrix = translateMat * rotateMat * zoomMat;
             //}
+        }
+        if( outMatrix ) *outMatrix = projectionMatrix * viewMatrix;
+        if( updateMatrix )
+        {
             updateMatrix = false;
             return true;
         }
         return false;
     }
 
-
     mat4 Camera::getVPMatrix()
     {
-        return projectionMatrix * viewMatrix;
+        if( updateMatrix ) updateViewProjectionMatrix(0);
+        return vpMatrix;
     }
 
 }
