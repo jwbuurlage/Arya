@@ -45,6 +45,7 @@ namespace Arya
 
         if(camera) delete camera;
         camera = new Camera;
+        camera->setProjectionMatrix(45.0f, 1.6f, 0.1f, 50.0f);
 
         return true;
     }
@@ -79,12 +80,16 @@ namespace Arya
     {
         basicProgram->use();
 
+        mat4 vpMatrix;
+        camera->updateViewProjectionMatrix(&vpMatrix);
+        basicProgram->setUniformMatrix4fv("vpMatrix", vpMatrix);
+
         for(int i = 0; i < objects.size(); ++i)
         {
             glBindVertexArray(objects[i]->getVAO());
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
 
-        // terrain->render();
+        terrain->render(camera);
     }
 }

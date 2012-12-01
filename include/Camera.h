@@ -11,6 +11,9 @@ namespace Arya
             Camera();
             ~Camera();
 
+            //Sets the projection matrix
+            void setProjectionMatrix(float fov, float aspect, float near, float far);
+
             //Use setPostion to instantly move the look-at position of the camera
             //Use setTargetLocation to make the camera smoothly move to that look-at position
 
@@ -49,16 +52,19 @@ namespace Arya
             //the matrix will be copied to outMatrix
             //if the argument is not zero
             //returns if it updated
-            bool updateViewMatrix(mat4* outMatrix);
+            bool updateViewProjectionMatrix(mat4* outMatrix);
             bool updateMatrix;
 
             float camZoomSpeed; //Zoomspeed. positive means zooming out
             float camYawSpeed; //Yaw speed in radians per second
             float camPitchSpeed; //Pitch speed in radians per second
 
+            mat4 getVPMatrix();
+
         private:
             vec3 position; //look-at-position. Actual camera is 'zoomed out' from here
             mat4 viewMatrix;
+            mat4 projectionMatrix;
             float yaw, pitch;
             float camDist; //Zoom. Higher means further away
             float minCamDist;

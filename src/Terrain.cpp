@@ -158,9 +158,9 @@ namespace Arya
             if(distance(pPos, camPos) < 20.0f)
                 p.lod = 0;
             else if(distance(pPos, camPos) < 40.0f)
-                p.lod = 1;
-            else
                 p.lod = 2;
+            else
+                p.lod = 4;
         }
     }
 
@@ -168,10 +168,11 @@ namespace Arya
     // RENDER
     //---------------------------------------
 
-    void Terrain::render()
+    void Terrain::render(Camera* cam)
     {
         terrainProgram->use();
         terrainProgram->setUniform1i("heightMap", 0);
+        terrainProgram->setUniformMatrix4fv("vpMatrix", cam->getVPMatrix());
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, heightMap->handle);
