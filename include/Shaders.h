@@ -60,6 +60,7 @@ namespace Arya
             void use();
 
             string getName() { return name; };
+            GLuint getHandle() { return handle; };
 
             GLuint getUniformLocation(const char* name);
             void setUniform1i(const char* name, int val);
