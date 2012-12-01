@@ -6,15 +6,29 @@ SET(
   PROJECT_NAME
   "Arya"
   )
-
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
+
+SET(
+  PROJECT_LIBRARIES
+  "GLEW"
+  "glfw"
+  )
 
 IF(APPLE)
   SET(
     CMAKE_CXX_LINK_FLAGS
     "-Wall -framework Cocoa -framework OpenGL -framework IOKit"
+    )
+ELSE()
+  SET(
+    PROJECT_LIBRARIES
+    ${PROJECT_LIBRARIES}
+    "GL"
+    "GLU"
+    "GLEW"
+    "glfw"
     )
 ENDIF()
 
@@ -34,14 +48,6 @@ SET(
 SET(
   PROJECT_INCLUDES
   "../include"
-  )
-
-SET(
-  PROJECT_LIBRARIES
-  "GL"
-  "GLU"
-  "GLEW"
-  "glfw"
   )
 
 INCLUDE_DIRECTORIES( ${PROJECT_INCLUDES} )
