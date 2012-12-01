@@ -20,7 +20,7 @@ namespace Arya
     {
         heightMap = hm;
         tileSet = ts;
-        if(!tileSet.size() == 4)
+        if(!(tileSet.size() == 4))
             LOG_WARNING("Tileset is of wrong size");
         splatMap = sm;
     }
