@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string.h>
 #include <GL/glew.h>
+#include <glm/glm.hpp>
 
 #include "Shaders.h"
 #include "Files.h"
@@ -8,6 +9,9 @@
 using std::string;
 using std::cerr;
 using std::endl;
+
+using glm::mat4;
+using glm::vec2;
 
 namespace Arya
 {	
@@ -146,5 +150,29 @@ namespace Arya
     void ShaderProgram::use()
     {
         glUseProgram(handle);
+    }
+
+    //---------------------------
+    // Uniforms
+    //---------------------------
+
+    GLuint ShaderProgram::getUniformLocation(const char* name)
+    {
+        return glGetUniformLocation(handle, name);
+    }
+
+    void ShaderProgram::setUniform1i(const char* name, int val)
+    {
+        glUniform1i(getUniformLocation(name), val);
+    }
+
+    void ShaderProgram::setUniform2fv(const char* name, vec2 values)
+    {
+        glUniform2fv(getUniformLocation(name), 1, &values[0]);
+    }
+
+    void ShaderProgram::setUniformMatrix4fv(const char* name, mat4 matrix)
+    {
+        glUniformMatrix4fv(getUniformLocation(name), 1, false, &matrix[0][0]);
     }
 }

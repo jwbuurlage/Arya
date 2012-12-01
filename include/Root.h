@@ -36,9 +36,11 @@ namespace Arya
             Root();
             ~Root();
 
-            bool init();
+            bool init(bool fullscreen = false);
             void startRendering();
             void stopRendering();
+            bool getFullscreen() const { return fullscreen; }
+            void setFullscreen(bool fullscreen = true);
 
             //TODO: Extra arguments like APPEND_LAST or FRONT or CALL_ALWAYS or something??
             void addInputListener(InputListener* listener);
@@ -47,13 +49,16 @@ namespace Arya
             void addFrameListener(FrameListener* listener);
             void removeFrameListener(FrameListener* listener);
 
+            Scene* getScene() const { return scene; }
+
         private:
             bool initGLFW();
             bool initGLEW();
-            bool initShaders();
-            bool initObjects();
             Scene* scene;
 
+            int desktopWidth, desktopHeight;
+
+            bool fullscreen;
             bool running;
             void render();
 

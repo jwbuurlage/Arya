@@ -11,10 +11,11 @@ namespace Arya
 {
     class Texture;
     class ShaderProgram;
+    class Scene;
 
     typedef struct
     {
-        vec3 position;
+        vec2 position;
         vec2 offset;
         int lod;
     } Patch;
@@ -26,11 +27,13 @@ namespace Arya
             ~Terrain(); 
 
             void render();
+            void update(float dt, Scene* curScene);
+
+            bool init();
 
         private:
-            bool init();
-            void generate();
-            void generateIndices();
+            bool generate();
+            bool generateIndices();
 
             Texture* heightMap;
             Texture* tileSet;

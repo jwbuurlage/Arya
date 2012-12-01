@@ -1,5 +1,7 @@
 build/*
+game/build/*
 obj/
 bin/*
 
 !/build/CMakeLists.txt
+!/game/build/CMakeLists.txt
