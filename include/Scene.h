@@ -21,16 +21,20 @@ namespace Arya
             Scene();
             ~Scene();
 
-            bool init();
-            bool initShaders();
+            bool isInitialized() const { return initialized; }
+
             void cleanup();
             void render();
             Camera* getCamera() { return camera; };
 
         private:
+            bool initialized;
             vector<Object*> objects;
             Terrain* terrain;
             Camera* camera;
+
+            bool init();
+            bool initShaders();
 
             ShaderProgram* basicProgram;
     };

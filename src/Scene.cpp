@@ -21,6 +21,7 @@ namespace Arya
     {
         terrain = 0;
         camera = 0;
+        initialized = false;
         init();
     }
 
@@ -53,6 +54,8 @@ namespace Arya
         camera = new Camera;
         camera->setProjectionMatrix(45.0f, 1.6f, 0.1f, 50.0f);
 
+        initialized = true;
+
         return true;
     }
 
@@ -80,6 +83,7 @@ namespace Arya
         camera = 0;
         if(terrain) delete terrain;
         terrain = 0;
+        initialized = false;
     }
 
     void Scene::render()

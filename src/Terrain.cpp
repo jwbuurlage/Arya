@@ -27,14 +27,18 @@ namespace Arya
 
     Terrain::~Terrain()
     {
+        //JW I HATE YOU
         delete[] indexBuffer;
+        //I HATE YOU SO HARD
         delete[] indexCount;
+        //WHAT THE FUCK WERE YOU SMOKING
+        //WHEN WRITING THIS
         delete terrainProgram;
     }
 
     bool Terrain::init()
     {
-        if(heightMap == 0) return false;
+        if(heightMap == 0 || splatMap == 0) return false;
         if(!generate()) return false;
 
         Shader* terrainVertex = new Shader(VERTEX);

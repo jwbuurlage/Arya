@@ -27,6 +27,7 @@ namespace Arya
 
     Root::Root()
     {
+        scene = 0;
         oldTime = 0.0;
 
         Logger* log = new Logger();
@@ -40,6 +41,8 @@ namespace Arya
         //Only clean them up if needed
         glfwTerminate();
 
+        if( scene ) delete scene;
+
         delete &FileSystem::shared();
         delete &Logger::shared();
         delete &TextureManager::shared();
@@ -51,11 +54,18 @@ namespace Arya
         if(!initGLFW()) return false;
         if(!initGLEW()) return false;
 
-        scene = new Scene();
+        if( scene == 0 ) scene = new Scene();
+        if( !scene->isInitialized() )
+        {
+            LOG_ERROR("Unable to initialize scene");
+            delete scene;
+            scene = 0;
+            return false;
+        }
 
         return true;
-    }
 
+    }
     void Root::startRendering()
     {
         running = true;
@@ -67,9 +77,9 @@ namespace Arya
             double elapsed = oldTime - pollTime;
             oldTime = pollTime;
 
-            for(std::vector<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();)
+            for(std::vector<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();++it)
                 (*it)->onFrame((float)elapsed);
- 
+
             render();
             glfwPollEvents();
             if( glfwGetWindowParam(GLFW_OPENED) == 0 ) running = false;
