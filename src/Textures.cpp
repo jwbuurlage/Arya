@@ -45,7 +45,7 @@ namespace Arya
             glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
             glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 
-            glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, texture->width, texture->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, glfwimage.Data);
+            glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, texture->width, texture->height, 0, glfwimage.Format, GL_UNSIGNED_BYTE, glfwimage.Data);
 
             addResource(filename, texture);
             glfwFreeImage(&glfwimage);

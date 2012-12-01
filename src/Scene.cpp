@@ -19,9 +19,12 @@ namespace Arya
 {	
     Scene::Scene()
     {
+        initialized = false;
         terrain = 0;
         camera = 0;
-        initialized = false;
+        basicVertex = 0;
+        basicFragment = 0;
+        basicProgram = 0;
         init();
     }
 
@@ -37,22 +40,27 @@ namespace Arya
         ColoredTriangle* cTri = new ColoredTriangle;
         objects.push_back(cTri);
 
-        if(terrain) delete terrain;
-        vector<Texture*> tiles;
-        tiles.push_back(TextureManager::shared().getTexture("grass.tga"));
-        tiles.push_back(TextureManager::shared().getTexture("rock.tga"));
-        tiles.push_back(TextureManager::shared().getTexture("dirt.tga"));
-        tiles.push_back(TextureManager::shared().getTexture("snow.tga"));
-        terrain = new Terrain(TextureManager::shared().getTexture("heightmap.tga"),tiles,0);
-
-        if(!terrain->init()) {
-            LOG_WARNING("Could not load terrain");
-            return false;
+        if(!terrain)
+        {
+            vector<Texture*> tiles;
+            tiles.push_back(TextureManager::shared().getTexture("grass.tga"));
+            tiles.push_back(TextureManager::shared().getTexture("rock.tga"));
+            tiles.push_back(TextureManager::shared().getTexture("dirt.tga"));
+            tiles.push_back(TextureManager::shared().getTexture("snow.tga"));
+            terrain = new Terrain(TextureManager::shared().getTexture("heightmap.tga"),tiles,0);
+            if(!terrain->init()) {
+                LOG_WARNING("Could not load terrain");
+                delete terrain;
+                terrain = 0;
+                return false;
+            }
         }
 
-        if(camera) delete camera;
-        camera = new Camera;
-        camera->setProjectionMatrix(45.0f, 1.6f, 0.1f, 50.0f);
+        if(!camera)
+        {
+            camera = new Camera;
+            camera->setProjectionMatrix(45.0f, 1.6f, 0.1f, 50.0f);
+        }
 
         initialized = true;
 
@@ -61,17 +69,17 @@ namespace Arya
 
     bool Scene::initShaders()
     {
-        Shader* vertex = new Shader(VERTEX);
-        if(!(vertex->addSourceFile("../shaders/basic.vert"))) return false;
-        if(!(vertex->compile())) return false;
+        basicVertex = new Shader(VERTEX);
+        if(!(basicVertex->addSourceFile("../shaders/basic.vert"))) return false;
+        if(!(basicVertex->compile())) return false;
 
-        Shader* fragment = new Shader(FRAGMENT);
-        if(!(fragment->addSourceFile("../shaders/basic.frag"))) return false;
-        if(!(fragment->compile())) return false;
+        basicFragment = new Shader(FRAGMENT);
+        if(!(basicFragment->addSourceFile("../shaders/basic.frag"))) return false;
+        if(!(basicFragment->compile())) return false;
 
         basicProgram = new ShaderProgram("basic");
-        basicProgram->attach(vertex);
-        basicProgram->attach(fragment);
+        basicProgram->attach(basicVertex);
+        basicProgram->attach(basicFragment);
         if(!(basicProgram->link())) return false;
 
         return true;
@@ -83,6 +91,12 @@ namespace Arya
         camera = 0;
         if(terrain) delete terrain;
         terrain = 0;
+        if(basicVertex) delete basicVertex;
+        basicVertex = 0;
+        if(basicFragment) delete basicFragment;
+        basicFragment = 0;
+        if(basicProgram) delete basicProgram;
+        basicProgram = 0;
         initialized = false;
     }
 

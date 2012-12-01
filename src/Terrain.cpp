@@ -23,17 +23,29 @@ namespace Arya
         if(!(tileSet.size() == 4))
             LOG_WARNING("Tileset is of wrong size");
         splatMap = sm;
+        vertexBuffer = 0;
+        indexBuffer = 0;
+        indexCount = 0;
+        terrainVertex = 0;
+        terrainFragment = 0;
+        terrainProgram = 0;
+        patchCount = 0;
+        patchSizeMax = 0;
+        levelMax = 0;
     }
 
     Terrain::~Terrain()
     {
-        //JW I HATE YOU
-        delete[] indexBuffer;
-        //I HATE YOU SO HARD
-        delete[] indexCount;
-        //WHAT THE FUCK WERE YOU SMOKING
-        //WHEN WRITING THIS
-        delete terrainProgram;
+        if(indexBuffer)
+            delete[] indexBuffer;
+        if(indexCount)
+            delete[] indexCount;
+        if(terrainProgram)
+            delete terrainProgram;
+        if(terrainVertex)
+            delete terrainVertex;
+        if(terrainFragment)
+            delete terrainFragment;
     }
 
     bool Terrain::init()
@@ -41,11 +53,11 @@ namespace Arya
         if(heightMap == 0 || splatMap == 0) return false;
         if(!generate()) return false;
 
-        Shader* terrainVertex = new Shader(VERTEX);
+        terrainVertex = new Shader(VERTEX);
         if(!(terrainVertex->addSourceFile("../shaders/terrain.vert"))) return false;
         if(!(terrainVertex->compile())) return false;
 
-        Shader* terrainFragment = new Shader(FRAGMENT);
+        terrainFragment = new Shader(FRAGMENT);
         if(!(terrainFragment->addSourceFile("../shaders/terrain.frag"))) return false;
         if(!(terrainFragment->compile())) return false;
 

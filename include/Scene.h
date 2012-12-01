@@ -13,6 +13,7 @@ namespace Arya
     class Object;
     class Terrain;
     class Camera;
+    class Shader;
     class ShaderProgram;
 
     class Scene
@@ -36,6 +37,8 @@ namespace Arya
             bool init();
             bool initShaders();
 
+            Shader* basicVertex;
+            Shader* basicFragment;
             ShaderProgram* basicProgram;
     };
 }

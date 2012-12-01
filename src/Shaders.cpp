@@ -19,6 +19,19 @@ namespace Arya
     // SHADER
     //---------------------------------------------------------
 
+    Shader::Shader(ShaderType type)
+    {
+        this->type = type;
+        handle = 0;
+        compiled = false;
+    }
+
+    Shader::~Shader()
+    {
+        if(handle)
+            glDeleteShader(handle);
+    }
+
     bool Shader::addSourceFile(string f)
     {
         File* source = FileSystem::shared().getFile(f);
@@ -40,33 +53,32 @@ namespace Arya
             for(int i = 0; i < sources.size(); ++i)
                 gl_sources[i] = sources[i]->getData();
 
-            GLuint shaderHandle;
             switch(type)
             {
-                case VERTEX:    shaderHandle = glCreateShader(GL_VERTEX_SHADER); break;
-                case FRAGMENT:  shaderHandle = glCreateShader(GL_FRAGMENT_SHADER); break;
-                case GEOMETRY:  shaderHandle = glCreateShader(GL_GEOMETRY_SHADER); break;
+                case VERTEX:    handle = glCreateShader(GL_VERTEX_SHADER); break;
+                case FRAGMENT:  handle = glCreateShader(GL_FRAGMENT_SHADER); break;
+                case GEOMETRY:  handle = glCreateShader(GL_GEOMETRY_SHADER); break;
                 default: cerr << "Error compiling shader: Invalid type." << endl; break;
             }
 
             const GLchar* pFile = sources[0]->getData();
             const GLint pSize  = sources[0]->getSize();
-            glShaderSource(shaderHandle, 1, &pFile, &pSize);
+            glShaderSource(handle, 1, &pFile, &pSize);
 
-            glCompileShader(shaderHandle);
+            glCompileShader(handle);
 
             GLint result;
-            glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &result);
+            glGetShaderiv(handle, GL_COMPILE_STATUS, &result);
             if(result == GL_FALSE)
             {
                 cerr << "Error compiling shader, log:" << endl;
                 GLint logLength;
-                glGetShaderiv(shaderHandle, GL_INFO_LOG_LENGTH, &logLength);
+                glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &logLength);
                 if(logLength > 0)
                 {
                     char* log = new char[logLength];
                     GLsizei written;
-                    glGetShaderInfoLog(shaderHandle, logLength, &written, log);
+                    glGetShaderInfoLog(handle, logLength, &written, log);
                     cerr << log << endl;
                     delete[] log;
                 }
@@ -75,7 +87,7 @@ namespace Arya
                     cerr << "No Log available.." << endl;
                 }
 
-                glDeleteShader(shaderHandle);
+                glDeleteShader(handle);
                 compiled = false;
                 handle = 0;
 
@@ -83,7 +95,6 @@ namespace Arya
             }
 
             compiled = true;
-            handle = shaderHandle;
         }
 
         return true;
@@ -95,25 +106,24 @@ namespace Arya
 
     ShaderProgram::ShaderProgram(string name)
     {
-        init();
+        handle = 0;
+        linked = false;
         this->name = name;
+        init();
     }
 
     ShaderProgram::~ShaderProgram() { 
-        glDeleteShader(handle);
+        if(handle)
+            glDeleteShader(handle);
     }
 
     bool ShaderProgram::init()
     {
-        GLuint programHandle = glCreateProgram();
-        if(programHandle == 0) { 
+        handle = glCreateProgram();
+        if(handle == 0) { 
             cerr << "Error creating program" << endl; 
             return false;
         }
-
-        handle = programHandle;
-
-
         return true;
     }
 

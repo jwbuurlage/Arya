@@ -11,6 +11,7 @@ using std::vector;
 namespace Arya
 {
     class Texture;
+    class Shader;
     class ShaderProgram;
     class Scene;
     class Camera;
@@ -48,6 +49,8 @@ namespace Arya
             GLuint* indexBuffer;
             GLuint* indexCount;
 
+            Shader* terrainVertex;
+            Shader* terrainFragment;
             ShaderProgram* terrainProgram;
 
             vector<Patch> patches;

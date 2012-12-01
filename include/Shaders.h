@@ -29,8 +29,8 @@ namespace Arya
     class Shader
     {
         public:
-            Shader(ShaderType type) { this->type = type; };
-            ~Shader() { };
+            Shader(ShaderType type);
+            ~Shader();
 
             // Adds a source file to the shader
             bool addSourceFile(string f);
