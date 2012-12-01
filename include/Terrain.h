@@ -5,6 +5,7 @@
 
 using glm::vec2;
 using glm::vec3;
+using glm::mat4;
 using std::vector;
 
 namespace Arya
@@ -40,6 +41,8 @@ namespace Arya
             Texture* heightMap;
             vector<Texture*> tileSet;
             Texture* splatMap;
+
+            mat4 scaleMatrix;
 
             GLuint vertexBuffer;
             GLuint* indexBuffer;

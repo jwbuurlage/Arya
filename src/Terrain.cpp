@@ -1,6 +1,7 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/log_base.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "common/Logger.h"
 #include "Terrain.h"
@@ -65,11 +66,12 @@ namespace Arya
             LOG_INFO("Heightmap: width and height set to default value (1025).");
         }
 
-        patchCount = 16; // 16 x 16 grid
+        patchCount = 16; // default: 16 x 16 grid
         patchSizeMax = (w-1)/patchCount + 1; // default: 1024/16 + 1 = 65x65
 
         GLfloat* vertexData = new GLfloat[patchSizeMax*patchSizeMax * 2];
 
+        scaleMatrix = glm::scale(mat4(1.0), vec3((float)patchSizeMax, (float)patchSizeMax, (float)patchSizeMax));
         float perVertex = 1.0f / (patchSizeMax - 1);
 
         for(int i = 0; i < patchSizeMax; ++i)
@@ -136,7 +138,7 @@ namespace Arya
                     for(int i = 0; i < patchSizeMax; i += 1 << l) {
                         indices[c++] = j*patchSizeMax + patchSizeMax - 1 - i;
                         indices[c++] = (j+(1 << l))*patchSizeMax + patchSizeMax - 1 - i;
-                   }
+                    }
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[l]);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER,
@@ -174,6 +176,7 @@ namespace Arya
     {
         terrainProgram->use();
         terrainProgram->setUniformMatrix4fv("vpMatrix", cam->getVPMatrix());
+        terrainProgram->setUniformMatrix4fv("scaleMatrix", scaleMatrix);
 
         // heightmap
         terrainProgram->setUniform1i("heightMap", 0);
@@ -204,8 +207,10 @@ namespace Arya
 
         // render patches
         glBindVertexArray(vertexBuffer);
+        glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, (void*)0);
         for(int i = 0; i < patches.size(); ++i) {
             Patch p = patches[i];
+            if(p.lod < 0) continue;
             terrainProgram->setUniform2fv("patchOffset", p.offset);
             terrainProgram->setUniform2fv("patchPosition", p.position);
 
