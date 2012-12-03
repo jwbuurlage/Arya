@@ -17,10 +17,10 @@ vec4 terrainColor()
     tColor += splatSample.g * texture2D(texture2, vec2(mod(texCoo * 10.0, 1.0)));
     tColor += splatSample.b * texture2D(texture3, vec2(mod(texCoo * 10.0, 1.0)));
     tColor += splatSample.a * texture2D(texture4, vec2(mod(texCoo * 10.0, 1.0)));
-    return tColor;
+    return 0.25*tColor;
 }
 
 void main()
 {
-    FragColor = vec4(1.0);
+    FragColor = terrainColor();
 }

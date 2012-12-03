@@ -88,12 +88,12 @@ namespace Arya
         GLfloat* vertexData = new GLfloat[patchSizeMax*patchSizeMax * 2];
 
         scaleMatrix = glm::scale(mat4(1.0), vec3((float)patchSizeMax, (float)patchSizeMax, (float)patchSizeMax));
-        float perVertex = 1.0f / (patchSizeMax - 1);
+        float perVertex = (1.0f / ((patchSizeMax - 1) * patchCount));
 
         for(int i = 0; i < patchSizeMax; ++i)
             for(int j = 0; j < patchSizeMax; ++j) {
-                vertexData[2*i*patchSizeMax + 2*j + 0] = i*perVertex;
-                vertexData[2*i*patchSizeMax + 2*j + 1] = j*perVertex;
+                vertexData[2*i*patchSizeMax + 2*j + 0] = j*perVertex;
+                vertexData[2*i*patchSizeMax + 2*j + 1] = i*perVertex;
             }
 
         glGenBuffers(1, &vertexBuffer);
@@ -109,7 +109,7 @@ namespace Arya
         for(int i = 0; i < patchCount; ++i)
             for(int j = 0; j < patchCount; ++j) {
                 Patch p;
-                p.offset = vec2(j*(patchCount - 1), i*(patchCount - 1));
+                p.offset = vec2((1.0 / patchCount)*j, (1.0 / patchCount)*i);
                 p.position = vec2(-w/2 + (w-1)/patchSizeMax*j, -h/2 + (h-1)/patchSizeMax*j);
                 p.lod = -1;
                 patches.push_back(p);
@@ -183,6 +183,9 @@ namespace Arya
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[l]);
         }
+
+        // prevent other code from mesing up our vao
+        glBindVertexArray(0);
 
         return true;
     }

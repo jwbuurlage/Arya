@@ -48,7 +48,7 @@ namespace Arya
             tiles.push_back(TextureManager::shared().getTexture("rock.tga"));
             tiles.push_back(TextureManager::shared().getTexture("dirt.tga"));
             tiles.push_back(TextureManager::shared().getTexture("snow.tga"));
-            terrain = new Terrain(TextureManager::shared().getTexture("heightmap.tga"),tiles,TextureManager::shared().getTexture("heightmap.tga"));
+            terrain = new Terrain(TextureManager::shared().getTexture("heightmap.tga"),tiles,TextureManager::shared().getTexture("splatmap.tga"));
             if(!terrain->init()) {
                 LOG_WARNING("Could not load terrain");
                 delete terrain;
