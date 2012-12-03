@@ -13,7 +13,7 @@ out vec2 texCoo;
 void main()
 {
     texCoo = patchOffset + texCooPatch;
-    vec2 scaledPos = scaleMatrix*vec4(vec2(-0.5)+texCoo, 0.0, 1.0);
+    vec2 scaledPos = (scaleMatrix*vec4(vec2(-0.5)+texCoo, 0.0, 1.0)).xy;
     vec4 pos = vec4(scaledPos.x, -20.0 + 20.0*texture2D(heightMap, texCoo).r, scaledPos.y, 1.0);
 
     gl_Position = vpMatrix * pos;
