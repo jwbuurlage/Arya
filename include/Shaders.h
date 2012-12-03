@@ -1,3 +1,13 @@
+// Shader object information
+//
+// The engine can create a Shader and then attach it to a ShaderProgram
+// From that moment on, ShaderProgram will have a pointer to it
+// and as soon as the ShaderProgram is deleted it will decrease
+// the refCount of its Shaders. When one of them reaches zero the
+// Shader is deleted.
+// The engine should allocate both Shader and ShaderProgram objects
+// The engine should keep a pointer of the ShaderProgram and can forget the Shader pointers
+// The engine should delete the ShaderProgram when no longer needed. This will automatically delete the Shaders
 #pragma once
 
 #include <string>
@@ -44,6 +54,9 @@ namespace Arya
         private:
             GLuint handle;
             bool compiled;
+            int refCount;
+
+            friend class ShaderProgram;
 
             vector<File*> sources;
             ShaderType type;
@@ -73,5 +86,7 @@ namespace Arya
             GLuint handle;
             bool linked;
             string name;
+
+            vector<Shader*> shaders;
     };
 }

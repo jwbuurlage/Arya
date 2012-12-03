@@ -5,6 +5,7 @@ Game::Game()
 {
     root = 0;
     goingForward = goingBackward = goingLeft = goingRight = goingUp = goingDown = false;
+    draggingLeftMouse = draggingRightMouse = false;
     forceDirection = vec3(0.0f);
     specMovement = vec3(0.0f);
     specPos = vec3(0.0f);
@@ -99,3 +100,38 @@ bool Game::keyDown(int key, bool keyDown)
     }
     return keyHandled;
 }
+
+bool Game::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int x, int y)
+{
+    //TODO: Send to UI manager and see if it was handled. If not, then do this:
+    if( button == Arya::BUTTON_LEFT ){
+        draggingLeftMouse = (buttonDown == true);
+    }else if( button == Arya::BUTTON_RIGHT ){
+        draggingRightMouse = (buttonDown == true);
+    }
+    return false;
+}
+
+bool Game::mouseWheelMoved(int delta)
+{
+    if( delta > 0 ){
+        Camera* cam = root->getScene()->getCamera();
+        if( cam ) cam->camZoomSpeed -= 5.0f;
+    }else{
+        Camera* cam = root->getScene()->getCamera();
+        if( cam ) cam->camZoomSpeed += 5.0f;
+    }
+    return false;
+}
+
+bool Game::mouseMoved(int x, int y, int dx, int dy)
+{
+    if( draggingRightMouse ){
+        Camera* cam = root->getScene()->getCamera();
+        if( cam ){
+            cam->rotateCamera( -(float)dx/250.0f, -(float)dy/250.0f );
+        }
+    }
+    return false;
+}
+

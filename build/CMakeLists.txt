@@ -26,7 +26,6 @@ ELSE()
     SET(
         LIB_LIBRARIES
         "GL"
-        "GLU"
         "GLEW"
         "glfw"
         )

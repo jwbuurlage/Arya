@@ -26,8 +26,6 @@ namespace Arya
         vertexBuffer = 0;
         indexBuffer = 0;
         indexCount = 0;
-        terrainVertex = 0;
-        terrainFragment = 0;
         terrainProgram = 0;
         patchCount = 0;
         patchSizeMax = 0;
@@ -42,10 +40,6 @@ namespace Arya
             delete[] indexCount;
         if(terrainProgram)
             delete terrainProgram;
-        if(terrainVertex)
-            delete terrainVertex;
-        if(terrainFragment)
-            delete terrainFragment;
     }
 
     bool Terrain::init()
@@ -53,11 +47,11 @@ namespace Arya
         if(heightMap == 0 || splatMap == 0) return false;
         if(!generate()) return false;
 
-        terrainVertex = new Shader(VERTEX);
+        Shader* terrainVertex = new Shader(VERTEX);
         if(!(terrainVertex->addSourceFile("../shaders/terrain.vert"))) return false;
         if(!(terrainVertex->compile())) return false;
 
-        terrainFragment = new Shader(FRAGMENT);
+        Shader* terrainFragment = new Shader(FRAGMENT);
         if(!(terrainFragment->addSourceFile("../shaders/terrain.frag"))) return false;
         if(!(terrainFragment->compile())) return false;
 

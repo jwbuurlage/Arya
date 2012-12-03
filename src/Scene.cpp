@@ -2,6 +2,7 @@
 #include <string.h>
 #include <GL/glew.h>
 
+#include "common/Listeners.h"
 #include "common/Logger.h"
 #include "Primitives.h"
 #include "Scene.h"
@@ -9,7 +10,6 @@
 #include "Textures.h"
 #include "Camera.h"
 #include "Shaders.h"
-#include "Root.h"
 
 using std::string;
 using std::cerr;
@@ -21,10 +21,7 @@ namespace Arya
     Scene::Scene()
     {
         initialized = false;
-        terrain = 0;
-        camera = 0;
-        basicVertex = 0;
-        basicFragment = 0;
+        terrain = 0; camera = 0;
         basicProgram = 0;
         init();
     }
@@ -70,11 +67,11 @@ namespace Arya
 
     bool Scene::initShaders()
     {
-        basicVertex = new Shader(VERTEX);
+        Shader* basicVertex = new Shader(VERTEX);
         if(!(basicVertex->addSourceFile("../shaders/basic.vert"))) return false;
         if(!(basicVertex->compile())) return false;
 
-        basicFragment = new Shader(FRAGMENT);
+        Shader* basicFragment = new Shader(FRAGMENT);
         if(!(basicFragment->addSourceFile("../shaders/basic.frag"))) return false;
         if(!(basicFragment->compile())) return false;
 
@@ -90,14 +87,17 @@ namespace Arya
     {
         if(camera) delete camera;
         camera = 0;
+
         if(terrain) delete terrain;
         terrain = 0;
-        if(basicVertex) delete basicVertex;
-        basicVertex = 0;
-        if(basicFragment) delete basicFragment;
-        basicFragment = 0;
+
         if(basicProgram) delete basicProgram;
         basicProgram = 0;
+
+        for(int i = 0; i < objects.size(); ++i)
+            delete objects[i];
+        objects.clear();
+
         initialized = false;
     }
 
