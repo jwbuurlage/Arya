@@ -150,6 +150,7 @@ namespace Arya
             return false;
         }
 
+        glfwSetWindowTitle("Arya");
         glfwSetKeyCallback(keyCallback);
         glfwSetMouseButtonCallback(mouseButtonCallback);
         glfwSetMousePosCallback(mousePosCallback);
