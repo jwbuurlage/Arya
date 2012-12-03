@@ -7,6 +7,7 @@ uniform sampler2D texture3;
 uniform sampler2D texture4;
 
 in vec2 texCoo;
+in vec4 posOut;
 out vec4 FragColor;
 
 vec4 terrainColor()
@@ -22,5 +23,8 @@ vec4 terrainColor()
 
 void main()
 {
-    FragColor = terrainColor();
+    if(posOut.y  < -135.0)
+        FragColor = normalize(terrainColor() * vec4(0.2, 0.5, 1.0, 1.0));
+    else 
+        FragColor = terrainColor();
 }

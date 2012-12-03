@@ -61,7 +61,7 @@ void Game::onFrame(float elapsedTime)
 
         vec3 force = forceDirection;
         force = glm::rotateY(force, cam->getYaw());
-        specMovement += force * 100.0f * elapsedTime;
+        specMovement += force * 2000.0f * elapsedTime;
     }
 
     specPos += specMovement * elapsedTime;

@@ -9,6 +9,7 @@ uniform vec2 patchOffset;
 
 layout (location = 0) in vec2 texCooPatch;
 out vec2 texCoo;
+out vec4 posOut;
 
 void main()
 {
@@ -17,4 +18,5 @@ void main()
     vec4 pos = vec4(scaledPos.x, -200.0 + 200.0*texture2D(heightMap, texCoo).r, scaledPos.y, 1.0);
 
     gl_Position = vpMatrix * pos;
+    posOut = pos;
 }
