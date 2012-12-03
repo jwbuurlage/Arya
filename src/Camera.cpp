@@ -13,9 +13,9 @@ namespace Arya
         camZoomSpeed = 0.0f;
         camYawSpeed = 0.0f;
         camPitchSpeed = 0.0f;
-        camDist = 5.0f;
-        minCamDist = 3.0f;
-        maxCamDist = 100.0f;
+        camDist = 50.0f;
+        minCamDist = 30.0f;
+        maxCamDist = 1000.0f;
         freeYaw = false;
         yaw = 0.0f;
         pitch = -40.0f;
@@ -94,8 +94,8 @@ namespace Arya
 
         //3. Camera zoom
         if( camZoomSpeed ){
-            if( camZoomSpeed > 40 ) camZoomSpeed = 40;
-            else if( camZoomSpeed < -40 ) camZoomSpeed = -40;
+            if( camZoomSpeed > 400 ) camZoomSpeed = 400;
+            else if( camZoomSpeed < -400 ) camZoomSpeed = -400;
             //Adjust the zoom with the speed
             camDist += camZoomSpeed * elapsedTime;
             updateMatrix = true;
@@ -103,7 +103,7 @@ namespace Arya
             if( camDist < minCamDist ){ camDist = minCamDist; camZoomSpeed = 0; }
             else if( camDist > maxCamDist ){ camDist = maxCamDist; camZoomSpeed = 0; }
             //Decrease the speed (which causes a natural 'slow down')
-            deAccelerate(camZoomSpeed, 40 * elapsedTime); //Deacceleration of 40 units per second per second
+            deAccelerate(camZoomSpeed, 800 * elapsedTime); //Deacceleration of 40 units per second per second
         }
         return;
     }

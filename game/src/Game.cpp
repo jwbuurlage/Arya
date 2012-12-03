@@ -21,7 +21,7 @@ void Game::run()
 {
     root = new Root;
 
-    if(!(root->init())) {
+    if(!(root->init(false, 800, 600))) {
         LOG_ERROR("Unable to init root");
     }
     else
@@ -117,10 +117,10 @@ bool Game::mouseWheelMoved(int delta)
 {
     if( delta > 0 ){
         Camera* cam = root->getScene()->getCamera();
-        if( cam ) cam->camZoomSpeed -= 5.0f;
+        if( cam ) cam->camZoomSpeed -= 50.0f;
     }else{
         Camera* cam = root->getScene()->getCamera();
-        if( cam ) cam->camZoomSpeed += 5.0f;
+        if( cam ) cam->camZoomSpeed += 50.0f;
     }
     return false;
 }
