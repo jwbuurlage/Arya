@@ -54,6 +54,9 @@ namespace Arya
         if(!initGLFW()) return false;
         if(!initGLEW()) return false;
 
+        // set GL stuff
+        glEnable(GL_DEPTH_TEST);
+
         if( scene == 0 ) scene = new Scene();
         if( !scene->isInitialized() )
         {
@@ -165,6 +168,7 @@ namespace Arya
     {
         glClearColor(0.0, 0.0, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_DEPTH_BUFFER_BIT);
 
         scene->render();
 
