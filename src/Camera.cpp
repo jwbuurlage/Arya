@@ -7,7 +7,8 @@ const float PI = 3.14159265358979323846264338327950288f;
 
 namespace Arya
 {
-    Camera::Camera(){
+    Camera::Camera()
+    {
         updateMatrix = true;
         camZoomSpeed = 0.0f;
         camYawSpeed = 0.0f;
@@ -22,10 +23,10 @@ namespace Arya
 
         position = vec3(0.0f);
         targetPosition = vec3(0.0f);
-        LOG_INFO(targetPosition.x << " " << targetPosition.y << " " <<  targetPosition .z << " " << position.x << " " << position.y << " " << position.z);
     }
 
-    Camera::~Camera(){
+    Camera::~Camera()
+    {
     }
 
     void Camera::setProjectionMatrix(float fov, float aspect, float near, float far)
@@ -33,7 +34,8 @@ namespace Arya
         projectionMatrix = glm::perspective(fov, aspect, near, far);
     }
 
-    void Camera::update(float elapsedTime){
+    void Camera::update(float elapsedTime)
+    {
         //---------------------------------------------
         //TODO: Camera shouldn't move beneath the floor
         //		so we need to check with a heightmap or
@@ -106,7 +108,8 @@ namespace Arya
         return;
     }
 
-    void Camera::deAccelerate(float& Speed, float Acceleration){
+    void Camera::deAccelerate(float& Speed, float Acceleration)
+    {
         if( Speed > 0 ){
             if( Speed < Acceleration ) Speed = 0;
             else Speed -= Acceleration;
@@ -116,12 +119,14 @@ namespace Arya
         }
     }
 
-    void Camera::setTargetLocation(const vec3 &location, bool FreeYawRotation) {
+    void Camera::setTargetLocation(const vec3 &location, bool FreeYawRotation) 
+    {
         targetPosition = location;
         freeYaw = FreeYawRotation;
     }
 
-    void Camera::rotateCamera(float Yaw, float Pitch){
+    void Camera::rotateCamera(float Yaw, float Pitch)
+    {
         yaw += Yaw, 
             pitch += Pitch;
         updateMatrix = true;
@@ -136,7 +141,8 @@ namespace Arya
         return getPosition() + relative;
     }
 
-    bool Camera::updateViewProjectionMatrix(mat4* outMatrix){
+    bool Camera::updateViewProjectionMatrix(mat4* outMatrix)
+    {
         if( updateMatrix ){
             viewMatrix = glm::translate( mat4(1.0f), -position );
             viewMatrix = glm::rotate( viewMatrix, -yaw, vec3(0.0, 1.0, 0.0) );
