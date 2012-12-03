@@ -51,8 +51,6 @@ namespace Arya
             GLuint* indexCount;
             GLuint* vaoHandles;
 
-            Shader* terrainVertex;
-            Shader* terrainFragment;
             ShaderProgram* terrainProgram;
 
             vector<Patch> patches;

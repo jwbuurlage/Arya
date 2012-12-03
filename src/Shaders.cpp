@@ -28,7 +28,6 @@ namespace Arya
 
     Shader::~Shader()
     {
-        LOG_INFO("Unloading shader");
         if(handle)
             glDeleteShader(handle);
     }
@@ -115,7 +114,6 @@ namespace Arya
 
     ShaderProgram::~ShaderProgram()
     {
-        LOG_INFO("Deleting shaderpogram ");
         for(unsigned int i = 0; i < shaders.size(); ++i)
         {
             shaders[i]->refCount--;

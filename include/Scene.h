@@ -42,8 +42,6 @@ namespace Arya
             bool init();
             bool initShaders();
 
-            Shader* basicVertex;
-            Shader* basicFragment;
             ShaderProgram* basicProgram;
     };
 }
