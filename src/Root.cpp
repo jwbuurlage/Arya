@@ -48,9 +48,12 @@ namespace Arya
         delete &TextureManager::shared();
     }
 
-    bool Root::init(bool fullscr)
+    bool Root::init(bool fullscr, int w, int h)
     {
-        fullscreen = fullscr; //lol
+        windowWidth = w;
+        windowHeight = h;
+        fullscreen = fullscr;
+
         if(!initGLFW()) return false;
         if(!initGLEW()) return false;
 
@@ -106,15 +109,7 @@ namespace Arya
 
         glfwCloseWindow();
 
-        int width = desktopWidth, height = desktopHeight;
-
-        if( fullscreen == false ) //use 3/4 of desktop res
-        {
-            width = height;
-            height = (height*3)/4;
-        }
-
-        if(!glfwOpenWindow(width, height, 0, 0, 0, 0, 0, 0, (fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW)))
+        if(!glfwOpenWindow(windowWidth, windowHeight, 0, 0, 0, 0, 0, 0, (fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW)))
         {
             LOG_ERROR("Could not re-create window. Closing now.");
             stopRendering();

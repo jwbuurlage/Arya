@@ -15,7 +15,7 @@ namespace Arya
             Root();
             ~Root();
 
-            bool init(bool fullscreen = false);
+            bool init(bool fullscreen = true, int width = 0, int height = 0);
             void startRendering();
             void stopRendering();
             bool getFullscreen() const { return fullscreen; }
@@ -30,11 +30,15 @@ namespace Arya
 
             Scene* getScene() const { return scene; }
 
+            int getWindowWidth() const { return windowWidth; }
+            int getWindowHeight() const { return windowHeight; }
+
         private:
             bool initGLFW();
             bool initGLEW();
             Scene* scene;
 
+            int windowWidth, windowHeight;
             int desktopWidth, desktopHeight;
 
             bool fullscreen;
