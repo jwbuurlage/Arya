@@ -44,6 +44,9 @@ namespace Arya
         private:
             GLuint handle;
             bool compiled;
+            int refCount;
+
+            friend class ShaderProgram;
 
             vector<File*> sources;
             ShaderType type;
@@ -73,5 +76,7 @@ namespace Arya
             GLuint handle;
             bool linked;
             string name;
+
+            vector<Shader*> shaders;
     };
 }
