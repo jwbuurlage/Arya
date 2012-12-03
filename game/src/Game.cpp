@@ -126,12 +126,16 @@ bool Game::mouseWheelMoved(int delta)
 
 bool Game::mouseMoved(int x, int y, int dx, int dy)
 {
-    if( draggingRightMouse ){
-        Camera* cam = root->getScene()->getCamera();
-        if( cam ){
-            cam->rotateCamera( -(float)dx/250.0f, -(float)dy/250.0f );
-        }
-    }
+    int padding = 10;
+    if(x < padding)
+        // move left
+    if(y < padding)
+        // move top
+    if(x > root->getWindowWidth() - padding)
+        // move right
+    if(y > root->getWindowHeight() - padding)
+        // move bottom
+
     return false;
 }
 

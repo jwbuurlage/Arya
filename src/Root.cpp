@@ -134,13 +134,13 @@ namespace Arya
         glfwGetDesktopMode(&mode);
         desktopWidth = mode.Width;
         desktopHeight = mode.Height;
-        if( fullscreen == false ) //use 3/4 of desktop res
+        if(fullscreen)
         {
-            mode.Width = mode.Height; //the aspect ratio is then 3:4
-            mode.Height = (mode.Height*3)/4;
+            windowWidth = desktopWidth;
+            windowHeight = desktopHeight;
         }
 
-        if(!glfwOpenWindow(mode.Width, mode.Height, 0, 0, 0, 0, 0, 0, (fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW)))
+        if(!glfwOpenWindow(windowWidth, windowHeight, 0, 0, 0, 0, 0, 0, (fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW)))
         {
             return false;
         }
