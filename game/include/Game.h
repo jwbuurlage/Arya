@@ -21,6 +21,7 @@ class Game : public Arya::InputListener, public Arya::FrameListener
 
         //For key movement
         bool goingForward, goingBackward, goingLeft, goingRight, goingUp, goingDown, rotatingLeft, rotatingRight;
+        bool mouseLeft, mouseRight, mouseTop, mouseBot; //wether mouse is at edge
         bool draggingLeftMouse, draggingRightMouse;
         vec3 forceDirection;
         vec3 specMovement;

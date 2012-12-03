@@ -5,6 +5,7 @@ Game::Game()
 {
     root = 0;
     goingForward = goingBackward = goingLeft = goingRight = goingUp = goingDown = false;
+    mouseLeft = mouseRight = mouseTop = mouseBot = false;
     draggingLeftMouse = draggingRightMouse = false;
     forceDirection = vec3(0.0f);
     specMovement = vec3(0.0f);
@@ -20,7 +21,7 @@ void Game::run()
 {
     root = new Root;
 
-    if(!(root->init(false, 1024, 768))) {
+    if(!(root->init(false, 800, 600))) {
         LOG_ERROR("Unable to init root");
     }
     else
@@ -88,11 +89,11 @@ bool Game::keyDown(int key, bool keyDown)
     }
 
     if( DirectionChanged ){
-        forceDirection.x =  forceDirection.y = forceDirection.z = 0.0f;
-        if(goingForward)    forceDirection.z -= 1.0f;
-        if(goingBackward)   forceDirection.z += 1.0f;
-        if(goingLeft)       forceDirection.x -= 1.0f;
-        if(goingRight)      forceDirection.x  = 1.0f;
+        forceDirection = vec3(0.0f);
+        if(goingForward || mouseTop)    forceDirection.z -= 1.0f;
+        if(goingBackward || mouseBot)   forceDirection.z += 1.0f;
+        if(goingLeft || mouseLeft)      forceDirection.x -= 1.0f;
+        if(goingRight || mouseRight)    forceDirection.x  = 1.0f;
         if(goingUp)         forceDirection.y  = 1.0f;
         if(goingDown)       forceDirection.y -= 1.0f;
         if(forceDirection != vec3(0.0f))
@@ -126,16 +127,39 @@ bool Game::mouseWheelMoved(int delta)
 
 bool Game::mouseMoved(int x, int y, int dx, int dy)
 {
+    bool handled = false;
     int padding = 10;
-    if(x < padding)
-        // move left
-    if(y < padding)
-        // move top
-    if(x > root->getWindowWidth() - padding)
-        // move right
-    if(y > root->getWindowHeight() - padding)
-        // move bottom
 
-    return false;
+    if(x < padding)
+        mouseLeft = true, handled = true;
+    else
+        mouseLeft = false;
+
+    if(y < padding)
+        mouseTop = true, handled = true;
+    else
+        mouseTop = false;
+
+    if(x > root->getWindowWidth() - padding)
+        mouseRight = true, handled = true;
+    else
+        mouseRight = false;
+
+    if(y > root->getWindowHeight() - padding)
+        mouseBot = true, handled = true;
+    else
+        mouseBot = false;
+
+    forceDirection = vec3(0.0f);
+    if(goingForward || mouseTop)    forceDirection.z -= 1.0f;
+    if(goingBackward || mouseBot)   forceDirection.z += 1.0f;
+    if(goingLeft || mouseLeft)      forceDirection.x -= 1.0f;
+    if(goingRight || mouseRight)    forceDirection.x  = 1.0f;
+    if(goingUp)         forceDirection.y  = 1.0f;
+    if(goingDown)       forceDirection.y -= 1.0f;
+    if(forceDirection != vec3(0.0f))
+        forceDirection = glm::normalize(forceDirection);
+
+    return handled; 
 }
 
