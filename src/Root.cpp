@@ -146,6 +146,7 @@ namespace Arya
         }
 
         glfwSetWindowTitle("Arya");
+        glfwEnable(GLFW_MOUSE_CURSOR);
         glfwSetKeyCallback(keyCallback);
         glfwSetMouseButtonCallback(mouseButtonCallback);
         glfwSetMousePosCallback(mousePosCallback);
