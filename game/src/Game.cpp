@@ -39,7 +39,7 @@ void Game::onFrame(float elapsedTime)
 
     //For normal speeds, friction force proportional to the speed
     if(glm::length2(specMovement) > 1.0f) {
-        vec3 frictionVec( -3.0f * specMovement );
+        vec3 frictionVec( -5.0f * specMovement );
         specMovement += frictionVec * elapsedTime;
     } else { //For low speeds, constant friction force
         if(specMovement != vec3(0.0f))
@@ -54,13 +54,13 @@ void Game::onFrame(float elapsedTime)
         cam->setTargetLocation(specPos, false);
 
         if( rotatingLeft && !rotatingRight )
-            cam->rotateCamera( 10.0f * elapsedTime , 0.0f );
+            cam->rotateCamera( 90.0f * elapsedTime , 0.0f );
         else if( rotatingRight && !rotatingLeft )
-            cam->rotateCamera( -10.0f * elapsedTime , 0.0f );
+            cam->rotateCamera( -90.0f * elapsedTime , 0.0f );
 
-        vec3 force(forceDirection);
+        vec3 force = forceDirection;
         force = glm::rotateY(force, cam->getYaw());
-        specMovement += force * 10.0f * elapsedTime;
+        specMovement += force * 100.0f * elapsedTime;
     }
 
     specPos += specMovement * elapsedTime;
@@ -76,10 +76,10 @@ bool Game::keyDown(int key, bool keyDown)
     switch(key) {
         case 'W': goingForward = keyDown;	DirectionChanged = true; break;
         case 'S': goingBackward = keyDown;	DirectionChanged = true; break;
-        case 'A': rotatingLeft = keyDown;	break;
-        case 'D': rotatingRight = keyDown;	break;
-        case 'Q': goingLeft = keyDown;		DirectionChanged = true; break;
-        case 'E': goingRight = keyDown;		DirectionChanged = true; break;
+        case 'Q': rotatingLeft = keyDown;	break;
+        case 'E': rotatingRight = keyDown;	break;
+        case 'A': goingLeft = keyDown;		DirectionChanged = true; break;
+        case 'D': goingRight = keyDown;		DirectionChanged = true; break;
         case 'Z': goingDown = keyDown;		DirectionChanged = true; break;
         case 'X': goingUp = keyDown;		DirectionChanged = true; break;
         case GLFW_KEY_F11: root->setFullscreen(!root->getFullscreen()); break;

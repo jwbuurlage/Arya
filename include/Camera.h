@@ -42,17 +42,15 @@ namespace Arya
             //This will give the camera a swing
             void rotateCameraSwing(float yawspeed, float pitchspeed);
             //This will also rotate the camera but will instantly apply the angle and not swing
-            void rotateCamera(float Yaw, float Pitch); //Add yaw/pitch to current angle
+            void rotateCamera(float deltaYaw, float deltaPitch); //Add yaw/pitch to current angle
             void setCameraAngle(float Yaw, float Pitch);
 
             vec3 getRealCameraPosition();
 
-            //called by Renderer every frame
-            //it will generate a new matrix if it changed
-            //the matrix will be copied to outMatrix
-            //if the argument is not zero
-            //returns if it updated
-            bool updateViewProjectionMatrix(mat4* outMatrix);
+            //Calculates the new viewprojection matrix if it changed
+            //If outMatrix is not null, the correct vp matrix will
+            //alwas be copied into outMatrix
+            void updateViewProjectionMatrix(mat4* outMatrix);
             bool updateMatrix;
 
             float camZoomSpeed; //Zoomspeed. positive means zooming out

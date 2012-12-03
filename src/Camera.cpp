@@ -18,8 +18,8 @@ namespace Arya
         maxCamDist = 100.0f;
         freeYaw = false;
         yaw = 0.0f;
-        pitch = 0.0f;
-        projectionMatrix = glm::perspective(45.0f, 1.6f, 0.1f, 50.0f);
+        pitch = -40.0f;
+        projectionMatrix = mat4(1.0f);
 
         position = vec3(0.0f);
         targetPosition = vec3(0.0f);
@@ -58,7 +58,7 @@ namespace Arya
                 //ToMove already has a length, so if the camera is further away from the player,
                 //then the camera will go faster.
                 //When the object is moving in a single direction then the camera will be (PlayerSpeed/2.0f) units behind the object
-                position += ToMove * 2.0f * elapsedTime; //speed is proportional to distance
+                position += ToMove * 12.0f * elapsedTime; //speed is proportional to distance
             }else{ //Really close
                 vec3 newMove = glm::normalize(ToMove);
                 newMove *= 3.0f * elapsedTime; //constant speed of 3.0f units per second
@@ -125,10 +125,10 @@ namespace Arya
         freeYaw = FreeYawRotation;
     }
 
-    void Camera::rotateCamera(float Yaw, float Pitch)
+    void Camera::rotateCamera(float deltaYaw, float deltaPitch)
     {
-        yaw += Yaw, 
-            pitch += Pitch;
+        yaw += deltaYaw;
+        pitch += deltaPitch;
         updateMatrix = true;
     }
 
@@ -141,13 +141,14 @@ namespace Arya
         return getPosition() + relative;
     }
 
-    bool Camera::updateViewProjectionMatrix(mat4* outMatrix)
+    void Camera::updateViewProjectionMatrix(mat4* outMatrix)
     {
         if( updateMatrix ){
-            viewMatrix = glm::translate( mat4(1.0f), -position );
-            viewMatrix = glm::rotate( viewMatrix, -yaw, vec3(0.0, 1.0, 0.0) );
-            viewMatrix = glm::rotate( viewMatrix, -pitch, vec3(1.0, 0.0, 0.0) );
+            viewMatrix = mat4(1.0f);
             viewMatrix = glm::translate( viewMatrix, vec3(0, 0, -camDist) );
+            viewMatrix = glm::rotate( viewMatrix, -pitch, vec3(1.0, 0.0, 0.0) );
+            viewMatrix = glm::rotate( viewMatrix, -yaw, vec3(0.0, 1.0, 0.0) );
+            viewMatrix = glm::translate( viewMatrix, -position );
             vpMatrix = projectionMatrix * viewMatrix;
 
             //if( inverseViewMatrix ){
@@ -158,14 +159,10 @@ namespace Arya
             //	translateMat.setTranslation(position);
             //	*inverseViewMatrix = translateMat * rotateMat * zoomMat;
             //}
+            updateMatrix = false;
         }
         if( outMatrix ) *outMatrix = projectionMatrix * viewMatrix;
-        if( updateMatrix )
-        {
-            updateMatrix = false;
-            return true;
-        }
-        return false;
+        return;
     }
 
     mat4 Camera::getVPMatrix()
