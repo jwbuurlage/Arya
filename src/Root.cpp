@@ -62,6 +62,8 @@ namespace Arya
             scene = 0;
             return false;
         }
+        else
+            addFrameListener(scene);
 
         return true;
 
@@ -73,12 +75,15 @@ namespace Arya
         {
             if(!oldTime)
                 oldTime = glfwGetTime();
-            double pollTime = glfwGetTime();
-            double elapsed = oldTime - pollTime;
-            oldTime = pollTime;
+            else {
+                double pollTime = glfwGetTime();
+                double elapsed = pollTime - oldTime;
 
-            for(std::vector<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();++it)
-                (*it)->onFrame((float)elapsed);
+                for(std::vector<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();++it)
+                    (*it)->onFrame((float)elapsed);
+
+                oldTime = pollTime;
+            }
 
             render();
             glfwPollEvents();

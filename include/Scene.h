@@ -4,6 +4,8 @@
 #include <vector>
 #include <map>
 
+#include "Root.h"
+
 using std::string;
 using std::vector;
 using std::map;
@@ -16,7 +18,7 @@ namespace Arya
     class Shader;
     class ShaderProgram;
 
-    class Scene
+    class Scene : public FrameListener
     {
         public:
             Scene();
@@ -26,6 +28,9 @@ namespace Arya
 
             void cleanup();
             void render();
+
+            void onFrame(float elapsedTime);
+
             Camera* getCamera() { return camera; };
 
         private:

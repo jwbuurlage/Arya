@@ -9,6 +9,7 @@
 #include "Textures.h"
 #include "Camera.h"
 #include "Shaders.h"
+#include "Root.h"
 
 using std::string;
 using std::cerr;
@@ -47,7 +48,7 @@ namespace Arya
             tiles.push_back(TextureManager::shared().getTexture("rock.tga"));
             tiles.push_back(TextureManager::shared().getTexture("dirt.tga"));
             tiles.push_back(TextureManager::shared().getTexture("snow.tga"));
-            terrain = new Terrain(TextureManager::shared().getTexture("heightmap.tga"),tiles,0);
+            terrain = new Terrain(TextureManager::shared().getTexture("heightmap.tga"),tiles,TextureManager::shared().getTexture("heightmap.tga"));
             if(!terrain->init()) {
                 LOG_WARNING("Could not load terrain");
                 delete terrain;
@@ -100,6 +101,11 @@ namespace Arya
         initialized = false;
     }
 
+    void Scene::onFrame(float elapsedTime)
+    {
+        camera->update(elapsedTime);
+    }
+
     void Scene::render()
     {
         basicProgram->use();
@@ -114,6 +120,6 @@ namespace Arya
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
 
-        terrain->render(camera);
+        // terrain->render(camera);
     }
 }

@@ -22,5 +22,5 @@ vec4 terrainColor()
 
 void main()
 {
-    FragColor = terrainColor();
+    FragColor = vec4(1.0);
 }

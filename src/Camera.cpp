@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "common/Logger.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 
@@ -15,10 +16,13 @@ namespace Arya
         minCamDist = 3.0f;
         maxCamDist = 100.0f;
         freeYaw = false;
-        position.x = position.y = position.z = 0.0f;
         yaw = 0.0f;
         pitch = 0.0f;
         projectionMatrix = glm::perspective(45.0f, 1.6f, 0.1f, 50.0f);
+
+        position = vec3(0.0f);
+        targetPosition = vec3(0.0f);
+        LOG_INFO(targetPosition.x << " " << targetPosition.y << " " <<  targetPosition .z << " " << position.x << " " << position.y << " " << position.z);
     }
 
     Camera::~Camera(){
@@ -38,6 +42,8 @@ namespace Arya
 
         vec3 ToMove = targetPosition - position;
         float dist = ToMove.length();
+
+        // LOG_INFO(targetPosition.x << " " << targetPosition.y << " " <<  targetPosition .z << " " << position.x << " " << position.y << " " << position.z << "to move: " << dist);
 
         //1. Camera position
         //We only need to move if the camera is not at the player
