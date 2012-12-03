@@ -38,6 +38,7 @@ namespace Arya
         private:
             bool generate();
             bool generateIndices();
+            bool generateVAO();
 
             Texture* heightMap;
             vector<Texture*> tileSet;
@@ -48,6 +49,7 @@ namespace Arya
             GLuint vertexBuffer;
             GLuint* indexBuffer;
             GLuint* indexCount;
+            GLuint* vaoHandles;
 
             Shader* terrainVertex;
             Shader* terrainFragment;

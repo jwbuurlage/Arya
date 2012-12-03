@@ -88,12 +88,12 @@ namespace Arya
         GLfloat* vertexData = new GLfloat[patchSizeMax*patchSizeMax * 2];
 
         scaleMatrix = glm::scale(mat4(1.0), vec3((float)patchSizeMax, (float)patchSizeMax, (float)patchSizeMax));
-        float perVertex = 1.0f / (patchSizeMax - 1);
+        float perVertex = (1.0f / ((patchSizeMax - 1) * patchCount));
 
         for(int i = 0; i < patchSizeMax; ++i)
             for(int j = 0; j < patchSizeMax; ++j) {
-                vertexData[2*i*patchSizeMax + 2*j + 0] = i*perVertex;
-                vertexData[2*i*patchSizeMax + 2*j + 1] = j*perVertex;
+                vertexData[2*i*patchSizeMax + 2*j + 0] = j*perVertex;
+                vertexData[2*i*patchSizeMax + 2*j + 1] = i*perVertex;
             }
 
         glGenBuffers(1, &vertexBuffer);
@@ -109,9 +109,9 @@ namespace Arya
         for(int i = 0; i < patchCount; ++i)
             for(int j = 0; j < patchCount; ++j) {
                 Patch p;
-                p.offset = vec2(j*(patchCount - 1), i*(patchCount - 1));
+                p.offset = vec2((1.0 / patchCount)*j, (1.0 / patchCount)*i);
                 p.position = vec2(-w/2 + (w-1)/patchSizeMax*j, -h/2 + (h-1)/patchSizeMax*j);
-                p.lod = log((float)(patchSizeMax-1), 2.0f) + 1;
+                p.lod = -1;
                 patches.push_back(p);
             }
 
@@ -127,17 +127,16 @@ namespace Arya
         // ...
         // level levels: 1^2
 
-        int levels = log((float)(patchSizeMax-1), 2.0f) + 1;
-        LOG_INFO("levels: " << levels);
+        levelMax = log((float)(patchSizeMax-1), 2.0f) + 1;
 
-        indexBuffer = new GLuint[levels];
-        indexCount = new GLuint[levels];
+        indexBuffer = new GLuint[levelMax];
+        indexCount = new GLuint[levelMax];
 
-        glGenBuffers(levels, indexBuffer);
+        glGenBuffers(levelMax, indexBuffer);
 
         GLuint* indices = new GLuint[patchSizeMax * (patchSizeMax-1) * 2];
 
-        for(int l = 0; l < levels; ++l)
+        for(int l = 0; l < levelMax; ++l)
         {
             int c = 0;
             int levelSize = (patchSizeMax-1)/(1 << l) + 1;
@@ -165,6 +164,29 @@ namespace Arya
 
         delete[] indices;
 
+        if(!generateVAO()) return false;
+        return true;
+    }
+
+    bool Terrain::generateVAO()
+    {
+        vaoHandles = new GLuint[levelMax];
+        glGenVertexArrays(levelMax, vaoHandles);
+
+        for(int l = 0; l < levelMax; ++l) 
+        {
+            glBindVertexArray(vaoHandles[l]);
+
+            glEnableVertexAttribArray(0);
+            glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+            glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, (void*)0);
+
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[l]);
+        }
+
+        // prevent other code from mesing up our vao
+        glBindVertexArray(0);
+
         return true;
     }
 
@@ -173,7 +195,7 @@ namespace Arya
         // update patches LOD
         vec3 camPos = curScene->getCamera()->getRealCameraPosition();
         for(int i = 0; i < patches.size(); ++i) {
-            Patch p = patches[i];
+            Patch& p = patches[i];
             vec3 pPos = vec3(p.position, 0.0);
             if(distance(pPos, camPos) < 20.0f)
                 p.lod = 0;
@@ -221,16 +243,13 @@ namespace Arya
         glActiveTexture(GL_TEXTURE5);
         glBindTexture(GL_TEXTURE_2D, tileSet[3]->handle);
 
-        // render patches
-        glBindVertexArray(vertexBuffer);
-        glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, (void*)0);
         for(int i = 0; i < patches.size(); ++i) {
-            Patch p = patches[i];
+            Patch& p = patches[i];
             if(p.lod < 0) continue;
             terrainProgram->setUniform2fv("patchOffset", p.offset);
             terrainProgram->setUniform2fv("patchPosition", p.position);
 
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[3]);
+            glBindVertexArray(vaoHandles[3]);
             glDrawElements(GL_TRIANGLE_STRIP, indexCount[3], GL_UNSIGNED_INT, (void*)0);
         }
     }
