@@ -2,6 +2,7 @@
 #include <string.h>
 #include <GL/glew.h>
 
+#include "common/Listeners.h"
 #include "common/Logger.h"
 #include "Primitives.h"
 #include "Scene.h"
@@ -9,7 +10,6 @@
 #include "Textures.h"
 #include "Camera.h"
 #include "Shaders.h"
-#include "Root.h"
 
 using std::string;
 using std::cerr;
