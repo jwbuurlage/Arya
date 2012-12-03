@@ -104,6 +104,7 @@ namespace Arya
     void Scene::onFrame(float elapsedTime)
     {
         camera->update(elapsedTime);
+        terrain->update(elapsedTime, this);
     }
 
     void Scene::render()
@@ -120,6 +121,6 @@ namespace Arya
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
 
-        // terrain->render(camera);
+        terrain->render(camera);
     }
 }
