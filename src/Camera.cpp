@@ -14,7 +14,7 @@ namespace Arya
         camYawSpeed = 0.0f;
         camPitchSpeed = 0.0f;
         camDist = 50.0f;
-        minCamDist = 30.0f;
+        minCamDist = 10.0f;
         maxCamDist = 1000.0f;
         freeYaw = false;
         yaw = 0.0f;
