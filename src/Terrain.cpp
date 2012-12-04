@@ -197,8 +197,14 @@ namespace Arya
             vec3 pPos = vec3(p.position, -100.0f);
             if(distance(pPos, camPos) < 300.0f)
                 p.lod = 0;
+            else if(distance(pPos, camPos) < 400.0f)
+                p.lod = 1;
             else if(distance(pPos, camPos) < 600.0f)
+                p.lod = 2;
+            else if(distance(pPos, camPos) < 800.0f)
                 p.lod = 3;
+            else if(distance(pPos, camPos) < 1000.0f)
+                p.lod = 4;
             else
                 p.lod = 5;
         }
