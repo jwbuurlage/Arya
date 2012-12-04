@@ -17,8 +17,7 @@ vec4 terrainColor()
     tColor += splatSample.r * texture2D(texture1, vec2(mod(texCoo * 10.0, 1.0)));
     tColor += splatSample.g * texture2D(texture2, vec2(mod(texCoo * 10.0, 1.0)));
     tColor += splatSample.b * texture2D(texture3, vec2(mod(texCoo * 10.0, 1.0)));
-    tColor += splatSample.a * texture2D(texture4, vec2(mod(texCoo * 10.0, 1.0)));
-    return 0.25*tColor;
+    return 0.33*tColor;
 }
 
 void main()

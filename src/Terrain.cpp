@@ -11,7 +11,9 @@
 #include "Textures.h"
 
 using glm::log;
+using glm::vec2;
 using glm::vec3;
+using glm::vec4;
 using glm::distance;
 
 namespace Arya
@@ -104,7 +106,9 @@ namespace Arya
             for(int j = 0; j < patchCount; ++j) {
                 Patch p;
                 p.offset = vec2((1.0 / patchCount)*j, (1.0 / patchCount)*i);
-                p.position = vec2(-w/2 + (w-1)/patchSizeMax*j, -h/2 + (h-1)/patchSizeMax*j);
+                p.position = (vec2(-0.5) + p.offset);
+                p.position.x *= w;
+                p.position.y *= w;
                 p.lod = -1;
                 patches.push_back(p);
             }
@@ -190,10 +194,10 @@ namespace Arya
         vec3 camPos = curScene->getCamera()->getRealCameraPosition();
         for(int i = 0; i < patches.size(); ++i) {
             Patch& p = patches[i];
-            vec3 pPos = vec3(p.position, 0.0);
-            if(distance(pPos, camPos) < 20.0f)
+            vec3 pPos = vec3(p.position, -100.0f);
+            if(distance(pPos, camPos) < 300.0f)
                 p.lod = 0;
-            else if(distance(pPos, camPos) < 40.0f)
+            else if(distance(pPos, camPos) < 600.0f)
                 p.lod = 2;
             else
                 p.lod = 4;
@@ -243,8 +247,8 @@ namespace Arya
             terrainProgram->setUniform2fv("patchOffset", p.offset);
             terrainProgram->setUniform2fv("patchPosition", p.position);
 
-            glBindVertexArray(vaoHandles[3]);
-            glDrawElements(GL_TRIANGLE_STRIP, indexCount[3], GL_UNSIGNED_INT, (void*)0);
+            glBindVertexArray(vaoHandles[p.lod]);
+            glDrawElements(GL_TRIANGLE_STRIP, indexCount[p.lod], GL_UNSIGNED_INT, (void*)0);
         }
     }
 }
