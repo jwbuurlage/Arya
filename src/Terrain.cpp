@@ -198,9 +198,9 @@ namespace Arya
             if(distance(pPos, camPos) < 300.0f)
                 p.lod = 0;
             else if(distance(pPos, camPos) < 600.0f)
-                p.lod = 2;
+                p.lod = 3;
             else
-                p.lod = 4;
+                p.lod = 5;
         }
     }
 

@@ -25,10 +25,10 @@ void main()
 {
 	float lightFraction = max(0.0,dot(normalize(normalOut), normalize(vec3(1.0, 1.0, 0.0))));
 	//Ambient
-	lightFraction = min(lightFraction + 0.20, 1.0);
+	lightFraction = min(lightFraction + 0.0, 1.0);
 	
     FragColor = lightFraction * terrainColor();
 
-    if(posOut.y  < -135.0)
+    if(posOut.y  < -150.0)
         FragColor *= vec4(0.2, 0.5, 1.0, 1.0);
 }
