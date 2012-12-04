@@ -29,6 +29,6 @@ void main()
 	
     FragColor = lightFraction * terrainColor();
 
-    if(posOut.y  < -50.0)
+    if(posOut.y  < -150.0)
         FragColor *= vec4(0.2, 0.5, 1.0, 1.0);
 }

@@ -12,17 +12,23 @@ out vec2 texCoo;
 out vec4 posOut;
 out vec3 normalOut;
 
+float height(vec2 tco)
+{
+    vec3 height = texture2D(heightMap, tco).rgb;
+    return height.x * height.y * height.z * 3.0;
+}
+
 void main()
 {
     texCoo = patchOffset + texCooPatch;
     vec2 scaledPos = (scaleMatrix*vec4(vec2(-0.5)+texCoo, 0.0, 1.0)).xy;
-    vec4 pos = vec4(scaledPos.x, -200.0 + 200.0*(length(texture2D(heightMap, texCoo).rgb)), scaledPos.y, 1.0);
+    vec4 pos = vec4(scaledPos.x, -200.0 + 200.0*height(texCoo), scaledPos.y, 1.0);
 
     float textureDelta = 1.0/512.0;
-    float A = length(texture2D(heightMap, texCoo + vec2(0.0,textureDelta)).rgb);
-    float B = length(texture2D(heightMap, texCoo + vec2(textureDelta,0.0)).rgb);
-    float C = length(texture2D(heightMap, texCoo + vec2(0.0,-textureDelta)).rgb);
-    float D = length(texture2D(heightMap, texCoo + vec2(-textureDelta,0.0)).rgb);
+    float A = height(texCoo + vec2(0.0,textureDelta));
+    float B = height(texCoo + vec2(textureDelta,0.0));
+    float C = height(texCoo + vec2(0.0,-textureDelta));
+    float D = height(texCoo + vec2(-textureDelta,0.0));
 
     vec4 normal = vec4( (D-B), 2.0/200.0, (C-A), 0.0 );
     normalOut = normalize( normal.xyz );
