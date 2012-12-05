@@ -61,6 +61,7 @@ namespace Arya
 
         // set GL stuff
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
 
         if( scene == 0 ) scene = new Scene();
         if( !scene->isInitialized() )
