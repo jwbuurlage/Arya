@@ -25,6 +25,8 @@ namespace Arya
         mesh->addRef();
     }
 
+    template<> ModelManager* Singleton<ModelManager>::singleton = 0;
+
     ModelManager::ModelManager()
     {
     }
