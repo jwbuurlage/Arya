@@ -145,13 +145,12 @@ namespace Arya
             windowHeight = desktopHeight;
         }
 
-
 #ifdef __APPLE__
         glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3); // Use OpenGL Core v3.2
         glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 2);
 #endif
 
-        if(!glfwOpenWindow(windowWidth, windowHeight, 0, 0, 0, 0, 8, 0, (fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW)))
+        if(!glfwOpenWindow(windowWidth, windowHeight, 0, 0, 0, 0, 32, 0, (fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW)))
         {
             return false;
         }
