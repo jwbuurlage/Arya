@@ -132,7 +132,7 @@ namespace Arya
 
         glGenBuffers(levelMax, indexBuffer);
 
-        GLuint* indices = new GLuint[patchSizeMax * (patchSizeMax-1) * 2 + 3 * (patchSizeMax - 1)];
+        GLuint* indices = new GLuint[patchSizeMax * (patchSizeMax-1) * 2 + (patchSizeMax - 1)];
 
         for(int l = 0; l < levelMax; ++l)
         {
