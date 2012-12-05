@@ -3,6 +3,7 @@
 #include "Files.h"
 #include <sstream>
 #include <GL/glfw.h>
+#include "ext/stb_image.c"
 
 namespace Arya
 {
@@ -28,32 +29,60 @@ namespace Arya
         File* imagefile = FileSystem::shared().getFile(filename);
         if( imagefile == 0 ) return 0;
 
-        //sf::Image image;
-        //if( image.loadFromMemory(imagefile->data, imagefile->size) )
-
         Texture* texture = 0;
 
-        GLFWimage glfwimage;
-        if( glfwReadMemoryImage(imagefile->getData(), imagefile->getSize(), &glfwimage, 0) == GL_TRUE )
+        int width, height, channels;
+        unsigned char* ptr = stbi_load_from_memory((stbi_uc*)imagefile->getData(), imagefile->getSize(), &width, &height, &channels, STBI_default);
+        if(ptr)
         {
             texture = new Texture;
-            texture->width = glfwimage.Width; //image.getSize().x;
-            texture->height = glfwimage.Height; //image.getSize().y;
+            texture->width = width;
+            texture->height = height;
 
             glGenTextures(1, &texture->handle);
-            glBindTexture( GL_TEXTURE_2D, texture->handle );
-            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+            glBindTexture(GL_TEXTURE_2D, texture->handle);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-            glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, texture->width, texture->height, 0, glfwimage.Format, GL_UNSIGNED_BYTE, glfwimage.Data);
+            GLenum format = GL_RGBA;
+            if(channels == 1) format = GL_RED;
+            else if(channels == 2) format = GL_RG;
+            else if(channels == 3) format = GL_RGB;
+            else if(channels == 4) format = GL_RGBA;
+            else LOG_ERROR("Invalid channel count in " << filename);
+
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture->width, texture->height, 0, format, GL_UNSIGNED_BYTE, ptr);
 
             addResource(filename, texture);
-            glfwFreeImage(&glfwimage);
+
+            stbi_image_free(ptr);
         }
         else
         {
-            LOG_ERROR("Unable to read image data of " << filename);
+            LOG_ERROR("Unable to read image data of " << filename << ". Reason: " << stbi_failure_reason());
         }
+
+        //GLFWimage glfwimage;
+        //if( glfwReadMemoryImage(imagefile->getData(), imagefile->getSize(), &glfwimage, 0) == GL_TRUE )
+        //{
+        //    texture = new Texture;
+        //    texture->width = glfwimage.Width;
+        //    texture->height = glfwimage.Height;
+
+        //    glGenTextures(1, &texture->handle);
+        //    glBindTexture( GL_TEXTURE_2D, texture->handle );
+        //    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+        //    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+
+        //    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, texture->width, texture->height, 0, glfwimage.Format, GL_UNSIGNED_BYTE, glfwimage.Data);
+
+        //    addResource(filename, texture);
+        //    glfwFreeImage(&glfwimage);
+        //}
+        //else
+        //{
+        //    LOG_ERROR("Unable to read image data of " << filename);
+        //}
 
         //OpenGL has the image data now
         FileSystem::shared().releaseFile(imagefile);
