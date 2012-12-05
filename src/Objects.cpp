@@ -5,10 +5,15 @@ namespace Arya
 {
     Object::Object()
     {
+        model = 0;
         updateMatrix = true;
         position = vec3(0.0, 0.0, 0.0);
         pitch = 0.0f;
         yaw = 0.0f;
+    }
+
+    Object::~Object()
+    {
     }
 
     const mat4& Object::getMoveMatrix()

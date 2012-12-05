@@ -1,9 +1,9 @@
 #include "Mesh.h"
-#include "Objects.h"
+#include "Models.h"
 
 namespace Arya
 {
-    class Triangle : public Mesh
+    class Triangle : public Model
     {
         public:
             Triangle();
@@ -11,16 +11,6 @@ namespace Arya
 
         private:
             void init();
-    };
-
-    class ColoredTriangle : public StaticObject
-    {
-        public:
-            ColoredTriangle();
-            ~ColoredTriangle();
-
-        private:
-            void makeVAO();
     };
 }
 

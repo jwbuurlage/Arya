@@ -6,27 +6,25 @@ using glm::vec3;
 using glm::mat4;
 using std::vector;
 
-class Mesh;
 
 namespace Arya
 {
+    class Model;
+
     class Object
     {
         public:
             Object();
-            ~Object(){}
-
-            GLuint getVAO() { return vaoHandle; }
+            ~Object();
 
             void setPosition(vec3 pos){ position = pos; updateMatrix = true; }
             const vec3& getPosition() const { return position; }
 
             const mat4& getMoveMatrix();
 
-        protected:
-            vector<Mesh*> meshes;
-            GLuint vaoHandle;
+            Model* model;
 
+        private:
             vec3 position;
             float pitch;
             float yaw;
@@ -34,6 +32,4 @@ namespace Arya
             mat4 mMatrix; //cached
             bool updateMatrix;
     };
-
-    typedef Object StaticObject;
 }
