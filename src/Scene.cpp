@@ -117,6 +117,7 @@ namespace Arya
 
         for(int i = 0; i < objects.size(); ++i)
         {
+            basicProgram->setUniformMatrix4fv("mMatrix", objects[i]->getMoveMatrix());
             glBindVertexArray(objects[i]->getVAO());
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
