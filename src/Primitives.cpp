@@ -1,4 +1,5 @@
 #include "Primitives.h"
+#include "common/Logger.h"
 
 namespace Arya
 {
@@ -53,6 +54,7 @@ namespace Arya
 
     ColoredTriangle::ColoredTriangle() : StaticObject()
     {
+        vaoHandle = 0;
         Triangle* tri = new Triangle;
         meshes.push_back(tri);
         makeVAO();
@@ -60,8 +62,14 @@ namespace Arya
 
     void ColoredTriangle::makeVAO()
     {
+        LOG_INFO("Making VAO");
+
         glGenVertexArrays(1, &vaoHandle);
+
+        LOG_INFO("Finished making VAO");
+
         glBindVertexArray(vaoHandle);
+
 
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
@@ -71,5 +79,6 @@ namespace Arya
 
         glBindBuffer(GL_ARRAY_BUFFER, meshes[0]->getColorBuffer());
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLubyte*)NULL);   
+
     }
 }
