@@ -106,7 +106,7 @@ namespace Arya
             for(int j = 0; j < patchCount; ++j) {
                 Patch p;
                 p.offset = vec2((1.0 / patchCount)*j, (1.0 / patchCount)*i);
-                p.position = (vec2(-0.5) + p.offset);
+                p.position = (vec2(-0.5 + 0.5 / patchCount) + p.offset);
                 p.position.x *= w;
                 p.position.y *= w;
                 p.lod = -1;
@@ -132,16 +132,15 @@ namespace Arya
 
         glGenBuffers(levelMax, indexBuffer);
 
-        GLuint* indices = new GLuint[patchSizeMax * (patchSizeMax-1) * 2];
+        GLuint* indices = new GLuint[patchSizeMax * (patchSizeMax-1) * 2 + (patchSizeMax - 1)];
 
         for(int l = 0; l < levelMax; ++l)
         {
             int c = 0;
             int levelSize = (patchSizeMax-1)/(1 << l) + 1;
-            indexCount[l] = levelSize * (levelSize-1) * 2;
             // level l
             int row = 0;
-            for(int j = 0; j < patchSizeMax - 1; j += 1 << l)
+            for(int j = 0; j < patchSizeMax - 1; j += 1 << l) {
                 if(row++ % 2 == 0)
                     for(int i = 0; i < patchSizeMax; i += 1 << l) {
                         indices[c++] = j*patchSizeMax + i;
@@ -152,6 +151,9 @@ namespace Arya
                         indices[c++] = j*patchSizeMax + patchSizeMax - 1 - i;
                         indices[c++] = (j+(1 << l))*patchSizeMax + patchSizeMax - 1 - i;
                     }
+                indices[c++] = indices[c - 2];
+                indexCount[l] = c + 1;
+            }
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[l]);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER,
@@ -192,9 +194,10 @@ namespace Arya
     {
         // update patches LOD
         vec3 camPos = curScene->getCamera()->getRealCameraPosition();
+
         for(int i = 0; i < patches.size(); ++i) {
             Patch& p = patches[i];
-            vec3 pPos = vec3(p.position, -100.0f);
+            vec3 pPos = vec3(p.position.x, -100.0f, p.position.y);
             if(distance(pPos, camPos) < 300.0f)
                 p.lod = 0;
             else if(distance(pPos, camPos) < 400.0f)
