@@ -4,6 +4,7 @@
 
 #include "common/Listeners.h"
 #include "common/Logger.h"
+#include "Objects.h"
 #include "Primitives.h"
 #include "Scene.h"
 #include "Terrain.h"
@@ -35,8 +36,10 @@ namespace Arya
     {
         if(!initShaders()) return false;
 
-        ColoredTriangle* cTri = new ColoredTriangle;
-        objects.push_back(cTri);
+        triangleModel = new Triangle;
+        Object* triObject = new Object;
+        triObject->model = triangleModel;
+        objects.push_back(triObject);
 
         LOG_INFO("Loading scene");
 
@@ -119,9 +122,15 @@ namespace Arya
 
         for(int i = 0; i < objects.size(); ++i)
         {
+            if( objects[i]->model == 0 ) continue;
             basicProgram->setUniformMatrix4fv("mMatrix", objects[i]->getMoveMatrix());
-            glBindVertexArray(objects[i]->getVAO());
-            glDrawArrays(GL_TRIANGLES, 0, 3);
+            Model* model = objects[i]->model;
+            for(int j = 0; j < model->getMeshes().size(); ++j)
+            {
+                Mesh* mesh = model->getMeshes()[j];
+                glBindVertexArray(mesh->vaoHandle);
+                glDrawArrays(mesh->primitiveType, 0, mesh->vertexCount);
+            }
         }
 
         terrain->render(camera);

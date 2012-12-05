@@ -8,19 +8,23 @@ namespace Arya
     {
         public:
             Mesh();
-            ~Mesh() { };
+            ~Mesh();
 
-            GLuint getVertexBuffer() { return vertexBuffer; }
-            GLuint getColorBuffer() { return colorBuffer; }
-            GLsizei getVertexCount() { return vertexCount; }
-            GLenum getPrimitiveType() { return primitiveType; }
+            //GLuint getVAO() { return vaoHandle; }
+            //GLuint getVertexBuffer() { return vertexBuffer; }
+            //GLsizei getVertexCount() { return vertexCount; }
+            //GLenum getPrimitiveType() { return primitiveType; }
 
-        protected:
+            void addRef(){ refCount++; }
+            void release(){ refCount--; }
+            int getRefCount() const { return refCount; }
+
+            GLuint vaoHandle;
             GLuint vertexBuffer;
-            GLuint colorBuffer;
             GLsizei vertexCount;
             GLenum primitiveType;
 
-            bool hasColor;
+        private:
+            int refCount;
     };
 }

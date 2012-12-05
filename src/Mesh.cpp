@@ -5,10 +5,14 @@ namespace Arya
     Mesh::Mesh()
     {
         vertexBuffer = 0;
-        colorBuffer = 0;
         vertexCount = 0;
         primitiveType = 0;
+        refCount = 0;
+    }
 
-        hasColor = false;
+    Mesh::~Mesh()
+    {
+        if(vertexBuffer)
+            glDeleteBuffers(1, &vertexBuffer);
     }
 }
