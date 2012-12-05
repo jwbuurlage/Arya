@@ -38,6 +38,8 @@ namespace Arya
         ColoredTriangle* cTri = new ColoredTriangle;
         objects.push_back(cTri);
 
+        LOG_INFO("Loading scene");
+
         if(!terrain)
         {
             vector<Texture*> tiles;

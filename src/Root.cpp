@@ -50,6 +50,8 @@ namespace Arya
 
     bool Root::init(bool fullscr, int w, int h)
     {
+        LOG_INFO("loading root");
+
         windowWidth = w;
         windowHeight = h;
         fullscreen = fullscr;
@@ -142,6 +144,12 @@ namespace Arya
             windowHeight = desktopHeight;
         }
 
+
+#ifdef __APPLE__
+        glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3); // Use OpenGL Core v3.2
+        glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 2);
+#endif
+
         if(!glfwOpenWindow(windowWidth, windowHeight, 0, 0, 0, 0, 0, 0, (fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW)))
         {
             return false;
@@ -159,6 +167,9 @@ namespace Arya
 
     bool Root::initGLEW()
     {
+#ifdef __APPLE__
+        glewExperimental = GL_TRUE; 
+#endif
         glewInit();
         return true;
     }
