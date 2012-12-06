@@ -152,9 +152,9 @@ namespace Arya
                         indices[c++] = (j+(1 << l))*patchSizeMax + patchSizeMax - 1 - i;
                     }
                 indices[c++] = indices[c - 2];
-                indexCount[l] = c + 1;
             }
 
+            indexCount[l] = c;
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[l]);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                     sizeof(GLuint) * indexCount[l],
