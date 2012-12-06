@@ -55,6 +55,10 @@ namespace Arya
         for(int i = 0; i < tileSet.size(); ++i) {
             glBindTexture(GL_TEXTURE_2D, tileSet[i]->handle);
             glGenerateMipmap(GL_TEXTURE_2D);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         }
 
         if(!generate()) return false;
@@ -210,16 +214,16 @@ namespace Arya
             vec3 pPos = vec3(p.position.x, -100.0f, p.position.y);
             if(distance(pPos, camPos) < 300.0f)
                 p.lod = 0;
-            else if(distance(pPos, camPos) < 400.0f)
+            else if(distance(pPos, camPos) < 500.0f)
                 p.lod = 1;
-            else if(distance(pPos, camPos) < 600.0f)
+            else if(distance(pPos, camPos) < 700.0f)
                 p.lod = 2;
-            else if(distance(pPos, camPos) < 800.0f)
+            else if(distance(pPos, camPos) < 900.0f)
                 p.lod = 3;
-            else if(distance(pPos, camPos) < 1000.0f)
+            else if(distance(pPos, camPos) < 1100.0f)
                 p.lod = 4;
             else
-                p.lod = 5;
+                p.lod = levelMax -1;
         }
     }
 
