@@ -22,7 +22,7 @@ namespace Arya
     }
 
     void TextureManager::cleanup(){
-
+        unloadAll();
     }
 
     Texture* TextureManager::loadResource( const char* filename ){

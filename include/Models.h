@@ -1,7 +1,10 @@
 #pragma once
+#include "common/Singleton.h"
+#include "Resources.h"
 #include "Mesh.h"
 #include "Materials.h"
 #include <vector>
+#include <GL/glew.h>
 
 using std::vector;
 
@@ -31,5 +34,18 @@ namespace Arya
         private:
             vector<Mesh*> meshes;
             vector<Material*> materials;
+    };
+
+    class ModelManager : public Singleton<ModelManager>, public ResourceManager<Model> {
+        public:
+            ModelManager();
+            ~ModelManager();
+
+            int initialize();
+            void cleanup();
+
+            Model* getModel(const char* filename){ return getResource(filename); }
+        private:
+            Model* loadResource( const char* filename );
     };
 }

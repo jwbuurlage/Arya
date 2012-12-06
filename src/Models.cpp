@@ -24,4 +24,30 @@ namespace Arya
         meshes.push_back(mesh);
         mesh->addRef();
     }
+
+    template<> ModelManager* Singleton<ModelManager>::singleton = 0;
+
+    ModelManager::ModelManager()
+    {
+    }
+
+    ModelManager::~ModelManager()
+    {
+        cleanup();
+    }
+
+    int ModelManager::initialize()
+    {
+        //Could load some primitives here if wanted
+    }
+
+    void ModelManager::cleanup()
+    {
+        unloadAll();
+    }
+
+    Model* ModelManager::loadResource(const char* filename)
+    {
+        return 0;
+    }
 }
