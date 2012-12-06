@@ -47,6 +47,16 @@ namespace Arya
     bool Terrain::init()
     {
         if(heightMap == 0 || splatMap == 0) return false;
+
+        glBindTexture(GL_TEXTURE_2D, heightMap->handle);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        for(int i = 0; i < tileSet.size(); ++i) {
+            glBindTexture(GL_TEXTURE_2D, tileSet[i]->handle);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+
         if(!generate()) return false;
 
         Shader* terrainVertex = new Shader(VERTEX);

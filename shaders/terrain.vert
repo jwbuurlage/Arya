@@ -16,7 +16,7 @@ float height(vec2 tco)
 {
     vec4 h = vec4(0.0);
     h = texture(heightMap, tco);
-    return h.x * h.y * h.z;
+    return 0.33 * (h.x + h.y + h.z);
 }
 
 void main()
