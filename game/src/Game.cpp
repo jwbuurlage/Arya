@@ -28,6 +28,18 @@ void Game::run()
     {
         root->addInputListener(this);
         root->addFrameListener(this);
+
+        Scene* scene = root->getScene();
+        Object* obj;
+
+        obj = scene->createObject();
+        obj->setModel(ModelManager::shared().getModel("triangle"));
+        obj->setPosition(vec3(0, 0, 0));
+
+        obj = scene->createObject();
+        obj->setModel(ModelManager::shared().getModel("quad"));
+        obj->setPosition(vec3(0, 0, 5));
+
         root->startRendering();
     }
 

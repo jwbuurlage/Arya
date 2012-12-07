@@ -14,17 +14,25 @@ namespace Arya
     class Object
     {
         public:
-            Object();
-            ~Object();
-
             void setPosition(vec3 pos){ position = pos; updateMatrix = true; }
             const vec3& getPosition() const { return position; }
 
             const mat4& getMoveMatrix();
 
-            Model* model;
+            //TODO: Add refcount
+            //or even give 'Model' a list of Objects
+            //so we can do optimized OpenGL Instancing
+            void setModel(Model* m){ model = m; }
+            Model* getModel() const { return model; }
 
         private:
+            //Only Scene can make Objects
+            friend class Scene;
+            Object();
+            ~Object();
+
+            Model* model;
+
             vec3 position;
             float pitch;
             float yaw;

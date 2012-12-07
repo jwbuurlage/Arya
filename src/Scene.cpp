@@ -32,13 +32,16 @@ namespace Arya
         cleanup();
     }
 
+    Object* Scene::createObject()
+    {
+        Object* obj = new Object;
+        objects.push_back(obj);
+        return obj;
+    }
+
     bool Scene::init()
     {
         if(!initShaders()) return false;
-
-        Object* triObject = new Object;
-        triObject->model = ModelManager::shared().getModel("triangle");
-        objects.push_back(triObject);
 
         LOG_INFO("Loading scene");
 

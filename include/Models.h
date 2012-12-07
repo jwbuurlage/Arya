@@ -34,7 +34,7 @@ namespace Arya
             friend class ModelManager;
             friend class ResourceManager<Model>;
             Model();
-            ~Model();
+            virtual ~Model();
 
             Mesh* createAndAddMesh();
 

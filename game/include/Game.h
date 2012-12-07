@@ -1,6 +1,10 @@
 #include "Arya.h"
 
 using Arya::Root;
+using Arya::Scene;
+using Arya::Object;
+using Arya::Model;
+using Arya::ModelManager;
 using Arya::Camera;
 
 class Game : public Arya::InputListener, public Arya::FrameListener

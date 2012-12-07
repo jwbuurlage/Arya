@@ -46,9 +46,8 @@ namespace Arya
 
     int ModelManager::initialize()
     {
-        //Could load some primitives here if wanted
-        Model* triangle = new Triangle;
-        addResource("triangle", triangle);
+        addResource("triangle", new Triangle);
+        addResource("quad", new Quad);
     }
 
     void ModelManager::cleanup()
