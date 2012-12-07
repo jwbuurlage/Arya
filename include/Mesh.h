@@ -7,9 +7,6 @@ namespace Arya
     class Mesh
     {
         public:
-            Mesh();
-            ~Mesh();
-
             //GLuint getVAO() { return vaoHandle; }
             //GLuint getVertexBuffer() { return vertexBuffer; }
             //GLsizei getVertexCount() { return vertexCount; }
@@ -26,5 +23,11 @@ namespace Arya
 
         private:
             int refCount;
+
+            //Only Model and ModelManger can create meshes
+            friend class ModelManager;
+            friend class Model;
+            Mesh();
+            ~Mesh();
     };
 }

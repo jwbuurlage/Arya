@@ -40,8 +40,6 @@ namespace Arya
             Terrain* terrain;
             Camera* camera;
 
-            Model* triangleModel; //this should be in ModelManager soon
-
             bool init();
             bool initShaders();
 

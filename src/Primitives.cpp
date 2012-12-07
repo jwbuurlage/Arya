@@ -14,8 +14,7 @@ namespace Arya
 
     void Triangle::init()
     {
-        Mesh* mesh = new Mesh;
-        addMesh(mesh);
+        Mesh* mesh = createAndAddMesh();
 
         // Vertices
         GLfloat triangleVertices[] = {

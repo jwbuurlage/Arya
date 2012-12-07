@@ -5,7 +5,7 @@
 #include "common/Listeners.h"
 #include "common/Logger.h"
 #include "Objects.h"
-#include "Primitives.h"
+#include "Models.h"
 #include "Scene.h"
 #include "Terrain.h"
 #include "Textures.h"
@@ -36,9 +36,8 @@ namespace Arya
     {
         if(!initShaders()) return false;
 
-        triangleModel = new Triangle;
         Object* triObject = new Object;
-        triObject->model = triangleModel;
+        triObject->model = ModelManager::shared().getModel("triangle");
         objects.push_back(triObject);
 
         LOG_INFO("Loading scene");

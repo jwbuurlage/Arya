@@ -21,9 +21,6 @@ namespace Arya
     class Model
     {
         public:
-            Model();
-            ~Model();
-
             ModelType modelType;
 
             //Adds refcount to mesh as well
@@ -31,7 +28,16 @@ namespace Arya
 
             const vector<Mesh*>& getMeshes() const { return meshes; }
 
-        private:
+        protected:
+            //Private constructor because only
+            //ModelManager is allowed to create these
+            friend class ModelManager;
+            friend class ResourceManager<Model>;
+            Model();
+            ~Model();
+
+            Mesh* createAndAddMesh();
+
             vector<Mesh*> meshes;
             vector<Material*> materials;
     };

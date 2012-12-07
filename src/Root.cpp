@@ -4,6 +4,7 @@
 #include <GL/glfw.h>
 
 #include "Root.h"
+#include "Models.h"
 #include "Shaders.h"
 #include "Textures.h"
 #include "Scene.h"
@@ -33,6 +34,7 @@ namespace Arya
         Logger* log = new Logger();
         FileSystem* files = new FileSystem();
         TextureManager* tex = new TextureManager();
+        ModelManager* modelManager = new ModelManager();
     }
 
     Root::~Root()
@@ -43,6 +45,7 @@ namespace Arya
 
         if( scene ) delete scene;
 
+        delete &ModelManager::shared();
         delete &FileSystem::shared();
         delete &Logger::shared();
         delete &TextureManager::shared();
@@ -62,6 +65,10 @@ namespace Arya
         // set GL stuff
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
+
+        //Call these in the right order: Models need Textures
+        TextureManager::shared().initialize();
+        ModelManager::shared().initialize();
 
         if( scene == 0 ) scene = new Scene();
         if( !scene->isInitialized() )

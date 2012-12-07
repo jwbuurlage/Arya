@@ -1,4 +1,5 @@
 #include "Models.h"
+#include "Primitives.h"
 
 namespace Arya
 {
@@ -25,6 +26,13 @@ namespace Arya
         mesh->addRef();
     }
 
+    Mesh* Model::createAndAddMesh()
+    {
+        Mesh* newMesh = new Mesh;
+        addMesh(newMesh);
+        return newMesh;
+    }
+
     template<> ModelManager* Singleton<ModelManager>::singleton = 0;
 
     ModelManager::ModelManager()
@@ -39,6 +47,8 @@ namespace Arya
     int ModelManager::initialize()
     {
         //Could load some primitives here if wanted
+        Model* triangle = new Triangle;
+        addResource("triangle", triangle);
     }
 
     void ModelManager::cleanup()

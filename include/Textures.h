@@ -26,6 +26,7 @@ namespace Arya
             int initialize();
             void cleanup();
 
+            //If no texture found it will return 0
             Texture* getTexture( const char* filename ){ return getResource(filename); }
 
         private:
