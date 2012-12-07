@@ -20,6 +20,14 @@ namespace Arya
         }
     }
 
+    AnimationState* Model::createAnimationState()
+    {
+        //If bone, create BoneAnimationState
+        //If vertex, create VertexAnimationState
+        //else return 0
+        return 0;
+    }
+
     void Model::addMesh(Mesh* mesh)
     {
         meshes.push_back(mesh);

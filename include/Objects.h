@@ -10,6 +10,7 @@ using std::vector;
 namespace Arya
 {
     class Model;
+    class AnimationState;
 
     class Object
     {
@@ -19,11 +20,14 @@ namespace Arya
 
             const mat4& getMoveMatrix();
 
-            //TODO: Add refcount
-            //or even give 'Model' a list of Objects
-            //so we can do optimized OpenGL Instancing
-            void setModel(Model* m){ model = m; }
+            //setModel also recreates a new AnimationState object
+            void setModel(Model* model);
             Model* getModel() const { return model; }
+
+            void setAnimation(const char* name);
+
+            AnimationState* getAnimationState() const { return animState; }
+            void updateAnimation(float elapsedTime);
 
         private:
             //Only Scene can make Objects
@@ -32,6 +36,7 @@ namespace Arya
             ~Object();
 
             Model* model;
+            AnimationState* animState;
 
             vec3 position;
             float pitch;
