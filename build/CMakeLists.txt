@@ -31,7 +31,7 @@ ELSE()
         )
 ENDIF()
 
-SET(LIB_NAME "arya")
+SET(LIB_NAME "Arya")
 
 SET(
     LIB_SOURCES

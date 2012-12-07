@@ -27,7 +27,7 @@ namespace Arya
     {
         public:
             // Tileset needs to have 4 elements
-            Terrain(Texture* hm, vector<Texture*> ts, Texture* sm);
+            Terrain(const char* hm, vector<Texture*> ts, Texture* sm);
             ~Terrain(); 
 
             void render(Camera* cam);
@@ -40,9 +40,10 @@ namespace Arya
             bool generateIndices();
             bool generateVAO();
 
-            Texture* heightMap;
+            const char* heightMapName;
             vector<Texture*> tileSet;
             Texture* splatMap;
+            GLuint heightMapHandle;
 
             mat4 scaleMatrix;
 

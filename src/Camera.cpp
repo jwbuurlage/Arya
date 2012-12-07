@@ -18,7 +18,7 @@ namespace Arya
         maxCamDist = 1000.0f;
         freeYaw = false;
         yaw = 0.0f;
-        pitch = -40.0f;
+        pitch = -60.0f;
         projectionMatrix = mat4(1.0f);
 
         position = vec3(0.0f);

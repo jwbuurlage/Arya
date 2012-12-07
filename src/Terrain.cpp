@@ -9,6 +9,7 @@
 #include "Scene.h"
 #include "Camera.h"
 #include "Textures.h"
+#include "Files.h"
 
 using glm::log;
 using glm::vec2;
@@ -18,9 +19,9 @@ using glm::distance;
 
 namespace Arya
 {
-    Terrain::Terrain(Texture* hm, vector<Texture*> ts, Texture* sm) 
+    Terrain::Terrain(const char* hm, vector<Texture*> ts, Texture* sm) 
     {
-        heightMap = hm;
+        heightMapName = hm;
         tileSet = ts;
         if(!(tileSet.size() == 4))
             LOG_WARNING("Tileset is of wrong size");
@@ -32,6 +33,8 @@ namespace Arya
         patchCount = 0;
         patchSizeMax = 0;
         levelMax = 0;
+
+        heightMapHandle = 0;
     }
 
     Terrain::~Terrain()
@@ -46,11 +49,7 @@ namespace Arya
 
     bool Terrain::init()
     {
-        if(heightMap == 0 || splatMap == 0) return false;
-
-        glBindTexture(GL_TEXTURE_2D, heightMap->handle);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        if(heightMapName == 0 || splatMap == 0) return false;
 
         for(int i = 0; i < tileSet.size(); ++i) {
             glBindTexture(GL_TEXTURE_2D, tileSet[i]->handle);
@@ -75,6 +74,22 @@ namespace Arya
         terrainProgram->attach(terrainVertex);
         terrainProgram->attach(terrainFragment);
         if(!(terrainProgram->link())) return false;
+
+        // load in heightmap
+        File* hFile = FileSystem::shared().getFile(heightMapName);
+
+        glGenTextures(1, &heightMapHandle);
+        glBindTexture(GL_TEXTURE_2D, heightMapHandle);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        GLint swizzle_mask[] = { GL_RED, GL_RED, GL_RED, GL_ONE };
+        glTexParameteriv( GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzle_mask);
+
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, 1025, 1025, 0, GL_RED, GL_UNSIGNED_SHORT, hFile->getData());
 
         return true;
     }
@@ -240,7 +255,7 @@ namespace Arya
         // heightmap
         terrainProgram->setUniform1i("heightMap", 0);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, heightMap->handle);
+        glBindTexture(GL_TEXTURE_2D, heightMapHandle);
 
         // splatmap
         terrainProgram->setUniform1i("splatTexture", 1);
