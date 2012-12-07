@@ -39,12 +39,19 @@ namespace Arya
 
     Terrain::~Terrain()
     {
-        if(indexBuffer)
+        if(indexBuffer) {
+            glDeleteBuffers(levelMax, indexBuffer);
             delete[] indexBuffer;
+        }
         if(indexCount)
             delete[] indexCount;
-        if(terrainProgram)
+        if(terrainProgram) 
             delete terrainProgram;
+
+        glDeleteBuffers(1, &vertexBuffer);
+
+        if(heightMapHandle)
+            glDeleteTextures(1, &heightMapHandle);
     }
 
     bool Terrain::init()
