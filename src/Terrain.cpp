@@ -9,6 +9,7 @@
 #include "Scene.h"
 #include "Camera.h"
 #include "Textures.h"
+#include "Files.h"
 
 using glm::log;
 using glm::vec2;
@@ -18,9 +19,9 @@ using glm::distance;
 
 namespace Arya
 {
-    Terrain::Terrain(Texture* hm, vector<Texture*> ts, Texture* sm) 
+    Terrain::Terrain(const char* hm, vector<Texture*> ts, Texture* sm) 
     {
-        heightMap = hm;
+        heightMapName = hm;
         tileSet = ts;
         if(!(tileSet.size() == 4))
             LOG_WARNING("Tileset is of wrong size");
@@ -32,21 +33,40 @@ namespace Arya
         patchCount = 0;
         patchSizeMax = 0;
         levelMax = 0;
+
+        heightMapHandle = 0;
     }
 
     Terrain::~Terrain()
     {
-        if(indexBuffer)
+        if(indexBuffer) {
+            glDeleteBuffers(levelMax, indexBuffer);
             delete[] indexBuffer;
+        }
         if(indexCount)
             delete[] indexCount;
-        if(terrainProgram)
+        if(terrainProgram) 
             delete terrainProgram;
+
+        glDeleteBuffers(1, &vertexBuffer);
+
+        if(heightMapHandle)
+            glDeleteTextures(1, &heightMapHandle);
     }
 
     bool Terrain::init()
     {
-        if(heightMap == 0 || splatMap == 0) return false;
+        if(heightMapName == 0 || splatMap == 0) return false;
+
+        for(int i = 0; i < tileSet.size(); ++i) {
+            glBindTexture(GL_TEXTURE_2D, tileSet[i]->handle);
+            glGenerateMipmap(GL_TEXTURE_2D);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        }
+
         if(!generate()) return false;
 
         Shader* terrainVertex = new Shader(VERTEX);
@@ -61,6 +81,22 @@ namespace Arya
         terrainProgram->attach(terrainVertex);
         terrainProgram->attach(terrainFragment);
         if(!(terrainProgram->link())) return false;
+
+        // load in heightmap
+        File* hFile = FileSystem::shared().getFile(heightMapName);
+
+        glGenTextures(1, &heightMapHandle);
+        glBindTexture(GL_TEXTURE_2D, heightMapHandle);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        GLint swizzle_mask[] = { GL_RED, GL_RED, GL_RED, GL_ONE };
+        glTexParameteriv( GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzle_mask);
+
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, 1025, 1025, 0, GL_RED, GL_UNSIGNED_SHORT, hFile->getData());
 
         return true;
     }
@@ -106,7 +142,7 @@ namespace Arya
             for(int j = 0; j < patchCount; ++j) {
                 Patch p;
                 p.offset = vec2((1.0 / patchCount)*j, (1.0 / patchCount)*i);
-                p.position = (vec2(-0.5) + p.offset);
+                p.position = (vec2(-0.5 + 0.5 / patchCount) + p.offset);
                 p.position.x *= w;
                 p.position.y *= w;
                 p.lod = -1;
@@ -132,16 +168,15 @@ namespace Arya
 
         glGenBuffers(levelMax, indexBuffer);
 
-        GLuint* indices = new GLuint[patchSizeMax * (patchSizeMax-1) * 2];
+        GLuint* indices = new GLuint[patchSizeMax * (patchSizeMax-1) * 2 + (patchSizeMax - 1)];
 
         for(int l = 0; l < levelMax; ++l)
         {
             int c = 0;
             int levelSize = (patchSizeMax-1)/(1 << l) + 1;
-            indexCount[l] = levelSize * (levelSize-1) * 2;
             // level l
             int row = 0;
-            for(int j = 0; j < patchSizeMax - 1; j += 1 << l)
+            for(int j = 0; j < patchSizeMax - 1; j += 1 << l) {
                 if(row++ % 2 == 0)
                     for(int i = 0; i < patchSizeMax; i += 1 << l) {
                         indices[c++] = j*patchSizeMax + i;
@@ -152,7 +187,10 @@ namespace Arya
                         indices[c++] = j*patchSizeMax + patchSizeMax - 1 - i;
                         indices[c++] = (j+(1 << l))*patchSizeMax + patchSizeMax - 1 - i;
                     }
+                indices[c++] = indices[c - 2];
+            }
 
+            indexCount[l] = c;
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[l]);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                     sizeof(GLuint) * indexCount[l],
@@ -192,21 +230,22 @@ namespace Arya
     {
         // update patches LOD
         vec3 camPos = curScene->getCamera()->getRealCameraPosition();
+
         for(int i = 0; i < patches.size(); ++i) {
             Patch& p = patches[i];
-            vec3 pPos = vec3(p.position, -100.0f);
+            vec3 pPos = vec3(p.position.x, -100.0f, p.position.y);
             if(distance(pPos, camPos) < 300.0f)
                 p.lod = 0;
-            else if(distance(pPos, camPos) < 400.0f)
+            else if(distance(pPos, camPos) < 500.0f)
                 p.lod = 1;
-            else if(distance(pPos, camPos) < 600.0f)
+            else if(distance(pPos, camPos) < 700.0f)
                 p.lod = 2;
-            else if(distance(pPos, camPos) < 800.0f)
+            else if(distance(pPos, camPos) < 900.0f)
                 p.lod = 3;
-            else if(distance(pPos, camPos) < 1000.0f)
+            else if(distance(pPos, camPos) < 1100.0f)
                 p.lod = 4;
             else
-                p.lod = 5;
+                p.lod = levelMax -1;
         }
     }
 
@@ -223,7 +262,7 @@ namespace Arya
         // heightmap
         terrainProgram->setUniform1i("heightMap", 0);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, heightMap->handle);
+        glBindTexture(GL_TEXTURE_2D, heightMapHandle);
 
         // splatmap
         terrainProgram->setUniform1i("splatTexture", 1);

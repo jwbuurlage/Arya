@@ -74,21 +74,22 @@ namespace Arya
 
 	inline Logger& operator<<(Logger& logger, Logger::LOGLEVEL lvl){
 		logger.currentLogLevel = lvl;
+        logger.streambuff.seekp(0);
 		switch(lvl){
 		case Logger::CRITICALERROR:
-			logger.streambuff.str("Critical ERROR: ");
+			logger.streambuff << "Critical ERROR: ";
 			break;
 		case Logger::ERROR:
-			logger.streambuff.str("ERROR: ");
+			logger.streambuff << "ERROR: ";
 			break;
 		case Logger::WARNING:
-			logger.streambuff.str("Warning: ");
+			logger.streambuff << "Warning: ";
 			break;
 		case Logger::INFO:
-			logger.streambuff.str("Info: ");
+			logger.streambuff << "Info: ";
 			break;
 		case Logger::DEBUG:
-			logger.streambuff.str("Debug: ");
+			logger.streambuff << "Debug: ";
 			break;
 		default:
 			break;

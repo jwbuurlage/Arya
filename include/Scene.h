@@ -12,6 +12,7 @@ using std::map;
 
 namespace Arya
 {
+    class Model;
     class Object;
     class Terrain;
     class Camera;
@@ -38,6 +39,8 @@ namespace Arya
             vector<Object*> objects;
             Terrain* terrain;
             Camera* camera;
+
+            Model* triangleModel; //this should be in ModelManager soon
 
             bool init();
             bool initShaders();

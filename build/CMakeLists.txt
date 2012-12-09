@@ -31,12 +31,13 @@ ELSE()
         )
 ENDIF()
 
-SET(LIB_NAME "arya")
+SET(LIB_NAME "Arya")
 
 SET(
     LIB_SOURCES
     "../src/Root.cpp"
     "../src/Shaders.cpp"
+    "../src/Models.cpp"
     "../src/Objects.cpp"
     "../src/Scene.cpp"
     "../src/Files.cpp"

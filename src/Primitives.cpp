@@ -1,4 +1,5 @@
 #include "Primitives.h"
+#include "common/Logger.h"
 
 namespace Arya
 {
@@ -6,13 +7,16 @@ namespace Arya
     // Triangle
     //-----------------------------
 
-    Triangle::Triangle() : Mesh()
+    Triangle::Triangle() : Model()
     {
         init();
     }
 
     void Triangle::init()
     {
+        Mesh* mesh = new Mesh;
+        addMesh(mesh);
+
         // Vertices
         GLfloat triangleVertices[] = {
             1.0f, -1.0f, 0.0f,
@@ -20,56 +24,23 @@ namespace Arya
             -1.0f, -1.0f, 0.0f
         };
 
-        vertexCount = 3;
-        primitiveType = GL_TRIANGLES;
+        mesh->vertexCount = 3;
+        mesh->primitiveType = GL_TRIANGLES;
 
-        glGenBuffers(1, &vertexBuffer);
-        glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+        glGenBuffers(1, &mesh->vertexBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
         glBufferData(GL_ARRAY_BUFFER,
-                vertexCount * 3 * sizeof(GLfloat),
+                mesh->vertexCount * 3 * sizeof(GLfloat),
                 triangleVertices,
                 GL_STATIC_DRAW);
 
-        // Colors
-        GLfloat triangleColors[] = {
-            1.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 1.0f
-        };
+        glGenVertexArrays(1, &mesh->vaoHandle);
 
-        glGenBuffers(1, &colorBuffer);
-        glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-        glBufferData(GL_ARRAY_BUFFER,
-                vertexCount * 3 * sizeof(GLfloat),
-                triangleColors,
-                GL_STATIC_DRAW);
-
-        hasColor = true;
-    }
-
-    //-----------------------------
-    // Colored Triangle
-    //-----------------------------
-
-    ColoredTriangle::ColoredTriangle() : StaticObject()
-    {
-        Triangle* tri = new Triangle;
-        meshes.push_back(tri);
-        makeVAO();
-    }
-
-    void ColoredTriangle::makeVAO()
-    {
-        glGenVertexArrays(1, &vaoHandle);
-        glBindVertexArray(vaoHandle);
+        glBindVertexArray(mesh->vaoHandle);
 
         glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
 
-        glBindBuffer(GL_ARRAY_BUFFER, meshes[0]->getVertexBuffer());
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLubyte*)NULL);
-
-        glBindBuffer(GL_ARRAY_BUFFER, meshes[0]->getColorBuffer());
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLubyte*)NULL);   
     }
 }

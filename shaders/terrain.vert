@@ -14,8 +14,9 @@ out vec3 normalOut;
 
 float height(vec2 tco)
 {
-    vec3 height = texture2D(heightMap, tco).rgb;
-    return height.x * height.y * height.z * 3.0;
+    vec4 h = vec4(0.0);
+    h = texture(heightMap, tco);
+    return h.r;
 }
 
 void main()

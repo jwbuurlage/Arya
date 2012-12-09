@@ -18,7 +18,7 @@ namespace Arya
         maxCamDist = 1000.0f;
         freeYaw = false;
         yaw = 0.0f;
-        pitch = -40.0f;
+        pitch = -60.0f;
         projectionMatrix = mat4(1.0f);
 
         position = vec3(0.0f);
@@ -102,8 +102,7 @@ namespace Arya
             //Make sure it does not zoom in or out too far
             if( camDist < minCamDist ){ camDist = minCamDist; camZoomSpeed = 0; }
             else if( camDist > maxCamDist ){ camDist = maxCamDist; camZoomSpeed = 0; }
-            //Decrease the speed (which causes a natural 'slow down')
-            deAccelerate(camZoomSpeed, 800 * elapsedTime); //Deacceleration of 40 units per second per second
+            else deAccelerate(camZoomSpeed, 800 * elapsedTime); //Deacceleration of 40 units per second per second
         }
         return;
     }
