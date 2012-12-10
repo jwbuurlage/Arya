@@ -6,6 +6,7 @@
 #include "Root.h"
 #include "Models.h"
 #include "Shaders.h"
+#include "Fonts.h"
 #include "Textures.h"
 #include "Scene.h"
 #include "Files.h"
@@ -34,6 +35,7 @@ namespace Arya
         FileSystem* files = new FileSystem();
         TextureManager* tex = new TextureManager();
         ModelManager* modelManager = new ModelManager();
+        FontManager* fon = new FontManager();
     }
 
     Root::~Root()

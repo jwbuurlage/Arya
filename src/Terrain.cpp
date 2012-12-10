@@ -3,6 +3,7 @@
 #include <glm/gtx/log_base.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "Fonts.h"
 #include "common/Logger.h"
 #include "Terrain.h"
 #include "Shaders.h"
@@ -273,7 +274,7 @@ namespace Arya
         // texture 1 to 4
         terrainProgram->setUniform1i("texture1", 2);
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, tileSet[0]->handle);
+        glBindTexture(GL_TEXTURE_2D, FontManager::shared().getFont("courier.ttf")->textureHandle);
 
         terrainProgram->setUniform1i("texture2", 3);
         glActiveTexture(GL_TEXTURE3);
