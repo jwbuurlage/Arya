@@ -45,8 +45,10 @@ bool Game::keyDown(int key, bool keyDown)
 
         case 'L':
             if(keyDown)
+            {
                 if(session) delete session;
-            session = 0;
+                session = 0;
+            }
             break;
 
         case 'O': glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
