@@ -3,7 +3,12 @@
 
 GameSession::GameSession()
 {
-
+    goingForward = goingBackward = goingLeft = goingRight = goingUp = goingDown = false;
+    mouseLeft = mouseRight = mouseTop = mouseBot = false;
+    draggingLeftMouse = draggingRightMouse = false;
+    forceDirection = vec3(0.0f);
+    specMovement = vec3(0.0f);
+    specPos = vec3(0.0f);
 }
 
 GameSession::~GameSession()
@@ -12,6 +17,8 @@ GameSession::~GameSession()
     Root::shared().removeFrameListener(this);
 
     Root::shared().removeScene();
+
+    LOG_INFO("Ending session");
 }
 
 void GameSession::init()

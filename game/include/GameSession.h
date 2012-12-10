@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Arya.h"
 
 #include <vector>

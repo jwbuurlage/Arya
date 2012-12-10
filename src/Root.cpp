@@ -92,7 +92,9 @@ namespace Arya
 
     void Root::removeScene()
     {
+        removeFrameListener(scene);
         if(scene) delete scene;
+        scene = 0;
     }
 
     void Root::startRendering()
@@ -204,7 +206,8 @@ namespace Arya
         glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_DEPTH_BUFFER_BIT);
 
-        scene->render();
+        if(scene)
+            scene->render();
 
         glfwSwapBuffers();
     }

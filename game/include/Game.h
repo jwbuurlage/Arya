@@ -1,4 +1,5 @@
 #include "Arya.h"
+#include "../include/GameSession.h"
 
 using Arya::Root;
 using Arya::Scene;
@@ -25,12 +26,5 @@ class Game : public Arya::InputListener
 
     private:
         Root* root;
-
-        //For key movement
-        bool goingForward, goingBackward, goingLeft, goingRight, goingUp, goingDown, rotatingLeft, rotatingRight;
-        bool mouseLeft, mouseRight, mouseTop, mouseBot; //wether mouse is at edge
-        bool draggingLeftMouse, draggingRightMouse;
-        vec3 forceDirection;
-        vec3 specMovement;
-        vec3 specPos;
+        GameSession* session;
 };

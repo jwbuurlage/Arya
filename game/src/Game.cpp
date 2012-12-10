@@ -6,12 +6,7 @@
 Game::Game()
 {
     root = 0;
-    goingForward = goingBackward = goingLeft = goingRight = goingUp = goingDown = false;
-    mouseLeft = mouseRight = mouseTop = mouseBot = false;
-    draggingLeftMouse = draggingRightMouse = false;
-    forceDirection = vec3(0.0f);
-    specMovement = vec3(0.0f);
-    specPos = vec3(0.0f);
+    session = 0;
 }
 
 Game::~Game()
@@ -30,10 +25,6 @@ void Game::run()
     {
         root->addInputListener(this);
 
-        GameSession* session = new GameSession;
-        session->init();
-        session->start();
-
         root->startRendering();
     }
 }
@@ -43,8 +34,23 @@ bool Game::keyDown(int key, bool keyDown)
     bool keyHandled = true;
 
     switch(key) {
-        case 'S': keyHandled = false; break;
-        case 'X': keyHandled = false; break;
+        case 'P':
+            if(keyDown) {
+                if(session) delete session;
+                session = new GameSession;
+                session->init();
+                session->start();
+            }
+            break;
+
+        case 'L':
+            if(keyDown)
+                if(session) delete session;
+            session = 0;
+            break;
+
+        case 'O': glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
+        case 'I': glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
         default: keyHandled = false; break;
     }
 
