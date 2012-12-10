@@ -97,9 +97,7 @@ bool GameSession::keyDown(int key, bool keyDown)
         case 'D': goingRight = keyDown;		DirectionChanged = true; break;
         case 'Z': goingDown = keyDown;		DirectionChanged = true; break;
         case 'X': goingUp = keyDown;		DirectionChanged = true; break;
-        case GLFW_KEY_F11: Root::shared().setFullscreen(!Root::shared().getFullscreen()); break;
-        case GLFW_KEY_ESC: Root::shared().stopRendering(); break;
-        default: keyHandled = false; break;
+       default: keyHandled = false; break;
     }
 
     if( DirectionChanged ){

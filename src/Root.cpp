@@ -16,7 +16,6 @@ using std::endl;
 
 namespace Arya
 {
-
     template<> Root* Singleton<Root>::singleton = 0;
 
     //glfw callback functions

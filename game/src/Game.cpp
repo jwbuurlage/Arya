@@ -53,6 +53,8 @@ bool Game::keyDown(int key, bool keyDown)
 
         case 'O': glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
         case 'I': glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
+        case GLFW_KEY_F11: Root::shared().setFullscreen(!Root::shared().getFullscreen()); break;
+        case GLFW_KEY_ESC: Root::shared().stopRendering(); break;
         default: keyHandled = false; break;
     }
 
