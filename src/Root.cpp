@@ -14,7 +14,6 @@
 using std::cerr;
 using std::endl;
 
-
 namespace Arya
 {
 
@@ -70,20 +69,32 @@ namespace Arya
         TextureManager::shared().initialize();
         ModelManager::shared().initialize();
 
-        if( scene == 0 ) scene = new Scene();
+        return true;
+    }
+
+    Scene* Root::makeDefaultScene()
+    {
+        if(!scene) delete scene;
+
+        scene = new Scene;
         if( !scene->isInitialized() )
         {
             LOG_ERROR("Unable to initialize scene");
             delete scene;
             scene = 0;
-            return false;
+            return 0;
         }
         else
             addFrameListener(scene);
 
-        return true;
-
+        return scene;
     }
+
+    void Root::removeScene()
+    {
+        if(scene) delete scene;
+    }
+
     void Root::startRendering()
     {
         running = true;

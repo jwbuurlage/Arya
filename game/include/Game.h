@@ -10,7 +10,7 @@ using Arya::Map;
 using Arya::Texture;
 using Arya::TextureManager;
 
-class Game : public Arya::InputListener, public Arya::FrameListener
+class Game : public Arya::InputListener
 {
     public:
         Game();
@@ -18,12 +18,12 @@ class Game : public Arya::InputListener, public Arya::FrameListener
 
         void run();
 
-        void onFrame(float elapsedTime);
         bool keyDown(int key, bool keyDown);
         bool mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int x, int y);
         bool mouseWheelMoved(int delta);
         bool mouseMoved(int x, int y, int dx, int dy);
-    public:
+
+    private:
         Root* root;
 
         //For key movement
