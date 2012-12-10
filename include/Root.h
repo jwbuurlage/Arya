@@ -28,7 +28,9 @@ namespace Arya
             void addFrameListener(FrameListener* listener);
             void removeFrameListener(FrameListener* listener);
 
+            Scene* makeDefaultScene();
             Scene* getScene() const { return scene; }
+            void removeScene();
 
             int getWindowWidth() const { return windowWidth; }
             int getWindowHeight() const { return windowHeight; }

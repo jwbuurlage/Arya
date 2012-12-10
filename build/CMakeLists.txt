@@ -46,6 +46,7 @@ SET(
     "../src/Camera.cpp"
     "../src/Terrain.cpp"
     "../src/Textures.cpp"
+    "../src/Map.cpp"
     "../src/common/Logger.cpp"
     )
 

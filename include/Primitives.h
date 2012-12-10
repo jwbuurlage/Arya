@@ -7,10 +7,14 @@ namespace Arya
     {
         public:
             Triangle();
-            ~Triangle();
+            ~Triangle(){};
+    };
 
-        private:
-            void init();
+    class Quad : public Model
+    {
+        public:
+            Quad();
+            ~Quad(){};
     };
 }
 

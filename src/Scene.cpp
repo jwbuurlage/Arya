@@ -5,9 +5,9 @@
 #include "common/Listeners.h"
 #include "common/Logger.h"
 #include "Objects.h"
-#include "Primitives.h"
+#include "Models.h"
 #include "Scene.h"
-#include "Terrain.h"
+#include "Map.h"
 #include "Textures.h"
 #include "Camera.h"
 #include "Shaders.h"
@@ -22,7 +22,8 @@ namespace Arya
     Scene::Scene()
     {
         initialized = false;
-        terrain = 0; camera = 0;
+        currentMap = 0; 
+        camera = 0;
         basicProgram = 0;
         init();
     }
@@ -32,32 +33,18 @@ namespace Arya
         cleanup();
     }
 
+    Object* Scene::createObject()
+    {
+        Object* obj = new Object;
+        objects.push_back(obj);
+        return obj;
+    }
+
     bool Scene::init()
     {
         if(!initShaders()) return false;
 
-        triangleModel = new Triangle;
-        Object* triObject = new Object;
-        triObject->model = triangleModel;
-        objects.push_back(triObject);
-
         LOG_INFO("Loading scene");
-
-        if(!terrain)
-        {
-            vector<Texture*> tiles;
-            tiles.push_back(TextureManager::shared().getTexture("grass.tga"));
-            tiles.push_back(TextureManager::shared().getTexture("dirt.tga"));
-            tiles.push_back(TextureManager::shared().getTexture("snow.tga"));
-            tiles.push_back(TextureManager::shared().getTexture("rock.tga"));
-            terrain = new Terrain("heightmap.raw",tiles,TextureManager::shared().getTexture("splatmap.tga"));
-            if(!terrain->init()) {
-                LOG_WARNING("Could not load terrain");
-                delete terrain;
-                terrain = 0;
-                return false;
-            }
-        }
 
         if(!camera)
         {
@@ -88,13 +75,20 @@ namespace Arya
         return true;
     }
 
+    void Scene::setMap(const char* hm, vector<Texture*> ts, Texture* sm)
+    {
+        if(currentMap)
+            delete currentMap;
+        currentMap = new Map(hm, ts, sm);
+    }
+
     void Scene::cleanup()
     {
         if(camera) delete camera;
         camera = 0;
 
-        if(terrain) delete terrain;
-        terrain = 0;
+        if(currentMap) delete currentMap;
+        currentMap = 0;
 
         if(basicProgram) delete basicProgram;
         basicProgram = 0;
@@ -109,7 +103,7 @@ namespace Arya
     void Scene::onFrame(float elapsedTime)
     {
         camera->update(elapsedTime);
-        terrain->update(elapsedTime, this);
+        currentMap->update(elapsedTime, this);
     }
 
     void Scene::render()
@@ -133,6 +127,6 @@ namespace Arya
             }
         }
 
-        terrain->render(camera);
+        currentMap->render(camera);
     }
 }

@@ -9,13 +9,7 @@ namespace Arya
 
     Triangle::Triangle() : Model()
     {
-        init();
-    }
-
-    void Triangle::init()
-    {
-        Mesh* mesh = new Mesh;
-        addMesh(mesh);
+        Mesh* mesh = createAndAddMesh();
 
         // Vertices
         GLfloat triangleVertices[] = {
@@ -42,5 +36,25 @@ namespace Arya
 
         glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLubyte*)NULL);
+    }
+
+    Quad::Quad() : Model()
+    {
+        GLfloat quadVerts[] = {
+            1.0f, -1.0f, 0.0f,
+            1.0f,  1.0f, 0.0f,
+            -1.0f,-1.0f, 0.0f,
+            -1.0f, 1.0f, 0.0f
+        };
+        Mesh* mesh = createAndAddMesh();
+        mesh->vertexCount = 4;
+        mesh->primitiveType = GL_TRIANGLE_STRIP;
+        glGenBuffers(1, &mesh->vertexBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
+        glBufferData(GL_ARRAY_BUFFER, mesh->vertexCount * 3 * sizeof(GLfloat), quadVerts, GL_STATIC_DRAW);
+        glGenVertexArrays(1, &mesh->vaoHandle);
+        glBindVertexArray(mesh->vaoHandle);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
     }
 }

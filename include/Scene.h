@@ -14,7 +14,7 @@ namespace Arya
 {
     class Model;
     class Object;
-    class Terrain;
+    class Map;
     class Camera;
     class Shader;
     class ShaderProgram;
@@ -32,15 +32,26 @@ namespace Arya
 
             void onFrame(float elapsedTime);
 
+            void setMap(const char* hm, vector<Texture*> ts, Texture* sm);
             Camera* getCamera() { return camera; };
+
+            Object* createObject();
 
         private:
             bool initialized;
-            vector<Object*> objects;
-            Terrain* terrain;
-            Camera* camera;
 
-            Model* triangleModel; //this should be in ModelManager soon
+            //TODO: think about whether we
+            //want to make this into a linked list
+            //since we will be removing objects
+            //a lot (units dying)
+            //Not a std::list though because this adds
+            //overhead. We can do the trick where
+            //we subclass Object in a clever way
+            //so no extra space is needed.
+            vector<Object*> objects;
+
+            Map* currentMap;
+            Camera* camera;
 
             bool init();
             bool initShaders();

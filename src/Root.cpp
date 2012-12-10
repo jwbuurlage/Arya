@@ -4,6 +4,7 @@
 #include <GL/glfw.h>
 
 #include "Root.h"
+#include "Models.h"
 #include "Shaders.h"
 #include "Textures.h"
 #include "Scene.h"
@@ -13,10 +14,8 @@
 using std::cerr;
 using std::endl;
 
-
 namespace Arya
 {
-
     template<> Root* Singleton<Root>::singleton = 0;
 
     //glfw callback functions
@@ -33,6 +32,7 @@ namespace Arya
         Logger* log = new Logger();
         FileSystem* files = new FileSystem();
         TextureManager* tex = new TextureManager();
+        ModelManager* modelManager = new ModelManager();
     }
 
     Root::~Root()
@@ -43,6 +43,7 @@ namespace Arya
 
         if( scene ) delete scene;
 
+        delete &ModelManager::shared();
         delete &FileSystem::shared();
         delete &Logger::shared();
         delete &TextureManager::shared();
@@ -63,20 +64,38 @@ namespace Arya
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
 
-        if( scene == 0 ) scene = new Scene();
+        //Call these in the right order: Models need Textures
+        TextureManager::shared().initialize();
+        ModelManager::shared().initialize();
+
+        return true;
+    }
+
+    Scene* Root::makeDefaultScene()
+    {
+        if(!scene) delete scene;
+
+        scene = new Scene;
         if( !scene->isInitialized() )
         {
             LOG_ERROR("Unable to initialize scene");
             delete scene;
             scene = 0;
-            return false;
+            return 0;
         }
         else
             addFrameListener(scene);
 
-        return true;
-
+        return scene;
     }
+
+    void Root::removeScene()
+    {
+        removeFrameListener(scene);
+        if(scene) delete scene;
+        scene = 0;
+    }
+
     void Root::startRendering()
     {
         running = true;
@@ -186,7 +205,8 @@ namespace Arya
         glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_DEPTH_BUFFER_BIT);
 
-        scene->render();
+        if(scene)
+            scene->render();
 
         glfwSwapBuffers();
     }

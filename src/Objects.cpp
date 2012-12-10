@@ -1,4 +1,5 @@
 #include "Objects.h"
+#include "Models.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace Arya
@@ -6,6 +7,7 @@ namespace Arya
     Object::Object()
     {
         model = 0;
+        animState = 0;
         updateMatrix = true;
         position = vec3(0.0, 0.0, 0.0);
         pitch = 0.0f;
@@ -25,6 +27,28 @@ namespace Arya
             mMatrix = glm::rotate(mMatrix, pitch, vec3(1.0, 0.0, 0.0));
         }
         return mMatrix;
+    }
+
+    void Object::setModel(Model* newModel)
+    {
+        if( model ) model->release();
+        if( animState ) delete animState;
+
+        //Set new model and get a new animation state object
+        //(subclass of AnimationState)
+        model = newModel;
+        animState = model->createAnimationState();
+        model->addRef();
+    }
+
+    void Object::setAnimation(const char* name)
+    {
+        if( animState ) animState->setAnimation(name);
+    }
+
+    void Object::updateAnimation(float elapsedTime)
+    {
+        if( animState ) animState->updateAnimation(elapsedTime);
     }
 }
 

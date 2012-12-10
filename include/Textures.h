@@ -9,13 +9,17 @@ namespace Arya
 {
     class Texture{
         public:
-            Texture(){ handle = 0; width = 0; height = 0; }
-            ~Texture(){ if( handle ) glDeleteTextures(1, &handle); }
             GLuint handle;
             GLuint width;
             GLuint height;
             //we could add more info about
             //bit depths and mipmap info and so on
+        private:
+            //Only TextureManager can create Textures
+            friend class TextureManager;
+            friend class ResourceManager<Texture>;
+            Texture(){ handle = 0; width = 0; height = 0; }
+            ~Texture(){ if( handle ) glDeleteTextures(1, &handle); }
     };
 
     class TextureManager : public Singleton<TextureManager>, public ResourceManager<Texture> {
@@ -26,6 +30,7 @@ namespace Arya
             int initialize();
             void cleanup();
 
+            //If no texture found it will return 0
             Texture* getTexture( const char* filename ){ return getResource(filename); }
 
         private:

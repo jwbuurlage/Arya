@@ -26,7 +26,7 @@ void main()
 {
     float lightFraction = max(0.0,dot(normalize(normalOut), vec3(0.7, 0.7, 0.0)));
     //Ambient
-    lightFraction = min(lightFraction + 0.20, 1.0);
+    lightFraction = min(lightFraction + 0.40, 1.0);
 
     FragColor = terrainColor(texCoo);
     FragColor *= lightFraction;

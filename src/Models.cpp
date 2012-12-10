@@ -1,4 +1,5 @@
 #include "Models.h"
+#include "Primitives.h"
 
 namespace Arya
 {
@@ -19,10 +20,25 @@ namespace Arya
         }
     }
 
+    AnimationState* Model::createAnimationState()
+    {
+        //If bone, create BoneAnimationState
+        //If vertex, create VertexAnimationState
+        //else return 0
+        return 0;
+    }
+
     void Model::addMesh(Mesh* mesh)
     {
         meshes.push_back(mesh);
         mesh->addRef();
+    }
+
+    Mesh* Model::createAndAddMesh()
+    {
+        Mesh* newMesh = new Mesh;
+        addMesh(newMesh);
+        return newMesh;
     }
 
     template<> ModelManager* Singleton<ModelManager>::singleton = 0;
@@ -38,7 +54,8 @@ namespace Arya
 
     int ModelManager::initialize()
     {
-        //Could load some primitives here if wanted
+        addResource("triangle", new Triangle);
+        addResource("quad", new Quad);
     }
 
     void ModelManager::cleanup()
