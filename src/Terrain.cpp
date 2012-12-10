@@ -48,7 +48,8 @@ namespace Arya
         if(terrainProgram) 
             delete terrainProgram;
 
-        glDeleteBuffers(1, &vertexBuffer);
+        if(vertexBuffer)
+            glDeleteBuffers(1, &vertexBuffer);
 
         if(heightMapHandle)
             glDeleteTextures(1, &heightMapHandle);

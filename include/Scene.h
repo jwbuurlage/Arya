@@ -14,7 +14,7 @@ namespace Arya
 {
     class Model;
     class Object;
-    class Terrain;
+    class Map;
     class Camera;
     class Shader;
     class ShaderProgram;
@@ -32,6 +32,7 @@ namespace Arya
 
             void onFrame(float elapsedTime);
 
+            void setMap(const char* hm, vector<Texture*> ts, Texture* sm);
             Camera* getCamera() { return camera; };
 
             Object* createObject();
@@ -39,7 +40,7 @@ namespace Arya
         private:
             bool initialized;
 
-            //TODO: think about wether we
+            //TODO: think about whether we
             //want to make this into a linked list
             //since we will be removing objects
             //a lot (units dying)
@@ -49,7 +50,7 @@ namespace Arya
             //so no extra space is needed.
             vector<Object*> objects;
 
-            Terrain* terrain;
+            Map* currentMap;
             Camera* camera;
 
             bool init();

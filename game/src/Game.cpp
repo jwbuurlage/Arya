@@ -21,7 +21,7 @@ void Game::run()
 {
     root = new Root;
 
-    if(!(root->init(false, 800, 600))) {
+    if(!(root->init(true, 800, 600))) {
         LOG_ERROR("Unable to init root");
     }
     else
@@ -39,6 +39,13 @@ void Game::run()
         obj = scene->createObject();
         obj->setModel(ModelManager::shared().getModel("quad"));
         obj->setPosition(vec3(0, 0, 5));
+
+        vector<Texture*> tileSet;
+        tileSet.push_back(TextureManager::shared().getTexture("grass.tga"));
+        tileSet.push_back(TextureManager::shared().getTexture("rock.tga"));
+        tileSet.push_back(TextureManager::shared().getTexture("dirt.tga"));
+        tileSet.push_back(TextureManager::shared().getTexture("snow.tga"));
+        scene->setMap("heightmap.raw", tileSet, TextureManager::shared().getTexture("splatmap.tga"));
 
         root->startRendering();
     }
