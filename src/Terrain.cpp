@@ -60,6 +60,7 @@ namespace Arya
         if(heightMapName == 0 || splatMap == 0) return false;
 
         for(int i = 0; i < tileSet.size(); ++i) {
+            if(!tileSet[i]) return false;
             glBindTexture(GL_TEXTURE_2D, tileSet[i]->handle);
             glGenerateMipmap(GL_TEXTURE_2D);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -106,8 +107,8 @@ namespace Arya
     bool Terrain::generate()
     {
         int w, h;
-        w = 1025; //heightMap->width;
-        h = 1025; //heightMap->height;
+        w = 1025;
+        h = 1025;
 
         if(!(((w-1) & (w-2)) == 0) || w != h) {
             LOG_WARNING("Heightmap is of the wrong size. Must be of the form 2^n + 1, and square.");
