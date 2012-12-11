@@ -4,10 +4,10 @@ layout (location = 0) in vec3 vertexPosition;
 
 uniform mat4 mMatrix;
 uniform mat4 vpMatrix;
-out vec3 Color;
+out vec2 texCoo;
 
 void main()
 {
-    Color = vertexPosition;
+    texCoo = vertexPosition.xy;
     gl_Position = vpMatrix * mMatrix * vec4(vertexPosition, 1.0);
 }
