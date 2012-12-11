@@ -11,6 +11,7 @@ Game::Game()
 
 Game::~Game()
 {
+    if(session) delete session;
     if(root) delete &Root::shared();
 }
 
@@ -38,8 +39,10 @@ bool Game::keyDown(int key, bool keyDown)
             if(keyDown) {
                 if(session) delete session;
                 session = new GameSession;
-                session->init();
-                session->start();
+                if(!session->init()) {
+                    LOG_ERROR("Could not start a new session");
+                    Root::shared().stopRendering();
+                }
             }
             break;
 

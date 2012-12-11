@@ -18,18 +18,17 @@ GameSession::~GameSession()
 
     Root::shared().removeScene();
 
-    LOG_INFO("Ending session");
+    LOG_INFO("Ended session");
 }
 
-void GameSession::init()
+bool GameSession::init()
 {
     Root::shared().addInputListener(this);
-    Root::shared().addFrameListener(this);
-}
+    Root::shared().addFrameListener(this); 
 
-void GameSession::start()
-{
     Scene* scene = Root::shared().makeDefaultScene();
+    if(!scene)
+        return false;
     Object* obj;
 
     obj = scene->createObject();
@@ -45,7 +44,10 @@ void GameSession::start()
     tileSet.push_back(TextureManager::shared().getTexture("rock.tga"));
     tileSet.push_back(TextureManager::shared().getTexture("dirt.tga"));
     tileSet.push_back(TextureManager::shared().getTexture("snow.tga"));
-    scene->setMap("heightmap.raw", tileSet, TextureManager::shared().getTexture("splatmap.tga"));
+    if(!scene->setMap("heightmap.raw", tileSet, TextureManager::shared().getTexture("splatmap.tga")))
+        return false;
+
+    return true;
 }
 
 void GameSession::onFrame(float elapsedTime)
@@ -97,7 +99,7 @@ bool GameSession::keyDown(int key, bool keyDown)
         case 'D': goingRight = keyDown;		DirectionChanged = true; break;
         case 'Z': goingDown = keyDown;		DirectionChanged = true; break;
         case 'X': goingUp = keyDown;		DirectionChanged = true; break;
-       default: keyHandled = false; break;
+        default: keyHandled = false; break;
     }
 
     if( DirectionChanged ){

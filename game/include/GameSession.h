@@ -23,8 +23,7 @@ class GameSession : public Arya::InputListener, public Arya::FrameListener
         GameSession();
         ~GameSession();
 
-        void start();
-        void init();
+        bool init();
 
         void onFrame(float elapsedTime);
         bool keyDown(int key, bool keyDown);

@@ -85,6 +85,7 @@ namespace Arya
 
         // load in heightmap
         File* hFile = FileSystem::shared().getFile(heightMapName);
+        if(!hFile) return false;
 
         glGenTextures(1, &heightMapHandle);
         glBindTexture(GL_TEXTURE_2D, heightMapHandle);
