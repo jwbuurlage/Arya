@@ -1,5 +1,6 @@
 #include "Arya.h"
 #include "../include/GameSession.h"
+#include "../include/Faction.h"
 
 GameSession::GameSession()
 {
@@ -41,6 +42,7 @@ bool GameSession::init()
     obj->setModel(ModelManager::shared().getModel("quad"));
     obj->setPosition(vec3(0, 0, 5));
 
+    // init map
     vector<Texture*> tileSet;
     tileSet.push_back(TextureManager::shared().getTexture("grass.tga"));
     tileSet.push_back(TextureManager::shared().getTexture("rock.tga"));
@@ -48,6 +50,10 @@ bool GameSession::init()
     tileSet.push_back(TextureManager::shared().getTexture("snow.tga"));
     if(!scene->setMap("heightmap.raw", tileSet, TextureManager::shared().getTexture("splatmap.tga")))
         return false;
+
+    // init factions
+    Faction* localFaction = new Faction;
+    factions.push_back(localFaction);
 
     Root::shared().getOverlay()->addRect(&selectionRect);
 
@@ -123,9 +129,9 @@ bool GameSession::keyDown(int key, bool keyDown)
 bool GameSession::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int x, int y)
 {
     //TODO: Send to UI manager and see if it was handled. If not, then do this:
-    if( button == Arya::BUTTON_LEFT ){
+    if(button == Arya::BUTTON_LEFT) {
         draggingLeftMouse = (buttonDown == true);
-    }else if( button == Arya::BUTTON_RIGHT ){
+    } else if(button == Arya::BUTTON_RIGHT) {
         draggingRightMouse = (buttonDown == true);
     }
 
@@ -137,6 +143,8 @@ bool GameSession::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int x, in
     {
         selectionRect.pixelOffset = vec2(0.0);
         selectionRect.pixelSize = vec2(0.0);
+
+        // select units here
     }
 
     return false;

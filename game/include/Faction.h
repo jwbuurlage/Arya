@@ -11,4 +11,4 @@ class Faction
 
     private:
         vector<Unit*> units;
-}
+};

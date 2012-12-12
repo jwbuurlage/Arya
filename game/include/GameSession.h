@@ -45,5 +45,6 @@ class GameSession : public Arya::InputListener, public Arya::FrameListener
 
         Rect selectionRect;
 
+        Faction* localFaction;
         vector<Faction*> factions;
 };

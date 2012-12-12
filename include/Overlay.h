@@ -17,8 +17,6 @@ namespace Arya
     {
         Rect()
         {
-            LOG_INFO("herp");
-
             relative = vec2(-1.0);
             pixelOffset = vec2(0.0);
             pixelSize = vec2(0.0);
