@@ -9,6 +9,7 @@ GameSessionInput::GameSessionInput(GameSession* ses)
     session = ses;
 
     goingForward = goingBackward = goingLeft = goingRight = goingUp = goingDown = false;
+    rotatingRight = rotatingLeft = false;
     mouseLeft = mouseRight = mouseTop = mouseBot = false;
     draggingLeftMouse = draggingRightMouse = false;
     slowMode = false;
