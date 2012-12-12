@@ -14,6 +14,7 @@ using Arya::Camera;
 using Arya::Map;
 using Arya::Texture;
 using Arya::TextureManager;
+using Arya::Rect;
 
 class Faction;
 
@@ -39,6 +40,10 @@ class GameSession : public Arya::InputListener, public Arya::FrameListener
         vec3 forceDirection;
         vec3 specMovement;
         vec3 specPos;
+
+        vec2 originalMousePos;
+
+        Rect selectionRect;
 
         vector<Faction*> factions;
 };

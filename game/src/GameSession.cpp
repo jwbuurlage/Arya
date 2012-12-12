@@ -9,6 +9,7 @@ GameSession::GameSession()
     forceDirection = vec3(0.0f);
     specMovement = vec3(0.0f);
     specPos = vec3(0.0f);
+    originalMousePos = vec2(0.0);
 }
 
 GameSession::~GameSession()
@@ -17,6 +18,7 @@ GameSession::~GameSession()
     Root::shared().removeFrameListener(this);
 
     Root::shared().removeScene();
+    Root::shared().getOverlay()->removeRect(&selectionRect); 
 
     LOG_INFO("Ended session");
 }
@@ -46,6 +48,8 @@ bool GameSession::init()
     tileSet.push_back(TextureManager::shared().getTexture("snow.tga"));
     if(!scene->setMap("heightmap.raw", tileSet, TextureManager::shared().getTexture("splatmap.tga")))
         return false;
+
+    Root::shared().getOverlay()->addRect(&selectionRect);
 
     return true;
 }
@@ -124,6 +128,17 @@ bool GameSession::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int x, in
     }else if( button == Arya::BUTTON_RIGHT ){
         draggingRightMouse = (buttonDown == true);
     }
+
+    if(draggingLeftMouse)
+    {
+        originalMousePos = vec2(x, y);
+    }
+    else
+    {
+        selectionRect.pixelOffset = vec2(0.0);
+        selectionRect.pixelSize = vec2(0.0);
+    }
+
     return false;
 }
 
@@ -150,9 +165,9 @@ bool GameSession::mouseMoved(int x, int y, int dx, int dy)
         mouseLeft = false;
 
     if(y < padding)
-        mouseTop = true, handled = true;
+        mouseBot = true, handled = true;
     else
-        mouseTop = false;
+        mouseBot = false;
 
     if(x > Root::shared().getWindowWidth() - padding)
         mouseRight = true, handled = true;
@@ -160,9 +175,9 @@ bool GameSession::mouseMoved(int x, int y, int dx, int dy)
         mouseRight = false;
 
     if(y > Root::shared().getWindowHeight() - padding)
-        mouseBot = true, handled = true;
+        mouseTop = true, handled = true;
     else
-        mouseBot = false;
+        mouseTop = false;
 
     forceDirection = vec3(0.0f);
     if(goingForward || mouseTop)    forceDirection.z -= 1.0f;
@@ -173,6 +188,37 @@ bool GameSession::mouseMoved(int x, int y, int dx, int dy)
     if(goingDown)       forceDirection.y -= 1.0f;
     if(forceDirection != vec3(0.0f))
         forceDirection = glm::normalize(forceDirection);
+
+    if(draggingLeftMouse)
+    {
+        int deltaX = x - originalMousePos.x;
+        int deltaY = y - originalMousePos.y;
+
+        if(deltaX < 0 && deltaY > 0) {
+            selectionRect.pixelOffset.x = x;
+            selectionRect.pixelOffset.y = originalMousePos.y;
+            selectionRect.pixelSize.x = originalMousePos.x - x;
+            selectionRect.pixelSize.y = y - originalMousePos.y;
+        }
+        else if(deltaX > 0 && deltaY < 0) {
+            selectionRect.pixelOffset.x = x;
+            selectionRect.pixelOffset.y = originalMousePos.y;
+            selectionRect.pixelSize.x = originalMousePos.x - x;
+            selectionRect.pixelSize.y = y - originalMousePos.y;
+        }
+        else if(deltaX > 0 && deltaY > 0) {
+            selectionRect.pixelOffset.x = originalMousePos.x;
+            selectionRect.pixelOffset.y = originalMousePos.y;
+            selectionRect.pixelSize.x = x - originalMousePos.x;
+            selectionRect.pixelSize.y = y - originalMousePos.y;
+        }
+        else if(deltaX < 0 && deltaY < 0) {
+            selectionRect.pixelOffset.x = x;
+            selectionRect.pixelOffset.y = y;
+            selectionRect.pixelSize.x = originalMousePos.x - x;
+            selectionRect.pixelSize.y = originalMousePos.y - y;
+        }
+    }
 
     return handled; 
 }
