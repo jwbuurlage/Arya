@@ -12,6 +12,9 @@ namespace Arya
 {
     enum ModelType
     {
+        //Note: these constants match
+        //the constants that are used
+        //in the AryaModel file format
         ModelTypeUnkown = 0,
         ModelTypeStatic = 1,
         VertexAnimated = 2,
@@ -37,6 +40,7 @@ namespace Arya
             ModelType modelType;
 
             const vector<Mesh*>& getMeshes() const { return meshes; }
+            const vector<Material*>& getMaterials() const { return materials; }
 
             //Called by Object
             AnimationState* createAnimationState();
@@ -51,8 +55,9 @@ namespace Arya
             Model();
             virtual ~Model();
 
-            //Adds refcount to mesh as well
+            //Adds refcount as well
             void addMesh(Mesh* mesh);
+            void addMaterial(Material* mat);
 
             Mesh* createAndAddMesh();
 

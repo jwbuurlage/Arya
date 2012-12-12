@@ -60,3 +60,4 @@ ADD_LIBRARY( ${LIB_NAME} STATIC ${LIB_SOURCES} )
 TARGET_LINK_LIBRARIES( ${LIB_NAME} ${LIB_LIBRARIES} )
 
 ADD_SUBDIRECTORY(../game/build ../game/build)
+ADD_SUBDIRECTORY(../tools/build ../tools/build)

@@ -32,12 +32,16 @@ void GameSession::start()
     Scene* scene = Root::shared().makeDefaultScene();
     Object* obj;
 
-    obj = scene->createObject();
-    obj->setModel(ModelManager::shared().getModel("triangle"));
-    obj->setPosition(vec3(0, 0, 0));
+//    obj = scene->createObject();
+//    obj->setModel(ModelManager::shared().getModel("triangle"));
+//    obj->setPosition(vec3(0, 0, 0));
+//
+//    obj = scene->createObject();
+//    obj->setModel(ModelManager::shared().getModel("quad"));
+//    obj->setPosition(vec3(0, 0, 5));
 
     obj = scene->createObject();
-    obj->setModel(ModelManager::shared().getModel("quad"));
+    obj->setModel(ModelManager::shared().getModel("ogros.aryamodel"));
     obj->setPosition(vec3(0, 0, 5));
 
     vector<Texture*> tileSet;

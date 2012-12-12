@@ -122,8 +122,16 @@ namespace Arya
             for(int j = 0; j < model->getMeshes().size(); ++j)
             {
                 Mesh* mesh = model->getMeshes()[j];
-                glBindVertexArray(mesh->vaoHandle);
-                glDrawArrays(mesh->primitiveType, 0, mesh->vertexCount);
+                if(mesh->frameCount > 0)
+                {
+                    Material* mat = model->getMaterials()[mesh->materialIndex];
+                    //basicProgram->setUniform1i("tex", 0);
+                    glActiveTexture(GL_TEXTURE0);
+                    if(mat) glBindTexture(GL_TEXTURE_2D, mat->handle);
+
+                    glBindVertexArray(mesh->vaoHandles[0]);
+                    glDrawArrays(mesh->primitiveType, 0, mesh->vertexCount);
+                }
             }
         }
 

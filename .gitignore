@@ -1,5 +1,6 @@
 build/*
 game/build/*
+tools/build/*
 obj/
 bin/*
 
@@ -7,3 +8,4 @@ bin/*
 
 !/build/CMakeLists.txt
 !/game/build/CMakeLists.txt
+!/tools/build/CMakeLists.txt
