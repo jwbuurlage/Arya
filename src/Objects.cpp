@@ -37,8 +37,11 @@ namespace Arya
         //Set new model and get a new animation state object
         //(subclass of AnimationState)
         model = newModel;
-        animState = model->createAnimationState();
-        model->addRef();
+        if(model)
+        {
+            animState = model->createAnimationState();
+            model->addRef();
+        }
     }
 
     void Object::setAnimation(const char* name)
