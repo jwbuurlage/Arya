@@ -60,11 +60,11 @@ namespace Arya
     bool Scene::initShaders()
     {
         Shader* basicVertex = new Shader(VERTEX);
-        if(!(basicVertex->addSourceFile("../shaders/basic.vert"))) return false;
+        if(!(basicVertex->addSourceFile("../shaders/staticmodel.vert"))) return false;
         if(!(basicVertex->compile())) return false;
 
         Shader* basicFragment = new Shader(FRAGMENT);
-        if(!(basicFragment->addSourceFile("../shaders/basic.frag"))) return false;
+        if(!(basicFragment->addSourceFile("../shaders/staticmodel.frag"))) return false;
         if(!(basicFragment->compile())) return false;
 
         basicProgram = new ShaderProgram("basic");

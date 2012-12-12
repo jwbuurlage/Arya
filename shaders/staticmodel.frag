@@ -3,7 +3,7 @@
 uniform sampler2D tex;
 
 in vec2 texCoo;
-in vec2 normal;
+in vec3 normal;
 
 layout (location = 0) vec4 fragColor;
 

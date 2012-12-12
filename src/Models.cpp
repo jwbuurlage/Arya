@@ -167,6 +167,11 @@ namespace Arya
                             modelfile->getData() + header->submesh[s].indexbufferOffset,
                             GL_STATIC_DRAW);
                 }
+                else
+                {
+                    mesh->indexCount = 0;
+                    mesh->indexBuffer = 0;
+                }
 
                 LOG_INFO("Creating VAOs");
 
@@ -176,17 +181,18 @@ namespace Arya
                 {
                     glBindVertexArray(mesh->vaoHandles[f]);
                     glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
-                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);
 
                     glEnableVertexAttribArray(0); //pos
-                    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<GLubyte*>(f*frameBytes + 0));
+                    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, floatCount * sizeof(GLfloat), reinterpret_cast<GLubyte*>(f*frameBytes + 0));
                     glEnableVertexAttribArray(1); //tex
-                    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<GLubyte*>(f*frameBytes + 12));
+                    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, floatCount * sizeof(GLfloat), reinterpret_cast<GLubyte*>(f*frameBytes + 12));
                     if(header->submesh[s].hasNormals)
                     {
                         glEnableVertexAttribArray(2); //norm
-                        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<GLubyte*>(f*frameBytes + 20));
+                        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, floatCount * sizeof(GLfloat), reinterpret_cast<GLubyte*>(f*frameBytes + 20));
                     }
+                    if(mesh->indexCount > 0)
+                        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);
                 }
             }
 
