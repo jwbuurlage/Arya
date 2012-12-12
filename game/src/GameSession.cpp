@@ -7,6 +7,7 @@ GameSession::GameSession()
     goingForward = goingBackward = goingLeft = goingRight = goingUp = goingDown = false;
     mouseLeft = mouseRight = mouseTop = mouseBot = false;
     draggingLeftMouse = draggingRightMouse = false;
+	slowMode = false;
     forceDirection = vec3(0.0f);
     specMovement = vec3(0.0f);
     specPos = vec3(0.0f);
@@ -64,17 +65,7 @@ void GameSession::onFrame(float elapsedTime)
 {
     Camera* cam = Root::shared().getScene()->getCamera();
 
-    //For normal speeds, friction force proportional to the speed
-    if(glm::length2(specMovement) > 1.0f) {
-        vec3 frictionVec( -5.0f * specMovement );
-        specMovement += frictionVec * elapsedTime;
-    } else { //For low speeds, constant friction force
-        if(specMovement != vec3(0.0f))
-        {
-            vec3 frictionVec( -3.0f * glm::normalize(specMovement) );
-            specMovement += frictionVec * elapsedTime;
-        }
-    }
+	specMovement*=pow(.002f,elapsedTime);
 
     if(cam != 0)
     {
@@ -87,7 +78,9 @@ void GameSession::onFrame(float elapsedTime)
 
         vec3 force = forceDirection;
         force = glm::rotateY(force, cam->getYaw());
-        specMovement += force * 2000.0f * elapsedTime;
+		float speedFactor=4000.0f;
+		if(slowMode) speedFactor=500.0f;
+        specMovement += force * speedFactor * elapsedTime;
     }
 
     specPos += specMovement * elapsedTime;
@@ -101,6 +94,7 @@ bool GameSession::keyDown(int key, bool keyDown)
     bool DirectionChanged = false;
 
     switch(key) {
+		case GLFW_KEY_LSHIFT: slowMode = keyDown; break;
         case 'W': goingForward = keyDown;	DirectionChanged = true; break;
         case 'S': goingBackward = keyDown;	DirectionChanged = true; break;
         case 'Q': rotatingLeft = keyDown;	break;
@@ -118,10 +112,8 @@ bool GameSession::keyDown(int key, bool keyDown)
         if(goingBackward || mouseBot)   forceDirection.z += 1.0f;
         if(goingLeft || mouseLeft)      forceDirection.x -= 1.0f;
         if(goingRight || mouseRight)    forceDirection.x  = 1.0f;
-        if(goingUp)         forceDirection.y  = 1.0f;
-        if(goingDown)       forceDirection.y -= 1.0f;
-        if(forceDirection != vec3(0.0f))
-            forceDirection = glm::normalize(forceDirection);
+        if(goingUp)         forceDirection.y  = 2.0f;
+        if(goingDown)       forceDirection.y -= 2.0f;
     }
     return keyHandled;
 }
