@@ -95,9 +95,6 @@ namespace Arya
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-        GLint swizzle_mask[] = { GL_RED, GL_RED, GL_RED, GL_ONE };
-        glTexParameteriv( GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzle_mask);
-
         glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, 1025, 1025, 0, GL_RED, GL_UNSIGNED_SHORT, hFile->getData());
 
