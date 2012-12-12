@@ -70,7 +70,7 @@ namespace Arya
             ModelManager();
             ~ModelManager();
 
-            int initialize();
+            bool initialize();
             void cleanup();
 
             Model* getModel(const char* filename){ return getResource(filename); }
