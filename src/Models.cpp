@@ -52,10 +52,11 @@ namespace Arya
         cleanup();
     }
 
-    int ModelManager::initialize()
+    bool ModelManager::initialize()
     {
         addResource("triangle", new Triangle);
         addResource("quad", new Quad);
+        return true;
     }
 
     void ModelManager::cleanup()
