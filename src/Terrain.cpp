@@ -60,6 +60,7 @@ namespace Arya
         if(heightMapName == 0 || splatMap == 0) return false;
 
         for(int i = 0; i < tileSet.size(); ++i) {
+            if(!tileSet[i]) return false;
             glBindTexture(GL_TEXTURE_2D, tileSet[i]->handle);
             glGenerateMipmap(GL_TEXTURE_2D);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -85,6 +86,7 @@ namespace Arya
 
         // load in heightmap
         File* hFile = FileSystem::shared().getFile(heightMapName);
+        if(!hFile) return false;
 
         glGenTextures(1, &heightMapHandle);
         glBindTexture(GL_TEXTURE_2D, heightMapHandle);
@@ -92,9 +94,6 @@ namespace Arya
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-        GLint swizzle_mask[] = { GL_RED, GL_RED, GL_RED, GL_ONE };
-        glTexParameteriv( GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzle_mask);
 
         glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, 1025, 1025, 0, GL_RED, GL_UNSIGNED_SHORT, hFile->getData());
@@ -105,8 +104,8 @@ namespace Arya
     bool Terrain::generate()
     {
         int w, h;
-        w = 1025; //heightMap->width;
-        h = 1025; //heightMap->height;
+        w = 1025;
+        h = 1025;
 
         if(!(((w-1) & (w-2)) == 0) || w != h) {
             LOG_WARNING("Heightmap is of the wrong size. Must be of the form 2^n + 1, and square.");

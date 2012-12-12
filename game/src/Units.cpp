@@ -1,13 +1,16 @@
-#include "Arya.h"
+#include "../include/Units.h"
 
-using Arya::Model;
-
-class Unit
+Unit::Unit()
 {
-    public:
-        Unit();
-        ~Unit();
+    object = 0;
+}
 
-    private:
-        Model* model;
-};
+Unit::~Unit()
+{
+    // todo decunstruct the obj
+}
+
+void Unit::setObject(Object* obj)
+{
+    object = obj;
+}

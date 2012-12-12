@@ -2,6 +2,7 @@
 #include "Map.h"
 #include "Models.h"
 #include "Root.h"
+#include "Overlay.h"
 #include "Camera.h"
 #include "Objects.h"
 #include "Scene.h"

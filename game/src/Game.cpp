@@ -11,6 +11,7 @@ Game::Game()
 
 Game::~Game()
 {
+    if(session) delete session;
     if(root) delete &Root::shared();
 }
 
@@ -18,7 +19,7 @@ void Game::run()
 {
     root = new Root;
 
-    if(!(root->init(true, 800, 600))) {
+    if(!(root->init(false, 800, 600))) {
         LOG_ERROR("Unable to init root");
     }
     else
@@ -38,8 +39,10 @@ bool Game::keyDown(int key, bool keyDown)
             if(keyDown) {
                 if(session) delete session;
                 session = new GameSession;
-                session->init();
-                session->start();
+                if(!session->init()) {
+                    LOG_ERROR("Could not start a new session");
+                    Root::shared().stopRendering();
+                }
             }
             break;
 
@@ -53,6 +56,8 @@ bool Game::keyDown(int key, bool keyDown)
 
         case 'O': glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
         case 'I': glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
+        case GLFW_KEY_F11: Root::shared().setFullscreen(!Root::shared().getFullscreen()); break;
+        case GLFW_KEY_ESC: Root::shared().stopRendering(); break;
         default: keyHandled = false; break;
     }
 
