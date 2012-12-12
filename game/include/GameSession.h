@@ -37,6 +37,7 @@ class GameSession : public Arya::InputListener, public Arya::FrameListener
         bool goingForward, goingBackward, goingLeft, goingRight, goingUp, goingDown, rotatingLeft, rotatingRight;
         bool mouseLeft, mouseRight, mouseTop, mouseBot; //wether mouse is at edge
         bool draggingLeftMouse, draggingRightMouse;
+		bool slowMode; //Precise movement
         vec3 forceDirection;
         vec3 specMovement;
         vec3 specPos;
