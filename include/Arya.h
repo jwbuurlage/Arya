@@ -1,5 +1,6 @@
 #include "Textures.h"
 #include "Map.h"
+#include "Terrain.h"
 #include "Models.h"
 #include "Root.h"
 #include "Overlay.h"

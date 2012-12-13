@@ -83,6 +83,8 @@ namespace Arya
     void Overlay::render()
     {
         glDisable(GL_DEPTH_TEST);
+        glEnable(GL_ALPHA_TEST);
+        glEnable(GL_BLEND);
 
         // bind shader
         overlayProgram->use();
@@ -99,6 +101,8 @@ namespace Arya
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
 
+        glDisable(GL_ALPHA_TEST);
+        glDisable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
     }
 }

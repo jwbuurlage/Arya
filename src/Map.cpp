@@ -47,7 +47,7 @@ namespace Arya
 
         if(terrain) delete terrain;
         terrain = newTerrain;
-         
+
         return true;
     }
 

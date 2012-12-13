@@ -22,6 +22,8 @@ namespace Arya
             void render(Camera* cam);
             void update(float elapsedTime, Scene* scene);
 
+            Terrain* getTerrain() const { return terrain; };
+
         private:
             Terrain* terrain;
     };
