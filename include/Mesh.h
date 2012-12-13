@@ -12,6 +12,8 @@ namespace Arya
             //GLsizei getVertexCount() { return vertexCount; }
             //GLenum getPrimitiveType() { return primitiveType; }
 
+            bool isAnimated() const { return frameCount > 1; }
+
             void addRef(){ refCount++; }
             void release(){ refCount--; }
             int getRefCount() const { return refCount; }

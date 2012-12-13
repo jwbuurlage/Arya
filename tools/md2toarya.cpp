@@ -258,6 +258,10 @@ int main(int argc, char* argv[])
             }
         }
     }
+    else
+    {
+        *(int*)pointer = 0; pointer += 4; //zero animations
+    }
     //End of animation info
 
     //Now we will create a new index buffer

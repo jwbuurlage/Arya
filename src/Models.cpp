@@ -126,6 +126,12 @@ namespace Arya
                 break;
             }
 
+            if( header->frameCount < 1 )
+            {
+                LOG_ERROR("Arya model with invalid number of frames: " << header->frameCount);
+                break;
+            }
+
             model = new Model;
 
             model->modelType = (ModelType)header->modeltype;
@@ -178,22 +184,53 @@ namespace Arya
                 //Create a VAO for every frame
                 mesh->createVAOs(mesh->frameCount);
                 int stride = floatCount * sizeof(GLfloat);
-                for(int f = 0; f < mesh->frameCount; ++f)
+
+                if( mesh->frameCount == 1 )
                 {
-                    glBindVertexArray(mesh->vaoHandles[f]);
+                    //Not animated
+                    glBindVertexArray(mesh->vaoHandles[0]);
                     glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
 
                     glEnableVertexAttribArray(0); //pos
-                    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLubyte*>(f*frameBytes + 0));
+                    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLubyte*>(0));
                     glEnableVertexAttribArray(1); //tex
-                    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLubyte*>(f*frameBytes + 12));
+                    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLubyte*>(12));
                     if(header->submesh[s].hasNormals)
                     {
                         glEnableVertexAttribArray(2); //norm
-                        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLubyte*>(f*frameBytes + 20));
+                        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLubyte*>(20));
                     }
                     if(mesh->indexCount > 0)
                         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);
+                }
+                else
+                {
+                    //Animated
+                    for(int f = 0; f < mesh->frameCount; ++f)
+                    {
+                        glBindVertexArray(mesh->vaoHandles[f]);
+                        glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
+
+                        glEnableVertexAttribArray(0); //pos
+                        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLubyte*>(f*frameBytes + 0));
+
+                        glEnableVertexAttribArray(3); //next pos
+                        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLubyte*>(((f+1)%mesh->frameCount)*frameBytes + 0));
+
+                        glEnableVertexAttribArray(1); //tex
+                        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLubyte*>(f*frameBytes + 12));
+
+                        if(header->submesh[s].hasNormals)
+                        {
+                            glEnableVertexAttribArray(2); //norm
+                            glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLubyte*>(f*frameBytes + 20));
+
+                            glEnableVertexAttribArray(4); //next norm
+                            glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLubyte*>(((f+1)%mesh->frameCount)*frameBytes + 20));
+                        }
+                        if(mesh->indexCount > 0)
+                            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);
+                    }
                 }
             }
 
@@ -219,11 +256,28 @@ namespace Arya
                 Material* mat = TextureManager::shared().getTexture(nameBuf);
                 model->addMaterial(mat);
             }
-            delete[] nameBuf;
 
             //Parse animations
-            int animationCount = *(int*)pointer;
+            int animationCount = *(int*)pointer; pointer += 4;
             LOG_INFO("Model has " << animationCount << " animations.");
+            for(int anim = 0; anim < animationCount; ++anim)
+            {
+                //Get string
+                int count = 0;
+                nameBuf[0] = *pointer++;
+                while(nameBuf[count]){ ++count; nameBuf[count] = *pointer++; }
+                LOG_INFO("Loading animation: " << nameBuf);
+
+                int startFrame = *(int*)pointer; pointer += 4;
+                int endFrame = *(int*)pointer; pointer += 4;
+                for(int i = 0; i < (endFrame-startFrame); ++i)
+                {
+                    float frameTime = *(float*)pointer;
+                    pointer += 4;
+                }
+             }
+
+            delete[] nameBuf;
 
             addResource(filename, model);
         }while(0);
