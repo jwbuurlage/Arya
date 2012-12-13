@@ -177,19 +177,20 @@ namespace Arya
 
                 //Create a VAO for every frame
                 mesh->createVAOs(mesh->frameCount);
+                int stride = floatCount * sizeof(GLfloat);
                 for(int f = 0; f < mesh->frameCount; ++f)
                 {
                     glBindVertexArray(mesh->vaoHandles[f]);
                     glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
 
                     glEnableVertexAttribArray(0); //pos
-                    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, floatCount * sizeof(GLfloat), reinterpret_cast<GLubyte*>(f*frameBytes + 0));
+                    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLubyte*>(f*frameBytes + 0));
                     glEnableVertexAttribArray(1); //tex
-                    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, floatCount * sizeof(GLfloat), reinterpret_cast<GLubyte*>(f*frameBytes + 12));
+                    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLubyte*>(f*frameBytes + 12));
                     if(header->submesh[s].hasNormals)
                     {
                         glEnableVertexAttribArray(2); //norm
-                        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, floatCount * sizeof(GLfloat), reinterpret_cast<GLubyte*>(f*frameBytes + 20));
+                        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLubyte*>(f*frameBytes + 20));
                     }
                     if(mesh->indexCount > 0)
                         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);

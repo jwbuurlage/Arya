@@ -127,7 +127,7 @@ namespace Arya
                 if(mesh->frameCount > 0)
                 {
                     Material* mat = model->getMaterials()[mesh->materialIndex];
-                    //basicProgram->setUniform1i("tex", 0);
+                    basicProgram->setUniform1i("tex", 0);
                     glActiveTexture(GL_TEXTURE0);
                     if(mat) glBindTexture(GL_TEXTURE_2D, mat->handle);
 
