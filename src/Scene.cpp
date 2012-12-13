@@ -106,6 +106,13 @@ namespace Arya
     {
         camera->update(elapsedTime);
         currentMap->update(elapsedTime, this);
+        //We might want to let the Game loop on all
+        //the objects and animate them. This way the game
+        //has more control: it could slow animations down for example
+        for(int i = 0; i < objects.size(); ++i)
+        {
+            objects[i]->updateAnimation(elapsedTime);
+        }
     }
 
     void Scene::render()
@@ -119,7 +126,19 @@ namespace Arya
         for(int i = 0; i < objects.size(); ++i)
         {
             if( objects[i]->model == 0 ) continue;
+
             basicProgram->setUniformMatrix4fv("mMatrix", objects[i]->getMoveMatrix());
+
+            int frame = 0;
+            float interpolation = 0.0f;
+            AnimationState* animState = objects[i]->getAnimationState(); //can be zero
+            if(animState)
+            {
+                frame = animState->getCurFrame();
+                interpolation = animState->getInterpolation();
+                basicProgram->setUniform1f("interpolation", interpolation);
+            }
+
             Model* model = objects[i]->model;
             for(int j = 0; j < model->getMeshes().size(); ++j)
             {
@@ -131,7 +150,7 @@ namespace Arya
                     glActiveTexture(GL_TEXTURE0);
                     if(mat) glBindTexture(GL_TEXTURE_2D, mat->handle);
 
-                    glBindVertexArray(mesh->vaoHandles[0]);
+                    glBindVertexArray(mesh->vaoHandles[frame]);
                     glDrawArrays(mesh->primitiveType, 0, mesh->vertexCount);
                 }
             }

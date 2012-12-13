@@ -27,9 +27,62 @@ typedef struct{
 
 namespace Arya
 {
+    //The different animation states
+    //These classes are declared here
+    //so that the rest of the engine
+    //only has to know the base class
+
+    class VertexAnimationState : public AnimationState
+    {
+        public:
+            VertexAnimationState(Model* m)
+            {
+                model = m;
+                curAnim = 0;
+                currentFrame = 0;
+                nextFrame = 0;
+                timer = 0.0f;
+                interpolation = 0.0f;
+            }
+            ~VertexAnimationState() {}
+
+            //Base class overloads
+            void setAnimation(const char* name)
+            {
+
+            }
+
+            void updateAnimation(float elapsedTime)
+            {
+                //YOAO: You only animate once
+                interpolation += 3.0f*elapsedTime;
+                while( interpolation > 1.0f )
+                {
+                    interpolation -= 1.0f;
+                    currentFrame = nextFrame;
+                    nextFrame++;
+                    if(nextFrame > 50) nextFrame = 0;
+                }
+            }
+
+            int getCurFrame(){ return currentFrame; }
+            float getInterpolation(){ return interpolation; }
+
+        private:
+            Model* model;
+
+            int curAnim; //index into the models animation list
+
+            int currentFrame; //currently playing this frame
+            int nextFrame; //currentFrame + 1 but wrapped to start if needed
+            float timer;
+            float interpolation; //in range [0,1]
+    };
+
     Model::Model()
     {
-
+        refCount = 0;
+        animationData = 0;
     }
 
     Model::~Model()
@@ -49,6 +102,7 @@ namespace Arya
         //If bone, create BoneAnimationState
         //If vertex, create VertexAnimationState
         //else return 0
+        if(modelType == VertexAnimated) return new VertexAnimationState(this);
         return 0;
     }
 
@@ -275,7 +329,7 @@ namespace Arya
                     float frameTime = *(float*)pointer;
                     pointer += 4;
                 }
-             }
+            }
 
             delete[] nameBuf;
 

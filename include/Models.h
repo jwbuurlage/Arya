@@ -21,17 +21,27 @@ namespace Arya
         BoneAnimated = 3
     };
 
-    //Base class for an animation state
+    //Base class for an animation state, stored in each object
+    //Only contains the state, not the full animation data
     //Subclasses can be bone positions or keyframes
-    //and so on
+    //The actual keyframe data (like timings) are in the Model
     class AnimationState
     {
         public:
             AnimationState(){}
             virtual ~AnimationState(){}
 
-            virtual void setAnimation(const char* name);
-            virtual void updateAnimation(float elapsedTime);
+            virtual void setAnimation(const char* name) = 0;
+            virtual void updateAnimation(float elapsedTime) = 0;
+
+            virtual int getCurFrame() = 0;
+            virtual float getInterpolation() = 0;
+    };
+
+    //Base class for animation data
+    //This is stored inside the model, not in the object
+    class AnimationData
+    {
     };
 
     class Model
@@ -41,6 +51,8 @@ namespace Arya
 
             const vector<Mesh*>& getMeshes() const { return meshes; }
             const vector<Material*>& getMaterials() const { return materials; }
+
+            const AnimationData* getAnimationData() const { return animationData; }
 
             //Called by Object
             AnimationState* createAnimationState();
@@ -63,6 +75,8 @@ namespace Arya
 
             vector<Mesh*> meshes;
             vector<Material*> materials;
+
+            AnimationData* animationData;
 
             int refCount;
             //TODO: keep a list of objects that

@@ -187,6 +187,11 @@ namespace Arya
         glUniform1i(getUniformLocation(name), val);
     }
 
+    void ShaderProgram::setUniform1f(const char* name, float val)
+    {
+        glUniform1f(getUniformLocation(name), val);
+    }
+
     void ShaderProgram::setUniform2fv(const char* name, vec2 values)
     {
         glUniform2fv(getUniformLocation(name), 1, &values[0]);
