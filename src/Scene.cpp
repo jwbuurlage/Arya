@@ -62,11 +62,11 @@ namespace Arya
     bool Scene::initShaders()
     {
         Shader* basicVertex = new Shader(VERTEX);
-        if(!(basicVertex->addSourceFile("../shaders/basic.vert"))) return false;
+        if(!(basicVertex->addSourceFile("../shaders/staticmodel.vert"))) return false;
         if(!(basicVertex->compile())) return false;
 
         Shader* basicFragment = new Shader(FRAGMENT);
-        if(!(basicFragment->addSourceFile("../shaders/basic.frag"))) return false;
+        if(!(basicFragment->addSourceFile("../shaders/staticmodel.frag"))) return false;
         if(!(basicFragment->compile())) return false;
 
         basicProgram = new ShaderProgram("basic");
@@ -77,11 +77,13 @@ namespace Arya
         return true;
     }
 
-    void Scene::setMap(const char* hm, vector<Texture*> ts, Texture* sm)
+    bool Scene::setMap(const char* hm, vector<Texture*> ts, Texture* sm)
     {
         if(currentMap)
             delete currentMap;
-        currentMap = new Map(hm, ts, sm);
+        currentMap = new Map();
+        if(!currentMap->init(hm, ts, sm)) return false;
+        return true;
     }
 
     void Scene::cleanup()
@@ -106,6 +108,13 @@ namespace Arya
     {
         camera->update(elapsedTime);
         currentMap->update(elapsedTime, this);
+        //We might want to let the Game loop on all
+        //the objects and animate them. This way the game
+        //has more control: it could slow animations down for example
+        for(int i = 0; i < objects.size(); ++i)
+        {
+            objects[i]->updateAnimation(elapsedTime);
+        }
     }
 
     void Scene::render()
@@ -122,13 +131,33 @@ namespace Arya
         for(int i = 0; i < objects.size(); ++i)
         {
             if( objects[i]->model == 0 ) continue;
+
             basicProgram->setUniformMatrix4fv("mMatrix", objects[i]->getMoveMatrix());
+
+            int frame = 0;
+            float interpolation = 0.0f;
+            AnimationState* animState = objects[i]->getAnimationState(); //can be zero
+            if(animState)
+            {
+                frame = animState->getCurFrame();
+                interpolation = animState->getInterpolation();
+                basicProgram->setUniform1f("interpolation", interpolation);
+            }
+
             Model* model = objects[i]->model;
             for(int j = 0; j < model->getMeshes().size(); ++j)
             {
                 Mesh* mesh = model->getMeshes()[j];
-                glBindVertexArray(mesh->vaoHandle);
-                glDrawArrays(mesh->primitiveType, 0, mesh->vertexCount);
+                if(mesh->frameCount > 0)
+                {
+                    Material* mat = model->getMaterials()[mesh->materialIndex];
+                    basicProgram->setUniform1i("tex", 0);
+                    glActiveTexture(GL_TEXTURE0);
+                    if(mat) glBindTexture(GL_TEXTURE_2D, mat->handle);
+
+                    glBindVertexArray(mesh->vaoHandles[frame]);
+                    glDrawArrays(mesh->primitiveType, 0, mesh->vertexCount);
+                }
             }
         }
 

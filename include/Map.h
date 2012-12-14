@@ -13,12 +13,16 @@ namespace Arya
     class Map
     {
         public:
-            Map(const char* hm, vector<Texture*> ts, Texture* sm);
+            Map();
             ~Map();
 
-            void setTerrain(const char* hm, vector<Texture*> ts, Texture* sm);
+            bool init(const char* hm, vector<Texture*> ts, Texture* sm);
+
+            bool setTerrain(const char* hm, vector<Texture*> ts, Texture* sm);
             void render(Camera* cam);
             void update(float elapsedTime, Scene* scene);
+
+            Terrain* getTerrain() const { return terrain; };
 
         private:
             Terrain* terrain;

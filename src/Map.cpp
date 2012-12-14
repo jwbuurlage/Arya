@@ -10,10 +10,9 @@ using std::vector;
 
 namespace Arya
 {
-    Map::Map(const char* hm, vector<Texture*> ts, Texture* sm)
+    Map::Map()
     {
         terrain = 0;
-        setTerrain(hm, ts, sm);
     }
 
     Map::~Map()
@@ -21,23 +20,35 @@ namespace Arya
         if(terrain) delete terrain;
     }
 
-    void Map::setTerrain(const char* hm, vector<Texture*> ts, Texture* sm)
+    bool Map::init(const char* hm, vector<Texture*> ts, Texture* sm)
+    {
+        if(!setTerrain(hm, ts, sm)) {
+            LOG_ERROR("Could not initialize map");
+            return false;
+        }
+
+        return true;
+    }
+
+    bool Map::setTerrain(const char* hm, vector<Texture*> ts, Texture* sm)
     {
         if(!hm || !(ts.size()) || !sm) {
             if(terrain) delete terrain;
             terrain = 0;
-            return;
+            return false;
         }
 
         Terrain* newTerrain = new Terrain(hm, ts, sm);
         if(!newTerrain->init()) {
             LOG_ERROR("Could not initialize terrain");
             delete newTerrain;
-            return;
+            return false;
         }
 
         if(terrain) delete terrain;
         terrain = newTerrain;
+
+        return true;
     }
 
     void Map::render(Camera* camera)

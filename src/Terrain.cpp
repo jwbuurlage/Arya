@@ -18,6 +18,8 @@ using glm::vec3;
 using glm::vec4;
 using glm::distance;
 
+#define TERRAIN_SIZE 1025
+
 namespace Arya
 {
     Terrain::Terrain(const char* hm, vector<Texture*> ts, Texture* sm) 
@@ -36,6 +38,7 @@ namespace Arya
         levelMax = 0;
 
         heightMapHandle = 0;
+        hFile = 0;
     }
 
     Terrain::~Terrain()
@@ -61,6 +64,7 @@ namespace Arya
         if(heightMapName == 0 || splatMap == 0) return false;
 
         for(int i = 0; i < tileSet.size(); ++i) {
+            if(!tileSet[i]) return false;
             glBindTexture(GL_TEXTURE_2D, tileSet[i]->handle);
             glGenerateMipmap(GL_TEXTURE_2D);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -85,7 +89,8 @@ namespace Arya
         if(!(terrainProgram->link())) return false;
 
         // load in heightmap
-        File* hFile = FileSystem::shared().getFile(heightMapName);
+        hFile = FileSystem::shared().getFile(heightMapName);
+        if(!hFile) return false;
 
         glGenTextures(1, &heightMapHandle);
         glBindTexture(GL_TEXTURE_2D, heightMapHandle);
@@ -94,11 +99,8 @@ namespace Arya
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-        GLint swizzle_mask[] = { GL_RED, GL_RED, GL_RED, GL_ONE };
-        glTexParameteriv( GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzle_mask);
-
         glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, 1025, 1025, 0, GL_RED, GL_UNSIGNED_SHORT, hFile->getData());
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, TERRAIN_SIZE, TERRAIN_SIZE, 0, GL_RED, GL_UNSIGNED_SHORT, hFile->getData());
 
         return true;
     }
@@ -106,8 +108,8 @@ namespace Arya
     bool Terrain::generate()
     {
         int w, h;
-        w = 1025; //heightMap->width;
-        h = 1025; //heightMap->height;
+        w = TERRAIN_SIZE;
+        h = TERRAIN_SIZE;
 
         if(!(((w-1) & (w-2)) == 0) || w != h) {
             LOG_WARNING("Heightmap is of the wrong size. Must be of the form 2^n + 1, and square.");
@@ -238,17 +240,32 @@ namespace Arya
             vec3 pPos = vec3(p.position.x, -100.0f, p.position.y);
             if(distance(pPos, camPos) < 300.0f)
                 p.lod = 0;
-            else if(distance(pPos, camPos) < 500.0f)
+            else if(distance(pPos, camPos) < 600.0f)
                 p.lod = 1;
-            else if(distance(pPos, camPos) < 700.0f)
-                p.lod = 2;
             else if(distance(pPos, camPos) < 900.0f)
+                p.lod = 2;
+            else if(distance(pPos, camPos) < 1200.0f)
                 p.lod = 3;
-            else if(distance(pPos, camPos) < 1100.0f)
+            else if(distance(pPos, camPos) < 1500.0f)
                 p.lod = 4;
             else
                 p.lod = levelMax -1;
         }
+    }
+
+    float Terrain::heightAtGroundPosition(float x, float z)
+    {
+        if(!hFile) {
+            LOG_WARNING("Querying height, but no heightmap set");
+            return 0.0;
+        }
+
+        unsigned short h;
+        unsigned short* heights = (unsigned short*)hFile->getData();
+
+        int index = (int)(z + (TERRAIN_SIZE/2.0))*TERRAIN_SIZE + (int)(x + (TERRAIN_SIZE / 2.0));
+        h = heights[index];
+        return -200.0 + 200.0*(h / 65535.0);
     }
 
     //---------------------------------------

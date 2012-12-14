@@ -12,14 +12,22 @@ namespace Arya
             //GLsizei getVertexCount() { return vertexCount; }
             //GLenum getPrimitiveType() { return primitiveType; }
 
+            bool isAnimated() const { return frameCount > 1; }
+
             void addRef(){ refCount++; }
             void release(){ refCount--; }
             int getRefCount() const { return refCount; }
 
-            GLuint vaoHandle;
+            void createVAOs(int frameCount);
+
+            int frameCount; //1 for static models
+            GLuint* vaoHandles; //a list of framecount handles
             GLuint vertexBuffer;
-            GLsizei vertexCount;
+            GLsizei vertexCount; //PER FRAME
+            GLuint indexBuffer;
+            GLsizei indexCount;
             GLenum primitiveType;
+            int materialIndex; //the model has a list of materials
 
         private:
             int refCount;

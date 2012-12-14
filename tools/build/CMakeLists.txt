@@ -2,28 +2,20 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.6 )
 
 SET(
 	PROJECT_NAME
-    "AryaGame"
+    "md2toarya"
 )
 
 SET(
 	PROJECT_SOURCES
-    "../src/Game.cpp"
-    "../src/GameSession.cpp"
-    "../src/GameSessionInput.cpp"
-    "../src/Faction.cpp"
-    "../src/Units.cpp"
-	"../src/main.cpp"
+    "../md2toarya.cpp"
 )
 
 SET(
 	PROJECT_INCLUDES
-	"../../include"
-	"../include"
 )
 
 SET(
 	PROJECT_LIBRARIES
-	"Arya"
 )
 
 INCLUDE_DIRECTORIES( ${PROJECT_INCLUDES} )

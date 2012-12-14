@@ -10,6 +10,7 @@
 #include "Textures.h"
 #include "Scene.h"
 #include "Files.h"
+#include "Overlay.h"
 #include "common/Logger.h"
 
 using std::cerr;
@@ -17,7 +18,6 @@ using std::endl;
 
 namespace Arya
 {
-
     template<> Root* Singleton<Root>::singleton = 0;
 
     //glfw callback functions
@@ -30,6 +30,7 @@ namespace Arya
     {
         scene = 0;
         oldTime = 0.0;
+        overlay = 0;
 
         Logger* log = new Logger();
         FileSystem* files = new FileSystem();
@@ -44,7 +45,8 @@ namespace Arya
         //Only clean them up if needed
         glfwTerminate();
 
-        if( scene ) delete scene;
+        if(scene) delete scene;
+        if(overlay) delete overlay;
 
         delete &ModelManager::shared();
         delete &FileSystem::shared();
@@ -67,9 +69,14 @@ namespace Arya
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
 
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         //Call these in the right order: Models need Textures
         TextureManager::shared().initialize();
         ModelManager::shared().initialize();
+
+        overlay = new Overlay();
+        if(!overlay->init()) return false;
 
         return true;
     }
@@ -88,6 +95,8 @@ namespace Arya
         }
         else
             addFrameListener(scene);
+
+        LOG_INFO("Made scene");
 
         return scene;
     }
@@ -211,6 +220,9 @@ namespace Arya
         if(scene)
             scene->render();
 
+        if(overlay)
+            overlay->render();
+
         glfwSwapBuffers();
     }
 
@@ -250,7 +262,7 @@ namespace Arya
     void Root::mouseDown(int button, int action)
     {
         for( std::vector<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
-            if( (*it)->mouseDown((MOUSEBUTTON)button, action == GLFW_PRESS, mouseX, mouseY) == true ) break;
+            if( (*it)->mouseDown((MOUSEBUTTON)button, action == GLFW_PRESS, mouseX, windowHeight - mouseY) == true ) break;
     }
 
     void Root::mouseWheelMoved(int pos)
@@ -266,7 +278,7 @@ namespace Arya
         int dx = x - mouseX, dy = y - mouseY;
         mouseX = x; mouseY = y;
         for( std::vector<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
-            if( (*it)->mouseMoved(x,y, dx, dy) == true ) break;
+            if( (*it)->mouseMoved(x, windowHeight - y, dx, dy) == true ) break;
     }
 
     void GLFWCALL keyCallback(int key, int action)

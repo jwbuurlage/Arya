@@ -1,3 +1,5 @@
+#pragma once
+
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
@@ -15,6 +17,7 @@ namespace Arya
     class ShaderProgram;
     class Scene;
     class Camera;
+    class File;
 
     typedef struct
     {
@@ -33,6 +36,8 @@ namespace Arya
             void render(Camera* cam);
             void update(float dt, Scene* curScene);
 
+            float heightAtGroundPosition(float x, float z);
+
             bool init();
 
         private:
@@ -44,6 +49,7 @@ namespace Arya
             vector<Texture*> tileSet;
             Texture* splatMap;
             GLuint heightMapHandle;
+            File* hFile;
 
             mat4 scaleMatrix;
 

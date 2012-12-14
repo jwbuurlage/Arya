@@ -28,9 +28,8 @@ namespace Arya
                 triangleVertices,
                 GL_STATIC_DRAW);
 
-        glGenVertexArrays(1, &mesh->vaoHandle);
-
-        glBindVertexArray(mesh->vaoHandle);
+        mesh->createVAOs(1);
+        glBindVertexArray(mesh->vaoHandles[0]);
 
         glEnableVertexAttribArray(0);
 
@@ -52,8 +51,8 @@ namespace Arya
         glGenBuffers(1, &mesh->vertexBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
         glBufferData(GL_ARRAY_BUFFER, mesh->vertexCount * 3 * sizeof(GLfloat), quadVerts, GL_STATIC_DRAW);
-        glGenVertexArrays(1, &mesh->vaoHandle);
-        glBindVertexArray(mesh->vaoHandle);
+        mesh->createVAOs(1);
+        glBindVertexArray(mesh->vaoHandles[0]);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
     }

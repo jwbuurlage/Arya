@@ -8,6 +8,7 @@
 namespace Arya
 {
     class Scene;
+    class Overlay;
 
     class Root : public Singleton<Root>
     {
@@ -35,10 +36,13 @@ namespace Arya
             int getWindowWidth() const { return windowWidth; }
             int getWindowHeight() const { return windowHeight; }
 
+            Overlay* getOverlay() const { return overlay; }
+
         private:
             bool initGLFW();
             bool initGLEW();
             Scene* scene;
+            Overlay* overlay;
 
             int windowWidth, windowHeight;
             int desktopWidth, desktopHeight;

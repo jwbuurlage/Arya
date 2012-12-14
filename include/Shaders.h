@@ -77,6 +77,7 @@ namespace Arya
 
             GLuint getUniformLocation(const char* name);
             void setUniform1i(const char* name, int val);
+            void setUniform1f(const char* name, float val);
             void setUniform2fv(const char* name, vec2 values);
             void setUniformMatrix4fv(const char* name, mat4 matrix);
 
