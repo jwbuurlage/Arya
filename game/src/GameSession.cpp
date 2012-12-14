@@ -94,7 +94,7 @@ bool GameSession::init()
         localFaction->addUnit(unit);
     }
 
-    selectionDecalHandle = TextureManager::shared().getTexture("selection.tga")->handle;
+    selectionDecalHandle = TextureManager::shared().getTexture("selection.png")->handle;
 
     return true;
 }
@@ -143,8 +143,9 @@ bool GameSession::initVertices()
 
 void GameSession::onRender()
 {
-    glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
+    glEnable(GL_ALPHA_TEST);
+    glEnable(GL_BLEND);
 
     decalProgram->use();
     glBindVertexArray(decalVao);
@@ -162,19 +163,16 @@ void GameSession::onRender()
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, selectionDecalHandle);
 
-    LOG_INFO("posses");
-
     for(int i = 0; i < localFaction->getUnits().size(); ++i)
     {
+        if(!localFaction->getUnits()[i]->isSelected()) continue;
         vec2 groundPos = vec2(localFaction->getUnits()[i]->getObject()->getPosition().x,
                 localFaction->getUnits()[i]->getObject()->getPosition().z);
-        LOG_INFO("groundPos.xy " << groundPos.x << " " << groundPos.y);
         decalProgram->setUniform2fv("groundPosition", groundPos);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 
-    LOG_INFO("/posses");
-
+    glDisable(GL_BLEND);
+    glDisable(GL_ALPHA_TEST);
     glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
 }

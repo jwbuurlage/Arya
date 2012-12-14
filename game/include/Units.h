@@ -21,6 +21,7 @@ class Unit
        UnitInfo* getInfo() const { return info; }
        void setInfo(UnitInfo* unitInfo) { info = unitInfo; }
        void setSelected(bool sel) { selected = sel; }
+       bool isSelected() { return selected; }
 
     private:
         Object* object;
