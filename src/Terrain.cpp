@@ -259,6 +259,12 @@ namespace Arya
             return 0.0;
         }
 
+        if( x >= TERRAIN_SIZE/2.0 || x <= -TERRAIN_SIZE/2.0 || z >= TERRAIN_SIZE/2.0 || z <= -TERRAIN_SIZE/2.0 )
+        {
+            LOG_WARNING("Querying height outside of terrain!");
+            return 0.0;
+        }
+
         unsigned short h;
         unsigned short* heights = (unsigned short*)hFile->getData();
 

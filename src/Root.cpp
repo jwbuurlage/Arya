@@ -141,7 +141,7 @@ namespace Arya
 
         glfwCloseWindow();
 
-        if(!glfwOpenWindow(windowWidth, windowHeight, 0, 0, 0, 0, 0, 0, (fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW)))
+        if(!glfwOpenWindow(windowWidth, windowHeight, 0, 0, 0, 0, 32, 0, (fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW)))
         {
             LOG_ERROR("Could not re-create window. Closing now.");
             stopRendering();
