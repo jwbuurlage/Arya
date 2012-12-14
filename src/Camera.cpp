@@ -164,6 +164,12 @@ namespace Arya
         return;
     }
 
+    mat4 Camera::getVMatrix()
+    {
+        if( updateMatrix ) updateViewProjectionMatrix(0);
+        return viewMatrix;
+    }
+
     mat4 Camera::getVPMatrix()
     {
         if( updateMatrix ) updateViewProjectionMatrix(0);

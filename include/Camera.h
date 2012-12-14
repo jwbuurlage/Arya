@@ -59,6 +59,7 @@ namespace Arya
             float camYawSpeed; //Yaw speed in radians per second
             float camPitchSpeed; //Pitch speed in radians per second
 
+            mat4 getVMatrix();
             mat4 getVPMatrix();
 
         private:
