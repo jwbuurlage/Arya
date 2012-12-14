@@ -59,10 +59,10 @@ bool GameSession::init()
 
     for(int i = 0; i < 10; ++ i) 
     {
-        float heightModel = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(0.0, -50.0+30.0*i);
+        float heightModel = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(0.0, -50.0+20.0*i);
         obj = scene->createObject();
         obj->setModel(ModelManager::shared().getModel("ogros.aryamodel"));
-        obj->setPosition(vec3(0, 22.0 + heightModel, -50 + 30 * i));
+        obj->setPosition(vec3(0, heightModel, -50 + 20 * i));
         localFaction->addUnit(obj);
     }
 
