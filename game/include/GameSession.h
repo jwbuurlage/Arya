@@ -18,13 +18,17 @@ using Arya::TextureManager;
 class Faction;
 class GameSessionInput;
 
-class GameSession{
+class GameSession : public Arya::FrameListener
+{
     public:
         GameSession();
         ~GameSession();
 
         bool init();
         Faction* getLocalFaction() const { return localFaction; } ;
+
+        // FrameListener
+        void onRender();
 
    private:
         GameSessionInput* input;

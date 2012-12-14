@@ -2,10 +2,11 @@
 #include "../include/GameSession.h"
 #include "../include/GameSessionInput.h"
 #include "../include/Faction.h"
+#include "../include/Units.h"
 
 GameSession::GameSession()
 {
-        input = 0;
+    input = 0;
 }
 
 GameSession::~GameSession()
@@ -15,6 +16,8 @@ GameSession::~GameSession()
         Root::shared().removeFrameListener(input);
         delete input;
     }
+
+    Root::shared().removeFrameListener(this);
 
     Root::shared().removeScene();
 
@@ -27,7 +30,8 @@ bool GameSession::init()
     input->init();
 
     Root::shared().addInputListener(input);
-    Root::shared().addFrameListener(input); 
+    Root::shared().addFrameListener(input);
+    Root::shared().addFrameListener(this);
 
     // init factions
     localFaction = new Faction;
@@ -38,16 +42,6 @@ bool GameSession::init()
         return false;
     Object* obj;
 
-//    obj = scene->createObject();
-//    obj->setModel(ModelManager::shared().getModel("triangle"));
-//    obj->setPosition(vec3(0, 0, 0));
-//    localFaction->addUnit(obj);
-//
-//    obj = scene->createObject();
-//    obj->setModel(ModelManager::shared().getModel("quad"));
-//    obj->setPosition(vec3(0, 0, 5));
-//    localFaction->addUnit(obj);
-
     // init map
     vector<Texture*> tileSet;
     tileSet.push_back(TextureManager::shared().getTexture("grass.tga"));
@@ -57,14 +51,40 @@ bool GameSession::init()
     if(!scene->setMap("heightmap.raw", tileSet, TextureManager::shared().getTexture("splatmap.tga")))
         return false;
 
+    // TODO: This is a memleak, but we will load info in from a file somewhere
+    // and this will fix this issue
+    UnitInfo* info = new UnitInfo;
+    info->radius = 2.0f;
+
+    Unit* unit = new Unit(info);
+
     for(int i = 0; i < 10; ++ i) 
     {
         float heightModel = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(0.0, -50.0+30.0*i);
         obj = scene->createObject();
         obj->setModel(ModelManager::shared().getModel("ogros.aryamodel"));
         obj->setPosition(vec3(0, 22.0 + heightModel, -50 + 30 * i));
-        localFaction->addUnit(obj);
+
+        unit->setObject(obj);
+        localFaction->addUnit(unit);
     }
 
+    delete unit;
+
     return true;
+}
+
+void GameSession::onRender()
+{
+    static GLfloat vertices[] = {
+        0.0, 1.0,
+        0.0, 0.0,
+        1.0, 1.0,
+        1.0, 0.0
+    };
+
+    for(int i = 0; i < localFaction->getUnits().size(); ++i)
+    {
+        // render circle
+    }
 }

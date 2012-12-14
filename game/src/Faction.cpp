@@ -11,9 +11,7 @@ Faction::~Faction()
 
 }
 
-void Faction::addUnit(Object* obj)
+void Faction::addUnit(Unit* unit)
 {
-    Unit* unit = new Unit;
-    unit->setObject(obj);
     units.push_back(unit);
 }

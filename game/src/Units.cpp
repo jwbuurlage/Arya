@@ -1,7 +1,8 @@
 #include "../include/Units.h"
 
-Unit::Unit()
+Unit::Unit(UnitInfo* inf)
 {
+    info = inf;
     object = 0;
 }
 

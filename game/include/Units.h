@@ -4,19 +4,27 @@
 
 using Arya::Object;
 
+typedef struct
+{
+    float radius;
+} UnitInfo;
+
 class Unit
 {
     public:
-        Unit();
+        Unit(UnitInfo* inf);
         ~Unit();
 
         void setObject(Object* obj);
         Object* getObject() const { return object; }
 
-        void setSelected(bool sel) { selected = sel; };
+       UnitInfo* getInfo() const { return info; }
+       void setInfo(UnitInfo* unitInfo) { info = unitInfo; }
+       void setSelected(bool sel) { selected = sel; }
 
     private:
         Object* object;
+        UnitInfo* info;
         bool selected;
 };
 

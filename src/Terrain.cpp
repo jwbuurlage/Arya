@@ -122,7 +122,7 @@ namespace Arya
 
         GLfloat* vertexData = new GLfloat[patchSizeMax*patchSizeMax * 2];
 
-        scaleMatrix = glm::scale(mat4(1.0), vec3((float)w));
+        scaleMatrix = glm::scale(mat4(1.0), vec3((float)w, 100.0, (float)w));
         float perVertex = (1.0f / ((patchSizeMax - 1) * patchCount));
 
         for(int i = 0; i < patchSizeMax; ++i)
