@@ -8,10 +8,19 @@ GameSession::GameSession()
 {
     input = 0;
     localFaction = 0;
+
+    decalVao = 0;
+    decalProgram = 0;
+    selectionDecalHandle = 0;
 }
 
 GameSession::~GameSession()
 {
+    if(decalProgram)
+        delete decalProgram;
+
+    // TODO: delete vertex buffers
+
     if(input) {
         Root::shared().removeInputListener(input);
         Root::shared().removeFrameListener(input);
@@ -35,6 +44,9 @@ bool GameSession::init()
 {
     input = new GameSessionInput(this);
     input->init();
+
+    if(!initShaders()) return false;
+    if(!initVertices()) return false;
 
     Root::shared().addInputListener(input);
     Root::shared().addFrameListener(input);
@@ -82,20 +94,87 @@ bool GameSession::init()
         localFaction->addUnit(unit);
     }
 
+    selectionDecalHandle = TextureManager::shared().getTexture("selection.tga")->handle;
+
+    return true;
+}
+
+bool GameSession::initShaders()
+{
+    Shader* decalVertex = new Shader(Arya::VERTEX);
+    if(!(decalVertex->addSourceFile("../shaders/terraindecal.vert"))) return false;
+    if(!(decalVertex->compile())) return false;
+
+    Shader* decalFragment = new Shader(Arya::FRAGMENT);
+    if(!(decalFragment->addSourceFile("../shaders/terraindecal.frag"))) return false;
+    if(!(decalFragment->compile())) return false;
+
+    decalProgram = new ShaderProgram("terraindecal");
+    decalProgram->attach(decalVertex);
+    decalProgram->attach(decalFragment);
+    if(!(decalProgram->link())) return false;
+
+    return true;
+}
+
+bool GameSession::initVertices()
+{
+    GLfloat vertices[] = {
+        0.0, 0.0,
+        1.0, 0.0,
+        0.0, 1.0,
+        1.0, 1.0
+    };
+
+    GLuint vbo;
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), vertices, GL_STATIC_DRAW); 
+
+    glGenVertexArrays(1, &decalVao);
+    glBindVertexArray(decalVao);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, (void*)0);
+
+    glBindVertexArray(0);
+
     return true;
 }
 
 void GameSession::onRender()
 {
-    static GLfloat vertices[] = {
-        0.0, 1.0,
-        0.0, 0.0,
-        1.0, 1.0,
-        1.0, 0.0
-    };
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+
+    decalProgram->use();
+    glBindVertexArray(decalVao);
+
+    decalProgram->setUniformMatrix4fv("vpMatrix", Root::shared().getScene()->getCamera()->getVPMatrix());
+    decalProgram->setUniformMatrix4fv("scaleMatrix", Root::shared().getScene()->getMap()->getTerrain()->getScaleMatrix());
+
+    // heightmap
+    decalProgram->setUniform1i("heightMap", 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, Root::shared().getScene()->getMap()->getTerrain()->getHeightMapHandle());
+
+    // selection
+    decalProgram->setUniform1i("selectionTexture", 1);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, selectionDecalHandle);
+
+    LOG_INFO("posses");
 
     for(int i = 0; i < localFaction->getUnits().size(); ++i)
     {
-        // render circle
+        vec2 groundPos = vec2(localFaction->getUnits()[i]->getObject()->getPosition().x,
+                localFaction->getUnits()[i]->getObject()->getPosition().z);
+        LOG_INFO("groundPos.xy " << groundPos.x << " " << groundPos.y);
+        decalProgram->setUniform2fv("groundPosition", groundPos);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
+
+    LOG_INFO("/posses");
+
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
 }

@@ -124,6 +124,7 @@ namespace Arya
             }
 
             render();
+
             glfwPollEvents();
             if( glfwGetWindowParam(GLFW_OPENED) == 0 ) running = false;
         }
@@ -220,6 +221,9 @@ namespace Arya
 
         if(overlay)
             overlay->render();
+
+        for(std::vector<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();++it)
+            (*it)->onRender();
 
         glfwSwapBuffers();
     }
