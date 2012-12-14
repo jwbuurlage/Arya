@@ -8,7 +8,8 @@ Faction::Faction()
 
 Faction::~Faction()
 {
-
+    for(int i = 0; i < units.size(); ++i)
+        delete units[i];
 }
 
 void Faction::addUnit(Unit* unit)

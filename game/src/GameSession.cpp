@@ -7,6 +7,7 @@
 GameSession::GameSession()
 {
     input = 0;
+    localFaction = 0;
 }
 
 GameSession::~GameSession()
@@ -16,6 +17,12 @@ GameSession::~GameSession()
         Root::shared().removeFrameListener(input);
         delete input;
     }
+
+    for(int i = 0; i < factions.size(); ++i)
+    {
+        delete factions[i];
+    }
+    factions.clear();
 
     Root::shared().removeFrameListener(this);
 
@@ -40,6 +47,13 @@ bool GameSession::init()
     Scene* scene = Root::shared().makeDefaultScene();
     if(!scene)
         return false;
+
+    Camera* cam = scene->getCamera();
+
+    cam->setPosition(vec3(0.0f, 150.0f, 0.0f));
+    cam->setCameraAngle(0.0f, -60.0f);
+    cam->camZoomSpeed = 80.0f;
+
     Object* obj;
 
     // init map
@@ -56,20 +70,17 @@ bool GameSession::init()
     UnitInfo* info = new UnitInfo;
     info->radius = 2.0f;
 
-    Unit* unit = new Unit(info);
-
     for(int i = 0; i < 10; ++ i) 
     {
+        Unit* unit = new Unit(info);
         float heightModel = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(0.0, -50.0+20.0*i);
         obj = scene->createObject();
         obj->setModel(ModelManager::shared().getModel("ogros.aryamodel"));
-        obj->setPosition(vec3(0, 22.0 + heightModel, -50 + 30 * i));
+        obj->setPosition(vec3(0, heightModel, -50 + 20 * i));
 
         unit->setObject(obj);
         localFaction->addUnit(unit);
     }
-
-    delete unit;
 
     return true;
 }

@@ -15,7 +15,7 @@ GameSessionInput::GameSessionInput(GameSession* ses)
     slowMode = false;
     forceDirection = vec3(0.0f);
     specMovement = vec3(0.0f);
-    specPos = vec3(0.0f);
+    specPos = vec3(0.0f, 150.0f, 0.0f);
     originalMousePos = vec2(0.0);
 }
 
@@ -192,12 +192,13 @@ bool GameSessionInput::mouseMoved(int x, int y, int dx, int dy)
         }
     }
 
-    return handled; 
+    return handled;
 }
 
 void GameSessionInput::unselectAll()
 {
     Faction* lf = session->getLocalFaction();
+    if(!lf) return;
     for(int i = 0; i < lf->getUnits().size(); ++i)
         lf->getUnits()[i]->setSelected(false);
 }
@@ -205,6 +206,7 @@ void GameSessionInput::unselectAll()
 void GameSessionInput::selectAll()
 {
     Faction* lf = session->getLocalFaction();
+    if(!lf) return;
     for(int i = 0; i < lf->getUnits().size(); ++i)
         lf->getUnits()[i]->setSelected(true);
 }
@@ -213,11 +215,14 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
 {
     unselectAll();
 
+    mat4 vpMatrix = Root::shared().getScene()->getCamera()->getVPMatrix();
+
     Faction* lf = session->getLocalFaction();
+    if(!lf) return;
     for(int i = 0; i < lf->getUnits().size(); ++i)
     {
-        vec4 onScreen = Root::shared().getScene()->getCamera()->getVPMatrix() * 
-            vec4(lf->getUnits()[i]->getObject()->getPosition(), 1.0);
+        vec4 onScreen(lf->getUnits()[i]->getObject()->getPosition(), 1.0);
+        onScreen = vpMatrix * onScreen;
         onScreen.x /= onScreen.w;
         onScreen.y /= onScreen.w;
 

@@ -122,7 +122,7 @@ namespace Arya
 
         GLfloat* vertexData = new GLfloat[patchSizeMax*patchSizeMax * 2];
 
-        scaleMatrix = glm::scale(mat4(1.0), vec3((float)w, 100.0, (float)w));
+        scaleMatrix = glm::scale(mat4(1.0), vec3((float)w, 300.0, (float)w));
         float perVertex = (1.0f / ((patchSizeMax - 1) * patchCount));
 
         for(int i = 0; i < patchSizeMax; ++i)
@@ -270,7 +270,7 @@ namespace Arya
 
         int index = (int)(z + (TERRAIN_SIZE/2.0))*TERRAIN_SIZE + (int)(x + (TERRAIN_SIZE / 2.0));
         h = heights[index];
-        return -200.0 + 200.0*(h / 65535.0);
+        return scaleMatrix[1][1]*(h / 65535.0);
     }
 
     //---------------------------------------

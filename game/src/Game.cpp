@@ -26,6 +26,13 @@ void Game::run()
     {
         root->addInputListener(this);
 
+        if(session) delete session;
+        session = new GameSession;
+        if(!session->init()) {
+            LOG_ERROR("Could not start a new session");
+            Root::shared().stopRendering();
+        }
+
         root->startRendering();
     }
 }

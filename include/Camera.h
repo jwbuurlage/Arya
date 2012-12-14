@@ -45,7 +45,7 @@ namespace Arya
             void rotateCameraSwing(float yawspeed, float pitchspeed);
             //This will also rotate the camera but will instantly apply the angle and not swing
             void rotateCamera(float deltaYaw, float deltaPitch); //Add yaw/pitch to current angle
-            void setCameraAngle(float Yaw, float Pitch);
+            void setCameraAngle(float Yaw, float Pitch){ yaw = Yaw; pitch = Pitch; updateMatrix = true; }
 
             vec3 getRealCameraPosition();
 
