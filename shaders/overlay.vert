@@ -1,5 +1,5 @@
-#version 140
-
+#version 400 
+#
 uniform vec2 screenSize;
 uniform vec2 screenPosition;
 uniform vec2 texOffset;

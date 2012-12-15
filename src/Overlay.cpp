@@ -93,7 +93,6 @@ namespace Arya
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D,FontManager::shared().getFont("courier.ttf")->textureHandle);
 
-
         glBindVertexArray(rectVAO);
 
         // render all rects

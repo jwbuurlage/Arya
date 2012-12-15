@@ -6,35 +6,35 @@
 
 namespace Arya
 {
-  class File;
+    class File;
 
-  class Font
-  {
-    public:
-      stbtt_bakedchar* baked[100];
-      Font(){textureHandle = 0;}
-      ~Font(){if( textureHandle ) glDeleteTextures(1, &textureHandle);}
-      GLuint textureHandle;
-  };
+    class Font
+    {
+        public:
+            stbtt_bakedchar baked[100];
+            Font(){textureHandle = 0;}
+            ~Font(){if( textureHandle ) glDeleteTextures(1, &textureHandle);}
+            GLuint textureHandle;
+    };
 
-  class FontManager : public Singleton<FontManager>, public ResourceManager<Font>
-  {
-    public: 
-      FontManager();
-      ~FontManager();
+    class FontManager : public Singleton<FontManager>, public ResourceManager<Font>
+    {
+        public: 
+            FontManager();
+            ~FontManager();
 
-      int initialize();
-      void cleanup();
+            int initialize();
+            void cleanup();
 
-      Font* getFont( const char* filename )
-      {
-        return getResource(filename); 
-      }
+            Font* getFont( const char* filename )
+            {
+                return getResource(filename); 
+            }
 
-    private:
-      Font* loadResource( const char* filename);
+        private:
+            Font* loadResource( const char* filename);
 
-      void loadDefaultFont();
-      void makeImage(File* filename,Font* font);
-  };
+            void loadDefaultFont();
+            void makeImage(File* filename,Font* font);
+    };
 }

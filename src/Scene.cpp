@@ -126,6 +126,7 @@ namespace Arya
         camera->updateViewProjectionMatrix(&vpMatrix);
         basicProgram->setUniformMatrix4fv("vpMatrix", vpMatrix);
         basicProgram->setUniform1i("texture1",0);
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, FontManager::shared().getFont("courier.ttf")->textureHandle);
 

@@ -30,7 +30,7 @@ namespace Arya
     Root::Root()
     {
         scene = 0;
-        oldTime = 0.0;
+        oldTime = 0;
         overlay = 0;
 
         Logger* log = new Logger();
@@ -113,8 +113,8 @@ namespace Arya
 
     void Root::startRendering()
     {
-LOG_INFO("start rendering");        
-running = true;
+        LOG_INFO("start rendering");        
+        running = true;
         while(running)
         {
             if(!oldTime)
@@ -129,6 +129,7 @@ running = true;
                 oldTime = pollTime;
             }
 
+            LOG_INFO("going to render");
             render();
             glfwPollEvents();
             if( glfwGetWindowParam(GLFW_OPENED) == 0 ) running = false;
@@ -221,9 +222,11 @@ running = true;
         glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_DEPTH_BUFFER_BIT);
 
+        LOG_INFO("going to render scene");
         if(scene)
             scene->render();
 
+        LOG_INFO("going to render overlay");
         if(overlay)
             overlay->render();
 
