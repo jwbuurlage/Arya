@@ -17,8 +17,7 @@ namespace Arya
 
   void Interface::init()
   {
-LOG_INFO("init begin");    
-vector<Rect*> rects;
+    vector<Rect*> rects;
     for(int i = 0; i<12; i++)
     {
       Rect* rect = new Rect;

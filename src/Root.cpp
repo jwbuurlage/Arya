@@ -75,11 +75,12 @@ namespace Arya
         //Call these in the right order: Models need Textures
         TextureManager::shared().initialize();
         ModelManager::shared().initialize();
+        if(!overlay->init()) return false;
+        overlay = new Overlay();
+
         Interface* interf = new Interface;
         interf->init();
         addFrameListener(interf);
-        overlay = new Overlay();
-        if(!overlay->init()) return false;
 
         return true;
     }
