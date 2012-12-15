@@ -77,12 +77,12 @@ namespace Arya
         return true;
     }
 
-    bool Scene::setMap(const char* hm, vector<Texture*> ts, Texture* sm)
+    bool Scene::setMap(const char* hm, const char* wm, vector<Texture*> ts, Texture* cm, Texture* sm)
     {
         if(currentMap)
             delete currentMap;
         currentMap = new Map();
-        if(!currentMap->init(hm, ts, sm)) return false;
+        if(!currentMap->init(hm, wm, ts, cm, sm)) return false;
         return true;
     }
 

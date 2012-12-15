@@ -21,12 +21,14 @@ using glm::distance;
 
 namespace Arya
 {
-    Terrain::Terrain(const char* hm, vector<Texture*> ts, Texture* sm) 
+    Terrain::Terrain(const char* hm, const char* wm, vector<Texture*> ts, Texture* cm, Texture* sm) 
     {
         heightMapName = hm;
+		waterMapName = wm;
         tileSet = ts;
         if(!(tileSet.size() == 4))
             LOG_WARNING("Tileset is of wrong size");
+		cloudMap = cm;
         splatMap = sm;
         vertexBuffer = 0;
         indexBuffer = 0;
@@ -37,8 +39,11 @@ namespace Arya
         levelMax = 0;
 
         heightMapHandle = 0;
+		waterMapHandle = 0;
         hFile = 0;
 		this->lightDirection=lightDirection;
+
+		time=0;
     }
 
     Terrain::~Terrain()
@@ -57,11 +62,14 @@ namespace Arya
 
         if(heightMapHandle)
             glDeleteTextures(1, &heightMapHandle);
+
+		if(waterMapHandle)
+			glDeleteTextures(1, &waterMapHandle);
     }
 
     bool Terrain::init()
     {
-        if(heightMapName == 0 || splatMap == 0) return false;
+        if(heightMapName == 0 || waterMapName == 0 || cloudMap == 0 || splatMap == 0) return false;
 
         for(int i = 0; i < tileSet.size(); ++i) {
             if(!tileSet[i]) return false;
@@ -88,6 +96,23 @@ namespace Arya
         terrainProgram->attach(terrainFragment);
         if(!(terrainProgram->link())) return false;
 
+
+		Shader* waterVertex = new Shader(VERTEX);
+        if(!(waterVertex->addSourceFile("../shaders/water.vert"))) return false;
+        if(!(waterVertex->compile())) return false;
+
+        Shader* waterFragment = new Shader(FRAGMENT);
+        if(!(waterFragment->addSourceFile("../shaders/water.frag"))) return false;
+        if(!(waterFragment->compile())) return false;
+
+        waterProgram = new ShaderProgram("basic");
+        waterProgram->attach(waterVertex);
+        waterProgram->attach(waterFragment);
+        if(!(waterProgram->link())) return false;
+
+
+
+
         // load in heightmap
         hFile = FileSystem::shared().getFile(heightMapName);
         if(!hFile) return false;
@@ -101,6 +126,32 @@ namespace Arya
 
         glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, TERRAIN_SIZE, TERRAIN_SIZE, 0, GL_RED, GL_UNSIGNED_SHORT, hFile->getData());
+
+
+		// load in watermap
+        File* wFile = FileSystem::shared().getFile(waterMapName);
+        if(!wFile) return false;
+
+        glGenTextures(1, &waterMapHandle);
+        glBindTexture(GL_TEXTURE_2D, waterMapHandle);
+		
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R16,TERRAIN_SIZE, TERRAIN_SIZE, 0, GL_RED, GL_UNSIGNED_SHORT, wFile->getData());
+		
+
+
+		glActiveTexture(GL_TEXTURE7);
+        glBindTexture(GL_TEXTURE_2D, cloudMap->handle);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+		
+
+		FileSystem::shared().releaseFile(wFile);
 
         return true;
     }
@@ -232,6 +283,8 @@ namespace Arya
 
     void Terrain::update(float dt, Scene* curScene)
     {
+		time+=dt;
+
         // update patches LOD
         vec3 camPos = curScene->getCamera()->getRealCameraPosition();
 
@@ -322,5 +375,42 @@ namespace Arya
             glBindVertexArray(vaoHandles[p.lod]);
             glDrawElements(GL_TRIANGLE_STRIP, indexCount[p.lod], GL_UNSIGNED_INT, (void*)0);
         }
+
+
+		glEnable(GL_ALPHA_TEST);
+        glEnable(GL_BLEND);
+
+		waterProgram->use();
+        waterProgram->setUniformMatrix4fv("vpMatrix", cam->getVPMatrix());
+		waterProgram->setUniformMatrix4fv("viewMatrix", cam->getVMatrix());
+        waterProgram->setUniformMatrix4fv("scaleMatrix", scaleMatrix);
+		waterProgram->setUniform3fv("lightSource",vec3(0.7,0.7,0.0));
+
+		// watermap
+        waterProgram->setUniform1i("waterMap", 6);
+        glActiveTexture(GL_TEXTURE6);
+        glBindTexture(GL_TEXTURE_2D, waterMapHandle);
+
+		// heightmap
+        waterProgram->setUniform1i("heightMap", 0);
+
+		//cloudmap
+		waterProgram->setUniform1i("clouds", 7);
+		glActiveTexture(GL_TEXTURE7);
+        glBindTexture(GL_TEXTURE_2D, cloudMap->handle);
+
+		for(int i = 0; i < patches.size(); ++i) {
+            Patch& p = patches[i];
+            if(p.lod < 0) continue;
+            waterProgram->setUniform2fv("patchOffset", p.offset);
+            waterProgram->setUniform2fv("patchPosition", p.position);
+			waterProgram->setUniform1f("time", time);
+
+            glBindVertexArray(vaoHandles[p.lod]);
+            glDrawElements(GL_TRIANGLE_STRIP, indexCount[p.lod], GL_UNSIGNED_INT, (void*)0);
+        }
+
+		glDisable(GL_ALPHA_TEST);
+        glDisable(GL_BLEND);
     }
 }
