@@ -82,13 +82,13 @@ bool GameSession::init()
     UnitInfo* info = new UnitInfo;
     info->radius = 2.0f;
 
-    for(int i = 0; i < 10; ++ i) 
+    for(int i = 0; i < 100; ++ i) 
     {
         Unit* unit = new Unit(info);
         float heightModel = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(0.0, -50.0+20.0*i);
         obj = scene->createObject();
         obj->setModel(ModelManager::shared().getModel("ogros.aryamodel"));
-        obj->setPosition(vec3(0, heightModel, -50 + 20 * i));
+        obj->setPosition(vec3(i / 10, heightModel, -50 + 20 * (i % 10)));
         obj->setAnimation("run");
 
         unit->setObject(obj);

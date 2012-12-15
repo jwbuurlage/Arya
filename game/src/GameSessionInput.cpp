@@ -251,9 +251,20 @@ void GameSessionInput::moveSelectedUnits()
 
     Faction* lf = session->getLocalFaction();
     if(!lf) return;
+
+    int numSelected = 0;
     for(int i = 0; i < lf->getUnits().size(); ++i)
-    {
         if(lf->getUnits()[i]->isSelected())
-            lf->getUnits()[i]->setTargetPosition(vec2(clickPos.x, clickPos.z));
-    }
+            ++numSelected;
+
+    int perRow = (int)(glm::sqrt(numSelected));
+    int currentIndex = 0;
+    float spread = 10.0f;
+
+    for(int i = 0; i < lf->getUnits().size(); ++i)
+        if(lf->getUnits()[i]->isSelected()) {
+            lf->getUnits()[i]->setTargetPosition(vec2(clickPos.x + spread*(currentIndex % perRow), 
+                        clickPos.z + spread*(currentIndex / perRow)));
+            ++currentIndex;
+        }
 }
