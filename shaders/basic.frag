@@ -1,10 +1,11 @@
 #version 400
 
-in vec3 Color;
+uniform sampler2D texture1;
+in vec2 texCoo;
 
 layout (location = 0) out vec4 fragColor;
 
 void main()
 {
-    fragColor = vec4(Color, 1.0);
+    fragColor = texture(texture1, texCoo);
 }

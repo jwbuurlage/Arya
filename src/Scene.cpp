@@ -7,10 +7,13 @@
 #include "Objects.h"
 #include "Models.h"
 #include "Scene.h"
+#include "Fonts.h"
 #include "Map.h"
+#include "Terrain.h"
 #include "Textures.h"
 #include "Camera.h"
 #include "Shaders.h"
+#include "Interface.h"
 
 using std::string;
 using std::cerr;
@@ -77,12 +80,12 @@ namespace Arya
         return true;
     }
 
-    bool Scene::setMap(const char* hm, vector<Texture*> ts, Texture* sm)
+    bool Scene::setMap(const char* hm, const char* wm, vector<Texture*> ts, Texture* cm, Texture* sm)
     {
         if(currentMap)
             delete currentMap;
         currentMap = new Map();
-        if(!currentMap->init(hm, ts, sm)) return false;
+        if(!currentMap->init(hm, wm, ts, cm, sm)) return false;
         return true;
     }
 
@@ -122,10 +125,11 @@ namespace Arya
         basicProgram->use();
 
         basicProgram->setUniformMatrix4fv("vpMatrix", camera->getVPMatrix());
-
+        
         for(int i = 0; i < objects.size(); ++i)
         {
             if( objects[i]->model == 0 ) continue;
+            basicProgram->setUniform3fv("tintColor", objects[i]->getTintColor());
 
             basicProgram->setUniformMatrix4fv("mMatrix", objects[i]->getMoveMatrix());
 

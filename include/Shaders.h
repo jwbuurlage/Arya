@@ -25,6 +25,7 @@ using std::map;
 using glm::mat4;
 using glm::vec2;
 using glm::vec3;
+using glm::vec4;
 
 namespace Arya
 {
@@ -80,7 +81,8 @@ namespace Arya
             void setUniform1i(const char* name, int val);
             void setUniform1f(const char* name, float val);
             void setUniform2fv(const char* name, vec2 values);
-			void setUniform3fv(const char* name, vec3 values);
+            void setUniform3fv(const char* name, vec3 values);
+            void setUniform4fv(const char* name, vec4 values);
             void setUniformMatrix4fv(const char* name, mat4 matrix);
 
         private:

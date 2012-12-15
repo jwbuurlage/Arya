@@ -36,10 +36,16 @@ void main()
     vec4 normal = vec4( (D-B), 2.0/scaleMatrix[1][1], (C-A), 0.0 );
 	normalOut = normalize( normal.xyz );
 
-	vec4 camNormal=normalize(viewMatrix*vec4(normal.xyz,0.0));
-	vec4 camLight=normalize(viewMatrix*vec4(lightDirection,0.0));
-	vec4 camReflection=2.0*camNormal*dot(camLight,camNormal)-camLight;
-	spec=max(dot(camReflection,-1.0*normalize(viewMatrix*pos)),0);
+	bool enableSpecular=false;
+	if(enableSpecular) {
+		vec4 camNormal=normalize(viewMatrix*vec4(normal.xyz,0.0));
+		vec4 camLight=normalize(viewMatrix*vec4(lightDirection,0.0));
+		vec4 camReflection=2.0*camNormal*dot(camLight,camNormal)-camLight;
+		spec=max(dot(camReflection,-1.0*normalize(viewMatrix*pos)),0);
+	} else {
+		spec=0;
+	}
+
 
     gl_Position = vpMatrix * pos;
     posOut = pos;

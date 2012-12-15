@@ -30,7 +30,7 @@ namespace Arya
     {
         public:
             // Tileset needs to have 4 elements
-            Terrain(const char* hm, vector<Texture*> ts, Texture* sm);
+            Terrain(const char* hm, const char* wm, vector<Texture*> ts, Texture* cm, Texture* sm);
             ~Terrain(); 
 			
             void render(Camera* cam);
@@ -49,9 +49,12 @@ namespace Arya
             bool generateVAO();
 
             const char* heightMapName;
+			const char* waterMapName;
             vector<Texture*> tileSet;
+			Texture* cloudMap;
             Texture* splatMap;
             GLuint heightMapHandle;
+			GLuint waterMapHandle;
             File* hFile;
 
             mat4 scaleMatrix;
@@ -62,11 +65,14 @@ namespace Arya
             GLuint* vaoHandles;
 
             ShaderProgram* terrainProgram;
+			ShaderProgram* waterProgram;
 
             vector<Patch> patches;
             int patchCount;
             int patchSizeMax;
             int levelMax;
 			vec3 lightDirection;
+
+			float time;
     };
 }

@@ -37,5 +37,6 @@ namespace Arya
             Texture* loadResource( const char* filename );
 
             void loadDefaultTexture(); //Generates default texture
+            void loadWhiteTexture(); //Generates white texture for overlay
     };
 }
