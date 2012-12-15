@@ -11,6 +11,8 @@ using Arya::Map;
 using Arya::Texture;
 using Arya::TextureManager;
 
+class Network;
+
 class Game : public Arya::InputListener
 {
     public:
@@ -26,5 +28,6 @@ class Game : public Arya::InputListener
 
     private:
         Root* root;
+        Network* network;
         GameSession* session;
 };

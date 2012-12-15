@@ -1,6 +1,6 @@
 #include "../include/Game.h"
 #include "../include/GameSession.h"
-
+#include "../include/Network.h"
 #include "common/Logger.h"
 
 Game::Game()
@@ -11,6 +11,7 @@ Game::Game()
 
 Game::~Game()
 {
+    if(network) delete network;
     if(session) delete session;
     if(root) delete &Root::shared();
 }
@@ -19,7 +20,8 @@ void Game::run()
 {
     root = new Root;
 
-    if(!(root->init(true, 800, 600))) {
+    if(!root->init(true, 800, 600))
+    {
         LOG_ERROR("Unable to init root");
     }
     else
@@ -28,12 +30,21 @@ void Game::run()
 
         if(session) delete session;
         session = new GameSession;
+
+
         if(!session->init()) {
             LOG_ERROR("Could not start a new session");
             Root::shared().stopRendering();
         }
+        else
+        {
+            if(network) delete network;
+            network = new Network;
 
-        root->startRendering();
+            network->startServer();
+
+            root->startRendering();
+        }
     }
 }
 

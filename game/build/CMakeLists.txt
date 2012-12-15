@@ -12,6 +12,8 @@ SET(
     "../src/GameSessionInput.cpp"
     "../src/Faction.cpp"
     "../src/Units.cpp"
+    "../src/Network.cpp"
+    "../src/Server.cpp"
 	"../src/main.cpp"
 )
 
@@ -24,6 +26,8 @@ SET(
 SET(
 	PROJECT_LIBRARIES
 	"Arya"
+    "PocoNet"
+    "PocoFoundation"
 )
 
 INCLUDE_DIRECTORIES( ${PROJECT_INCLUDES} )
