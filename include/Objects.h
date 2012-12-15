@@ -20,6 +20,9 @@ namespace Arya
             void setPosition(vec3 pos){ position = pos; updateMatrix = true; }
             const vec3& getPosition() const { return position; }
 
+            void setYaw(float y){ yaw = y; updateMatrix = true; }
+            float getYaw() const { return yaw; }
+
             const mat4& getMoveMatrix();
 
             //setModel also recreates a new AnimationState object

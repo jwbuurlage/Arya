@@ -35,7 +35,10 @@ class Unit
 
         // movement stuff
         vec2 targetPosition;
-        float speed;
         bool idle;
+
+        //TODO: move these to UnitInfo
+        float speed;
+        float yawspeed; //in degrees
 };
 
