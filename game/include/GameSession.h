@@ -31,6 +31,7 @@ class GameSession : public Arya::FrameListener
         bool initVertices();
 
         Faction* getLocalFaction() const { return localFaction; } ;
+        const vector<Faction*>& getFactions() const { return factions; }
 
         // FrameListener
         void onFrame(float elapsedTime);

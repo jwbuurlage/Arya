@@ -1,6 +1,6 @@
 #include "Arya.h"
-#include <vector>
-using std::vector;
+#include <list>
+using std::list;
 
 using Arya::Object;
 
@@ -17,8 +17,8 @@ class Faction
         vec3 getColor() const { return color; }
         void setColor(vec3 col) { color = col; }
 
-        const vector<Unit*>& getUnits() const { return units; }
+        list<Unit*>& getUnits() { return units; }
     private:
-        vector<Unit*> units;
+        list<Unit*> units;
         vec3 color;
 };

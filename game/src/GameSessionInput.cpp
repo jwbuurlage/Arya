@@ -232,17 +232,17 @@ bool GameSessionInput::mouseMoved(int x, int y, int dx, int dy)
 void GameSessionInput::unselectAll()
 {
     Faction* lf = session->getLocalFaction();
-    if(!lf) return;
-    for(int i = 0; i < lf->getUnits().size(); ++i)
-        lf->getUnits()[i]->setSelected(false);
+    for(list<Unit*>::iterator it = lf->getUnits().begin();
+            it != lf->getUnits().end(); ++it)
+        (*it)->setSelected(false);
 }
 
 void GameSessionInput::selectAll()
 {
     Faction* lf = session->getLocalFaction();
-    if(!lf) return;
-    for(int i = 0; i < lf->getUnits().size(); ++i)
-        lf->getUnits()[i]->setSelected(true);
+    for(list<Unit*>::iterator it = lf->getUnits().begin();
+            it != lf->getUnits().end(); ++it)
+        (*it)->setSelected(true);
 }
 
 void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float y_max)
@@ -253,16 +253,17 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
     mat4 vpMatrix = Root::shared().getScene()->getCamera()->getVPMatrix();
 
     Faction* lf = session->getLocalFaction();
-    if(!lf) return;
-    for(int i = 0; i < lf->getUnits().size(); ++i)
+
+    for(list<Unit*>::iterator it = lf->getUnits().begin();
+            it != lf->getUnits().end(); ++it)
     {
-        vec4 onScreen(lf->getUnits()[i]->getObject()->getPosition(), 1.0);
+        vec4 onScreen((*it)->getObject()->getPosition(), 1.0);
         onScreen = vpMatrix * onScreen;
         onScreen.x /= onScreen.w;
         onScreen.y /= onScreen.w;
 
         if((onScreen.x > x_min && onScreen.x < x_max) && (onScreen.y > y_min && onScreen.y < y_max)) {
-            lf->getUnits()[i]->setSelected(true);
+            (*it)->setSelected(true);
         }
     }
 }
@@ -274,18 +275,53 @@ void GameSessionInput::moveSelectedUnits()
     Faction* lf = session->getLocalFaction();
     if(!lf) return;
 
+    // did we click on an enemy unit
+    Unit* best_unit = 0;
+    float best_distance = 100.0;
+    Faction* from_faction = 0;
+
+
+    float dist;
+    for(int j = 0; j < session->getFactions().size(); ++j) {
+        if(session->getFactions()[j] == lf) continue;
+
+        for(list<Unit*>::iterator it = session->getFactions()[j]->getUnits().begin();
+                it != session->getFactions()[j]->getUnits().end(); ++it)
+        {
+            dist = glm::distance((*it)->getObject()->getPosition(), clickPos);
+            if(dist < 2.0 * (*it)->getInfo()->radius
+                    && dist < best_distance) {
+                best_distance = dist; 
+                best_unit = (*it);
+                from_faction = session->getFactions()[j];
+            }
+        }
+    }
+
+    if(best_unit)
+    {
+        for(list<Unit*>::iterator it = lf->getUnits().begin();
+                it != lf->getUnits().end(); ++it)
+            if((*it)->isSelected())
+                (*it)->setTargetUnit(best_unit);
+
+        return;
+    }
+
     int numSelected = 0;
-    for(int i = 0; i < lf->getUnits().size(); ++i)
-        if(lf->getUnits()[i]->isSelected())
+    for(list<Unit*>::iterator it = lf->getUnits().begin();
+            it != lf->getUnits().end(); ++it)
+        if((*it)->isSelected())
             ++numSelected;
 
     int perRow = (int)(glm::sqrt((float)numSelected));
     int currentIndex = 0;
     float spread = 10.0f;
 
-    for(int i = 0; i < lf->getUnits().size(); ++i)
-        if(lf->getUnits()[i]->isSelected()) {
-            lf->getUnits()[i]->setTargetPosition(vec2(clickPos.x + spread*((currentIndex % perRow) - perRow / 2), 
+    for(list<Unit*>::iterator it = lf->getUnits().begin();
+            it != lf->getUnits().end(); ++it)
+        if((*it)->isSelected()) {
+            (*it)->setTargetPosition(vec2(clickPos.x + spread*((currentIndex % perRow) - perRow / 2), 
                         clickPos.z + spread*(currentIndex / perRow - perRow / 2)));
             ++currentIndex;
         }
@@ -301,20 +337,23 @@ void GameSessionInput::selectUnit()
     Faction* lf = session->getLocalFaction();
     if(!lf) return;
 
-    int best_id = -1;
+    Unit* best_unit = 0;
     float best_distance = 100.0;
 
     int numSelected = 0;
     float dist;
-    for(int i = 0; i < lf->getUnits().size(); ++i)
+
+    for(list<Unit*>::iterator it = lf->getUnits().begin();
+            it != lf->getUnits().end(); ++it)
     {
-        dist = glm::distance(lf->getUnits()[i]->getObject()->getPosition(), clickPos);
-        if(dist < 2.0 * lf->getUnits()[i]->getInfo()->radius) {
+        dist = glm::distance((*it)->getObject()->getPosition(), clickPos);
+        if(dist < 2.0 * (*it)->getInfo()->radius
+                && dist < best_distance) {
             best_distance = dist; 
-            best_id = i;
+            best_unit = (*it);
         }
     }
 
-    if(best_id != -1)
-        lf->getUnits()[best_id]->setSelected(true);
+    if(best_unit)
+        best_unit->setSelected(true);
 }
