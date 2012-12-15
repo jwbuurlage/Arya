@@ -63,7 +63,7 @@ void main()
 		} else {
 			factor=1.0;
 		}
-		h=getWave(100.0*texCoo);
+		h=getWave(1000.0*texCoo);
 	}
 
 	//vec4 pos = vec4(scaledPos.x, -100.0 + 200.0*(hw+factor*0.01*h), scaledPos.y, 1.0);
