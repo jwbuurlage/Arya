@@ -21,7 +21,7 @@ class GameSessionInput : public Arya::InputListener, public Arya::FrameListener
         void selectAll();
         void selectUnits(float x_min, float x_max, float y_min, float y_max);
 
-        void moveSelectedUnits(int x, int y);
+        void moveSelectedUnits();
 
     private: 
         GameSession* session;
@@ -38,4 +38,5 @@ class GameSessionInput : public Arya::InputListener, public Arya::FrameListener
         vec2 originalMousePos;
 
         Rect selectionRect;
+        bool doUnitMovementNextFrame;
 };

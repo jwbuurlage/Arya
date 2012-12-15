@@ -20,7 +20,7 @@ namespace Arya
             //Use setTargetLocation to make the camera smoothly move to that look-at position
 
             //This is the look-at position of the camera.
-            void setPosition( const vec3& CamPos ){ position = CamPos; updateMatrix = true; }
+            void setPosition( const vec3& CamPos ){ position = CamPos; updateMatrix = updateInverse = true; }
             const vec3& getPosition() const { return position; }
             float getYaw() const { return yaw; }
             float getPitch() const { return pitch; }
@@ -45,15 +45,15 @@ namespace Arya
             void rotateCameraSwing(float yawspeed, float pitchspeed);
             //This will also rotate the camera but will instantly apply the angle and not swing
             void rotateCamera(float deltaYaw, float deltaPitch); //Add yaw/pitch to current angle
-            void setCameraAngle(float Yaw, float Pitch){ yaw = Yaw; pitch = Pitch; updateMatrix = true; }
+            void setCameraAngle(float Yaw, float Pitch){ yaw = Yaw; pitch = Pitch; updateMatrix = updateInverse = true; }
 
             vec3 getRealCameraPosition();
 
-            //Calculates the new viewprojection matrix if it changed
-            //If outMatrix is not null, the correct vp matrix will
-            //alwas be copied into outMatrix
-            void updateViewProjectionMatrix(mat4* outMatrix);
+            void updateViewProjectionMatrix();
             bool updateMatrix;
+
+            void updateInverseMatrix();
+            bool updateInverse;
 
             float camZoomSpeed; //Zoomspeed. positive means zooming out
             float camYawSpeed; //Yaw speed in radians per second
@@ -61,12 +61,16 @@ namespace Arya
 
             mat4 getVMatrix();
             mat4 getVPMatrix();
+            mat4 getInverseVPMatrix();
 
         private:
             vec3 position; //look-at-position. Actual camera is 'zoomed out' from here
             mat4 viewMatrix;
             mat4 projectionMatrix;
             mat4 vpMatrix;
+            mat4 inverseViewMatrix;
+            mat4 inverseProjectionMatrix;
+            mat4 inverseVPMatrix;
             float yaw, pitch;
             float camDist; //Zoom. Higher means further away
             float minCamDist;

@@ -17,6 +17,8 @@ GameSessionInput::GameSessionInput(GameSession* ses)
     specMovement = vec3(0.0f);
     specPos = vec3(0.0f, 150.0f, 0.0f);
     originalMousePos = vec2(0.0);
+
+    doUnitMovementNextFrame = false;
 }
 
 GameSessionInput::~GameSessionInput()
@@ -52,6 +54,12 @@ void GameSessionInput::onFrame(float elapsedTime)
     }
 
     specPos += specMovement * elapsedTime;
+
+    if(doUnitMovementNextFrame)
+    {
+        doUnitMovementNextFrame = false;
+        moveSelectedUnits();
+    }
     return;
 }
 
@@ -89,26 +97,31 @@ bool GameSessionInput::keyDown(int key, bool keyDown)
 bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int x, int y)
 {
     //TODO: Send to UI manager and see if it was handled. If not, then do this:
-    if(button == Arya::BUTTON_LEFT) {
+    if(button == Arya::BUTTON_LEFT)
+    {
         draggingLeftMouse = (buttonDown == true);
-    } else if(button == Arya::BUTTON_RIGHT) {
+
+        if(draggingLeftMouse)
+        {
+            originalMousePos = vec2(x, y);
+        }
+        else
+        {
+            selectUnits(-1.0 + 2.0 * selectionRect.pixelOffset.x / Root::shared().getWindowWidth(), 
+                    -1.0 + 2.0 * (selectionRect.pixelOffset.x + selectionRect.pixelSize.x) / Root::shared().getWindowWidth(),
+                    -1.0 + 2.0 * selectionRect.pixelOffset.y / Root::shared().getWindowHeight(), 
+                    -1.0 + 2.0 * (selectionRect.pixelOffset.y + selectionRect.pixelSize.y) / Root::shared().getWindowHeight());
+
+            selectionRect.pixelOffset = vec2(0.0);
+            selectionRect.pixelSize = vec2(0.0);
+        }
+    }
+    else if(button == Arya::BUTTON_RIGHT)
+    {
         draggingRightMouse = (buttonDown == true);
-        moveSelectedUnits(x, y);
-    }
 
-    if(draggingLeftMouse)
-    {
-        originalMousePos = vec2(x, y);
-    }
-    else
-    {
-        selectUnits(-1.0 + 2.0 * selectionRect.pixelOffset.x / Root::shared().getWindowWidth(), 
-                -1.0 + 2.0 * (selectionRect.pixelOffset.x + selectionRect.pixelSize.x) / Root::shared().getWindowWidth(),
-                -1.0 + 2.0 * selectionRect.pixelOffset.y / Root::shared().getWindowHeight(), 
-                -1.0 + 2.0 * (selectionRect.pixelOffset.y + selectionRect.pixelSize.y) / Root::shared().getWindowHeight());
-
-        selectionRect.pixelOffset = vec2(0.0);
-        selectionRect.pixelSize = vec2(0.0);
+        Root::shared().readDepthNextFrame(x, y);
+        doUnitMovementNextFrame = true;
     }
 
     return false;
@@ -232,7 +245,15 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
     }
 }
 
-void GameSessionInput::moveSelectedUnits(int x, int y)
+void GameSessionInput::moveSelectedUnits()
 {
-    
+    vec3 clickPos = Root::shared().getDepthResult();
+
+    Faction* lf = session->getLocalFaction();
+    if(!lf) return;
+    for(int i = 0; i < lf->getUnits().size(); ++i)
+    {
+        if(lf->getUnits()[i]->isSelected())
+            lf->getUnits()[i]->setTargetPosition(vec2(clickPos.x, clickPos.z));
+    }
 }

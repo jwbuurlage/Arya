@@ -10,6 +10,7 @@ namespace Arya
     Camera::Camera()
     {
         updateMatrix = true;
+        updateInverse = true;
         camZoomSpeed = 0.0f;
         camYawSpeed = 0.0f;
         camPitchSpeed = 0.0f;
@@ -20,6 +21,7 @@ namespace Arya
         yaw = 0.0f;
         pitch = 0.0f;
         projectionMatrix = mat4(1.0f);
+        inverseProjectionMatrix = mat4(1.0f);
 
         position = vec3(0.0f);
         targetPosition = vec3(0.0f);
@@ -32,6 +34,7 @@ namespace Arya
     void Camera::setProjectionMatrix(float fov, float aspect, float near, float far)
     {
         projectionMatrix = glm::perspective(fov, aspect, near, far);
+        inverseProjectionMatrix = glm::inverse(projectionMatrix);
     }
 
     void Camera::update(float elapsedTime)
@@ -69,6 +72,7 @@ namespace Arya
                 }
             }
             updateMatrix = true;
+            updateInverse = true;
         }
 
         //2. Camera rotation
@@ -79,6 +83,7 @@ namespace Arya
                 if( camYawSpeed < -1.5f*PI ) camYawSpeed = -1.5f*PI;
                 yaw += camYawSpeed * elapsedTime;
                 updateMatrix = true;
+                updateInverse = true;
                 deAccelerate(camYawSpeed, 12.0f * elapsedTime); //Deacceleration of 3.5 radians per second per second
             }
         }
@@ -88,6 +93,7 @@ namespace Arya
             else if( camPitchSpeed < -PI ) camPitchSpeed = -PI;
             pitch += camPitchSpeed * elapsedTime;
             updateMatrix = true;
+            updateInverse = true;
             //Decrease the speed (which causes a natural 'slow down')
             deAccelerate(camPitchSpeed, 12.0f * elapsedTime); //Deacceleration of 3.5 radians per second per second
         }
@@ -99,6 +105,7 @@ namespace Arya
             //Adjust the zoom with the speed
             camDist += camZoomSpeed * elapsedTime;
             updateMatrix = true;
+            updateInverse = true;
             //Make sure it does not zoom in or out too far
             if( camDist < minCamDist ){ camDist = minCamDist; camZoomSpeed = 0; }
             else if( camDist > maxCamDist ){ camDist = maxCamDist; camZoomSpeed = 0; }
@@ -129,51 +136,61 @@ namespace Arya
         yaw += deltaYaw;
         pitch += deltaPitch;
         updateMatrix = true;
+        updateInverse = true;
     }
 
     vec3 Camera::getRealCameraPosition()
     {
-        updateViewProjectionMatrix(0);
+        updateViewProjectionMatrix();
         vec3 relative(0, 0, camDist);
         relative = glm::rotateX(relative, pitch);
         relative = glm::rotateY(relative, yaw);
         return getPosition() + relative;
     }
 
-    void Camera::updateViewProjectionMatrix(mat4* outMatrix)
+    void Camera::updateViewProjectionMatrix()
     {
-        if( updateMatrix ){
-            viewMatrix = mat4(1.0f);
-            viewMatrix = glm::translate( viewMatrix, vec3(0, 0, -camDist) );
-            viewMatrix = glm::rotate( viewMatrix, -pitch, vec3(1.0, 0.0, 0.0) );
-            viewMatrix = glm::rotate( viewMatrix, -yaw, vec3(0.0, 1.0, 0.0) );
-            viewMatrix = glm::translate( viewMatrix, -position );
-            vpMatrix = projectionMatrix * viewMatrix;
+        if(!updateMatrix) return;
+        updateMatrix = false;
+        viewMatrix = mat4(1.0f);
+        viewMatrix = glm::translate( viewMatrix, vec3(0, 0, -camDist) );
+        viewMatrix = glm::rotate( viewMatrix, -pitch, vec3(1.0, 0.0, 0.0) );
+        viewMatrix = glm::rotate( viewMatrix, -yaw, vec3(0.0, 1.0, 0.0) );
+        viewMatrix = glm::translate( viewMatrix, -position );
+        vpMatrix = projectionMatrix * viewMatrix;
+        return;
+    }
 
-            //if( inverseViewMatrix ){
-            //	mat zoomMat, rotateMat, translateMat;
-            //	zoomMat.setTranslation(0, 0, mCamDist);
-            //	rotateMat.setRotationX(pitch);
-            //	rotateMat.rotateY(yaw);
-            //	translateMat.setTranslation(position);
-            //	*inverseViewMatrix = translateMat * rotateMat * zoomMat;
-            //}
-            updateMatrix = false;
-        }
-        if( outMatrix ) *outMatrix = projectionMatrix * viewMatrix;
+    void Camera::updateInverseMatrix()
+    {
+        if(!updateInverse) return;
+        updateInverse = false;
+
+        inverseViewMatrix = mat4(1.0f);
+        inverseViewMatrix = glm::translate( inverseViewMatrix, position );
+        inverseViewMatrix = glm::rotate( inverseViewMatrix, yaw, vec3(0.0, 1.0, 0.0) );
+        inverseViewMatrix = glm::rotate( inverseViewMatrix, pitch, vec3(1.0, 0.0, 0.0) );
+        inverseViewMatrix = glm::translate( inverseViewMatrix, vec3(0, 0, camDist) );
+        inverseVPMatrix = inverseViewMatrix * inverseProjectionMatrix;
         return;
     }
 
     mat4 Camera::getVMatrix()
     {
-        if( updateMatrix ) updateViewProjectionMatrix(0);
+        updateViewProjectionMatrix();
         return viewMatrix;
     }
 
     mat4 Camera::getVPMatrix()
     {
-        if( updateMatrix ) updateViewProjectionMatrix(0);
+        updateViewProjectionMatrix();
         return vpMatrix;
+    }
+
+    mat4 Camera::getInverseVPMatrix()
+    {
+        updateInverseMatrix();
+        return inverseVPMatrix;
     }
 
 }

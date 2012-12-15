@@ -119,9 +119,7 @@ namespace Arya
     {
         basicProgram->use();
 
-        mat4 vpMatrix;
-        camera->updateViewProjectionMatrix(&vpMatrix);
-        basicProgram->setUniformMatrix4fv("vpMatrix", vpMatrix);
+        basicProgram->setUniformMatrix4fv("vpMatrix", camera->getVPMatrix());
 
         for(int i = 0; i < objects.size(); ++i)
         {

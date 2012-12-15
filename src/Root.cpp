@@ -10,6 +10,7 @@
 #include "Scene.h"
 #include "Files.h"
 #include "Overlay.h"
+#include "Camera.h"
 #include "common/Logger.h"
 
 using std::cerr;
@@ -30,6 +31,8 @@ namespace Arya
         scene = 0;
         oldTime = 0.0;
         overlay = 0;
+
+        readDepthBuffer = false;
 
         Logger* log = new Logger();
         FileSystem* files = new FileSystem();
@@ -219,10 +222,23 @@ namespace Arya
         if(scene)
             scene->render();
 
-        // read from depth buffer
-        GLfloat depth;
-        glReadPixels(200, 200, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
-        // and do nothing with it, yay :)
+        if(readDepthBuffer)
+        {
+            readDepthBuffer = false;
+            GLfloat depth;
+            glReadPixels(readAtX, readAtY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+
+            vec4 screenPos(2.0f * readAtX /((float)windowWidth) - 1.0f, 2.0f * readAtY/((float)windowHeight) - 1.0f, depth, 1.0);
+            screenPos = scene->getCamera()->getInverseVPMatrix() * screenPos;
+            screenPos /= screenPos.w;
+
+            clickScreenLocation.x = screenPos.x;
+            clickScreenLocation.y = screenPos.y;
+            clickScreenLocation.z = screenPos.z;
+
+            LOG_INFO("depth = " << depth);
+            LOG_INFO("3D pos: " << screenPos.x << "," << screenPos.y << "," << screenPos.z);
+        }
 
         if(overlay)
             overlay->render();

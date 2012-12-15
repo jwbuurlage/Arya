@@ -2,8 +2,11 @@
 
 #include <vector>
 #include <GL/glfw.h>
+#include <glm/glm.hpp>
 #include "common/Listeners.h"
 #include "common/Singleton.h"
+
+using glm::vec3;
 
 namespace Arya
 {
@@ -38,6 +41,9 @@ namespace Arya
 
             Overlay* getOverlay() const { return overlay; }
 
+            void readDepthNextFrame(int x, int y){ readDepthBuffer = true; readAtX = x; readAtY = y; }
+            vec3 getDepthResult(){ return clickScreenLocation; }
+
         private:
             bool initGLFW();
             bool initGLEW();
@@ -60,6 +66,11 @@ namespace Arya
             void mouseWheelMoved(int pos);
             void mouseMoved(int x, int y);
             int mouseX, mouseY, mouseWheelPos; //To supply relative movement
+
+            bool readDepthBuffer;
+            int readAtX;
+            int readAtY;
+            vec3 clickScreenLocation;
 
             friend void GLFWCALL keyCallback(int key, int action);
             friend void GLFWCALL mouseButtonCallback(int button, int action);

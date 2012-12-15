@@ -8,7 +8,7 @@ Unit::Unit(UnitInfo* inf)
     object = 0;
     selected = false;
     targetPosition = vec2(0.0);
-    velocity = vec2(0.5);
+    velocity = vec2(50.0);
     idle = true;
 }
 
@@ -40,6 +40,7 @@ void Unit::update(float timeElapsed)
         LOG_INFO("Reached destination");
         return;
     }
+    diff = glm::normalize(diff);
 
     vec2 newPosition = currentPosition + timeElapsed * (velocity * diff);
     h = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(newPosition.x, newPosition.y);
