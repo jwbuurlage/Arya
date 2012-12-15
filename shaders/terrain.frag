@@ -6,6 +6,7 @@ uniform sampler2D texture2;
 uniform sampler2D texture3;
 uniform sampler2D texture4;
 
+in float spec;
 in vec2 texCoo;
 in vec4 posOut;
 in vec3 normalOut;
@@ -30,4 +31,6 @@ void main()
 
     FragColor = terrainColor(texCoo);
     FragColor *= lightFraction;
+	FragColor.a=1.0f;
+	FragColor+= 1.0*vec3(pow(spec,6.0));
 }

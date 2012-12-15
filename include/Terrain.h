@@ -32,7 +32,7 @@ namespace Arya
             // Tileset needs to have 4 elements
             Terrain(const char* hm, vector<Texture*> ts, Texture* sm);
             ~Terrain(); 
-
+			
             void render(Camera* cam);
             void update(float dt, Scene* curScene);
 
@@ -67,5 +67,6 @@ namespace Arya
             int patchCount;
             int patchSizeMax;
             int levelMax;
+			vec3 lightDirection;
     };
 }

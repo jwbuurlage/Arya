@@ -6,6 +6,7 @@
 #include "common/Logger.h"
 
 #include <vector>
+#include <glm/glm.hpp>
 using std::vector;
 
 namespace Arya

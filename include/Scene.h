@@ -3,12 +3,14 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <glm/glm.hpp>
 
 #include "Root.h"
 
 using std::string;
 using std::vector;
 using std::map;
+using glm::vec3;
 
 namespace Arya
 {
@@ -40,7 +42,7 @@ namespace Arya
 
         private:
             bool initialized;
-
+			
             //TODO: think about whether we
             //want to make this into a linked list
             //since we will be removing objects
@@ -50,6 +52,7 @@ namespace Arya
             //we subclass Object in a clever way
             //so no extra space is needed.
             vector<Object*> objects;
+			vec3 lightDirection;
 
             Map* currentMap;
             Camera* camera;

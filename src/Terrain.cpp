@@ -38,6 +38,7 @@ namespace Arya
 
         heightMapHandle = 0;
         hFile = 0;
+		this->lightDirection=lightDirection;
     }
 
     Terrain::~Terrain()
@@ -281,7 +282,9 @@ namespace Arya
     {
         terrainProgram->use();
         terrainProgram->setUniformMatrix4fv("vpMatrix", cam->getVPMatrix());
+		terrainProgram->setUniformMatrix4fv("viewMatrix", cam->getVMatrix());
         terrainProgram->setUniformMatrix4fv("scaleMatrix", scaleMatrix);
+		terrainProgram->setUniform3fv("lightDirection", vec3(0.7,0.7,0.0));
 
         // heightmap
         terrainProgram->setUniform1i("heightMap", 0);

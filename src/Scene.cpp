@@ -16,6 +16,7 @@ using std::string;
 using std::cerr;
 using std::endl;
 using std::vector;
+using glm::vec3;
 
 namespace Arya
 {	
@@ -25,6 +26,7 @@ namespace Arya
         currentMap = 0; 
         camera = 0;
         basicProgram = 0;
+		lightDirection=vec3(0.7,0.7,0.0);
         init();
     }
 
