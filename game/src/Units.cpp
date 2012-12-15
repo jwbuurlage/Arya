@@ -32,6 +32,8 @@ Unit::Unit(UnitInfo* inf)
 
 Unit::~Unit()
 {
+    if(targetUnit)
+        targetUnit->release();
     object->setObsolete();
 }
 
@@ -142,6 +144,9 @@ void Unit::update(float timeElapsed)
 
 void Unit::setUnitState(UnitState state)
 {
+    if(unitState == UNIT_DYING)
+        return;
+
     unitState = state;
 
     switch(unitState)
@@ -181,6 +186,10 @@ void Unit::setTargetUnit(Unit* target)
 
 void Unit::setTargetPosition(vec2 target)
 {
+    if(targetUnit)
+        targetUnit->release();
+    targetUnit = 0;
+
     targetPosition = target;
     setUnitState(UNIT_RUNNING);
 }
