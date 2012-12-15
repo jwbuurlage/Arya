@@ -7,10 +7,13 @@
 #include "Objects.h"
 #include "Models.h"
 #include "Scene.h"
+#include "Fonts.h"
 #include "Map.h"
+#include "Terrain.h"
 #include "Textures.h"
 #include "Camera.h"
 #include "Shaders.h"
+#include "Interface.h"
 
 using std::string;
 using std::cerr;
@@ -122,7 +125,7 @@ namespace Arya
         basicProgram->use();
 
         basicProgram->setUniformMatrix4fv("vpMatrix", camera->getVPMatrix());
-
+        
         for(int i = 0; i < objects.size(); ++i)
         {
             if( objects[i]->model == 0 ) continue;

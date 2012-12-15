@@ -6,12 +6,14 @@
 #include "Root.h"
 #include "Models.h"
 #include "Shaders.h"
+#include "Fonts.h"
 #include "Textures.h"
 #include "Scene.h"
 #include "Files.h"
 #include "Overlay.h"
 #include "Camera.h"
 #include "common/Logger.h"
+#include "Interface.h"
 
 using std::cerr;
 using std::endl;
@@ -29,7 +31,7 @@ namespace Arya
     Root::Root()
     {
         scene = 0;
-        oldTime = 0.0;
+        oldTime = 0;
         overlay = 0;
 
         readDepthBuffer = false;
@@ -38,6 +40,7 @@ namespace Arya
         FileSystem* files = new FileSystem();
         TextureManager* tex = new TextureManager();
         ModelManager* modelManager = new ModelManager();
+        FontManager* fon = new FontManager();
     }
 
     Root::~Root()
@@ -79,6 +82,10 @@ namespace Arya
         overlay = new Overlay();
         if(!overlay->init()) return false;
 
+        Interface* interf = new Interface;
+        interf->init();
+        addFrameListener(interf);
+
         return true;
     }
 
@@ -111,6 +118,7 @@ namespace Arya
 
     void Root::startRendering()
     {
+        LOG_INFO("start rendering");        
         running = true;
         while(running)
         {

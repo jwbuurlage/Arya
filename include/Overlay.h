@@ -1,9 +1,9 @@
 #pragma once 
 
-#include <glm/glm.hpp>
 #include <vector>
 #include <GL/glew.h>
 #include "common/Logger.h"
+#include <glm/glm.hpp>
 
 using std::vector;
 using glm::vec2;
@@ -18,22 +18,22 @@ namespace Arya
         Rect()
         {
             relative = vec2(-1.0);
-            pixelOffset = vec2(0.0);
-            pixelSize = vec2(0.0);
+            offsetInPixels = vec2(0.0);
+            sizeInPixels = vec2(0.0);
 
-            fillColor = vec4(0.0);
+            fillColor = vec4(1.0);
             borderColor = vec4(0.0);
 
             textureHandle = 0;
-            texSize = vec2(0.0);
+            texSize = vec2(1.0,1.0);
             texOffset = vec2(0.0);
 
             screenPosition = vec2(0.0);
         };
 
         vec2 relative; // in screen coordinates [-1, 1]
-        vec2 pixelOffset; // in pixels
-        vec2 pixelSize; // in pixels
+        vec2 offsetInPixels; // in pixels
+        vec2 sizeInPixels; // in pixels
 
         vec4 fillColor; // in RGBA
         vec4 borderColor; // in RGBA
@@ -43,6 +43,7 @@ namespace Arya
         vec2 texSize; // in texcoo [0, 1]
 
         vec2 screenPosition; //gets set by Overlay
+        vec2 screenSize; //gets set by Overlay
     };
 
     class Overlay

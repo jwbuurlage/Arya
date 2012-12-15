@@ -46,14 +46,17 @@ SET(
     "../src/Camera.cpp"
     "../src/Terrain.cpp"
     "../src/Textures.cpp"
+    "../src/Fonts.cpp"
     "../src/Map.cpp"
     "../src/Overlay.cpp"
+    "../src/Interface.cpp"
     "../src/common/Logger.cpp"
     )
 
 SET(
     LIB_INCLUDES
     "../include"
+    "../ext"
     )
 
 INCLUDE_DIRECTORIES( ${LIB_INCLUDES} )
