@@ -1,4 +1,5 @@
 #include "Overlay.h"
+#include "Fonts.h"
 #include "Root.h"
 #include "Shaders.h"
 #include "common/Logger.h"
@@ -27,9 +28,9 @@ namespace Arya
         // inititialize shader
         GLfloat vertices[] = {
             0.0,        0.0,
-            1.0 / ww,   0.0,
-            0.0,        1.0 / wh,
-            1.0 / ww,   1.0 / wh
+            1.0,        0.0,
+            0.0,        1.0,
+            1.0,        1.0
         };
 
         GLuint vbo;
@@ -88,16 +89,22 @@ namespace Arya
 
         // bind shader
         overlayProgram->use();
-
         glBindVertexArray(rectVAO);
+
+        overlayProgram->setUniform1i("texture1", 0);
+        glActiveTexture(GL_TEXTURE0);
 
         // render all rects
         for(int i = 0; i < rects.size(); ++i) {
-            // TODO: use dirty flag maybe?
-            rects[i]->screenPosition = rects[i]->relative + vec2(2.0 * rects[i]->pixelOffset.x / ww, 2.0 * rects[i]->pixelOffset.y / wh);
+            glBindTexture(GL_TEXTURE_2D, rects[i]->textureHandle);
 
-            overlayProgram->setUniform2fv("pixelSize", rects[i]->pixelSize);
+           // TODO: use dirty flag maybe?
+            rects[i]->screenPosition = rects[i]->relative + vec2(2.0 * rects[i]->offsetInPixels.x / ww, 2.0 * rects[i]->offsetInPixels.y / wh);
+            rects[i]->screenSize = vec2(2.0 * rects[i]->sizeInPixels.x / ww, 2.0 * rects[i]->sizeInPixels.y / wh);
+            overlayProgram->setUniform2fv("screenSize", rects[i]->screenSize);
             overlayProgram->setUniform2fv("screenPosition", rects[i]->screenPosition);
+            overlayProgram->setUniform2fv("texOffset", vec2(rects[i]->texOffset.x, 1 - rects[i]->texOffset.y));
+            overlayProgram->setUniform2fv("texSize", vec2(rects[i]->texSize.x, -rects[i]->texSize.y));
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
 

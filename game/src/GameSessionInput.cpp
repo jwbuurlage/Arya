@@ -109,13 +109,13 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
         }
         else
         {
-            selectUnits(-1.0 + 2.0 * selectionRect.pixelOffset.x / Root::shared().getWindowWidth(), 
-                    -1.0 + 2.0 * (selectionRect.pixelOffset.x + selectionRect.pixelSize.x) / Root::shared().getWindowWidth(),
-                    -1.0 + 2.0 * selectionRect.pixelOffset.y / Root::shared().getWindowHeight(), 
-                    -1.0 + 2.0 * (selectionRect.pixelOffset.y + selectionRect.pixelSize.y) / Root::shared().getWindowHeight());
+             // select units here
+            selectUnits(-1.0 + 2.0 * selectionRect.offsetInPixels.x / Root::shared().getWindowWidth(), 
+                    -1.0 + 2.0 * (selectionRect.offsetInPixels.x + selectionRect.sizeInPixels.x) / Root::shared().getWindowWidth(),
+                    -1.0 + 2.0 * selectionRect.offsetInPixels.y / Root::shared().getWindowHeight(), 
+                    -1.0 + 2.0 * (selectionRect.offsetInPixels.y + selectionRect.sizeInPixels.y) / Root::shared().getWindowHeight());
 
-            selectionRect.pixelOffset = vec2(0.0);
-            selectionRect.pixelSize = vec2(0.0);
+            selectionRect.offsetInPixels = vec2(0.0);
         }
     }
     else if(button == Arya::BUTTON_RIGHT)
@@ -182,28 +182,28 @@ bool GameSessionInput::mouseMoved(int x, int y, int dx, int dy)
         int deltaY = y - originalMousePos.y;
 
         if(deltaX < 0 && deltaY > 0) {
-            selectionRect.pixelOffset.x = x;
-            selectionRect.pixelOffset.y = originalMousePos.y;
-            selectionRect.pixelSize.x = originalMousePos.x - x;
-            selectionRect.pixelSize.y = y - originalMousePos.y;
+            selectionRect.offsetInPixels.x = x;
+            selectionRect.offsetInPixels.y = originalMousePos.y;
+            selectionRect.sizeInPixels.x = originalMousePos.x - x;
+            selectionRect.sizeInPixels.y = y - originalMousePos.y;
         }
         else if(deltaX > 0 && deltaY < 0) {
-            selectionRect.pixelOffset.x = originalMousePos.x;
-            selectionRect.pixelOffset.y = y;
-            selectionRect.pixelSize.x = x - originalMousePos.x;
-            selectionRect.pixelSize.y = originalMousePos.y - y;
+            selectionRect.offsetInPixels.x = originalMousePos.x;
+            selectionRect.offsetInPixels.y = y;
+            selectionRect.sizeInPixels.x = x - originalMousePos.x;
+            selectionRect.sizeInPixels.y = originalMousePos.y - y;
         }
         else if(deltaX > 0 && deltaY > 0) {
-            selectionRect.pixelOffset.x = originalMousePos.x;
-            selectionRect.pixelOffset.y = originalMousePos.y;
-            selectionRect.pixelSize.x = x - originalMousePos.x;
-            selectionRect.pixelSize.y = y - originalMousePos.y;
+            selectionRect.offsetInPixels.x = originalMousePos.x;
+            selectionRect.offsetInPixels.y = originalMousePos.y;
+            selectionRect.sizeInPixels.x = x - originalMousePos.x;
+            selectionRect.sizeInPixels.y = y - originalMousePos.y;
         }
         else if(deltaX < 0 && deltaY < 0) {
-            selectionRect.pixelOffset.x = x;
-            selectionRect.pixelOffset.y = y;
-            selectionRect.pixelSize.x = originalMousePos.x - x;
-            selectionRect.pixelSize.y = originalMousePos.y - y;
+            selectionRect.offsetInPixels.x = x;
+            selectionRect.offsetInPixels.y = y;
+            selectionRect.sizeInPixels.x = originalMousePos.x - x;
+            selectionRect.sizeInPixels.y = originalMousePos.y - y;
         }
     }
 
