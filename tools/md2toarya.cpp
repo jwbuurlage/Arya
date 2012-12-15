@@ -271,7 +271,7 @@ int main(int argc, char* argv[])
 
             *(int*)pointer = MD2animationlist[i].firstFrame; pointer += 4;
             *(int*)pointer = MD2animationlist[i].lastFrame; pointer += 4;
-            for(int j = 0; j < MD2animationlist[i].lastFrame - MD2animationlist[i].firstFrame; ++j)
+            for(int j = 0; j <= MD2animationlist[i].lastFrame - MD2animationlist[i].firstFrame; ++j)
             {
                 *(float*)pointer = 1.0f/((float)MD2animationlist[i].fps);
                 pointer += 4;

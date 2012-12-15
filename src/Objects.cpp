@@ -1,5 +1,6 @@
 #include "Objects.h"
 #include "Models.h"
+#include "common/Logger.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace Arya

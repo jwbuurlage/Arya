@@ -3,6 +3,8 @@
 #include "Files.h"
 #include "Materials.h"
 #include "common/Logger.h"
+#include <string>
+#include <map>
 
 typedef struct{
     int materialIndex;
@@ -32,15 +34,30 @@ namespace Arya
     //so that the rest of the engine
     //only has to know the base class
 
+    struct VertexAnim
+    {
+        int startFrame; //inclusive
+        int endFrame; //inclusive
+        vector<float> frameTimes; //size = end - start + 1
+    };
+
+    class VertexAnimationData : public AnimationData
+    {
+        public:
+            map<string, VertexAnim> animations;
+    };
+    typedef std::pair<string,VertexAnim> animMapType;
+    typedef std::map<string,VertexAnim>::iterator animMapIterator;
+
     class VertexAnimationState : public AnimationState
     {
         public:
-            VertexAnimationState(Model* m)
+            VertexAnimationState(VertexAnimationData* data)
             {
-                model = m;
+                animData = data;
                 curAnim = 0;
-                currentFrame = 0;
-                nextFrame = 0;
+                startFrame = 0;
+                curFrame = 0;
                 timer = 0.0f;
                 interpolation = 0.0f;
             }
@@ -49,32 +66,45 @@ namespace Arya
             //Base class overloads
             void setAnimation(const char* name)
             {
-
+                if(!animData) return;
+                animMapIterator anim = animData->animations.find(name);
+                if(anim == animData->animations.end()) return;
+                curAnim = &anim->second;
+                startFrame = curAnim->startFrame;
+                curFrame = 0;
+                timer = 0.0f;
+                interpolation = 0.0f;
             }
 
             void updateAnimation(float elapsedTime)
             {
-                //YOAO: You only animate once
-                interpolation += 3.0f*elapsedTime;
-                while( interpolation > 1.0f )
+                if(!curAnim) return;
+
+                timer += 0.2f*elapsedTime;
+
+                //Advance frames
+                //It is a loop because it is possible to skip more
+                //frames if frametimes are short, or the update is
+                //over a large time
+                while(timer > curAnim->frameTimes[curFrame])
                 {
-                    interpolation -= 1.0f;
-                    currentFrame = nextFrame;
-                    nextFrame++;
-                    if(nextFrame > 50) nextFrame = 0;
+                    timer -= curAnim->frameTimes[curFrame];
+                    curFrame++;
+                    if(curFrame > (curAnim->endFrame - curAnim->startFrame)) curFrame = 0;
                 }
+                interpolation = timer / curAnim->frameTimes[curFrame];
             }
 
-            int getCurFrame(){ return currentFrame; }
+            int getCurFrame(){ return startFrame + curFrame; }
             float getInterpolation(){ return interpolation; }
 
         private:
-            Model* model;
+            VertexAnimationData* animData;
 
-            int curAnim; //index into the models animation list
+            VertexAnim* curAnim; //one of the animations in animData
 
-            int currentFrame; //currently playing this frame
-            int nextFrame; //currentFrame + 1 but wrapped to start if needed
+            int startFrame;
+            int curFrame; //current frame RELATIVE TO STARTFRAME
             float timer;
             float interpolation; //in range [0,1]
     };
@@ -99,10 +129,11 @@ namespace Arya
 
     AnimationState* Model::createAnimationState()
     {
+        if(animationData == 0) return 0;
         //If bone, create BoneAnimationState
         //If vertex, create VertexAnimationState
         //else return 0
-        if(modelType == VertexAnimated) return new VertexAnimationState(this);
+        if(modelType == VertexAnimated) return new VertexAnimationState((VertexAnimationData*)animationData);
         return 0;
     }
 
@@ -190,8 +221,70 @@ namespace Arya
 
             model->modelType = (ModelType)header->modeltype;
 
-            LOG_INFO("Loading model " << filename);
-            LOG_INFO("Model has " << header->submeshCount << " meshes.");
+            LOG_INFO("Loading model " << filename << " with " << header->submeshCount << " meshes.");
+
+            //Parse all materials
+            pointer += sizeof(AryaHeader);
+            pointer += header->submeshCount*sizeof(SubmeshInfo);
+
+            char* nameBuf = new char[512];
+            for(int m = 0; m < header->materialCount; ++m)
+            {
+                //Get string
+                int count = 0;
+                nameBuf[0] = *pointer++;
+                while(nameBuf[count]){ ++count; nameBuf[count] = *pointer++; }
+                nameBuf[count++] = '.';
+                nameBuf[count++] = 't';
+                nameBuf[count++] = 'g';
+                nameBuf[count++] = 'a';
+                nameBuf[count++] = 0;
+                Material* mat = TextureManager::shared().getTexture(nameBuf);
+                model->addMaterial(mat);
+            }
+
+            //Parse animations
+            VertexAnimationData* animData = 0;
+
+            int animationCount = *(int*)pointer; pointer += 4;
+            if(!animationCount)
+            {
+                model->animationData = 0;
+                LOG_INFO("Model has no animations");
+            }
+            else
+            {
+                Logger::shared() << Logger::INFO << "Model has " << animationCount << " animations: ";
+
+                animData = new VertexAnimationData;
+                model->animationData = animData;
+
+                VertexAnim newAnim;
+                for(int anim = 0; anim < animationCount; ++anim)
+                {
+                    //Get string
+                    int count = 0;
+                    nameBuf[0] = *pointer++;
+                    while(nameBuf[count]){ ++count; nameBuf[count] = *pointer++; }
+
+                    Logger::shared() << nameBuf << " ";
+
+                    newAnim.frameTimes.clear();
+                    newAnim.startFrame = *(int*)pointer; pointer += 4;
+                    newAnim.endFrame = *(int*)pointer; pointer += 4;
+                    for(int i = 0; i <= (newAnim.endFrame-newAnim.startFrame); ++i)
+                    {
+                        newAnim.frameTimes.push_back( *(float*)pointer );
+                        pointer += 4;
+                    }
+
+                    animData->animations.insert(animMapType(nameBuf, newAnim));
+                }
+
+                Logger::shared() << endLog;
+            }
+
+            delete[] nameBuf;
 
             //Parse all meshes
             for(int s = 0; s < header->submeshCount; ++s)
@@ -206,10 +299,6 @@ namespace Arya
                 int floatCount = header->submesh[s].hasNormals ? 8 : 5;
                 int frameBytes = mesh->vertexCount * floatCount * sizeof(GLfloat);
 
-                LOG_INFO("Loading vertex data. frameBytes: " << frameBytes << ". frameCount: " << mesh->frameCount);
-                LOG_INFO("Buffer offset: " << header->submesh[s].bufferOffset);
-                LOG_INFO("Model filesize: " << modelfile->getSize());
-
                 glGenBuffers(1, &mesh->vertexBuffer);
                 glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
                 glBufferData(GL_ARRAY_BUFFER,
@@ -218,7 +307,6 @@ namespace Arya
                         GL_STATIC_DRAW);
                 if( header->submesh[s].indexCount > 0 )
                 {
-                    LOG_INFO("Mesh has index buffer");
                     mesh->indexCount = header->submesh[s].indexCount;
                     glGenBuffers(1, &mesh->indexBuffer);
                     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);
@@ -232,8 +320,6 @@ namespace Arya
                     mesh->indexCount = 0;
                     mesh->indexBuffer = 0;
                 }
-
-                LOG_INFO("Creating VAOs");
 
                 //Create a VAO for every frame
                 mesh->createVAOs(mesh->frameCount);
@@ -260,8 +346,24 @@ namespace Arya
                 else
                 {
                     //Animated
+                    //We actually have to parse the list of animations here
+                    //because the endFrame of one animation should have startFrame as 'nextFrame'
                     for(int f = 0; f < mesh->frameCount; ++f)
                     {
+                        int nextf = (f+1)%mesh->frameCount;
+                        if(animData)
+                        {
+                            animMapIterator iter;
+                            for(iter = animData->animations.begin(); iter != animData->animations.end(); ++iter)
+                            {
+                                if( iter->second.endFrame == f )
+                                {
+                                    nextf = iter->second.startFrame;
+                                    break;
+                                }
+                            }
+                        }
+
                         glBindVertexArray(mesh->vaoHandles[f]);
                         glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
 
@@ -269,7 +371,7 @@ namespace Arya
                         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLubyte*>(f*frameBytes + 0));
 
                         glEnableVertexAttribArray(3); //next pos
-                        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLubyte*>(((f+1)%mesh->frameCount)*frameBytes + 0));
+                        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLubyte*>(nextf*frameBytes + 0));
 
                         glEnableVertexAttribArray(1); //tex
                         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLubyte*>(f*frameBytes + 12));
@@ -280,58 +382,13 @@ namespace Arya
                             glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLubyte*>(f*frameBytes + 20));
 
                             glEnableVertexAttribArray(4); //next norm
-                            glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLubyte*>(((f+1)%mesh->frameCount)*frameBytes + 20));
+                            glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<GLubyte*>(nextf*frameBytes + 20));
                         }
                         if(mesh->indexCount > 0)
                             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);
                     }
                 }
             }
-
-            LOG_INFO("Vertex data loaded. Loading materials");
-
-            //Parse all materials
-            pointer += sizeof(AryaHeader);
-            pointer += header->submeshCount*sizeof(SubmeshInfo);
-
-            char* nameBuf = new char[512];
-            for(int m = 0; m < header->materialCount; ++m)
-            {
-                //Get string
-                int count = 0;
-                nameBuf[0] = *pointer++;
-                while(nameBuf[count]){ ++count; nameBuf[count] = *pointer++; }
-                nameBuf[count++] = '.';
-                nameBuf[count++] = 't';
-                nameBuf[count++] = 'g';
-                nameBuf[count++] = 'a';
-                nameBuf[count++] = 0;
-                LOG_INFO("Loading material: " << nameBuf);
-                Material* mat = TextureManager::shared().getTexture(nameBuf);
-                model->addMaterial(mat);
-            }
-
-            //Parse animations
-            int animationCount = *(int*)pointer; pointer += 4;
-            LOG_INFO("Model has " << animationCount << " animations.");
-            for(int anim = 0; anim < animationCount; ++anim)
-            {
-                //Get string
-                int count = 0;
-                nameBuf[0] = *pointer++;
-                while(nameBuf[count]){ ++count; nameBuf[count] = *pointer++; }
-                LOG_INFO("Loading animation: " << nameBuf);
-
-                int startFrame = *(int*)pointer; pointer += 4;
-                int endFrame = *(int*)pointer; pointer += 4;
-                for(int i = 0; i < (endFrame-startFrame); ++i)
-                {
-                    float frameTime = *(float*)pointer;
-                    pointer += 4;
-                }
-            }
-
-            delete[] nameBuf;
 
             addResource(filename, model);
         }while(0);

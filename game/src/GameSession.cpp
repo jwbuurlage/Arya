@@ -77,6 +77,7 @@ bool GameSession::init()
         obj = scene->createObject();
         obj->setModel(ModelManager::shared().getModel("ogros.aryamodel"));
         obj->setPosition(vec3(0, heightModel, -50 + 20 * i));
+        obj->setAnimation("run");
 
         unit->setObject(obj);
         localFaction->addUnit(unit);

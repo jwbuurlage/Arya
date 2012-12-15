@@ -16,7 +16,7 @@ uniform float interpolation;
 void main()
 {
     texCoo = texCooIn;
-    normal = (1.0 - interpolation)*normalIn + interpolation*normalNext;
+    normal = normalize((mMatrix*vec4( (1.0 - interpolation)*normalIn + interpolation*normalNext , 0.0)).xyz);
     vec3 pos = (1.0 - interpolation) * position + interpolation*posNext;
     gl_Position = vpMatrix * mMatrix * vec4(pos,1.0);
 }
