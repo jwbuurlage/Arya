@@ -95,7 +95,9 @@ bool GameSession::init()
         localFaction->addUnit(unit);
     }
 
-    selectionDecalHandle = TextureManager::shared().getTexture("selection.png")->handle;
+    selectionDecalHandle = 0;
+    Texture* selectionTex = TextureManager::shared().getTexture("selection.png");
+    if(selectionTex) selectionDecalHandle = selectionTex->handle;
 
     return true;
 }

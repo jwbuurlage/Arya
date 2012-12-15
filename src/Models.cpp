@@ -80,7 +80,7 @@ namespace Arya
             {
                 if(!curAnim) return;
 
-                timer += 0.2f*elapsedTime;
+                timer += elapsedTime;
 
                 //Advance frames
                 //It is a loop because it is possible to skip more

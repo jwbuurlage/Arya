@@ -17,7 +17,7 @@ namespace Arya
 {
     template <typename T> class ResourceManager {
         public:
-            ResourceManager(){};
+            ResourceManager(){ defaultResource = 0; };
             virtual ~ResourceManager(){ unloadAll(); }
 
             //Will load the resource if not already loaded
@@ -26,7 +26,9 @@ namespace Arya
                 ResourceContainer::iterator iter = resources.find(filename);
                 if( iter != resources.end() )
                     return (T*)(iter->second);
-                return loadResource(filename);
+                T* ret = loadResource(filename);
+                if(ret) return ret;
+                return defaultResource;
             }
 
             void unloadAll()
@@ -50,6 +52,8 @@ namespace Arya
         protected:
             //Must be implemented by subclass and use addResource to add the resource
             virtual T* loadResource( const char* filename )=0;
+
+            T* defaultResource;
 
             void addResource( const char* name, T* res ){
                 resources.insert( ResourceContainer::value_type( name, res ) );
