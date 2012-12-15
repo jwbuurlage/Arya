@@ -40,6 +40,9 @@ namespace Arya
 
             bool init();
 
+            GLuint getHeightMapHandle() const { return heightMapHandle; }
+            mat4 getScaleMatrix() const { return scaleMatrix; }
+
         private:
             bool generate();
             bool generateIndices();

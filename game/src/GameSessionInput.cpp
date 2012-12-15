@@ -93,6 +93,7 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
         draggingLeftMouse = (buttonDown == true);
     } else if(button == Arya::BUTTON_RIGHT) {
         draggingRightMouse = (buttonDown == true);
+        moveSelectedUnits(x, y);
     }
 
     if(draggingLeftMouse)
@@ -101,7 +102,6 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
     }
     else
     {
-        // select units here
         selectUnits(-1.0 + 2.0 * selectionRect.pixelOffset.x / Root::shared().getWindowWidth(), 
                 -1.0 + 2.0 * (selectionRect.pixelOffset.x + selectionRect.pixelSize.x) / Root::shared().getWindowWidth(),
                 -1.0 + 2.0 * selectionRect.pixelOffset.y / Root::shared().getWindowHeight(), 
@@ -227,8 +227,12 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
         onScreen.y /= onScreen.w;
 
         if((onScreen.x > x_min && onScreen.x < x_max) && (onScreen.y > y_min && onScreen.y < y_max)) {
-            LOG_INFO("Selecting unit: " << i);
             lf->getUnits()[i]->setSelected(true);
         }
     }
+}
+
+void GameSessionInput::moveSelectedUnits(int x, int y)
+{
+    
 }

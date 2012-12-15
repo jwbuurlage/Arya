@@ -20,11 +20,22 @@ class Unit
 
        UnitInfo* getInfo() const { return info; }
        void setInfo(UnitInfo* unitInfo) { info = unitInfo; }
+
        void setSelected(bool sel) { selected = sel; }
+       bool isSelected() { return selected; }
+
+       void update(float elapsedTime);
+
+       void setTargetPosition(vec2 target);
 
     private:
         Object* object;
         UnitInfo* info;
         bool selected;
+
+        // movement stuff
+        vec2 targetPosition;
+        vec2 velocity;
+        bool idle;
 };
 
