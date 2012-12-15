@@ -31,6 +31,6 @@ void main()
 
     FragColor = terrainColor(texCoo);
     FragColor *= lightFraction;
+	FragColor += 1.0*vec4(pow(spec,6.0));
 	FragColor.a=1.0f;
-	FragColor+= 1.0*vec3(pow(spec,6.0));
 }
