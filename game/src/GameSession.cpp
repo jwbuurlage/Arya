@@ -67,7 +67,7 @@ bool GameSession::init()
 
     cam->setPosition(vec3(0.0f, 150.0f, 0.0f));
     cam->setCameraAngle(0.0f, -60.0f);
-    cam->camZoomSpeed = 80.0f;
+    cam->setZoom(300.0f);
 
     Object* obj;
 
