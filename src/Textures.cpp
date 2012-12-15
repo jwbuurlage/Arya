@@ -88,6 +88,7 @@ namespace Arya
         delete[] imageData;
 
         addResource("default", defaultTex);
+        defaultResource = defaultTex;
 
         return;
     }

@@ -14,20 +14,35 @@ using Arya::Camera;
 using Arya::Map;
 using Arya::Texture;
 using Arya::TextureManager;
+using Arya::Shader;
+using Arya::ShaderProgram;
 
 class Faction;
 class GameSessionInput;
 
-class GameSession{
+class GameSession : public Arya::FrameListener
+{
     public:
         GameSession();
         ~GameSession();
 
         bool init();
+        bool initShaders();
+        bool initVertices();
+
         Faction* getLocalFaction() const { return localFaction; } ;
 
-   private:
+        // FrameListener
+        void onFrame(float elapsedTime);
+        void onRender();
+
+    private:
         GameSessionInput* input;
         Faction* localFaction;
         vector<Faction*> factions;
+
+        ShaderProgram* decalProgram;
+        GLuint decalVao;
+
+        GLuint selectionDecalHandle;
 };

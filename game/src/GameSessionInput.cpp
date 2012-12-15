@@ -13,10 +13,13 @@ GameSessionInput::GameSessionInput(GameSession* ses)
     mouseLeft = mouseRight = mouseTop = mouseBot = false;
     draggingLeftMouse = draggingRightMouse = false;
     slowMode = false;
+    leftShiftPressed = false;
     forceDirection = vec3(0.0f);
     specMovement = vec3(0.0f);
-    specPos = vec3(0.0f);
+    specPos = vec3(0.0f, 150.0f, 0.0f);
     originalMousePos = vec2(0.0);
+
+    doUnitMovementNextFrame = false;
 }
 
 GameSessionInput::~GameSessionInput()
@@ -52,6 +55,12 @@ void GameSessionInput::onFrame(float elapsedTime)
     }
 
     specPos += specMovement * elapsedTime;
+
+    if(doUnitMovementNextFrame)
+    {
+        doUnitMovementNextFrame = false;
+        moveSelectedUnits();
+    }
     return;
 }
 
@@ -62,7 +71,8 @@ bool GameSessionInput::keyDown(int key, bool keyDown)
     bool DirectionChanged = false;
 
     switch(key) {
-        case GLFW_KEY_LSHIFT: slowMode = keyDown; break;
+        case GLFW_KEY_LSHIFT: leftShiftPressed = keyDown; break;
+        case GLFW_KEY_RSHIFT: slowMode = keyDown; break;
         case 'W': goingForward = keyDown;	DirectionChanged = true; break;
         case 'S': goingBackward = keyDown;	DirectionChanged = true; break;
         case 'Q': rotatingLeft = keyDown;	break;
@@ -89,26 +99,31 @@ bool GameSessionInput::keyDown(int key, bool keyDown)
 bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int x, int y)
 {
     //TODO: Send to UI manager and see if it was handled. If not, then do this:
-    if(button == Arya::BUTTON_LEFT) {
+    if(button == Arya::BUTTON_LEFT)
+    {
         draggingLeftMouse = (buttonDown == true);
-    } else if(button == Arya::BUTTON_RIGHT) {
+
+        if(draggingLeftMouse)
+        {
+            originalMousePos = vec2(x, y);
+        }
+        else
+        {
+            selectUnits(-1.0 + 2.0 * selectionRect.pixelOffset.x / Root::shared().getWindowWidth(), 
+                    -1.0 + 2.0 * (selectionRect.pixelOffset.x + selectionRect.pixelSize.x) / Root::shared().getWindowWidth(),
+                    -1.0 + 2.0 * selectionRect.pixelOffset.y / Root::shared().getWindowHeight(), 
+                    -1.0 + 2.0 * (selectionRect.pixelOffset.y + selectionRect.pixelSize.y) / Root::shared().getWindowHeight());
+
+            selectionRect.pixelOffset = vec2(0.0);
+            selectionRect.pixelSize = vec2(0.0);
+        }
+    }
+    else if(button == Arya::BUTTON_RIGHT)
+    {
         draggingRightMouse = (buttonDown == true);
-    }
 
-    if(draggingLeftMouse)
-    {
-        originalMousePos = vec2(x, y);
-    }
-    else
-    {
-        // select units here
-        selectUnits(-1.0 + 2.0 * selectionRect.offsetInPixels.x / Root::shared().getWindowWidth(), 
-                -1.0 + 2.0 * (selectionRect.offsetInPixels.x + selectionRect.sizeInPixels.x) / Root::shared().getWindowWidth(),
-                -1.0 + 2.0 * selectionRect.offsetInPixels.y / Root::shared().getWindowHeight(), 
-                -1.0 + 2.0 * (selectionRect.offsetInPixels.y + selectionRect.sizeInPixels.y) / Root::shared().getWindowHeight());
-
-        selectionRect.offsetInPixels = vec2(0.0);
-        selectionRect.sizeInPixels = vec2(0.0);
+        Root::shared().readDepthNextFrame(x, y);
+        doUnitMovementNextFrame = true;
     }
 
     return false;
@@ -192,12 +207,13 @@ bool GameSessionInput::mouseMoved(int x, int y, int dx, int dy)
         }
     }
 
-    return handled; 
+    return handled;
 }
 
 void GameSessionInput::unselectAll()
 {
     Faction* lf = session->getLocalFaction();
+    if(!lf) return;
     for(int i = 0; i < lf->getUnits().size(); ++i)
         lf->getUnits()[i]->setSelected(false);
 }
@@ -205,25 +221,53 @@ void GameSessionInput::unselectAll()
 void GameSessionInput::selectAll()
 {
     Faction* lf = session->getLocalFaction();
+    if(!lf) return;
     for(int i = 0; i < lf->getUnits().size(); ++i)
         lf->getUnits()[i]->setSelected(true);
 }
 
 void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float y_max)
 {
-    unselectAll();
+    if(!leftShiftPressed)
+        unselectAll();
+
+    mat4 vpMatrix = Root::shared().getScene()->getCamera()->getVPMatrix();
 
     Faction* lf = session->getLocalFaction();
+    if(!lf) return;
     for(int i = 0; i < lf->getUnits().size(); ++i)
     {
-        vec4 onScreen = Root::shared().getScene()->getCamera()->getVPMatrix() * 
-            vec4(lf->getUnits()[i]->getObject()->getPosition(), 1.0);
+        vec4 onScreen(lf->getUnits()[i]->getObject()->getPosition(), 1.0);
+        onScreen = vpMatrix * onScreen;
         onScreen.x /= onScreen.w;
         onScreen.y /= onScreen.w;
 
         if((onScreen.x > x_min && onScreen.x < x_max) && (onScreen.y > y_min && onScreen.y < y_max)) {
-            LOG_INFO("Selecting unit: " << i);
             lf->getUnits()[i]->setSelected(true);
         }
     }
+}
+
+void GameSessionInput::moveSelectedUnits()
+{
+    vec3 clickPos = Root::shared().getDepthResult();
+
+    Faction* lf = session->getLocalFaction();
+    if(!lf) return;
+
+    int numSelected = 0;
+    for(int i = 0; i < lf->getUnits().size(); ++i)
+        if(lf->getUnits()[i]->isSelected())
+            ++numSelected;
+
+    int perRow = (int)(glm::sqrt(numSelected));
+    int currentIndex = 0;
+    float spread = 10.0f;
+
+    for(int i = 0; i < lf->getUnits().size(); ++i)
+        if(lf->getUnits()[i]->isSelected()) {
+            lf->getUnits()[i]->setTargetPosition(vec2(clickPos.x + spread*((currentIndex % perRow) - perRow / 2), 
+                        clickPos.z + spread*(currentIndex / perRow - perRow / 2)));
+            ++currentIndex;
+        }
 }

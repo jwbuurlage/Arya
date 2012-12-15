@@ -123,7 +123,7 @@ namespace Arya
 
         GLfloat* vertexData = new GLfloat[patchSizeMax*patchSizeMax * 2];
 
-        scaleMatrix = glm::scale(mat4(1.0), vec3((float)w));
+        scaleMatrix = glm::scale(mat4(1.0), vec3((float)w, 300.0, (float)w));
         float perVertex = (1.0f / ((patchSizeMax - 1) * patchCount));
 
         for(int i = 0; i < patchSizeMax; ++i)
@@ -260,12 +260,18 @@ namespace Arya
             return 0.0;
         }
 
+        if( x >= TERRAIN_SIZE/2.0 || x <= -TERRAIN_SIZE/2.0 || z >= TERRAIN_SIZE/2.0 || z <= -TERRAIN_SIZE/2.0 )
+        {
+            LOG_WARNING("Querying height outside of terrain!");
+            return 0.0;
+        }
+
         unsigned short h;
         unsigned short* heights = (unsigned short*)hFile->getData();
 
         int index = (int)(z + (TERRAIN_SIZE/2.0))*TERRAIN_SIZE + (int)(x + (TERRAIN_SIZE / 2.0));
         h = heights[index];
-        return -200.0 + 200.0*(h / 65535.0);
+        return scaleMatrix[1][1]*(h / 65535.0);
     }
 
     //---------------------------------------

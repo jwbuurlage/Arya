@@ -21,6 +21,7 @@ namespace Arya
     class FrameListener{
         public:
             //Time is since previous frame
-            virtual void onFrame(float elapsedTime){ return; }
+            virtual void onFrame(float elapsedTime) { return; }
+            virtual void onRender() { return; }
     };
 }

@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "Objects.h"
 #include "Scene.h"
+#include "Shaders.h"
 #include "common/Logger.h"
 
 #include <glm/glm.hpp>

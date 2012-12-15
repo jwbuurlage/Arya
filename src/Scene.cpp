@@ -52,7 +52,7 @@ namespace Arya
         if(!camera)
         {
             camera = new Camera;
-            camera->setProjectionMatrix(45.0f, 1.6f, 0.1f, 2000.0f);
+            camera->setProjectionMatrix(45.0f, Root::shared().getAspectRatio(), 0.1f, 2000.0f);
         }
 
         initialized = true;
@@ -122,6 +122,7 @@ namespace Arya
     {
         basicProgram->use();
 
+<<<<<<< HEAD
         mat4 vpMatrix;
         camera->updateViewProjectionMatrix(&vpMatrix);
         basicProgram->setUniformMatrix4fv("vpMatrix", vpMatrix);
@@ -129,6 +130,9 @@ namespace Arya
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, FontManager::shared().getFont("courier.ttf")->textureHandle);
+=======
+        basicProgram->setUniformMatrix4fv("vpMatrix", camera->getVPMatrix());
+>>>>>>> jw/master
 
         for(int i = 0; i < objects.size(); ++i)
         {

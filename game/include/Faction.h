@@ -12,7 +12,7 @@ class Faction
         Faction();
         ~Faction();
 
-        void addUnit(Object* obj);
+        void addUnit(Unit* unit);
 
         const vector<Unit*>& getUnits() const { return units; }
     private:

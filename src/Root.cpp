@@ -11,6 +11,7 @@
 #include "Scene.h"
 #include "Files.h"
 #include "Overlay.h"
+#include "Camera.h"
 #include "common/Logger.h"
 #include "Interface.h"
 
@@ -32,6 +33,8 @@ namespace Arya
         scene = 0;
         oldTime = 0;
         overlay = 0;
+
+        readDepthBuffer = false;
 
         Logger* log = new Logger();
         FileSystem* files = new FileSystem();
@@ -132,6 +135,7 @@ namespace Arya
             }
 
             render();
+
             glfwPollEvents();
             if( glfwGetWindowParam(GLFW_OPENED) == 0 ) running = false;
         }
@@ -149,7 +153,7 @@ namespace Arya
 
         glfwCloseWindow();
 
-        if(!glfwOpenWindow(windowWidth, windowHeight, 0, 0, 0, 0, 0, 0, (fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW)))
+        if(!glfwOpenWindow(windowWidth, windowHeight, 0, 0, 0, 0, 32, 0, (fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW)))
         {
             LOG_ERROR("Could not re-create window. Closing now.");
             stopRendering();
@@ -226,8 +230,26 @@ namespace Arya
         if(scene)
             scene->render();
 
+        if(readDepthBuffer)
+        {
+            readDepthBuffer = false;
+            GLfloat depth;
+            glReadPixels(readAtX, readAtY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+
+            vec4 screenPos(2.0f * readAtX /((float)windowWidth) - 1.0f, 2.0f * readAtY/((float)windowHeight) - 1.0f, 2.0f*depth-1.0f, 1.0);
+            screenPos = scene->getCamera()->getInverseVPMatrix() * screenPos;
+            screenPos /= screenPos.w;
+
+            clickScreenLocation.x = screenPos.x;
+            clickScreenLocation.y = screenPos.y;
+            clickScreenLocation.z = screenPos.z;
+        }
+
         if(overlay)
             overlay->render();
+
+        for(std::vector<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();++it)
+            (*it)->onRender();
 
         glfwSwapBuffers();
     }

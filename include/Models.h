@@ -42,6 +42,9 @@ namespace Arya
     //This is stored inside the model, not in the object
     class AnimationData
     {
+        public:
+            AnimationData(){}
+            virtual ~AnimationData(){}
     };
 
     class Model

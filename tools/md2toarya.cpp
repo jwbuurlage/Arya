@@ -1,5 +1,7 @@
 #include <fstream>
 #include <iostream>
+#include <sstream>
+#include <string>
 #include <cstring>
 #include <map>
 #include <algorithm>
@@ -152,26 +154,42 @@ int main(int argc, char* argv[])
     // Generic file opening
     //
 
-    if( argc != 3 )
+    if( argc < 3 )
     {
-        cout << "Usage: " << argv[0] << " md2file.md2 outputfile.aryamodel" << endl;
+        cout << "Usage: " << argv[0] << " md2file.md2 outputfile.aryamodel [scalefactor translatevector]" << endl;
+        cout << "Example: " << argv[0] << " ogros.md2 ogros.aryamodel" << endl;
+        cout << "Example: " << argv[0] << " ogros.md2 ogros.aryamodel 0.2 0 -5 0" << endl;
         return 0;
+    }
+
+    string inputfilename;
+    string outputfilename;
+    float scaleFactor = 1.0f;
+    float transX = 0.0f, transY = 0.0f, transZ = 0.0f;
+
+    inputfilename = argv[1];
+    outputfilename = argv[2];
+    if( argc >= 7 )
+    {
+        stringstream parser;
+        parser << argv[3] << " " << argv[4] << " " << argv[5] << " " << argv[6];
+        parser >> scaleFactor >> transX >> transY >> transZ;
     }
 
     ifstream inputfile;
     ofstream outputfile;
 
-    inputfile.open(argv[1], ios::binary);
+    inputfile.open(inputfilename.c_str(), ios::binary);
     if(!inputfile.is_open())
     {
-        cerr << "File not found: " << argv[1] << endl;
+        cerr << "File not found: " << inputfilename << endl;
         return -1;
     }
 
-    outputfile.open(argv[2], ios::binary);
+    outputfile.open(outputfilename.c_str(), ios::binary);
     if(!outputfile.is_open())
     {
-        cerr << "Unable to open output file: " << argv[2] << endl;
+        cerr << "Unable to open output file: " << outputfilename << endl;
         return -1;
     }
 
@@ -201,13 +219,15 @@ int main(int argc, char* argv[])
         return -1;
     }
 
+    cout << "Scale factor " << scaleFactor << endl;
+    cout << "Translation: (" << transX << "," << transY << "," << transZ << ")" << endl;
     cout << "Parsing input file..." << endl;
 
     bool animated = header->nFrames > 1 ? true : false;
 
     //TODO: calculate needed size
     //Just take a huge upper bound :D
-    char* outBuffer = new char[inputFilesize * 100];
+    char* outBuffer = new char[inputFilesize * 300];
 
     char* pointer = outBuffer;
 
@@ -230,8 +250,8 @@ int main(int argc, char* argv[])
     //end of submesh info
 
     //material list: only one material
-    int namelen = strlen(argv[1]) - 4; //remove the .md2
-    for(int i = 0; i < namelen; ++i) *pointer++ = argv[1][i];
+    int namelen = inputfilename.length() - 4; //remove the .md2
+    for(int i = 0; i < namelen; ++i) *pointer++ = inputfilename[i];
     *pointer++ = 0; //zero terminated
     cout << "Saving material " << (pointer - namelen - 1) << endl;
 
@@ -251,7 +271,7 @@ int main(int argc, char* argv[])
 
             *(int*)pointer = MD2animationlist[i].firstFrame; pointer += 4;
             *(int*)pointer = MD2animationlist[i].lastFrame; pointer += 4;
-            for(int j = 0; j < MD2animationlist[i].lastFrame - MD2animationlist[i].firstFrame; ++j)
+            for(int j = 0; j <= MD2animationlist[i].lastFrame - MD2animationlist[i].firstFrame; ++j)
             {
                 *(float*)pointer = 1.0f/((float)MD2animationlist[i].fps);
                 pointer += 4;
@@ -290,6 +310,9 @@ int main(int argc, char* argv[])
 
     float* floatOutput = (float*)pointer;
 
+    float maxX = -10000.0f, maxY = -10000.0f, maxZ = -10000.0f;
+    float minX = 10000.0f, minY = 10000.0f, minZ = 10000.0f;
+
     for(int fr = 0; fr < header->nFrames; ++fr)
     {
         frame* inputFrame = (frame*)(inputData + header->oFrames + fr * header->frameSize);
@@ -302,9 +325,12 @@ int main(int argc, char* argv[])
                 int texIndex = triangleInput[tri].tex[m];
                 int normIndex = inputFrame->verts[index].lightnormalindex;
 
-                *floatOutput++ = (float)((inputFrame->verts[index].v[1] * inputFrame->scale[1]) + inputFrame->translate[1]);
-                *floatOutput++ = (float)((inputFrame->verts[index].v[2] * inputFrame->scale[2]) + inputFrame->translate[2]);
-                *floatOutput++ = -(float)((inputFrame->verts[index].v[0] * inputFrame->scale[0]) + inputFrame->translate[0]);
+                float x = scaleFactor*(transX + (float)((inputFrame->verts[index].v[1] * inputFrame->scale[1]) + inputFrame->translate[1]));
+                float y = scaleFactor*(transY + (float)((inputFrame->verts[index].v[2] * inputFrame->scale[2]) + inputFrame->translate[2]));
+                float z = scaleFactor*(transZ - (float)((inputFrame->verts[index].v[0] * inputFrame->scale[0]) + inputFrame->translate[0]));
+                *floatOutput++ = x;
+                *floatOutput++ = y;
+                *floatOutput++ = z;
 
                 *floatOutput++ = (float)(texCooInput[texIndex].s) / ((float)header->textureWidth);
                 *floatOutput++ = (float)(texCooInput[texIndex].t) / ((float)header->textureHeight);
@@ -312,6 +338,13 @@ int main(int argc, char* argv[])
                 *floatOutput++ = (float)(anorms[normIndex][1]);
                 *floatOutput++ = (float)(anorms[normIndex][2]);
                 *floatOutput++ = (float)(anorms[normIndex][0]);
+
+                if(x>maxX) maxX = x;
+                else if(x<minX) minX = x;
+                if(y>maxY) maxY = y;
+                else if(y<minY) minY = y;
+                if(z>maxZ) maxZ = z;
+                else if(z<minZ) minZ = z;
             }
         }
     }
@@ -322,6 +355,8 @@ int main(int argc, char* argv[])
     outHeader->submesh[0].vertexCount = vertexCount;
     //End of vertex data
     cout << "Vertex buffer done. " << header->nFrames << " frames with " << vertexCount << " vertices each written." << endl;
+    cout << "min X, min Y, min Z : " << minX << "," << minY << "," << minZ << endl;
+    cout << "max X, max Y, max Z : " << maxX << "," << maxY << "," << maxZ << endl;
 
     //Index data
     outHeader->submesh[0].indexCount = 0;
