@@ -89,19 +89,22 @@ namespace Arya
 
         // bind shader
         overlayProgram->use();
+        glBindVertexArray(rectVAO);
+
         overlayProgram->setUniform1i("texture1", 0);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D,FontManager::shared().getFont("courier.ttf")->textureHandle);
-
-        glBindVertexArray(rectVAO);
 
         // render all rects
         for(int i = 0; i < rects.size(); ++i) {
-            // TODO: use dirty flag maybe?
+            glBindTexture(GL_TEXTURE_2D, rects[i]->textureHandle);
+
+           // TODO: use dirty flag maybe?
             rects[i]->screenPosition = rects[i]->relative + vec2(2.0 * rects[i]->offsetInPixels.x / ww, 2.0 * rects[i]->offsetInPixels.y / wh);
             rects[i]->screenSize = vec2(2.0 * rects[i]->sizeInPixels.x / ww, 2.0 * rects[i]->sizeInPixels.y / wh);
             overlayProgram->setUniform2fv("screenSize", rects[i]->screenSize);
             overlayProgram->setUniform2fv("screenPosition", rects[i]->screenPosition);
+            overlayProgram->setUniform2fv("texOffset", vec2(rects[i]->texOffset.x, 1 - rects[i]->texOffset.y));
+            overlayProgram->setUniform2fv("texSize", vec2(rects[i]->texSize.x, -rects[i]->texSize.y));
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
 

@@ -75,8 +75,9 @@ namespace Arya
         //Call these in the right order: Models need Textures
         TextureManager::shared().initialize();
         ModelManager::shared().initialize();
-        if(!overlay->init()) return false;
+
         overlay = new Overlay();
+        if(!overlay->init()) return false;
 
         Interface* interf = new Interface;
         interf->init();
