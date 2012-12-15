@@ -33,8 +33,8 @@ class GameSession : public Arya::FrameListener
         Faction* getLocalFaction() const { return localFaction; } ;
 
         // FrameListener
+        void onFrame(float elapsedTime);
         void onRender();
-
 
     private:
         GameSessionInput* input;

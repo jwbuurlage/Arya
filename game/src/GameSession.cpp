@@ -141,6 +141,14 @@ bool GameSession::initVertices()
     return true;
 }
 
+void GameSession::onFrame(float elapsedTime)
+{
+    // update units
+    for(int i = 0; i < factions.size(); ++i)
+        for(int j = 0; j < factions[i]->getUnits().size(); ++j)
+            factions[i]->getUnits()[j]->update(elapsedTime);
+}
+
 void GameSession::onRender()
 {
     glDisable(GL_CULL_FACE);

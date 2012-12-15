@@ -16,10 +16,12 @@ class GameSessionInput : public Arya::InputListener, public Arya::FrameListener
         bool mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int x, int y);
         bool mouseWheelMoved(int delta);
         bool mouseMoved(int x, int y, int dx, int dy);
-        
+
         void unselectAll();
         void selectAll();
         void selectUnits(float x_min, float x_max, float y_min, float y_max);
+
+        void moveSelectedUnits(int x, int y);
 
     private: 
         GameSession* session;
