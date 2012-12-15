@@ -12,6 +12,7 @@
 #include "Files.h"
 #include "Overlay.h"
 #include "common/Logger.h"
+#include "Interface.h"
 
 using std::cerr;
 using std::endl;
@@ -37,6 +38,8 @@ namespace Arya
         TextureManager* tex = new TextureManager();
         ModelManager* modelManager = new ModelManager();
         FontManager* fon = new FontManager();
+        Interface* interf = new Interface;
+        addFrameListener(interf);
     }
 
     Root::~Root()
@@ -110,7 +113,8 @@ namespace Arya
 
     void Root::startRendering()
     {
-        running = true;
+LOG_INFO("start rendering");        
+running = true;
         while(running)
         {
             if(!oldTime)

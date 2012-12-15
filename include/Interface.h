@@ -1,6 +1,5 @@
-#include <FTGL/ftgl.h>
 #include "common/Listeners.h"
-
+#include "Overlay.h"
 
 namespace Arya
 {
@@ -9,8 +8,10 @@ namespace Arya
 		public:
 			Interface(){};
 			~Interface(){};
-			void update(float elapsedTime);
+			void onFrame(float elapsedTime);
+      void Init();
 		private:
+      Rect rect[10];
 	};
 	
 }
