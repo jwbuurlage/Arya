@@ -9,7 +9,7 @@ Unit::Unit(UnitInfo* inf)
     selected = false;
     targetPosition = vec2(0.0);
     speed = 30.0;
-    yawspeed = 36.0f;
+    yawspeed = 360.0f;
     idle = true;
 }
 
@@ -33,7 +33,7 @@ void Unit::update(float timeElapsed)
     vec3 target(targetPosition.x, targeth, targetPosition.y);
     vec3 diff = target - object->getPosition();
 
-    float newYaw = 180.0f*atan2(-diff.x, -diff.z);
+    float newYaw = (180.0f/M_PI)*atan2(-diff.x, -diff.z);
     float oldYaw = object->getYaw();
     float yawDiff = newYaw - oldYaw;
 
@@ -41,7 +41,7 @@ void Unit::update(float timeElapsed)
     else if( yawDiff < -180.0f ) yawDiff += 360.0f;
 
     float deltaYaw = timeElapsed * yawspeed + 1.0f;
-    if( (yawDiff > 0 && yawDiff < deltaYaw) || (yawDiff < 0 && yawDiff > -deltaYaw) )
+    if( (yawDiff >= 0 && yawDiff < deltaYaw) || (yawDiff <= 0 && yawDiff > -deltaYaw) )
     {
         //angle is small enough (less than 1 degree) so we can start walking now
         object->setYaw(newYaw);
