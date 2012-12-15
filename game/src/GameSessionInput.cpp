@@ -263,8 +263,8 @@ void GameSessionInput::moveSelectedUnits()
 
     for(int i = 0; i < lf->getUnits().size(); ++i)
         if(lf->getUnits()[i]->isSelected()) {
-            lf->getUnits()[i]->setTargetPosition(vec2(clickPos.x + spread*(currentIndex % perRow), 
-                        clickPos.z + spread*(currentIndex / perRow)));
+            lf->getUnits()[i]->setTargetPosition(vec2(clickPos.x + spread*((currentIndex % perRow) - perRow / 2), 
+                        clickPos.z + spread*(currentIndex / perRow - perRow / 2)));
             ++currentIndex;
         }
 }
