@@ -1,4 +1,4 @@
-#version 140
+#version 400 
 
 uniform sampler2D heightMap;
 uniform mat4 vpMatrix;
