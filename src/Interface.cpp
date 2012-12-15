@@ -53,6 +53,8 @@ namespace Arya
         {
             float xpos = 0.0f, ypos = 0.0f;      
             std::stringstream myStream;
+            myStream.fill(' ');
+            myStream.width(3);
             if(count >= 1000) count = 999;
             myStream << count;
             stbtt_aligned_quad q;

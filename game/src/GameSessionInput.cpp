@@ -106,29 +106,17 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
 
         if(draggingLeftMouse)
         {
-            draggingLeftMouse = (buttonDown == true);
-
-            if(draggingLeftMouse)
-            {
-                originalMousePos = vec2(x, y);
-            }
-            else
-            {
-                // select units here
-                selectUnits(-1.0 + 2.0 * selectionRect.offsetInPixels.x / Root::shared().getWindowWidth(), 
-                        -1.0 + 2.0 * (selectionRect.offsetInPixels.x + selectionRect.sizeInPixels.x) / Root::shared().getWindowWidth(),
-                        -1.0 + 2.0 * selectionRect.offsetInPixels.y / Root::shared().getWindowHeight(), 
-                        -1.0 + 2.0 * (selectionRect.offsetInPixels.y + selectionRect.sizeInPixels.y) / Root::shared().getWindowHeight());
-
-                selectionRect.offsetInPixels = vec2(0.0);
-            }
+            originalMousePos = vec2(x, y);
         }
         else
         {
-            draggingRightMouse = (buttonDown == true);
+            selectUnits(-1.0 + 2.0 * selectionRect.offsetInPixels.x / Root::shared().getWindowWidth(), 
+                    -1.0 + 2.0 * (selectionRect.offsetInPixels.x + selectionRect.sizeInPixels.x) / Root::shared().getWindowWidth(),
+                    -1.0 + 2.0 * selectionRect.offsetInPixels.y / Root::shared().getWindowHeight(), 
+                    -1.0 + 2.0 * (selectionRect.offsetInPixels.y + selectionRect.sizeInPixels.y) / Root::shared().getWindowHeight());
 
-            Root::shared().readDepthNextFrame(x, y);
-            doUnitMovementNextFrame = true;
+            selectionRect.offsetInPixels = vec2(0.0);
+            selectionRect.sizeInPixels = vec2(0.0);
         }
     }
     else if(button == Arya::BUTTON_RIGHT)

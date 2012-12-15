@@ -1,4 +1,4 @@
-#version #version 400
+#version 400
 
 uniform sampler2D texture1;
 in vec2 texCoo;
