@@ -260,7 +260,7 @@ void GameSessionInput::moveSelectedUnits()
         if(lf->getUnits()[i]->isSelected())
             ++numSelected;
 
-    int perRow = (int)(glm::sqrt(numSelected));
+    int perRow = (int)(glm::sqrt((float)numSelected));
     int currentIndex = 0;
     float spread = 10.0f;
 
