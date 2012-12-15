@@ -9,6 +9,7 @@
 #pragma once
 #include "Singleton.h"
 #include <sstream>
+#include <fstream>
 
 //sometimes the word DEBUG is defined
 #ifdef DEBUG
@@ -58,6 +59,7 @@ namespace Arya
 		std::stringstream& getStream(){ return streambuff; }
 	private:
 		std::stringstream streambuff;
+        std::ofstream filestream;
 		LOGLEVEL currentLogLevel; //The log type that is currently in the streambuff
 
 		friend Logger& operator<<(Logger& logger, Logger::LOGLEVEL lvl);
@@ -74,7 +76,10 @@ namespace Arya
 
 	inline Logger& operator<<(Logger& logger, Logger::LOGLEVEL lvl){
 		logger.currentLogLevel = lvl;
+        //Reset the stringstream
+        logger.streambuff.str(std::string());
         logger.streambuff.seekp(0);
+        logger.streambuff.clear();
 		switch(lvl){
 		case Logger::CRITICALERROR:
 			logger.streambuff << "Critical ERROR: ";
