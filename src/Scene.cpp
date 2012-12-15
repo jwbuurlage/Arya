@@ -122,17 +122,7 @@ namespace Arya
     {
         basicProgram->use();
 
-<<<<<<< HEAD
-        mat4 vpMatrix;
-        camera->updateViewProjectionMatrix(&vpMatrix);
-        basicProgram->setUniformMatrix4fv("vpMatrix", vpMatrix);
-        basicProgram->setUniform1i("texture1",0);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, FontManager::shared().getFont("courier.ttf")->textureHandle);
-=======
         basicProgram->setUniformMatrix4fv("vpMatrix", camera->getVPMatrix());
->>>>>>> jw/master
 
         for(int i = 0; i < objects.size(); ++i)
         {
