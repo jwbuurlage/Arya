@@ -46,8 +46,8 @@ class Unit
         bool obsolete() { return !isAlive() && (dyingTime > 0.8f); }
         bool readyToDelete() { return refCount <= 0; }
 
-        void retain() { ++refCount; LOG_INFO("now: " << refCount); }
-        void release() { --refCount; LOG_INFO("now: " << refCount); }
+        void retain() { ++refCount; }
+        void release() { --refCount; }
 
     private:
         Object* object;

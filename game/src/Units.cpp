@@ -89,8 +89,6 @@ void Unit::update(float timeElapsed)
             }
             else
                 timeSinceLastAttack += timeElapsed;
-
-            return;
         }
         else {
             if(unitState != UNIT_ATTACKING_OUT_OF_RANGE)
@@ -117,6 +115,8 @@ void Unit::update(float timeElapsed)
     {
         //angle is small enough (less than 1 degree) so we can start walking now
         object->setYaw(newYaw);
+        if(unitState == UNIT_ATTACKING)
+            return;
 
         if(glm::length(diff) < 0.5) // arbitrary closeness...
         {
