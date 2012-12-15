@@ -197,6 +197,16 @@ namespace Arya
         glUniform2fv(getUniformLocation(name), 1, &values[0]);
     }
 
+    void ShaderProgram::setUniform3fv(const char* name, vec3 values)
+    {
+        glUniform3fv(getUniformLocation(name), 1, &values[0]);
+    }
+
+    void ShaderProgram::setUniform4fv(const char* name, vec4 values)
+    {
+        glUniform4fv(getUniformLocation(name), 1, &values[0]);
+    }
+
     void ShaderProgram::setUniformMatrix4fv(const char* name, mat4 matrix)
     {
         glUniformMatrix4fv(getUniformLocation(name), 1, false, &matrix[0][0]);
