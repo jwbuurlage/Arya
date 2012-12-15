@@ -13,6 +13,7 @@
 #include "Textures.h"
 #include "Camera.h"
 #include "Shaders.h"
+#include "Interface.h"
 
 using std::string;
 using std::cerr;
