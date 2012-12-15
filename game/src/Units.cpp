@@ -50,7 +50,7 @@ void Unit::update(float timeElapsed)
         {
             object->setPosition(target);
             targetPosition = vec2(0.0);
-            idle = true;
+            setIdle(true);
             return;
         }
         diff = glm::normalize(diff);
@@ -68,8 +68,17 @@ void Unit::update(float timeElapsed)
 
 }
 
+void Unit::setIdle(bool idl)
+{
+    idle = idl;
+    if(idle)
+        object->setAnimation("stand");
+    else
+        object->setAnimation("run");
+}
+
 void Unit::setTargetPosition(vec2 target)
 {
     targetPosition = target;
-    idle = false;
+    setIdle(false);
 }

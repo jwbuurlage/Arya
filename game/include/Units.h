@@ -28,6 +28,8 @@ class Unit
 
        void setTargetPosition(vec2 target);
 
+       void setIdle(bool idl);
+
     private:
         Object* object;
         UnitInfo* info;
@@ -41,4 +43,3 @@ class Unit
         float speed;
         float yawspeed; //in degrees
 };
-
