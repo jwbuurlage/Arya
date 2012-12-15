@@ -73,6 +73,7 @@ namespace Arya
                     LOG_WARNING("Animation not found: " << name);
                     return;
                 }
+                if(curAnim == &anim->second) return;
                 curAnim = &anim->second;
                 startFrame = curAnim->startFrame;
                 curFrame = 0;

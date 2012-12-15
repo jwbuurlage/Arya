@@ -9,7 +9,7 @@ Unit::Unit(UnitInfo* inf)
     selected = false;
     targetPosition = vec2(0.0);
     speed = 30.0;
-    yawspeed = 360.0f;
+    yawspeed = 720.0f;
     idle = true;
 }
 
