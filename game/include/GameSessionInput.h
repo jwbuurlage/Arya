@@ -31,6 +31,9 @@ class GameSessionInput : public Arya::InputListener, public Arya::FrameListener
         bool mouseLeft, mouseRight, mouseTop, mouseBot; //wether mouse is at edge
         bool draggingLeftMouse, draggingRightMouse;
 		bool slowMode; //Precise movement
+
+        bool leftShiftPressed;
+
         vec3 forceDirection;
         vec3 specMovement;
         vec3 specPos;
