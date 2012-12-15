@@ -49,7 +49,7 @@ namespace Arya
         if(!camera)
         {
             camera = new Camera;
-            camera->setProjectionMatrix(45.0f, 1.6f, 0.1f, 2000.0f);
+            camera->setProjectionMatrix(45.0f, Root::shared().getAspectRatio(), 0.1f, 2000.0f);
         }
 
         initialized = true;
