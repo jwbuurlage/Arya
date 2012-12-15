@@ -29,6 +29,7 @@ GameSessionInput::~GameSessionInput()
 
 void GameSessionInput::init()
 {
+    selectionRect.fillColor = vec4(1.0, 1.0, 1.0, 0.2);    
     Root::shared().getOverlay()->addRect(&selectionRect); 
 }
 
@@ -105,17 +106,29 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
 
         if(draggingLeftMouse)
         {
-            originalMousePos = vec2(x, y);
+            draggingLeftMouse = (buttonDown == true);
+
+            if(draggingLeftMouse)
+            {
+                originalMousePos = vec2(x, y);
+            }
+            else
+            {
+                // select units here
+                selectUnits(-1.0 + 2.0 * selectionRect.offsetInPixels.x / Root::shared().getWindowWidth(), 
+                        -1.0 + 2.0 * (selectionRect.offsetInPixels.x + selectionRect.sizeInPixels.x) / Root::shared().getWindowWidth(),
+                        -1.0 + 2.0 * selectionRect.offsetInPixels.y / Root::shared().getWindowHeight(), 
+                        -1.0 + 2.0 * (selectionRect.offsetInPixels.y + selectionRect.sizeInPixels.y) / Root::shared().getWindowHeight());
+
+                selectionRect.offsetInPixels = vec2(0.0);
+            }
         }
         else
         {
-             // select units here
-            selectUnits(-1.0 + 2.0 * selectionRect.offsetInPixels.x / Root::shared().getWindowWidth(), 
-                    -1.0 + 2.0 * (selectionRect.offsetInPixels.x + selectionRect.sizeInPixels.x) / Root::shared().getWindowWidth(),
-                    -1.0 + 2.0 * selectionRect.offsetInPixels.y / Root::shared().getWindowHeight(), 
-                    -1.0 + 2.0 * (selectionRect.offsetInPixels.y + selectionRect.sizeInPixels.y) / Root::shared().getWindowHeight());
+            draggingRightMouse = (buttonDown == true);
 
-            selectionRect.offsetInPixels = vec2(0.0);
+            Root::shared().readDepthNextFrame(x, y);
+            doUnitMovementNextFrame = true;
         }
     }
     else if(button == Arya::BUTTON_RIGHT)
@@ -250,7 +263,7 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
 
 void GameSessionInput::moveSelectedUnits()
 {
-    vec3 clickPos = Root::shared().getDepthResult();
+        vec3 clickPos = Root::shared().getDepthResult();
 
     Faction* lf = session->getLocalFaction();
     if(!lf) return;

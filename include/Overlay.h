@@ -21,7 +21,7 @@ namespace Arya
             offsetInPixels = vec2(0.0);
             sizeInPixels = vec2(0.0);
 
-            fillColor = vec4(0.0);
+            fillColor = vec4(1.0);
             borderColor = vec4(0.0);
 
             textureHandle = 0;
