@@ -9,7 +9,7 @@ namespace Arya
 			Interface(){};
 			~Interface(){};
 			void onFrame(float elapsedTime);
-      void Init();
+      void init();
 		private:
       Rect rect[10];
 	};

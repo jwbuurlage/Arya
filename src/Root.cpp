@@ -38,8 +38,6 @@ namespace Arya
         TextureManager* tex = new TextureManager();
         ModelManager* modelManager = new ModelManager();
         FontManager* fon = new FontManager();
-        Interface* interf = new Interface;
-        addFrameListener(interf);
     }
 
     Root::~Root()
@@ -77,7 +75,9 @@ namespace Arya
         //Call these in the right order: Models need Textures
         TextureManager::shared().initialize();
         ModelManager::shared().initialize();
-
+        Interface* interf = new Interface;
+        interf->init();
+        addFrameListener(interf);
         overlay = new Overlay();
         if(!overlay->init()) return false;
 
@@ -129,7 +129,6 @@ namespace Arya
                 oldTime = pollTime;
             }
 
-            LOG_INFO("going to render");
             render();
             glfwPollEvents();
             if( glfwGetWindowParam(GLFW_OPENED) == 0 ) running = false;
@@ -222,11 +221,9 @@ namespace Arya
         glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_DEPTH_BUFFER_BIT);
 
-        LOG_INFO("going to render scene");
         if(scene)
             scene->render();
 
-        LOG_INFO("going to render overlay");
         if(overlay)
             overlay->render();
 

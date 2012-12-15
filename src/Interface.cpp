@@ -15,9 +15,10 @@ namespace Arya
   float time = 0.0; 
   float count = 0.0;
 
-  void Interface::Init()
+  void Interface::init()
   {
-    vector<Rect*> rects;
+LOG_INFO("init begin");    
+vector<Rect*> rects;
     for(int i = 0; i<12; i++)
     {
       Rect* rect = new Rect;
@@ -31,7 +32,6 @@ namespace Arya
   }
   void Interface::onFrame(float elapsedTime)
   {	
-    LOG_INFO("Hoi");    
     Font *font = new Font;
     font = FontManager::shared().getFont("courier.ttf");
     time += elapsedTime;
@@ -45,9 +45,8 @@ namespace Arya
       myStream << "FPS = " << count;
       for(int i = 0; (i < 12 && i < myStream.str().size()); i++)
       {
-        //stbtt_GetBakedQuad(font->baked, 512, 512, myStream.str()[i], &xpos ,&ypos,&q,true);
+        stbtt_GetBakedQuad(font->baked, 512, 512, myStream.str()[i], &xpos ,&ypos,&q,true);
       }
-      myStream.str();
       count = 0.0;
       time = 0.0;
     }
