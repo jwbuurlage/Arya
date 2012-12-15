@@ -2,7 +2,7 @@
 #include "common/Singleton.h"
 #include "Resources.h"
 #include "Mesh.h"
-#include "Materials.h"
+#include "Material.h"
 #include <vector>
 #include <GL/glew.h>
 

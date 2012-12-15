@@ -152,7 +152,7 @@ namespace Arya
                     Material* mat = model->getMaterials()[mesh->materialIndex];
                     basicProgram->setUniform1i("tex", 0);
                     glActiveTexture(GL_TEXTURE0);
-                    if(mat) glBindTexture(GL_TEXTURE_2D, mat->handle);
+                    if(mat) glBindTexture(GL_TEXTURE_2D, mat->texture->handle);
 
                     glBindVertexArray(mesh->vaoHandles[frame]);
                     glDrawArrays(mesh->primitiveType, 0, mesh->vertexCount);

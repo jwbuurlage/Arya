@@ -1,5 +1,6 @@
 #version 400
 
+uniform sampler2D splatTexture;
 uniform sampler2D heightMap;
 uniform mat4 vpMatrix;
 uniform mat4 scaleMatrix;
@@ -36,8 +37,7 @@ void main()
     vec4 normal = vec4( (D-B), 2.0/scaleMatrix[1][1], (C-A), 0.0 );
 	normalOut = normalize( normal.xyz );
 
-	bool enableSpecular=false;
-	if(enableSpecular) {
+	if(texture(splatTexture, texCoo).b > 0.1) {
 		vec4 camNormal=normalize(viewMatrix*vec4(normal.xyz,0.0));
 		vec4 camLight=normalize(viewMatrix*vec4(lightDirection,0.0));
 		vec4 camReflection=2.0*camNormal*dot(camLight,camNormal)-camLight;

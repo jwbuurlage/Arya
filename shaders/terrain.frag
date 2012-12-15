@@ -19,7 +19,7 @@ vec4 terrainColor(vec2 tex)
     splatSample = texture(splatTexture, texCoo);
     tColor += splatSample.r * texture(texture1, 10.0*texCoo);
     tColor += splatSample.g * texture(texture2, 10.0*texCoo);
-    tColor += splatSample.b * texture(texture3, 10.0*texCoo);
+    tColor += splatSample.b * texture(texture3, 10.0*texCoo)+0.5*pow(spec,6.0);
     return tColor / (splatSample.r + splatSample.g + splatSample.b);
 }
 
@@ -31,6 +31,6 @@ void main()
 
     FragColor = terrainColor(texCoo);
     FragColor *= lightFraction;
-	FragColor += 1.0*vec4(pow(spec,6.0));
+	//FragColor += 1.0*vec4(pow(spec,6.0));
 	FragColor.a=1.0f;
 }

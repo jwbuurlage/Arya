@@ -1,7 +1,7 @@
 #include "Models.h"
 #include "Primitives.h"
 #include "Files.h"
-#include "Materials.h"
+#include "Material.h"
 #include "common/Logger.h"
 #include <string>
 #include <map>
@@ -244,7 +244,7 @@ namespace Arya
                 nameBuf[count++] = 'g';
                 nameBuf[count++] = 'a';
                 nameBuf[count++] = 0;
-                Material* mat = TextureManager::shared().getTexture(nameBuf);
+                Material* mat = MaterialManager::shared().getMaterial(nameBuf);
                 model->addMaterial(mat);
             }
 

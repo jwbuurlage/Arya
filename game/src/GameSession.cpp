@@ -75,8 +75,8 @@ bool GameSession::init()
     vector<Texture*> tileSet;
     tileSet.push_back(TextureManager::shared().getTexture("grass.tga"));
     tileSet.push_back(TextureManager::shared().getTexture("rock.tga"));
+	tileSet.push_back(TextureManager::shared().getTexture("snow.tga"));
     tileSet.push_back(TextureManager::shared().getTexture("dirt.tga"));
-    tileSet.push_back(TextureManager::shared().getTexture("snow.tga"));
     if(!scene->setMap("heightmap.raw", "watermap.raw", tileSet, TextureManager::shared().getTexture("clouds.jpg"), TextureManager::shared().getTexture("splatmap.tga")))
         return false;
 
