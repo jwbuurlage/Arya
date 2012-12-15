@@ -1,7 +1,6 @@
 #include "common/Logger.h"
 #include <sstream>
 #include <iostream>
-#include <fstream>
 
 namespace Arya
 {
@@ -12,10 +11,12 @@ namespace Arya
 		consoleLogLevel = INFO | WARNING | ERROR | CRITICALERROR | DEBUG;
 		fileLogLevel = WARNING | ERROR | CRITICALERROR;
 		currentLogLevel = NONE;
+        filestream.open("logarya.txt");
 	}
 
 	Logger::~Logger(void)
 	{
+        filestream.close();
 	}
 
 	void Logger::log(LOGLEVEL type, const char* logText)
@@ -30,7 +31,10 @@ namespace Arya
 		}
 		if( fileLogLevel & currentLogLevel ){
 			//Note: When doing file output, also prepend timestamp
+            filestream << streambuff.str() << std::endl;
 		}
-		streambuff.str(std::string());
+        streambuff.str(std::string());
+        streambuff.seekp(0);
+        streambuff.clear();
 	}
 }

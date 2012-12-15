@@ -16,6 +16,7 @@ using std::string;
 using std::cerr;
 using std::endl;
 using std::vector;
+using glm::vec3;
 
 namespace Arya
 {	
@@ -25,6 +26,7 @@ namespace Arya
         currentMap = 0; 
         camera = 0;
         basicProgram = 0;
+		lightDirection=vec3(0.7,0.7,0.0);
         init();
     }
 
@@ -75,12 +77,12 @@ namespace Arya
         return true;
     }
 
-    bool Scene::setMap(const char* hm, vector<Texture*> ts, Texture* sm)
+    bool Scene::setMap(const char* hm, const char* wm, vector<Texture*> ts, Texture* cm, Texture* sm)
     {
         if(currentMap)
             delete currentMap;
         currentMap = new Map();
-        if(!currentMap->init(hm, ts, sm)) return false;
+        if(!currentMap->init(hm, wm, ts, cm, sm)) return false;
         return true;
     }
 

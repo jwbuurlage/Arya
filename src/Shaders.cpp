@@ -11,6 +11,7 @@ using std::string;
 
 using glm::mat4;
 using glm::vec2;
+using glm::vec3;
 
 namespace Arya
 {	
@@ -197,7 +198,7 @@ namespace Arya
         glUniform2fv(getUniformLocation(name), 1, &values[0]);
     }
 
-    void ShaderProgram::setUniform3fv(const char* name, vec3 values)
+	void ShaderProgram::setUniform3fv(const char* name, vec3 values)
     {
         glUniform3fv(getUniformLocation(name), 1, &values[0]);
     }

@@ -6,6 +6,7 @@
 #include "common/Logger.h"
 
 #include <vector>
+#include <glm/glm.hpp>
 using std::vector;
 
 namespace Arya
@@ -20,9 +21,9 @@ namespace Arya
         if(terrain) delete terrain;
     }
 
-    bool Map::init(const char* hm, vector<Texture*> ts, Texture* sm)
+    bool Map::init(const char* hm, const char* wm, vector<Texture*> ts, Texture* cm, Texture* sm)
     {
-        if(!setTerrain(hm, ts, sm)) {
+        if(!setTerrain(hm, wm, ts, cm, sm)) {
             LOG_ERROR("Could not initialize map");
             return false;
         }
@@ -30,15 +31,15 @@ namespace Arya
         return true;
     }
 
-    bool Map::setTerrain(const char* hm, vector<Texture*> ts, Texture* sm)
+    bool Map::setTerrain(const char* hm, const char* wm, vector<Texture*> ts, Texture* cm, Texture* sm)
     {
-        if(!hm || !(ts.size()) || !sm) {
+        if(!hm || !wm || !(ts.size()) || !sm) {
             if(terrain) delete terrain;
             terrain = 0;
             return false;
         }
 
-        Terrain* newTerrain = new Terrain(hm, ts, sm);
+        Terrain* newTerrain = new Terrain(hm, wm, ts, cm, sm);
         if(!newTerrain->init()) {
             LOG_ERROR("Could not initialize terrain");
             delete newTerrain;

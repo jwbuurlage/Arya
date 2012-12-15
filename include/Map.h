@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <glm/glm.hpp>
 using std::vector;
 
 namespace Arya
@@ -16,9 +17,9 @@ namespace Arya
             Map();
             ~Map();
 
-            bool init(const char* hm, vector<Texture*> ts, Texture* sm);
+            bool init(const char* hm, const char* wm, vector<Texture*> ts, Texture* cm, Texture* sm);
 
-            bool setTerrain(const char* hm, vector<Texture*> ts, Texture* sm);
+            bool setTerrain(const char* hm, const char* wm, vector<Texture*> ts, Texture* cm, Texture* sm);
             void render(Camera* cam);
             void update(float elapsedTime, Scene* scene);
 
