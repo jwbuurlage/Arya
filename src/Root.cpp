@@ -228,16 +228,13 @@ namespace Arya
             GLfloat depth;
             glReadPixels(readAtX, readAtY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
 
-            vec4 screenPos(2.0f * readAtX /((float)windowWidth) - 1.0f, 2.0f * readAtY/((float)windowHeight) - 1.0f, depth, 1.0);
+            vec4 screenPos(2.0f * readAtX /((float)windowWidth) - 1.0f, 2.0f * readAtY/((float)windowHeight) - 1.0f, 2.0f*depth-1.0f, 1.0);
             screenPos = scene->getCamera()->getInverseVPMatrix() * screenPos;
             screenPos /= screenPos.w;
 
             clickScreenLocation.x = screenPos.x;
             clickScreenLocation.y = screenPos.y;
             clickScreenLocation.z = screenPos.z;
-
-            LOG_INFO("depth = " << depth);
-            LOG_INFO("3D pos: " << screenPos.x << "," << screenPos.y << "," << screenPos.z);
         }
 
         if(overlay)
