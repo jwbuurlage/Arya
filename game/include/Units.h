@@ -35,7 +35,7 @@ class Unit
 
         // movement stuff
         vec2 targetPosition;
-        vec2 velocity;
+        float speed;
         bool idle;
 };
 

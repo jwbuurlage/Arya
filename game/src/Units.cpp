@@ -8,7 +8,7 @@ Unit::Unit(UnitInfo* inf)
     object = 0;
     selected = false;
     targetPosition = vec2(0.0);
-    velocity = vec2(50.0);
+    speed = 30.0;
     idle = true;
 }
 
@@ -31,18 +31,17 @@ void Unit::update(float timeElapsed)
     vec2 currentPosition = vec2(object->getPosition().x, object->getPosition().z);
     vec2 diff = (targetPosition - currentPosition);
 
-    if(glm::length(diff) < 0.2) // arbitrary closeness...
+    if(glm::length(diff) < 0.5) // arbitrary closeness...
     {
         h = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(targetPosition.x, targetPosition.y);
         object->setPosition(vec3(targetPosition.x, h, targetPosition.y));
         targetPosition = vec2(0.0);
         idle = true;
-        LOG_INFO("Reached destination");
         return;
     }
     diff = glm::normalize(diff);
 
-    vec2 newPosition = currentPosition + timeElapsed * (velocity * diff);
+    vec2 newPosition = currentPosition + timeElapsed * (speed * diff);
     h = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(newPosition.x, newPosition.y);
 
     object->setPosition(vec3(newPosition.x, h, newPosition.y));
