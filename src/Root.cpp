@@ -219,6 +219,11 @@ namespace Arya
         if(scene)
             scene->render();
 
+        // read from depth buffer
+        GLfloat depth;
+        glReadPixels(200, 200, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+        // and do nothing with it, yay :)
+
         if(overlay)
             overlay->render();
 
