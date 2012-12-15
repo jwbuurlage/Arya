@@ -25,6 +25,9 @@ namespace Arya
 
             const mat4& getMoveMatrix();
 
+            vec3 getTintColor() const { return tintColor; }
+            void setTintColor(vec3 tColor) { tintColor = tColor; }
+
             //setModel also recreates a new AnimationState object
             void setModel(Model* model);
             Model* getModel() const { return model; }
@@ -49,5 +52,7 @@ namespace Arya
 
             mat4 mMatrix; //cached
             bool updateMatrix;
+
+            vec3 tintColor;
     };
 }

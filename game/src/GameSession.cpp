@@ -28,9 +28,7 @@ GameSession::~GameSession()
     }
 
     for(int i = 0; i < factions.size(); ++i)
-    {
         delete factions[i];
-    }
     factions.clear();
 
     Root::shared().removeFrameListener(this);
@@ -54,7 +52,12 @@ bool GameSession::init()
 
     // init factions
     localFaction = new Faction;
+    localFaction->setColor(vec3(1.0, 0.0, 0.0));
     factions.push_back(localFaction);
+
+    Faction* otherFaction = new Faction;
+    otherFaction->setColor(vec3(0.0, 0.0, 1.0));
+    factions.push_back(otherFaction);
 
     Scene* scene = Root::shared().makeDefaultScene();
     if(!scene)
@@ -82,17 +85,30 @@ bool GameSession::init()
     UnitInfo* info = new UnitInfo;
     info->radius = 2.0f;
 
-    for(int i = 0; i < 100; ++ i) 
+    for(int i = 0; i < 30; ++ i) 
     {
         Unit* unit = new Unit(info);
         float heightModel = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(20.0 * i / 10, -50.0+20.0*(i % 10));
         obj = scene->createObject();
         obj->setModel(ModelManager::shared().getModel("ogros.aryamodel"));
         obj->setPosition(vec3(20 * i / 10, heightModel, -50 + 20 * (i % 10)));
-        obj->setAnimation("run");
+        obj->setAnimation("stand");
 
         unit->setObject(obj);
         localFaction->addUnit(unit);
+    }
+
+    for(int i = 0; i < 30; ++ i) 
+    {
+        Unit* unit = new Unit(info);
+        float heightModel = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(-100.0 + 20.0 * i / 10, -100.0+20.0*(i % 10));
+        obj = scene->createObject();
+        obj->setModel(ModelManager::shared().getModel("ogros.aryamodel"));
+        obj->setPosition(vec3(-100.0 + 20 * i / 10, heightModel, -100.0 + 20 * (i % 10)));
+        obj->setAnimation("stand");
+
+        unit->setObject(obj);
+        otherFaction->addUnit(unit);
     }
 
     selectionDecalHandle = 0;
@@ -173,6 +189,8 @@ void GameSession::onRender()
     decalProgram->setUniform1i("selectionTexture", 1);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, selectionDecalHandle);
+
+    decalProgram->setUniform3fv("uColor", localFaction->getColor());
 
     for(int i = 0; i < localFaction->getUnits().size(); ++i)
     {

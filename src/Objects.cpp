@@ -13,6 +13,7 @@ namespace Arya
         position = vec3(0.0, 0.0, 0.0);
         pitch = 0.0f;
         yaw = 0.0f;
+        tintColor = vec3(0.5);
     }
 
     Object::~Object()

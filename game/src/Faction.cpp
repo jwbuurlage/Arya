@@ -3,7 +3,7 @@
 
 Faction::Faction()
 {
-
+    color = vec3(1.0);
 }
 
 Faction::~Faction()
@@ -14,5 +14,6 @@ Faction::~Faction()
 
 void Faction::addUnit(Unit* unit)
 {
+    unit->getObject()->setTintColor(color);
     units.push_back(unit);
 }
