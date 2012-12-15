@@ -68,7 +68,11 @@ namespace Arya
             {
                 if(!animData) return;
                 animMapIterator anim = animData->animations.find(name);
-                if(anim == animData->animations.end()) return;
+                if(anim == animData->animations.end())
+                {
+                    LOG_WARNING("Animation not found: " << name);
+                    return;
+                }
                 curAnim = &anim->second;
                 startFrame = curAnim->startFrame;
                 curFrame = 0;
