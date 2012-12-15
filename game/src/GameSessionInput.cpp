@@ -20,6 +20,7 @@ GameSessionInput::GameSessionInput(GameSession* ses)
     originalMousePos = vec2(0.0);
 
     doUnitMovementNextFrame = false;
+    doUnitSelectionNextFrame = false;
 }
 
 GameSessionInput::~GameSessionInput()
@@ -29,8 +30,8 @@ GameSessionInput::~GameSessionInput()
 
 void GameSessionInput::init()
 {
-    selectionRect.fillColor = vec4(1.0, 1.0, 1.0, 0.2);    
-    Root::shared().getOverlay()->addRect(&selectionRect); 
+    selectionRect.fillColor = vec4(1.0, 1.0, 1.0, 0.2);
+    Root::shared().getOverlay()->addRect(&selectionRect);
 }
 
 void GameSessionInput::onFrame(float elapsedTime)
@@ -44,14 +45,14 @@ void GameSessionInput::onFrame(float elapsedTime)
         cam->setTargetLocation(specPos, false);
 
         if( rotatingLeft && !rotatingRight )
-            cam->rotateCamera( 90.0f * elapsedTime , 0.0f );
+            cam->rotateCamera(90.0f * elapsedTime, 0.0f);
         else if( rotatingRight && !rotatingLeft )
-            cam->rotateCamera( -90.0f * elapsedTime , 0.0f );
+            cam->rotateCamera(-90.0f * elapsedTime, 0.0f);
 
         vec3 force = forceDirection;
         force = glm::rotateY(force, cam->getYaw());
-        float speedFactor=4000.0f;
-        if(slowMode) speedFactor=500.0f;
+        float speedFactor = 4000.0f;
+        if(slowMode) speedFactor = 500.0f;
         specMovement += force * speedFactor * elapsedTime;
     }
 
@@ -62,6 +63,15 @@ void GameSessionInput::onFrame(float elapsedTime)
         doUnitMovementNextFrame = false;
         moveSelectedUnits();
     }
+
+    if(doUnitSelectionNextFrame)
+    {
+        if(Root::shared().isDepthAvailable()) {
+            doUnitSelectionNextFrame = false;
+            selectUnit();
+        }
+    }
+
     return;
 }
 
@@ -110,13 +120,21 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
         }
         else
         {
-            selectUnits(-1.0 + 2.0 * selectionRect.offsetInPixels.x / Root::shared().getWindowWidth(), 
-                    -1.0 + 2.0 * (selectionRect.offsetInPixels.x + selectionRect.sizeInPixels.x) / Root::shared().getWindowWidth(),
-                    -1.0 + 2.0 * selectionRect.offsetInPixels.y / Root::shared().getWindowHeight(), 
-                    -1.0 + 2.0 * (selectionRect.offsetInPixels.y + selectionRect.sizeInPixels.y) / Root::shared().getWindowHeight());
+            if(originalMousePos == vec2(x, y))
+            {
+                Root::shared().readDepthNextFrame(x, y);
+                doUnitSelectionNextFrame = true;
+            }
+            else
+            {
+                selectUnits(-1.0 + 2.0 * selectionRect.offsetInPixels.x / Root::shared().getWindowWidth(), 
+                        -1.0 + 2.0 * (selectionRect.offsetInPixels.x + selectionRect.sizeInPixels.x) / Root::shared().getWindowWidth(),
+                        -1.0 + 2.0 * selectionRect.offsetInPixels.y / Root::shared().getWindowHeight(), 
+                        -1.0 + 2.0 * (selectionRect.offsetInPixels.y + selectionRect.sizeInPixels.y) / Root::shared().getWindowHeight());
 
-            selectionRect.offsetInPixels = vec2(0.0);
-            selectionRect.sizeInPixels = vec2(0.0);
+                selectionRect.offsetInPixels = vec2(0.0);
+                selectionRect.sizeInPixels = vec2(0.0);
+            }
         }
     }
     else if(button == Arya::BUTTON_RIGHT)
@@ -251,7 +269,7 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
 
 void GameSessionInput::moveSelectedUnits()
 {
-        vec3 clickPos = Root::shared().getDepthResult();
+    vec3 clickPos = Root::shared().getDepthResult();
 
     Faction* lf = session->getLocalFaction();
     if(!lf) return;
@@ -271,4 +289,32 @@ void GameSessionInput::moveSelectedUnits()
                         clickPos.z + spread*(currentIndex / perRow - perRow / 2)));
             ++currentIndex;
         }
+}
+
+void GameSessionInput::selectUnit()
+{
+    if(!leftShiftPressed)
+        unselectAll();
+
+    vec3 clickPos = Root::shared().getDepthResult();
+
+    Faction* lf = session->getLocalFaction();
+    if(!lf) return;
+
+    int best_id = -1;
+    float best_distance = 100.0;
+
+    int numSelected = 0;
+    float dist;
+    for(int i = 0; i < lf->getUnits().size(); ++i)
+    {
+        dist = glm::distance(lf->getUnits()[i]->getObject()->getPosition(), clickPos);
+        if(dist < 2.0 * lf->getUnits()[i]->getInfo()->radius) {
+            best_distance = dist; 
+            best_id = i;
+        }
+    }
+
+    if(best_id != -1)
+        lf->getUnits()[best_id]->setSelected(true);
 }

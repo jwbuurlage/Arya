@@ -43,6 +43,7 @@ namespace Arya
 
             void readDepthNextFrame(int x, int y){ readDepthBuffer = true; readAtX = x; readAtY = y; }
             vec3 getDepthResult(){ return clickScreenLocation; }
+            bool isDepthAvailable() { return !readDepthBuffer; }
 
             float getAspectRatio() const { return windowWidth/(float)windowHeight; }
 

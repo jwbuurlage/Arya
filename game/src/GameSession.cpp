@@ -83,7 +83,7 @@ bool GameSession::init()
     // TODO: This is a memleak, but we will load info in from a file somewhere
     // and this will fix this issue
     UnitInfo* info = new UnitInfo;
-    info->radius = 2.0f;
+    info->radius = 5.0f;
 
     for(int i = 0; i < 30; ++ i) 
     {
