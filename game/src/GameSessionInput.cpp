@@ -13,6 +13,7 @@ GameSessionInput::GameSessionInput(GameSession* ses)
     mouseLeft = mouseRight = mouseTop = mouseBot = false;
     draggingLeftMouse = draggingRightMouse = false;
     slowMode = false;
+    leftShiftPressed = false;
     forceDirection = vec3(0.0f);
     specMovement = vec3(0.0f);
     specPos = vec3(0.0f, 150.0f, 0.0f);
@@ -70,7 +71,8 @@ bool GameSessionInput::keyDown(int key, bool keyDown)
     bool DirectionChanged = false;
 
     switch(key) {
-        case GLFW_KEY_LSHIFT: slowMode = keyDown; break;
+        case GLFW_KEY_LSHIFT: leftShiftPressed = keyDown; break;
+        case GLFW_KEY_RSHIFT: slowMode = keyDown; break;
         case 'W': goingForward = keyDown;	DirectionChanged = true; break;
         case 'S': goingBackward = keyDown;	DirectionChanged = true; break;
         case 'Q': rotatingLeft = keyDown;	break;
@@ -226,7 +228,8 @@ void GameSessionInput::selectAll()
 
 void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float y_max)
 {
-    unselectAll();
+    if(!leftShiftPressed)
+        unselectAll();
 
     mat4 vpMatrix = Root::shared().getScene()->getCamera()->getVPMatrix();
 
