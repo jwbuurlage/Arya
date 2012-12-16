@@ -72,6 +72,7 @@ class Packet
         {
             *this << (unsigned int)val.size();
             if(!val.empty()) data.append(&val.front(), sizeof(int)*val.size());
+            return *this;
         }
 
     private:

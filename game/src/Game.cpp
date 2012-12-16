@@ -4,12 +4,16 @@
 #include "../include/Events.h"
 #include "common/Logger.h"
 
+Game* Game::singleton = 0;
+
 Game::Game()
 {
     root = 0;
     session = 0;
     eventManager = 0;
     network = 0;
+
+    singleton = this;
 }
 
 Game::~Game()

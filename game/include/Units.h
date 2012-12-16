@@ -61,7 +61,7 @@ class Unit
 
         void setScreenPosition(vec2 sPos) { screenPosition = sPos; }
         vec2 getScreenPosition() const { return screenPosition; }
-        vec3 setTintColor(vec3 tC);
+        void setTintColor(vec3 tC);
 
     private:
         Object* object;
