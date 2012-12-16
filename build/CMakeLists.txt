@@ -50,6 +50,7 @@ SET(
     "../src/Map.cpp"
     "../src/Overlay.cpp"
     "../src/Interface.cpp"
+    "../src/Materials.cpp"
     "../src/common/Logger.cpp"
     )
 

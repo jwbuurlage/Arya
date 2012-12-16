@@ -3,6 +3,7 @@
 
 using std::string;
 
+class EventManager;
 class Server;
 class Connection;
 class Packet;
@@ -12,6 +13,8 @@ class Network
     public:
         Network();
         ~Network();
+
+        void setPacketHandler(EventManager* handler);
 
         void startServer();
 
@@ -31,5 +34,6 @@ class Network
         Server* server;
         Connection* lobbyConnection;
         Connection* sessionConnection;
+        EventManager* eventHandler;
 };
 

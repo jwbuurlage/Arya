@@ -1,11 +1,20 @@
 #pragma once
 #include "../../ext/buffer.hpp"
+#include <vector>
 #include <string>
+#include <vector>
+
+using std::vector;
+using std::vector;
+
+using std::vector;
+using std::string;
 
 #define PACKETMAGICINT (('A' << 0) | ('r' << 8) | ('P' << 16) | ('k' << 24))
 
-//The first int of the packet is always the size
-//The second int of the packet is always the event ID
+//The first int is always the magic int
+//The second int is the size
+//The thirs int is the event ID
 
 class Packet
 {
@@ -13,18 +22,24 @@ class Packet
         friend class Connection;
         friend class Network;
 
-        Packet(int id) : data(8, 32), readPos(8), markedForSend(false) //allocate 32 bytes by default
+        //For creating packets (for sending)
+        Packet(int id) : data(12, 32), readPos(12), markedForSend(false) //allocate 32 bytes by default
         {
-            *(int*)&data[0] = 8;
-            *(int*)&data[4] = id;
+            *(int*)&data[0] = PACKETMAGICINT;
+            *(int*)&data[4] = 12;
+            *(int*)&data[8] = id;
         }
+
+        //For receiving packets
+        Packet(char* databuf, int size) : data(databuf, size), readPos(12), markedForSend(false) {};
+
         ~Packet(){};
 
         //When getting the data, for writing it to the network, we write the size in the buffer
-        char* getData() { *(int*)&data[0] = getSize(); return data.data(); }
+        char* getData() { *(int*)&data[4] = getSize(); return data.data(); }
 
     public:
-        int getId() { return *(int*)&data[4]; }
+        int getId() { return *(int*)&data[8]; }
 
         int getSize() const { return data.size(); }
 

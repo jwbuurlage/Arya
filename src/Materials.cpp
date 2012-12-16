@@ -1,4 +1,4 @@
-#include "Material.h"
+#include "Materials.h"
 #include "Files.h"
 #include "common/logger.h"
 #include <vector>
@@ -17,7 +17,7 @@ namespace Arya
 		std::string name=filename.substr(0,filename.size()-4);
 		std::string type;
 		float a,b,c,d;
-		File* mattyfile = FileSystem::shared().getFile(name+".matty");
+		File* mattyfile = FileSystem::shared().getFile(string("materials/") + string(name+".matty"));
 		if(mattyfile == 0) {
 			LOG_WARNING("Using default matty.");
 			type="Default";

@@ -33,7 +33,7 @@ namespace Arya
 
     Font* FontManager::loadResource(std::string filename)
     {
-        File* fontfile = FileSystem::shared().getFile(filename);
+        File* fontfile = FileSystem::shared().getFile(string("fonts/") + filename);
         if( fontfile == 0 )
         {
             cout << "Font not found!" << endl;

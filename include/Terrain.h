@@ -3,7 +3,7 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
-#include "Material.h"
+#include "Materials.h"
 #include <vector>
 
 using glm::vec2;

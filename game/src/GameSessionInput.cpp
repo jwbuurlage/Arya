@@ -2,6 +2,8 @@
 #include "../include/GameSession.h"
 #include "../include/Faction.h"
 #include "../include/Units.h"
+#include "../include/Game.h"
+#include "../include/Events.h"
 #include "common/Logger.h"
 
 GameSessionInput::GameSessionInput(GameSession* ses)
@@ -120,6 +122,10 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
         {
             if(originalMousePos == vec2(x, y))
             {
+                Event& newEvent = Game::shared().getEventManager()->createEvent(2001);
+                newEvent << 200;
+                newEvent.send();
+
                 doUnitSelectionNextFrame = true;
             }
             else
@@ -146,12 +152,12 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
 
 bool GameSessionInput::mouseWheelMoved(int delta)
 {
-    if( delta > 0 ){
+    if(delta > 0) {
         Camera* cam = Root::shared().getScene()->getCamera();
-        if( cam ) cam->camZoomSpeed -= 50.0f;
-    }else{
+        if(cam) cam->camZoomSpeed -= 50.0f;
+    } else {
         Camera* cam = Root::shared().getScene()->getCamera();
-        if( cam ) cam->camZoomSpeed += 50.0f;
+        if(cam) cam->camZoomSpeed += 50.0f;
     }
     return false;
 }

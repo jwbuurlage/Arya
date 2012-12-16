@@ -1,7 +1,7 @@
 #include "Models.h"
 #include "Primitives.h"
 #include "Files.h"
-#include "Material.h"
+#include "Materials.h"
 #include "common/Logger.h"
 #include <string>
 #include <map>
@@ -189,7 +189,7 @@ namespace Arya
 
     Model* ModelManager::loadResource(std::string filename)
     {
-        File* modelfile = FileSystem::shared().getFile(filename);
+        File* modelfile = FileSystem::shared().getFile(string("models/") + filename);
         if( modelfile == 0 ) return 0;
 
         //Note: except for the first magic int

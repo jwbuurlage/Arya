@@ -12,6 +12,9 @@
 #include "Textures.h"
 #include "Files.h"
 
+#include <string>
+using std::string;
+
 using glm::log;
 using glm::vec2;
 using glm::vec3;
@@ -112,10 +115,10 @@ namespace Arya
         if(!(waterProgram->link())) return false;
 
 
-
-
         // load in heightmap
-        hFile = FileSystem::shared().getFile(heightMapName);
+        string heightMapString(heightMapName);
+        heightMapString.insert(0, "textures/");
+        hFile = FileSystem::shared().getFile(heightMapString);
         if(!hFile) return false;
 
         glGenTextures(1, &heightMapHandle);
@@ -130,7 +133,9 @@ namespace Arya
 
 
 		// load in watermap
-        File* wFile = FileSystem::shared().getFile(waterMapName);
+        string waterMapString(heightMapName);
+        waterMapString.insert(0, "textures/");
+        File* wFile = FileSystem::shared().getFile(waterMapString);
         if(!wFile) return false;
 
         glGenTextures(1, &waterMapHandle);
