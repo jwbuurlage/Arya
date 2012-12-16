@@ -7,6 +7,7 @@
 //      This implementation must call addResource() to add it to the resource list
 
 #pragma once
+#include "common/logger.h"
 #include <string>
 #include <map>
 
@@ -21,7 +22,7 @@ namespace Arya
             virtual ~ResourceManager(){ unloadAll(); }
 
             //Will load the resource if not already loaded
-            T* getResource( const char* filename )
+            T* getResource( std::string filename )
             {
                 ResourceContainer::iterator iter = resources.find(filename);
                 if( iter != resources.end() )
@@ -40,7 +41,7 @@ namespace Arya
                 resources.clear();
             }
 
-            bool resourceLoaded( const char* name ){
+            bool resourceLoaded( std::string name ){
                 ResourceContainer::iterator iter = resources.find(name);
                 return (iter != resources.end());
             }
@@ -51,11 +52,11 @@ namespace Arya
 
         protected:
             //Must be implemented by subclass and use addResource to add the resource
-            virtual T* loadResource( const char* filename )=0;
+            virtual T* loadResource( std::string filename )=0;
 
             T* defaultResource;
 
-            void addResource( const char* name, T* res ){
+            void addResource( std::string name, T* res ){
                 resources.insert( ResourceContainer::value_type( name, res ) );
             }
     };

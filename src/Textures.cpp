@@ -17,16 +17,16 @@ namespace Arya
   }
 
   int TextureManager::initialize(){
-    loadDefaultTexture();
-    loadWhiteTexture();
-    return 1;
+		loadDefaultTexture();
+		loadWhiteTexture();
+		return 1;
   }
 
   void TextureManager::cleanup(){
     unloadAll();
   }
 
-  Texture* TextureManager::loadResource( const char* filename ){
+  Texture* TextureManager::loadResource( std::string filename ){
     File* imagefile = FileSystem::shared().getFile(filename);
     if( imagefile == 0 ) return 0;
 
@@ -67,16 +67,17 @@ namespace Arya
 
     Texture* defaultTex = new Texture;
     defaultTex->handle = 0;
-    defaultTex->width = 4;
-    defaultTex->height = 4;
+    defaultTex->width = 128;
+    defaultTex->height = 128;
 
     unsigned int pixelCount = defaultTex->width * defaultTex->height;
     float* imageData = new float[pixelCount * 4];
     for(unsigned int i = 0; i < pixelCount; ++i){
-      imageData[4*i+0] = 0.6f*i/pixelCount+0.4f; //red
-      imageData[4*i+1] = 0.6f*1/pixelCount; //green
-      imageData[4*i+2] = 0.8f*i/pixelCount+0.2f; //blue
-      imageData[4*i+3] = 0.8f; //alpha
+		bool purple=(((i%defaultTex->width)/16+(i/defaultTex->width/16))%2==0);
+		imageData[4*i+0] = purple?1.0f:0.0f; //red
+		imageData[4*i+1] = 0.0f; //green
+		imageData[4*i+2] = purple?1.0f:0.0f; //blue
+		imageData[4*i+3] = 0.8f; //alpha
     }
 
     //glGetError();

@@ -1,7 +1,7 @@
 #include "Models.h"
 #include "Primitives.h"
 #include "Files.h"
-#include "Materials.h"
+#include "Material.h"
 #include "common/Logger.h"
 #include <string>
 #include <map>
@@ -64,7 +64,7 @@ namespace Arya
             ~VertexAnimationState() {}
 
             //Base class overloads
-            void setAnimation(const char* name)
+            void setAnimation(std::string name)
             {
                 if(!animData) return;
                 animMapIterator anim = animData->animations.find(name);
@@ -187,7 +187,7 @@ namespace Arya
         unloadAll();
     }
 
-    Model* ModelManager::loadResource(const char* filename)
+    Model* ModelManager::loadResource(std::string filename)
     {
         File* modelfile = FileSystem::shared().getFile(filename);
         if( modelfile == 0 ) return 0;
@@ -225,9 +225,7 @@ namespace Arya
             model = new Model;
 
             model->modelType = (ModelType)header->modeltype;
-
             LOG_INFO("Loading model " << filename << " with " << header->submeshCount << " meshes.");
-
             //Parse all materials
             pointer += sizeof(AryaHeader);
             pointer += header->submeshCount*sizeof(SubmeshInfo);
@@ -244,7 +242,7 @@ namespace Arya
                 nameBuf[count++] = 'g';
                 nameBuf[count++] = 'a';
                 nameBuf[count++] = 0;
-                Material* mat = TextureManager::shared().getTexture(nameBuf);
+                Material* mat = MaterialManager::shared().getMaterial(nameBuf);
                 model->addMaterial(mat);
             }
 
@@ -259,7 +257,7 @@ namespace Arya
             }
             else
             {
-                Logger::shared() << Logger::INFO << "Model has " << animationCount << " animations: ";
+                Logger::shared() << Logger::L_INFO << "Model has " << animationCount << " animations: ";
 
                 animData = new VertexAnimationData;
                 model->animationData = animData;

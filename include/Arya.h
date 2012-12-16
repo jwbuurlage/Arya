@@ -1,4 +1,5 @@
 #include "Fonts.h"
+#include "Material.h"
 #include "Textures.h"
 #include "Map.h"
 #include "Terrain.h"

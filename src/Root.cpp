@@ -37,6 +37,7 @@ namespace Arya
         Logger* log = new Logger();
         FileSystem* files = new FileSystem();
         TextureManager* tex = new TextureManager();
+		MaterialManager* matMan = new MaterialManager();
         ModelManager* modelManager = new ModelManager();
         FontManager* fon = new FontManager();
     }
@@ -50,6 +51,7 @@ namespace Arya
         if(scene) delete scene;
         if(overlay) delete overlay;
 
+		delete &MaterialManager::shared();
         delete &ModelManager::shared();
         delete &FileSystem::shared();
         delete &Logger::shared();
@@ -75,6 +77,7 @@ namespace Arya
 
         //Call these in the right order: Models need Textures
         TextureManager::shared().initialize();
+		//MaterialManager::shared().initialize();
         ModelManager::shared().initialize();
 
         overlay = new Overlay();
