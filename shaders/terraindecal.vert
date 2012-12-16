@@ -24,7 +24,8 @@ void main()
                         0.0,
                         groundPosition.y + 10.0*(position.y - 0.5),
                          1.0);
-    pos.y = scaleMatrix[1][1]*height(vec2((pos.x + 512.5) / 1025.0, (pos.z + 512.5) / 1025.0)) + 0.5;
+    pos.y = scaleMatrix[1][1]*height(vec2(((pos.x + 1025.0) * 0.5) / 1025.0, ((pos.z + 1025.0) * 0.5) / 1025.0)) + 0.5;
+
     texcoo = position;
     gl_Position = vpMatrix * pos;
 }
