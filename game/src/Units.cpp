@@ -12,15 +12,37 @@ Unit::Unit(UnitInfo* inf)
     info = inf;
     object = 0;
     selected = false;
-    targetPosition = vec2(0.0);
-    speed = 30.0;
-    yawspeed = 720.0f;
-    idle = true;
+    targetPosition = vec2(0.0f);
+    unitState = UNIT_IDLE;
+    targetUnit = 0;
+
+    health = info->maxHealth;
+    timeSinceLastAttack = info->attackSpeed + 1.0f;
+    dyingTime = 0.0f;
+
+    refCount = 0;
+
+    screenPosition = vec2(0.0);
+    tintColor = vec3(0.5);
+
+    // init and register health bar
+    healthBar = new Rect;
+    healthBar->fillColor = vec4(tintColor, 1.0);
+    healthBar->sizeInPixels = vec2(25.0, 3.0);
+    // need to check if this flips orientation
+    healthBar->offsetInPixels = vec2(-12.5, 25.0);
+
+    Root::shared().getOverlay()->addRect(healthBar);
 }
 
 Unit::~Unit()
 {
-    // todo decunstruct the obj
+    if(targetUnit)
+        targetUnit->release();
+    object->setObsolete();
+
+    Root::shared().getOverlay()->removeRect(healthBar);
+    delete healthBar;
 }
 
 void Unit::setObject(Object* obj)
@@ -30,8 +52,63 @@ void Unit::setObject(Object* obj)
 
 void Unit::update(float timeElapsed)
 {
-    if(idle)
+    healthBar->relative = screenPosition;
+
+    if(unitState == UNIT_IDLE)
         return;
+
+    if(unitState == UNIT_DYING)
+    {
+        dyingTime += timeElapsed;
+        return;
+    }
+
+    if(unitState == UNIT_ATTACKING || 
+            unitState == UNIT_ATTACKING_OUT_OF_RANGE)
+    {
+        if(!targetUnit) {
+            LOG_WARNING("Attacking, but no target unit");
+            setUnitState(UNIT_IDLE);
+            return;
+        }
+
+        if(!(targetUnit->isAlive()) || targetUnit->obsolete())
+        {
+            targetUnit->release();
+            targetUnit = 0;
+            setUnitState(UNIT_IDLE);
+            return;
+        }
+
+        if(glm::distance(object->getPosition(), targetUnit->getObject()->getPosition())
+                < targetUnit->getInfo()->radius) {
+            if(unitState != UNIT_ATTACKING)
+                setUnitState(UNIT_ATTACKING);
+
+            if(timeSinceLastAttack > info->attackSpeed)
+            {
+                // make one attack
+                targetUnit->receiveDamage(info->damage, this);
+                if(!(targetUnit->isAlive()))
+                {
+                    targetUnit->release();
+                    targetUnit = 0;
+                    setUnitState(UNIT_IDLE);
+                    timeSinceLastAttack = info->attackSpeed + 1.0f;
+                    return;
+                }
+                timeSinceLastAttack = 0.0f;
+            }
+            else
+                timeSinceLastAttack += timeElapsed;
+        }
+        else {
+            if(unitState != UNIT_ATTACKING_OUT_OF_RANGE)
+                setUnitState(UNIT_ATTACKING_OUT_OF_RANGE);
+            targetPosition = vec2(targetUnit->getObject()->getPosition().x,
+                            targetUnit->getObject()->getPosition().z);
+        }
+    }
 
     float targeth;
     targeth = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(targetPosition.x, targetPosition.y);
@@ -45,22 +122,24 @@ void Unit::update(float timeElapsed)
     if( yawDiff > 180.0f ) yawDiff -= 360.0f;
     else if( yawDiff < -180.0f ) yawDiff += 360.0f;
 
-    float deltaYaw = timeElapsed * yawspeed + 1.0f;
+    float deltaYaw = timeElapsed * info->yawSpeed + 1.0f;
     if( (yawDiff >= 0 && yawDiff < deltaYaw) || (yawDiff <= 0 && yawDiff > -deltaYaw) )
     {
         //angle is small enough (less than 1 degree) so we can start walking now
         object->setYaw(newYaw);
+        if(unitState == UNIT_ATTACKING)
+            return;
 
         if(glm::length(diff) < 0.5) // arbitrary closeness...
         {
             object->setPosition(target);
             targetPosition = vec2(0.0);
-            setIdle(true);
+            setUnitState(UNIT_IDLE);
             return;
         }
         diff = glm::normalize(diff);
 
-        vec3 newPosition = object->getPosition() + timeElapsed * (speed * diff);
+        vec3 newPosition = object->getPosition() + timeElapsed * (info->speed * diff);
         newPosition.y = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(newPosition.x, newPosition.z);
         object->setPosition(newPosition);
     }
@@ -73,17 +152,78 @@ void Unit::update(float timeElapsed)
 
 }
 
-void Unit::setIdle(bool idl)
+void Unit::setUnitState(UnitState state)
 {
-    idle = idl;
-    if(idle)
-        object->setAnimation("stand");
-    else
-        object->setAnimation("run");
+    if(unitState == UNIT_DYING)
+        return;
+
+    unitState = state;
+
+    switch(unitState)
+    {
+        case UNIT_IDLE:
+            object->setAnimation("stand");
+            break;
+
+        case UNIT_RUNNING:
+            object->setAnimation("run");
+            break;
+
+        case UNIT_ATTACKING_OUT_OF_RANGE:
+            object->setAnimation("wave");
+            break;
+
+        case UNIT_ATTACKING:
+            object->setAnimation("attack");
+            break;
+
+         case UNIT_DYING:
+            object->setAnimation("death_fallback");
+            break;
+   }
+}
+
+void Unit::setTargetUnit(Unit* target)
+{
+    if(targetUnit)
+        targetUnit->release();
+
+    targetUnit = target;
+    targetUnit->retain();
+
+    setUnitState(UNIT_ATTACKING_OUT_OF_RANGE);
 }
 
 void Unit::setTargetPosition(vec2 target)
 {
+    if(targetUnit)
+        targetUnit->release();
+    targetUnit = 0;
+
     targetPosition = target;
-    setIdle(false);
+    setUnitState(UNIT_RUNNING);
+}
+
+void Unit::receiveDamage(int dmg, Unit* attacker)
+{
+    if(unitState == UNIT_IDLE) 
+    {
+        setUnitState(UNIT_ATTACKING_OUT_OF_RANGE);
+        targetUnit = attacker;
+    }
+
+    health -= dmg;
+    if(health < 0) health = 0;
+
+    healthBar->sizeInPixels = vec2(25.0*getHealthRatio(), 3.0);
+
+    if(!isAlive())
+        setUnitState(UNIT_DYING);
+}
+
+vec3 Unit::setTintColor(vec3 tC)
+{
+    tintColor = tC;
+    object->setTintColor(tC);
+    healthBar->fillColor = vec4(tintColor, 1.0);
 }

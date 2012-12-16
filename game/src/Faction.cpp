@@ -8,12 +8,16 @@ Faction::Faction()
 
 Faction::~Faction()
 {
-    for(int i = 0; i < units.size(); ++i)
-        delete units[i];
+    for(list<Unit*>::iterator it = units.begin(); 
+            it != units.end();)
+    {
+        delete *it;
+        it = units.erase(it);
+    }
 }
 
 void Faction::addUnit(Unit* unit)
 {
-    unit->getObject()->setTintColor(color);
+    unit->setTintColor(color);
     units.push_back(unit);
 }

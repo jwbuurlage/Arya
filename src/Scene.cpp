@@ -125,10 +125,11 @@ namespace Arya
         basicProgram->use();
 
         basicProgram->setUniformMatrix4fv("vpMatrix", camera->getVPMatrix());
-        
+
         for(int i = 0; i < objects.size(); ++i)
         {
             if( objects[i]->model == 0 ) continue;
+            if(objects[i]->isObsolete()) continue;
             basicProgram->setUniform3fv("tintColor", objects[i]->getTintColor());
 
             basicProgram->setUniformMatrix4fv("mMatrix", objects[i]->getMoveMatrix());

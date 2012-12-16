@@ -24,8 +24,7 @@ void Game::run()
 {
     root = new Root;
 
-    if(!root->init(true, 800, 600))
-    {
+    if(!(root->init(false, 800, 600))) {
         LOG_ERROR("Unable to init root");
     }
     else

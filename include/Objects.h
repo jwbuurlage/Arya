@@ -37,6 +37,9 @@ namespace Arya
             AnimationState* getAnimationState() const { return animState; }
             void updateAnimation(float elapsedTime);
 
+            void setObsolete() { obsolete = true; }
+            bool isObsolete() { return obsolete; }
+
         private:
             //Only Scene can make Objects
             friend class Scene;
@@ -52,6 +55,7 @@ namespace Arya
 
             mat4 mMatrix; //cached
             bool updateMatrix;
+            bool obsolete;
 
             vec3 tintColor;
     };

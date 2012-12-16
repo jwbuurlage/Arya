@@ -83,7 +83,12 @@ bool GameSession::init()
     // TODO: This is a memleak, but we will load info in from a file somewhere
     // and this will fix this issue
     UnitInfo* info = new UnitInfo;
-    info->radius = 2.0f;
+    info->radius = 5.0f;
+    info->maxHealth = 100.0f;
+    info->speed = 30.0f;
+    info->yawSpeed = 720.0f;
+    info->damage = 20.0f;
+    info->attackSpeed = 1.0f;
 
     for(int i = 0; i < 30; ++ i) 
     {
@@ -164,8 +169,28 @@ void GameSession::onFrame(float elapsedTime)
 {
     // update units
     for(int i = 0; i < factions.size(); ++i)
-        for(int j = 0; j < factions[i]->getUnits().size(); ++j)
-            factions[i]->getUnits()[j]->update(elapsedTime);
+    {
+        for(list<Unit*>::iterator it = factions[i]->getUnits().begin();
+                it != factions[i]->getUnits().end(); )
+        {
+            if((*it)->obsolete() && (*it)->readyToDelete()) {
+                delete *it;
+                it = factions[i]->getUnits().erase(it);
+            }
+            else {
+                mat4 vpMatrix = Root::shared().getScene()->getCamera()->getVPMatrix();
+
+                vec4 onScreen((*it)->getObject()->getPosition(), 1.0);
+                onScreen = vpMatrix * onScreen;
+                onScreen.x /= onScreen.w;
+                onScreen.y /= onScreen.w;
+                (*it)->setScreenPosition(vec2(onScreen.x, onScreen.y));
+
+                (*it)->update(elapsedTime);
+                ++it;
+            }
+        }
+    }
 }
 
 void GameSession::onRender()
@@ -177,6 +202,7 @@ void GameSession::onRender()
     decalProgram->use();
     glBindVertexArray(decalVao);
 
+    decalProgram->setUniform1f("yOffset", 0.5);
     decalProgram->setUniformMatrix4fv("vpMatrix", Root::shared().getScene()->getCamera()->getVPMatrix());
     decalProgram->setUniformMatrix4fv("scaleMatrix", Root::shared().getScene()->getMap()->getTerrain()->getScaleMatrix());
 
@@ -192,11 +218,14 @@ void GameSession::onRender()
 
     decalProgram->setUniform3fv("uColor", localFaction->getColor());
 
-    for(int i = 0; i < localFaction->getUnits().size(); ++i)
+    for(list<Unit*>::iterator it = localFaction->getUnits().begin();
+            it != localFaction->getUnits().end(); ++it)
     {
-        if(!localFaction->getUnits()[i]->isSelected()) continue;
-        vec2 groundPos = vec2(localFaction->getUnits()[i]->getObject()->getPosition().x,
-                localFaction->getUnits()[i]->getObject()->getPosition().z);
+        if(!((*it)->isSelected()))
+            continue;
+
+        vec2 groundPos = vec2((*it)->getObject()->getPosition().x,
+                (*it)->getObject()->getPosition().z);
         decalProgram->setUniform2fv("groundPosition", groundPos);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
