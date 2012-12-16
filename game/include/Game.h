@@ -42,5 +42,5 @@ class Game : public Arya::InputListener , public Arya::FrameListener
 
         //We want to check the network
         //every 5 frames
-        int networkFrameCount;
+        float timeSinceNetworkPoll;
 };
