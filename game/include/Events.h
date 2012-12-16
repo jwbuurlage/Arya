@@ -2,6 +2,8 @@
 
 class Packet;
 
+typedef Packet Event;
+
 class EventHandler
 {
     public:
@@ -14,11 +16,16 @@ class Network;
 class EventManager
 {
     public:
-        EventManager(Network* network);
+        EventManager(Network* net);
         ~EventManager();
 
         void addEventHandler(int eventId, EventHandler* handler);
         void removeEventHandler(int eventId, EventHandler* handler);
 
-        void sendEvent(Packet& packet);
+        //Sending events is done by event->Send();
+        //which marks it for sending on next update
+        Event* createEvent(int Id);
+
+    private:
+        Network* network;
 };

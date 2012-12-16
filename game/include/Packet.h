@@ -7,29 +7,46 @@
 
 class Packet
 {
-    public:
-        Packet(int id) : data(8, 32), readPos(8) { *(int*)&buffer[4] = id; } //allocate 32 bytes by default
-        virtual ~Packet(){};
+    private:
+        friend class Connection;
+        friend class Network;
 
-        int getSize() const { return buffer.size(); }
-        int getId() const { return *(int*)&buffer[4]; }
+        Packet(int id) : data(8, 32), readPos(8), markedForSend(false) //allocate 32 bytes by default
+        {
+            *(int*)&data[0] = 8;
+            *(int*)&data[4] = id;
+        }
+        ~Packet(){};
 
         //When getting the data, for writing it to the network, we write the size in the buffer
-        char* getData() { *(int*)&buffer[0] = getSize(); return buffer.data(); }
+        char* getData() { *(int*)&data[0] = getSize(); return data.data(); }
+
+    public:
+        int getId() { return *(int*)&data[4]; }
+
+        int getSize() const { return data.size(); }
+
+        void send() { markedForSend = true; }
 
         //READ functions
 
         inline Packet& operator>>(int val)
         {
-            if(readPos + sizeof(int) <= buffer.size())
+            if(readPos + sizeof(int) <= data.size())
             {
-                val = *(int*)&buffer[readPos];
+                val = *(int*)&data[readPos];
                 readPos += sizeof(int);
             }
             return *this;
         }
 
         //WRITE functions
+
+        inline Packet& operator<<(unsigned int val)
+        {
+            data.append(&val, sizeof(unsigned int));
+            return *this;
+        }
 
         inline Packet& operator<<(int val)
         {
@@ -45,18 +62,19 @@ class Packet
 
         inline Packet& operator<<(const std::string& str)
         {
-            data.append(str.c_str(), str.lenght()+1);
+            data.append(str.c_str(), str.size()+1);
             return *this;
         }
 
         inline Packet& operator<<(const std::vector<int>& val)
         {
-            *this << val.size();
+            *this << (unsigned int)val.size();
             if(!val.empty()) data.append(&val.front(), sizeof(int)*val.size());
         }
 
     private:
         buffer data;
         int readPos;
+        bool markedForSend;
 };
 

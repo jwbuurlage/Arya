@@ -2,7 +2,10 @@
 #include "../include/Server.h"
 #include "Arya.h"
 #include "Poco/Net/StreamSocket.h"
+#include "../include/Packet.h"
+#include <vector>
 
+using std::vector;
 using namespace Poco;
 using namespace Poco::Net;
 
@@ -47,6 +50,14 @@ class Connection
                     LOG_INFO("Server sent data");
                 }
             }
+            else
+            {
+                while(!packets.empty())
+                {
+                    delete packets.back();
+                    packets.pop_back();
+                }
+            }
         }
 
         void sendPacket(Packet& packet)
@@ -57,6 +68,7 @@ class Connection
         bool connected;
         bool connecting;
         StreamSocket* const socket; //const so it can not be made zero
+        vector<Packet*> packets;
 };
 
 Network::Network()
@@ -88,6 +100,20 @@ void Network::connectToLobbyServer(string host, int port)
 void Network::connectToSessionServer(string host, int port)
 {
     sessionConnection->connect(host,port);
+}
+
+Packet* Network::createLobbyPacket(int id)
+{
+    Packet* pak = new Packet(id);
+    lobbyConnection->packets.push_back(pak);
+    return pak;
+}
+
+Packet* Network::createSessionPacket(int id)
+{
+    Packet* pak = new Packet(id);
+    sessionConnection->packets.push_back(pak);
+    return pak;
 }
 
 void Network::update()
