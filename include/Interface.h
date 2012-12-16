@@ -10,7 +10,7 @@ namespace Arya
             ~Interface(){}
 
             void onFrame(float elapsedTime);
-            void init();
+            bool init();
 
         private:
             float time; 
