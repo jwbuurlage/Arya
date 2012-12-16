@@ -30,12 +30,12 @@ namespace Arya
 			MaterialManager(){}
 			~MaterialManager(){cleanup();}
 
-            bool initialize(std::vector<const char*> filenames);
+            bool initialize(std::vector<std::string> filenames);
             void cleanup();
 
-			Material* getMaterial( const char* filename ){ return getResource(filename); }
+			Material* getMaterial( std::string filename ){return getResource(filename); }
 
         private:
-			Material* loadResource(const char* filename);
+			Material* loadResource(std::string filename);
     };
 };

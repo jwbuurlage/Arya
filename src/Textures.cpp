@@ -26,7 +26,7 @@ namespace Arya
     unloadAll();
   }
 
-  Texture* TextureManager::loadResource( const char* filename ){
+  Texture* TextureManager::loadResource( std::string filename ){
     File* imagefile = FileSystem::shared().getFile(filename);
     if( imagefile == 0 ) return 0;
 
