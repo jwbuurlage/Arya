@@ -1,5 +1,6 @@
 #include "Arya.h"
 #include "../include/GameSession.h"
+#include "../include/Events.h"
 
 using Arya::Root;
 using Arya::Scene;
@@ -13,7 +14,6 @@ using Arya::TextureManager;
 
 class Network;
 class EventManager;
-class EventHandler;
 
 class Game : public Arya::InputListener , public Arya::FrameListener, public EventHandler
 {
@@ -29,6 +29,7 @@ class Game : public Arya::InputListener , public Arya::FrameListener, public Eve
         bool mouseMoved(int x, int y, int dx, int dy);
 
         void onFrame(float elapsedTime);
+        void handleEvent(Packet& packet);
 
         static Game& shared() { return (*singleton); }
         EventManager* getEventManager() { return eventManager; }
