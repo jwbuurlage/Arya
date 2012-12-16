@@ -20,6 +20,12 @@ namespace Arya
 		std::ifstream fin(name+".matty");
 		if(fin.good()) {
 			fin >> type >> a >> b >> c >> d;
+		} else {
+			type="Default";
+			a=1.0;
+			b=1.0;
+			c=0.3;
+			d=0.7;
 		}
 
 		Material* result=new Material(name , TextureManager::shared().getTexture(filename), type, a, b, c, d);

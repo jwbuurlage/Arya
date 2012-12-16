@@ -152,7 +152,6 @@ namespace Arya
                 if(mesh->frameCount > 0)
                 {
                     Material* mat = model->getMaterials()[mesh->materialIndex];
-					//LOG_INFO("DIFFSHIT " << mat->diffuse);
 					basicProgram->setUniform4fv("parameters", vec4(mat->specAmp,mat->specPow,mat->ambient,mat->diffuse));
                     basicProgram->setUniform1i("tex", 0);
                     glActiveTexture(GL_TEXTURE0);
