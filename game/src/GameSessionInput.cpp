@@ -66,10 +66,8 @@ void GameSessionInput::onFrame(float elapsedTime)
 
     if(doUnitSelectionNextFrame)
     {
-        if(Root::shared().isDepthAvailable()) {
-            doUnitSelectionNextFrame = false;
-            selectUnit();
-        }
+        doUnitSelectionNextFrame = false;
+        selectUnit();
     }
 
     return;
@@ -122,7 +120,6 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
         {
             if(originalMousePos == vec2(x, y))
             {
-                Root::shared().readDepthNextFrame(x, y);
                 doUnitSelectionNextFrame = true;
             }
             else
@@ -141,7 +138,6 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
     {
         draggingRightMouse = (buttonDown == true);
 
-        Root::shared().readDepthNextFrame(x, y);
         doUnitMovementNextFrame = true;
     }
 

@@ -7,6 +7,12 @@ using Arya::Object;
 typedef struct
 {
     float radius;
+    float speed;
+    float yawSpeed; //in degrees
+
+    float maxHealth;
+    float damage;
+    float attackSpeed; //the time one attack takes
 } UnitInfo;
 
 typedef enum
@@ -42,6 +48,8 @@ class Unit
         UnitState getUnitState() const { return unitState; }
 
         void receiveDamage(int dmg, Unit* attacker);
+        float getHealthRatio() const { return health / info->maxHealth; }
+
         bool isAlive() const { return (health > 0); }
         bool obsolete() { return !isAlive() && (dyingTime > 0.8f); }
         bool readyToDelete() { return refCount <= 0; }
@@ -59,16 +67,9 @@ class Unit
         Unit* targetUnit;
         UnitState unitState;
 
+        float health;
         float timeSinceLastAttack;
         float dyingTime;
 
-        //TODO: move these to UnitInfo
-        float speed;
-        float yawspeed; //in degrees
-        int health;
-        int damage;
-        float attackSpeed; //the time one attack takes
-
         int refCount;
-
 };

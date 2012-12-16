@@ -13,17 +13,12 @@ Unit::Unit(UnitInfo* inf)
     object = 0;
     selected = false;
     targetPosition = vec2(0.0f);
-    speed = 30.0f;
-    yawspeed = 720.0f;
     unitState = UNIT_IDLE;
     targetUnit = 0;
 
-    health = 100;
-    damage = 20;
+    health = info->maxHealth;
 
-    attackSpeed = 1.0f; 
-    // set high enough tsla, so we can start attacking
-    timeSinceLastAttack = attackSpeed + 1.0f;
+    timeSinceLastAttack = info->attackSpeed + 1.0f;
 
     dyingTime = 0.0f;
 
@@ -75,16 +70,16 @@ void Unit::update(float timeElapsed)
             if(unitState != UNIT_ATTACKING)
                 setUnitState(UNIT_ATTACKING);
 
-            if(timeSinceLastAttack > attackSpeed)
+            if(timeSinceLastAttack > info->attackSpeed)
             {
                 // make one attack
-                targetUnit->receiveDamage(damage, this);
+                targetUnit->receiveDamage(info->damage, this);
                 if(!(targetUnit->isAlive()))
                 {
                     targetUnit->release();
                     targetUnit = 0;
                     setUnitState(UNIT_IDLE);
-                    timeSinceLastAttack = attackSpeed + 1.0f;
+                    timeSinceLastAttack = info->attackSpeed + 1.0f;
                     return;
                 }
                 timeSinceLastAttack = 0.0f;
@@ -112,7 +107,7 @@ void Unit::update(float timeElapsed)
     if( yawDiff > 180.0f ) yawDiff -= 360.0f;
     else if( yawDiff < -180.0f ) yawDiff += 360.0f;
 
-    float deltaYaw = timeElapsed * yawspeed + 1.0f;
+    float deltaYaw = timeElapsed * info->yawSpeed + 1.0f;
     if( (yawDiff >= 0 && yawDiff < deltaYaw) || (yawDiff <= 0 && yawDiff > -deltaYaw) )
     {
         //angle is small enough (less than 1 degree) so we can start walking now
@@ -129,7 +124,7 @@ void Unit::update(float timeElapsed)
         }
         diff = glm::normalize(diff);
 
-        vec3 newPosition = object->getPosition() + timeElapsed * (speed * diff);
+        vec3 newPosition = object->getPosition() + timeElapsed * (info->speed * diff);
         newPosition.y = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(newPosition.x, newPosition.z);
         object->setPosition(newPosition);
     }
