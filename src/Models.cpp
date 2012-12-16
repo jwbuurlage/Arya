@@ -257,7 +257,7 @@ namespace Arya
             }
             else
             {
-                Logger::shared() << Logger::INFO << "Model has " << animationCount << " animations: ";
+                Logger::shared() << Logger::L_INFO << "Model has " << animationCount << " animations: ";
 
                 animData = new VertexAnimationData;
                 model->animationData = animData;
