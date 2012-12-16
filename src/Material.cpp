@@ -19,11 +19,9 @@ namespace Arya
 		float a,b,c,d;
 		File* mattyfile = FileSystem::shared().getFile(name+".matty");
 		if(mattyfile == 0) {
+			LOG_ERROR("File "+name+".matty"+" not found, using default matty.");
 			type="Default";
-			a=1.0;
-			b=1.0;
-			c=0.3;
-			d=0.7;
+			a=1.0; b=1.0; c=0.3; d=0.7;
 		} else {
 			std::stringstream str(mattyfile->getData());
 			str >> type >> a >> b >> c >> d;
