@@ -1,6 +1,6 @@
 #pragma once
 
-class Packet;
+#include "../include/Packet.h"
 
 typedef Packet Event;
 
@@ -24,7 +24,7 @@ class EventManager
 
         //Sending events is done by event->Send();
         //which marks it for sending on next update
-        Event* createEvent(int Id);
+        Event& createEvent(int Id);
 
     private:
         Network* network;

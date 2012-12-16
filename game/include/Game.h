@@ -30,6 +30,7 @@ class Game : public Arya::InputListener , public Arya::FrameListener
         void onFrame(float elapsedTime);
 
         static Game& shared() { return (*singleton); }
+        EventManager* getEventManager() { return eventManager; }
 
     private:
         static Game* singleton;

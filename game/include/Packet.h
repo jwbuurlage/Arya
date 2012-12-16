@@ -1,6 +1,10 @@
 #pragma once
 #include "../../ext/buffer.hpp"
 #include <string>
+#include <vector>
+
+using std::vector;
+using std::vector;
 
 #define PACKETMAGICINT (('A' << 0) | ('r' << 8) | ('P' << 16) | ('k' << 24))
 
