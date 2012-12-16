@@ -7,7 +7,7 @@
 //      This implementation must call addResource() to add it to the resource list
 
 #pragma once
-#include "common/logger.h"
+#include "common/Logger.h"
 #include <string>
 #include <map>
 
