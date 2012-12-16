@@ -2,6 +2,8 @@
 #include "../../ext/buffer.hpp"
 #include <string>
 
+#define PACKETMAGICINT (('A' << 0) | ('r' << 8) | ('P' << 16) | ('k' << 24))
+
 //The first int of the packet is always the size
 //The second int of the packet is always the event ID
 

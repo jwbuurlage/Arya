@@ -1,4 +1,5 @@
 #include "../include/Server.h"
+#include "../include/Packet.h"
 #include "Arya.h"
 #include <cstring>
 
@@ -13,8 +14,6 @@ using namespace Poco;
 using namespace Poco::Net;
 
 class NetworkClientHandler;
-
-#define PACKETMAGICINT (('A' << 0) | ('r' << 8) | ('P' << 16) | ('k' << 24))
 
 class ConnectionAcceptor : public SocketAcceptor<NetworkClientHandler>
 {
@@ -172,6 +171,11 @@ class NetworkClientHandler
             socket.shutdown(); //send TCP shutdown
             socket.close();
             delete this;
+        }
+
+        void sendPacket(Packet* pak)
+        {
+
         }
 
         void handlePacket(char* data, int packetSize)
