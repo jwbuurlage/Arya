@@ -8,9 +8,9 @@ namespace Arya
 
 	Logger::Logger(void)
 	{
-		consoleLogLevel = INFO | WARNING | ERROR | CRITICALERROR | DEBUG;
-		fileLogLevel = WARNING | ERROR | CRITICALERROR;
-		currentLogLevel = NONE;
+		consoleLogLevel = L_INFO | L_WARNING | L_ERROR | L_CRITICALERROR | L_DEBUG;
+		fileLogLevel = L_WARNING | L_ERROR | L_CRITICALERROR;
+		currentLogLevel = L_NONE;
         filestream.open("logarya.txt");
 	}
 

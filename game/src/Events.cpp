@@ -31,10 +31,10 @@ void EventManager::removeEventHandler(int eventId, EventHandler* handler)
     }
 }
 
-Event* EventManager::createEvent(int Id)
+Event& EventManager::createEvent(int Id)
 {
-    if( Id >= 2000 ) return network->createSessionPacket(Id);
-    else return network->createLobbyPacket(Id);
+    if( Id >= 2000 ) return *network->createSessionPacket(Id);
+    else return *network->createLobbyPacket(Id);
 }
 
 void EventManager::handlePacket(Packet& packet)

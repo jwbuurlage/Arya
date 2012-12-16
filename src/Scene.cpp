@@ -80,7 +80,7 @@ namespace Arya
         return true;
     }
 
-    bool Scene::setMap(const char* hm, const char* wm, vector<Texture*> ts, Texture* cm, Texture* sm)
+    bool Scene::setMap(const char* hm, const char* wm, vector<Material*> ts, Texture* cm, Texture* sm)
     {
         if(currentMap)
             delete currentMap;
@@ -125,6 +125,7 @@ namespace Arya
         basicProgram->use();
 
         basicProgram->setUniformMatrix4fv("vpMatrix", camera->getVPMatrix());
+		basicProgram->setUniformMatrix4fv("viewMatrix", camera->getVMatrix());
 
         for(int i = 0; i < objects.size(); ++i)
         {
@@ -151,9 +152,10 @@ namespace Arya
                 if(mesh->frameCount > 0)
                 {
                     Material* mat = model->getMaterials()[mesh->materialIndex];
+					basicProgram->setUniform4fv("parameters", vec4(mat->specAmp,mat->specPow,mat->ambient,mat->diffuse));
                     basicProgram->setUniform1i("tex", 0);
                     glActiveTexture(GL_TEXTURE0);
-                    if(mat) glBindTexture(GL_TEXTURE_2D, mat->handle);
+                    if(mat) glBindTexture(GL_TEXTURE_2D, mat->texture->handle);
 
                     glBindVertexArray(mesh->vaoHandles[frame]);
                     glDrawArrays(mesh->primitiveType, 0, mesh->vertexCount);

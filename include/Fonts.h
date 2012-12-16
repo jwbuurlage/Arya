@@ -26,13 +26,13 @@ namespace Arya
             int initialize();
             void cleanup();
 
-            Font* getFont( const char* filename )
+            Font* getFont( std::string filename )
             {
                 return getResource(filename); 
             }
 
         private:
-            Font* loadResource( const char* filename);
+            Font* loadResource( std::string filename);
 
             void loadDefaultFont();
             void makeImage(File* filename,Font* font);

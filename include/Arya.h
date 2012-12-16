@@ -1,4 +1,5 @@
 #include "Fonts.h"
+#include "Materials.h"
 #include "Textures.h"
 #include "Map.h"
 #include "Terrain.h"
@@ -9,6 +10,7 @@
 #include "Objects.h"
 #include "Scene.h"
 #include "Shaders.h"
+#include "common/Singleton.h"
 #include "common/Logger.h"
 
 #include <glm/glm.hpp>

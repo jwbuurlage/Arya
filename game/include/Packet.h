@@ -2,6 +2,10 @@
 #include "../../ext/buffer.hpp"
 #include <vector>
 #include <string>
+#include <vector>
+
+using std::vector;
+using std::vector;
 
 using std::vector;
 using std::string;

@@ -31,10 +31,10 @@ namespace Arya
             void cleanup();
 
             //If no texture found it will return 0
-            Texture* getTexture( const char* filename ){ return getResource(filename); }
+            Texture* getTexture( std::string filename ){ return getResource(filename); }
 
         private:
-            Texture* loadResource( const char* filename );
+            Texture* loadResource( std::string filename );
 
             void loadDefaultTexture(); //Generates default texture
             void loadWhiteTexture(); //Generates white texture for overlay

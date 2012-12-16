@@ -221,7 +221,7 @@ void Unit::receiveDamage(int dmg, Unit* attacker)
         setUnitState(UNIT_DYING);
 }
 
-vec3 Unit::setTintColor(vec3 tC)
+void Unit::setTintColor(vec3 tC)
 {
     tintColor = tC;
     object->setTintColor(tC);

@@ -29,7 +29,7 @@ class EventManager
 
         //Sending events is done by event->Send();
         //which marks it for sending on next update
-        Event* createEvent(int Id);
+        Event& createEvent(int Id);
 
         //Called by network on incoming packet
         void handlePacket(Packet& packet);

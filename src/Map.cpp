@@ -1,5 +1,6 @@
 #include "Map.h"
 #include "Terrain.h"
+#include "Materials.h"
 #include "Textures.h"
 #include "Camera.h"
 
@@ -21,7 +22,7 @@ namespace Arya
         if(terrain) delete terrain;
     }
 
-    bool Map::init(const char* hm, const char* wm, vector<Texture*> ts, Texture* cm, Texture* sm)
+    bool Map::init(const char* hm, const char* wm, vector<Material*> ts, Texture* cm, Texture* sm)
     {
         if(!setTerrain(hm, wm, ts, cm, sm)) {
             LOG_ERROR("Could not initialize map");
@@ -31,7 +32,7 @@ namespace Arya
         return true;
     }
 
-    bool Map::setTerrain(const char* hm, const char* wm, vector<Texture*> ts, Texture* cm, Texture* sm)
+    bool Map::setTerrain(const char* hm, const char* wm, vector<Material*> ts, Texture* cm, Texture* sm)
     {
         if(!hm || !wm || !(ts.size()) || !sm) {
             if(terrain) delete terrain;

@@ -7,21 +7,16 @@
 //LOG_WARNING("Texture not found. File: " << someVariable << ". Try again!");
 
 #pragma once
-#include "Singleton.h"
+#include "common/Singleton.h"
 #include <sstream>
 #include <fstream>
 
-//sometimes the word DEBUG is defined
-#ifdef DEBUG
-#undef DEBUG
-#endif
-
 //Note: the ; at the end is left out so that you can use this as a function with a ; at the end:  LOG_WARNING("Hello");
-#define LOG_WARNING(MSG)		Arya::Logger::shared() << Arya::Logger::WARNING		<< MSG << Arya::endLog
-#define LOG_ERROR(MSG)			Arya::Logger::shared() << Arya::Logger::ERROR		<< MSG << Arya::endLog
-#define LOG_CRITICALERROR(MSG)	Arya::Logger::shared() << Arya::Logger::CRITICALERROR	<< MSG << Arya::endLog
-#define LOG_INFO(MSG)			Arya::Logger::shared() << Arya::Logger::INFO		<< MSG << Arya::endLog
-#define LOG_DEBUG(MSG)			Arya::Logger::shared() << Arya::Logger::DEBUG		<< MSG << Arya::endLog
+#define LOG_WARNING(MSG)		Arya::Logger::shared() << Arya::Logger::L_WARNING		<< MSG << Arya::endLog
+#define LOG_ERROR(MSG)			Arya::Logger::shared() << Arya::Logger::L_ERROR		<< MSG << Arya::endLog
+#define LOG_CRITICALERROR(MSG)	Arya::Logger::shared() << Arya::Logger::L_CRITICALERROR	<< MSG << Arya::endLog
+#define LOG_INFO(MSG)			Arya::Logger::shared() << Arya::Logger::L_INFO		<< MSG << Arya::endLog
+#define LOG_DEBUG(MSG)			Arya::Logger::shared() << Arya::Logger::L_DEBUG		<< MSG << Arya::endLog
 
 namespace Arya
 {
@@ -33,12 +28,12 @@ namespace Arya
 
 		//Log level:
 		enum LOGLEVEL{ //Powers of 2
-			NONE=0,
-			DEBUG = 1,
-			INFO = 2,
-			WARNING = 4,
-			ERROR = 8,
-			CRITICALERROR = 16
+			L_NONE=0,
+			L_DEBUG = 1,
+			L_INFO = 2,
+			L_WARNING = 4,
+			L_ERROR = 8,
+			L_CRITICALERROR = 16
 		};
 
 		//combine the flags like DEBUG | ERROR | CRITICALERROR
@@ -81,19 +76,19 @@ namespace Arya
         logger.streambuff.seekp(0);
         logger.streambuff.clear();
 		switch(lvl){
-		case Logger::CRITICALERROR:
+		case Logger::L_CRITICALERROR:
 			logger.streambuff << "Critical ERROR: ";
 			break;
-		case Logger::ERROR:
+		case Logger::L_ERROR:
 			logger.streambuff << "ERROR: ";
 			break;
-		case Logger::WARNING:
+		case Logger::L_WARNING:
 			logger.streambuff << "Warning: ";
 			break;
-		case Logger::INFO:
+		case Logger::L_INFO:
 			logger.streambuff << "Info: ";
 			break;
-		case Logger::DEBUG:
+		case Logger::L_DEBUG:
 			logger.streambuff << "Debug: ";
 			break;
 		default:

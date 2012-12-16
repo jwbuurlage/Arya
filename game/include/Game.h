@@ -28,7 +28,13 @@ class Game : public Arya::InputListener , public Arya::FrameListener
         bool mouseMoved(int x, int y, int dx, int dy);
 
         void onFrame(float elapsedTime);
+
+        static Game& shared() { return (*singleton); }
+        EventManager* getEventManager() { return eventManager; }
+
     private:
+        static Game* singleton;
+
         Root* root;
         Network* network;
         EventManager* eventManager;
