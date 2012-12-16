@@ -72,12 +72,12 @@ bool GameSession::init()
     Object* obj;
 
     // init map
-    vector<Texture*> tileSet;
-    tileSet.push_back(TextureManager::shared().getTexture("grass.tga"));
-    tileSet.push_back(TextureManager::shared().getTexture("rock.tga"));
-	tileSet.push_back(TextureManager::shared().getTexture("snow.tga"));
-    tileSet.push_back(TextureManager::shared().getTexture("dirt.tga"));
-    if(!scene->setMap("heightmap.raw", "watermap.raw", tileSet, TextureManager::shared().getTexture("clouds.jpg"), TextureManager::shared().getTexture("splatmap.tga")))
+    vector<Arya::Material*> tileSet;
+    tileSet.push_back(Arya::MaterialManager::shared().getMaterial("grass.tga"));
+    tileSet.push_back(Arya::MaterialManager::shared().getMaterial("rock.tga"));
+	tileSet.push_back(Arya::MaterialManager::shared().getMaterial("snow.tga"));
+    tileSet.push_back(Arya::MaterialManager::shared().getMaterial("dirt.tga"));
+    if(!scene->setMap("heightmap.raw", "watermap.raw", tileSet, Arya::TextureManager::shared().getTexture("clouds.jpg"), Arya::TextureManager::shared().getTexture("splatmap.tga")))
         return false;
 
     // TODO: This is a memleak, but we will load info in from a file somewhere

@@ -22,7 +22,7 @@ using glm::distance;
 
 namespace Arya
 {
-    Terrain::Terrain(const char* hm, const char* wm, vector<Texture*> ts, Texture* cm, Texture* sm) 
+    Terrain::Terrain(const char* hm, const char* wm, vector<Material*> ts, Texture* cm, Texture* sm) 
     {
         heightMapName = hm;
 		waterMapName = wm;
@@ -74,7 +74,7 @@ namespace Arya
 
         for(int i = 0; i < tileSet.size(); ++i) {
             if(!tileSet[i]) return false;
-            glBindTexture(GL_TEXTURE_2D, tileSet[i]->handle);
+            glBindTexture(GL_TEXTURE_2D, tileSet[i]->texture->handle);
             glGenerateMipmap(GL_TEXTURE_2D);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -351,21 +351,26 @@ namespace Arya
         glBindTexture(GL_TEXTURE_2D, splatMap->handle);
 
         // texture 1 to 4
+		terrainProgram->setUniform4fv("parameters1",tileSet[0]->getParameters());
+		terrainProgram->setUniform4fv("parameters2",tileSet[1]->getParameters());
+		terrainProgram->setUniform4fv("parameters3",tileSet[2]->getParameters());
+		terrainProgram->setUniform4fv("parameters4",tileSet[3]->getParameters());
+
         terrainProgram->setUniform1i("texture1", 2);
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D,tileSet[0]->handle);
+        glBindTexture(GL_TEXTURE_2D,tileSet[0]->texture->handle);
 
         terrainProgram->setUniform1i("texture2", 3);
         glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, tileSet[1]->handle);
+        glBindTexture(GL_TEXTURE_2D, tileSet[1]->texture->handle);
 
         terrainProgram->setUniform1i("texture3", 4);
         glActiveTexture(GL_TEXTURE4);
-        glBindTexture(GL_TEXTURE_2D, tileSet[2]->handle);
+        glBindTexture(GL_TEXTURE_2D, tileSet[2]->texture->handle);
 
         terrainProgram->setUniform1i("texture4", 5);
         glActiveTexture(GL_TEXTURE5);
-        glBindTexture(GL_TEXTURE_2D, tileSet[3]->handle);
+        glBindTexture(GL_TEXTURE_2D, tileSet[3]->texture->handle);
 
         for(int i = 0; i < patches.size(); ++i) {
             Patch& p = patches[i];

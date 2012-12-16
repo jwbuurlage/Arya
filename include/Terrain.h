@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
+#include "Material.h"
 #include <vector>
 
 using glm::vec2;
@@ -30,7 +31,7 @@ namespace Arya
     {
         public:
             // Tileset needs to have 4 elements
-            Terrain(const char* hm, const char* wm, vector<Texture*> ts, Texture* cm, Texture* sm);
+            Terrain(const char* hm, const char* wm, vector<Material*> ts, Texture* cm, Texture* sm);
             ~Terrain(); 
 			
             void render(Camera* cam);
@@ -50,7 +51,7 @@ namespace Arya
 
             const char* heightMapName;
 			const char* waterMapName;
-            vector<Texture*> tileSet;
+            vector<Material*> tileSet;
 			Texture* cloudMap;
             Texture* splatMap;
             GLuint heightMapHandle;
