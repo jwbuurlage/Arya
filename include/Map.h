@@ -1,6 +1,6 @@
 #pragma once
 
-#include "material.h"
+#include "Material.h"
 #include <vector>
 #include <glm/glm.hpp>
 using std::vector;
