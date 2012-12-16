@@ -20,6 +20,7 @@ vec4 terrainColor(vec2 tex)
     tColor += splatSample.r * texture(texture1, 10.0*texCoo);
     tColor += splatSample.g * texture(texture2, 10.0*texCoo);
     tColor += splatSample.b * texture(texture3, 10.0*texCoo)+0.5*pow(spec,6.0);
+
     return tColor / (splatSample.r + splatSample.g + splatSample.b);
 }
 

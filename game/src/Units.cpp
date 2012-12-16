@@ -12,15 +12,29 @@ Unit::Unit(UnitInfo* inf)
     info = inf;
     object = 0;
     selected = false;
-    targetPosition = vec2(0.0);
-    speed = 30.0;
+    targetPosition = vec2(0.0f);
+    speed = 30.0f;
     yawspeed = 720.0f;
-    idle = true;
+    unitState = UNIT_IDLE;
+    targetUnit = 0;
+
+    health = 100;
+    damage = 20;
+
+    attackSpeed = 1.0f; 
+    // set high enough tsla, so we can start attacking
+    timeSinceLastAttack = attackSpeed + 1.0f;
+
+    dyingTime = 0.0f;
+
+    refCount = 0;
 }
 
 Unit::~Unit()
 {
-    // todo decunstruct the obj
+    if(targetUnit)
+        targetUnit->release();
+    object->setObsolete();
 }
 
 void Unit::setObject(Object* obj)
@@ -30,8 +44,61 @@ void Unit::setObject(Object* obj)
 
 void Unit::update(float timeElapsed)
 {
-    if(idle)
+    if(unitState == UNIT_IDLE)
         return;
+
+    if(unitState == UNIT_DYING)
+    {
+        dyingTime += timeElapsed;
+        return;
+    }
+
+    if(unitState == UNIT_ATTACKING || 
+            unitState == UNIT_ATTACKING_OUT_OF_RANGE)
+    {
+        if(!targetUnit) {
+            LOG_WARNING("Attacking, but no target unit");
+            setUnitState(UNIT_IDLE);
+            return;
+        }
+
+        if(!(targetUnit->isAlive()) || targetUnit->obsolete())
+        {
+            targetUnit->release();
+            targetUnit = 0;
+            setUnitState(UNIT_IDLE);
+            return;
+        }
+
+        if(glm::distance(object->getPosition(), targetUnit->getObject()->getPosition())
+                < targetUnit->getInfo()->radius) {
+            if(unitState != UNIT_ATTACKING)
+                setUnitState(UNIT_ATTACKING);
+
+            if(timeSinceLastAttack > attackSpeed)
+            {
+                // make one attack
+                targetUnit->receiveDamage(damage, this);
+                if(!(targetUnit->isAlive()))
+                {
+                    targetUnit->release();
+                    targetUnit = 0;
+                    setUnitState(UNIT_IDLE);
+                    timeSinceLastAttack = attackSpeed + 1.0f;
+                    return;
+                }
+                timeSinceLastAttack = 0.0f;
+            }
+            else
+                timeSinceLastAttack += timeElapsed;
+        }
+        else {
+            if(unitState != UNIT_ATTACKING_OUT_OF_RANGE)
+                setUnitState(UNIT_ATTACKING_OUT_OF_RANGE);
+            targetPosition = vec2(targetUnit->getObject()->getPosition().x,
+                            targetUnit->getObject()->getPosition().z);
+        }
+    }
 
     float targeth;
     targeth = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(targetPosition.x, targetPosition.y);
@@ -50,12 +117,14 @@ void Unit::update(float timeElapsed)
     {
         //angle is small enough (less than 1 degree) so we can start walking now
         object->setYaw(newYaw);
+        if(unitState == UNIT_ATTACKING)
+            return;
 
         if(glm::length(diff) < 0.5) // arbitrary closeness...
         {
             object->setPosition(target);
             targetPosition = vec2(0.0);
-            setIdle(true);
+            setUnitState(UNIT_IDLE);
             return;
         }
         diff = glm::normalize(diff);
@@ -73,17 +142,68 @@ void Unit::update(float timeElapsed)
 
 }
 
-void Unit::setIdle(bool idl)
+void Unit::setUnitState(UnitState state)
 {
-    idle = idl;
-    if(idle)
-        object->setAnimation("stand");
-    else
-        object->setAnimation("run");
+    if(unitState == UNIT_DYING)
+        return;
+
+    unitState = state;
+
+    switch(unitState)
+    {
+        case UNIT_IDLE:
+            object->setAnimation("stand");
+            break;
+
+        case UNIT_RUNNING:
+            object->setAnimation("run");
+            break;
+
+        case UNIT_ATTACKING_OUT_OF_RANGE:
+            object->setAnimation("wave");
+            break;
+
+        case UNIT_ATTACKING:
+            object->setAnimation("attack");
+            break;
+
+         case UNIT_DYING:
+            object->setAnimation("death_fallback");
+            break;
+   }
+}
+
+void Unit::setTargetUnit(Unit* target)
+{
+    if(targetUnit)
+        targetUnit->release();
+
+    targetUnit = target;
+    targetUnit->retain();
+
+    setUnitState(UNIT_ATTACKING_OUT_OF_RANGE);
 }
 
 void Unit::setTargetPosition(vec2 target)
 {
+    if(targetUnit)
+        targetUnit->release();
+    targetUnit = 0;
+
     targetPosition = target;
-    setIdle(false);
+    setUnitState(UNIT_RUNNING);
+}
+
+void Unit::receiveDamage(int dmg, Unit* attacker)
+{
+    if(unitState == UNIT_IDLE) 
+    {
+        setUnitState(UNIT_ATTACKING_OUT_OF_RANGE);
+        targetUnit = attacker;
+    }
+
+    health -= dmg;
+
+    if(!isAlive())
+        setUnitState(UNIT_DYING);
 }

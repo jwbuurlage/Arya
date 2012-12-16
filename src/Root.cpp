@@ -89,6 +89,8 @@ namespace Arya
         interf->init();
         addFrameListener(interf);
 
+        LOG_INFO("Root initialized");
+
         return true;
     }
 

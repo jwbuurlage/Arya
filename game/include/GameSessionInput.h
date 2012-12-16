@@ -42,4 +42,6 @@ class GameSessionInput : public Arya::InputListener, public Arya::FrameListener
 
         Rect selectionRect;
         bool doUnitMovementNextFrame;
+        bool doUnitSelectionNextFrame;
+        void selectUnit();
 };

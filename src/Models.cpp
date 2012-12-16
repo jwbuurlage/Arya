@@ -281,7 +281,9 @@ namespace Arya
                         pointer += 4;
                     }
 
-                    animData->animations.insert(animMapType(nameBuf, newAnim));
+                    //Only add the animation if there are actually enough frames
+                    if( newAnim.startFrame < header->frameCount && newAnim.endFrame < header->frameCount )
+                        animData->animations.insert(animMapType(nameBuf, newAnim));
                 }
 
                 Logger::shared() << endLog;

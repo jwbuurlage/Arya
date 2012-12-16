@@ -15,7 +15,10 @@ namespace Arya
 
   Overlay::~Overlay()
   {
-
+      for(vector<Rect*>::iterator it = rects.begin();
+              it != rects.end(); ++it)
+          delete *it;
+      rects.clear();
   }
 
   bool Overlay::init()

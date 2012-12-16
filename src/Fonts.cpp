@@ -53,7 +53,6 @@ namespace Arya
         //stbtt_bakedchar baked[100];
         stbtt_BakeFontBitmap((unsigned char*)file->getData(), 0, 20, pixeldata, width, height, 0, 100, font->baked);
         glGenTextures(1, &font->textureHandle);
-        LOG_INFO("Created texture: " << font->textureHandle);
         glBindTexture(GL_TEXTURE_2D, font->textureHandle);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );

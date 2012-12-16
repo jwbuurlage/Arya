@@ -67,7 +67,7 @@ bool GameSession::init()
 
     cam->setPosition(vec3(0.0f, 150.0f, 0.0f));
     cam->setCameraAngle(0.0f, -60.0f);
-    cam->camZoomSpeed = 80.0f;
+    cam->setZoom(300.0f);
 
     Object* obj;
 
@@ -83,7 +83,7 @@ bool GameSession::init()
     // TODO: This is a memleak, but we will load info in from a file somewhere
     // and this will fix this issue
     UnitInfo* info = new UnitInfo;
-    info->radius = 2.0f;
+    info->radius = 5.0f;
 
     for(int i = 0; i < 30; ++ i) 
     {
@@ -164,8 +164,20 @@ void GameSession::onFrame(float elapsedTime)
 {
     // update units
     for(int i = 0; i < factions.size(); ++i)
-        for(int j = 0; j < factions[i]->getUnits().size(); ++j)
-            factions[i]->getUnits()[j]->update(elapsedTime);
+    {
+        for(list<Unit*>::iterator it = factions[i]->getUnits().begin();
+                it != factions[i]->getUnits().end(); )
+        {
+            if((*it)->obsolete() && (*it)->readyToDelete()) {
+                delete *it;
+                it = factions[i]->getUnits().erase(it);
+            }
+            else {
+                (*it)->update(elapsedTime);
+                ++it;
+            }
+        }
+    }
 }
 
 void GameSession::onRender()
@@ -192,11 +204,14 @@ void GameSession::onRender()
 
     decalProgram->setUniform3fv("uColor", localFaction->getColor());
 
-    for(int i = 0; i < localFaction->getUnits().size(); ++i)
+    for(list<Unit*>::iterator it = localFaction->getUnits().begin();
+            it != localFaction->getUnits().end(); ++it)
     {
-        if(!localFaction->getUnits()[i]->isSelected()) continue;
-        vec2 groundPos = vec2(localFaction->getUnits()[i]->getObject()->getPosition().x,
-                localFaction->getUnits()[i]->getObject()->getPosition().z);
+        if(!((*it)->isSelected()))
+            continue;
+
+        vec2 groundPos = vec2((*it)->getObject()->getPosition().x,
+                (*it)->getObject()->getPosition().z);
         decalProgram->setUniform2fv("groundPosition", groundPos);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
@@ -204,4 +219,5 @@ void GameSession::onRender()
     glDisable(GL_BLEND);
     glDisable(GL_ALPHA_TEST);
     glEnable(GL_CULL_FACE);
+
 }

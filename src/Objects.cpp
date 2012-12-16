@@ -14,6 +14,7 @@ namespace Arya
         pitch = 0.0f;
         yaw = 0.0f;
         tintColor = vec3(0.5);
+        obsolete = false;
     }
 
     Object::~Object()
