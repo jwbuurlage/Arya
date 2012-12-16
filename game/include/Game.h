@@ -12,8 +12,9 @@ using Arya::Texture;
 using Arya::TextureManager;
 
 class Network;
+class EventManager;
 
-class Game : public Arya::InputListener
+class Game : public Arya::InputListener , public Arya::FrameListener
 {
     public:
         Game();
@@ -26,8 +27,14 @@ class Game : public Arya::InputListener
         bool mouseWheelMoved(int delta);
         bool mouseMoved(int x, int y, int dx, int dy);
 
+        void onFrame(float elapsedTime);
     private:
         Root* root;
         Network* network;
+        EventManager* eventManager;
         GameSession* session;
+
+        //We want to check the network
+        //every 5 frames
+        int networkFrameCount;
 };

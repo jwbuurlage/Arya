@@ -14,7 +14,7 @@ using namespace Poco::Net;
 
 class NetworkClientHandler;
 
-#define PACKETMAGICINT (('A' << 24) | ('r' << 16) | ('P' << 8) | ('k' << 0))
+#define PACKETMAGICINT (('A' << 0) | ('r' << 8) | ('P' << 16) | ('k' << 24))
 
 class ConnectionAcceptor : public SocketAcceptor<NetworkClientHandler>
 {
@@ -138,12 +138,14 @@ class NetworkClientHandler
                     {
                         LOG_WARNING("Invalid packet header! Removing client");
                         terminate();
+                        return;
                     }
                     int packetSize = *(int*)(dataBuffer + 4); //this is including the header
                     if(packetSize > bufferSizeTotal)
                     {
                         LOG_WARNING("Packet does not fit in buffer. Possible hack attempt. Removing client. Packet size = " << packetSize);
                         terminate();
+                        return;
                     }
                     if(bytesReceived >= packetSize)
                     {
