@@ -1,16 +1,25 @@
 #include "../include/Game.h"
 #include "../include/GameSession.h"
-
+#include "../include/Network.h"
+#include "../include/Events.h"
 #include "common/Logger.h"
+
+Game* Game::singleton = 0;
 
 Game::Game()
 {
     root = 0;
     session = 0;
+    eventManager = 0;
+    network = 0;
+
+    singleton = this;
 }
 
 Game::~Game()
 {
+    if(eventManager) delete eventManager;
+    if(network) delete network;
     if(session) delete session;
     if(root) delete &Root::shared();
 }
@@ -19,7 +28,7 @@ void Game::run()
 {
     root = new Root;
 
-    if(!(root->init(true, 800, 600))) {
+    if(!(root->init(false, 800, 600))) {
         LOG_ERROR("Unable to init root");
     }
     else
@@ -28,12 +37,28 @@ void Game::run()
 
         if(session) delete session;
         session = new GameSession;
+
         if(!session->init()) {
             LOG_ERROR("Could not start a new session");
             Root::shared().stopRendering();
         }
+        else
+        {
+            if(network) delete network;
+            network = new Network;
 
-        root->startRendering();
+            network->startServer();
+
+            network->connectToSessionServer("127.0.0.1", 1337);
+
+            if(eventManager) delete eventManager;
+            eventManager = new EventManager(network);
+
+            networkFrameCount = 0;
+            root->addFrameListener(this);
+
+            root->startRendering();
+        }
     }
 }
 
@@ -86,3 +111,12 @@ bool Game::mouseMoved(int x, int y, int dx, int dy)
     return false; 
 }
 
+void Game::onFrame(float elapsedTime)
+{
+    ++networkFrameCount;
+    if(networkFrameCount > 5)
+    {
+        network->update();
+        networkFrameCount = 0;
+    }
+}

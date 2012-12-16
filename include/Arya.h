@@ -10,6 +10,7 @@
 #include "Objects.h"
 #include "Scene.h"
 #include "Shaders.h"
+#include "common/Singleton.h"
 #include "common/Logger.h"
 
 #include <glm/glm.hpp>

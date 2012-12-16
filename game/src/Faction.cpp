@@ -18,6 +18,6 @@ Faction::~Faction()
 
 void Faction::addUnit(Unit* unit)
 {
-    unit->getObject()->setTintColor(color);
+    unit->setTintColor(color);
     units.push_back(unit);
 }

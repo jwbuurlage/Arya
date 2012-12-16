@@ -34,8 +34,6 @@ namespace Arya
         oldTime = 0;
         overlay = 0;
 
-        readDepthBuffer = false;
-
         Logger* log = new Logger();
         FileSystem* files = new FileSystem();
         TextureManager* tex = new TextureManager();
@@ -235,20 +233,16 @@ namespace Arya
         if(scene)
             scene->render();
 
-        if(readDepthBuffer)
-        {
-            readDepthBuffer = false;
-            GLfloat depth;
-            glReadPixels(readAtX, readAtY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+        GLfloat depth;
+        glReadPixels(mouseX, mouseY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
 
-            vec4 screenPos(2.0f * readAtX /((float)windowWidth) - 1.0f, 2.0f * readAtY/((float)windowHeight) - 1.0f, 2.0f*depth-1.0f, 1.0);
-            screenPos = scene->getCamera()->getInverseVPMatrix() * screenPos;
-            screenPos /= screenPos.w;
+        vec4 screenPos(2.0f * mouseX /((float)windowWidth) - 1.0f, 2.0f * mouseY/((float)windowHeight) - 1.0f, 2.0f*depth-1.0f, 1.0);
+        screenPos = scene->getCamera()->getInverseVPMatrix() * screenPos;
+        screenPos /= screenPos.w; 
 
-            clickScreenLocation.x = screenPos.x;
-            clickScreenLocation.y = screenPos.y;
-            clickScreenLocation.z = screenPos.z;
-        }
+        clickScreenLocation.x = screenPos.x;
+        clickScreenLocation.y = screenPos.y;
+        clickScreenLocation.z = screenPos.z;
 
         if(overlay)
             overlay->render();
@@ -295,7 +289,7 @@ namespace Arya
     void Root::mouseDown(int button, int action)
     {
         for( std::vector<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
-            if( (*it)->mouseDown((MOUSEBUTTON)button, action == GLFW_PRESS, mouseX, windowHeight - mouseY) == true ) break;
+            if( (*it)->mouseDown((MOUSEBUTTON)button, action == GLFW_PRESS, mouseX, mouseY) == true ) break;
     }
 
     void Root::mouseWheelMoved(int pos)
@@ -308,10 +302,12 @@ namespace Arya
 
     void Root::mouseMoved(int x, int y)
     {
+        y = windowHeight - y;
         int dx = x - mouseX, dy = y - mouseY;
         mouseX = x; mouseY = y;
+
         for( std::vector<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
-            if( (*it)->mouseMoved(x, windowHeight - y, dx, dy) == true ) break;
+            if( (*it)->mouseMoved(x, y, dx, dy) == true ) break;
     }
 
     void GLFWCALL keyCallback(int key, int action)

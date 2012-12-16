@@ -84,6 +84,11 @@ bool GameSession::init()
     // and this will fix this issue
     UnitInfo* info = new UnitInfo;
     info->radius = 5.0f;
+    info->maxHealth = 100.0f;
+    info->speed = 30.0f;
+    info->yawSpeed = 720.0f;
+    info->damage = 20.0f;
+    info->attackSpeed = 1.0f;
 
     for(int i = 0; i < 30; ++ i) 
     {
@@ -173,6 +178,14 @@ void GameSession::onFrame(float elapsedTime)
                 it = factions[i]->getUnits().erase(it);
             }
             else {
+                mat4 vpMatrix = Root::shared().getScene()->getCamera()->getVPMatrix();
+
+                vec4 onScreen((*it)->getObject()->getPosition(), 1.0);
+                onScreen = vpMatrix * onScreen;
+                onScreen.x /= onScreen.w;
+                onScreen.y /= onScreen.w;
+                (*it)->setScreenPosition(vec2(onScreen.x, onScreen.y));
+
                 (*it)->update(elapsedTime);
                 ++it;
             }
@@ -189,6 +202,7 @@ void GameSession::onRender()
     decalProgram->use();
     glBindVertexArray(decalVao);
 
+    decalProgram->setUniform1f("yOffset", 0.5);
     decalProgram->setUniformMatrix4fv("vpMatrix", Root::shared().getScene()->getCamera()->getVPMatrix());
     decalProgram->setUniformMatrix4fv("scaleMatrix", Root::shared().getScene()->getMap()->getTerrain()->getScaleMatrix());
 
@@ -219,5 +233,4 @@ void GameSession::onRender()
     glDisable(GL_BLEND);
     glDisable(GL_ALPHA_TEST);
     glEnable(GL_CULL_FACE);
-
 }

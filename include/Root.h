@@ -41,9 +41,7 @@ namespace Arya
 
             Overlay* getOverlay() const { return overlay; }
 
-            void readDepthNextFrame(int x, int y){ readDepthBuffer = true; readAtX = x; readAtY = y; }
             vec3 getDepthResult(){ return clickScreenLocation; }
-            bool isDepthAvailable() { return !readDepthBuffer; }
 
             float getAspectRatio() const { return windowWidth/(float)windowHeight; }
 
@@ -70,9 +68,6 @@ namespace Arya
             void mouseMoved(int x, int y);
             int mouseX, mouseY, mouseWheelPos; //To supply relative movement
 
-            bool readDepthBuffer;
-            int readAtX;
-            int readAtY;
             vec3 clickScreenLocation;
 
             friend void GLFWCALL keyCallback(int key, int action);
