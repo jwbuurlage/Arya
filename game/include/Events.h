@@ -1,4 +1,6 @@
 #pragma once
+
+#include "EventCodes.h"
 #include "Packet.h"
 #include <map>
 
