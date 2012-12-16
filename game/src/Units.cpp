@@ -1,4 +1,5 @@
 #include "../include/Units.h"
+#include "../include/Packet.h"
 #include <math.h>
 
 #ifdef _WIN32
@@ -33,6 +34,9 @@ Unit::Unit(UnitInfo* inf)
     healthBar->offsetInPixels = vec2(-12.5, 25.0);
 
     Root::shared().getOverlay()->addRect(healthBar);
+
+    id = -1;
+    factionId = -1;
 }
 
 Unit::~Unit()
@@ -226,4 +230,16 @@ void Unit::setTintColor(vec3 tC)
     tintColor = tC;
     object->setTintColor(tC);
     healthBar->fillColor = vec4(tintColor, 1.0);
+}
+
+void Unit::serialize(Packet& pk)
+{
+    pk << id;
+    pk << factionId;
+}
+
+void Unit::deserialize(Packet& pk)
+{
+    pk >> id;
+    pk >> factionId;
 }

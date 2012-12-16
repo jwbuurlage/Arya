@@ -26,6 +26,8 @@ typedef enum
     UNIT_DYING
 } UnitState;
 
+class Packet;
+
 class Unit
 {
     public:
@@ -63,6 +65,9 @@ class Unit
         vec2 getScreenPosition() const { return screenPosition; }
         void setTintColor(vec3 tC);
 
+        void serialize(Packet& pk);
+        void deserialize(Packet& pk);
+
     private:
         Object* object;
         UnitInfo* info;
@@ -83,4 +88,7 @@ class Unit
         Rect* healthBar;
 
         vec3 tintColor;
+
+        int id;
+        int factionId;
 };
