@@ -3,9 +3,9 @@
 #include "Poco/Thread.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/SocketReactor.h"
-#include "Poco/Net/SocketAcceptor.h"
 
 class ConnectionAcceptor;
+class Packet;
 
 class Server
 {
@@ -14,6 +14,8 @@ class Server
         ~Server();
 
         void runInThread();
+
+        void handlePacket(Packet& packet);
 
     private:
         Poco::Thread thread;

@@ -85,7 +85,7 @@ class Connection
                         bytesReceived += n;
 
                         //Check if we received the packet header
-                        if(bytesReceived >= 8)
+                        if(bytesReceived >= 12)
                         {
                             if( *(int*)dataBuffer != PACKETMAGICINT )
                             {
