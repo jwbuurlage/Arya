@@ -6,12 +6,16 @@
 
 Game* Game::singleton = 0;
 
+#define NETWORK_POLL 0.05f
+
 Game::Game()
 {
     root = 0;
     session = 0;
     eventManager = 0;
     network = 0;
+
+    timeSinceNetworkPoll = 1.0f;
 
     singleton = this;
 }
@@ -28,12 +32,31 @@ void Game::run()
 {
     root = new Root;
 
-    if(!(root->init(false, 800, 600))) {
+    if(!(root->init(true, 1920, 1080))) {
         LOG_ERROR("Unable to init root");
     }
     else
     {
         root->addInputListener(this);
+
+        if(network) delete network;
+        network = new Network;
+
+        network->startServer();
+
+        network->connectToSessionServer("127.0.0.1", 1337);
+
+        if(eventManager) delete eventManager;
+        eventManager = new EventManager(network);
+
+        network->setPacketHandler(eventManager);
+
+        Event& joinEvent = eventManager->createEvent(EVENT_JOIN_GAME);
+        joinEvent << 0; // accountId
+        joinEvent << 0; // roomId
+        joinEvent.send();
+
+        eventManager->addEventHandler(EVENT_GAME_READY, this);
 
         if(session) delete session;
         session = new GameSession;
@@ -44,21 +67,7 @@ void Game::run()
         }
         else
         {
-            if(network) delete network;
-            network = new Network;
-
-            network->startServer();
-
-            network->connectToSessionServer("127.0.0.1", 1337);
-
-            if(eventManager) delete eventManager;
-            eventManager = new EventManager(network);
-
-            network->setPacketHandler(eventManager);
-
-            networkFrameCount = 0;
             root->addFrameListener(this);
-
             root->startRendering();
         }
     }
@@ -115,10 +124,16 @@ bool Game::mouseMoved(int x, int y, int dx, int dy)
 
 void Game::onFrame(float elapsedTime)
 {
-    ++networkFrameCount;
-    if(networkFrameCount > 5)
+    timeSinceNetworkPoll += elapsedTime;
+    if(timeSinceNetworkPoll > NETWORK_POLL)
     {
         network->update();
-        networkFrameCount = 0;
+        timeSinceNetworkPoll = 0.0f;
     }
+}
+
+void Game::handleEvent(Packet& packet)
+{
+    if(packet.getId() == EVENT_GAME_READY)
+        LOG_INFO("Game is ready");
 }

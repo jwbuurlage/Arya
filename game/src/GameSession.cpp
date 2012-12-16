@@ -52,11 +52,11 @@ bool GameSession::init()
 
     // init factions
     localFaction = new Faction;
-    localFaction->setColor(vec3(1.0, 0.0, 0.0));
+    localFaction->setColor(0);
     factions.push_back(localFaction);
 
     Faction* otherFaction = new Faction;
-    otherFaction->setColor(vec3(0.0, 0.0, 1.0));
+    otherFaction->setColor(1);
     factions.push_back(otherFaction);
 
     Scene* scene = Root::shared().makeDefaultScene();

@@ -133,7 +133,7 @@ namespace Arya
 
 
 		// load in watermap
-        string waterMapString(heightMapName);
+        string waterMapString(waterMapName);
         waterMapString.insert(0, "textures/");
         File* wFile = FileSystem::shared().getFile(waterMapString);
         if(!wFile) return false;

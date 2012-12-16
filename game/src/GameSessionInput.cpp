@@ -122,10 +122,6 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
         {
             if(originalMousePos == vec2(x, y))
             {
-                Event& newEvent = Game::shared().getEventManager()->createEvent(EVENT_WALK);
-                newEvent << 0; // local faction id
-                newEvent.send();
-
                 doUnitSelectionNextFrame = true;
             }
             else
