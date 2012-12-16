@@ -51,6 +51,13 @@ void Game::run()
 
         network->setPacketHandler(eventManager);
 
+        Event& joinEvent = eventManager->createEvent(EVENT_JOIN_GAME);
+        joinEvent << 0; // accountId
+        joinEvent << 0; // roomId
+        joinEvent.send();
+
+        eventManager->addEventHandler(EVENT_GAME_READY, this);
+
         if(session) delete session;
         session = new GameSession;
 
@@ -123,4 +130,10 @@ void Game::onFrame(float elapsedTime)
         network->update();
         timeSinceNetworkPoll = 0.0f;
     }
+}
+
+void Game::handleEvent(Packet& packet)
+{
+    if(packet.getId() == EVENT_GAME_READY)
+        LOG_INFO("Game is ready");
 }

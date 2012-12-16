@@ -13,8 +13,9 @@ using Arya::TextureManager;
 
 class Network;
 class EventManager;
+class EventHandler;
 
-class Game : public Arya::InputListener , public Arya::FrameListener
+class Game : public Arya::InputListener , public Arya::FrameListener, public EventHandler
 {
     public:
         Game();
