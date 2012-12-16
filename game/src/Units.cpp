@@ -17,12 +17,22 @@ Unit::Unit(UnitInfo* inf)
     targetUnit = 0;
 
     health = info->maxHealth;
-
     timeSinceLastAttack = info->attackSpeed + 1.0f;
-
     dyingTime = 0.0f;
 
     refCount = 0;
+
+    screenPosition = vec2(0.0);
+    tintColor = vec3(0.5);
+
+    // init and register health bar
+    healthBar = new Rect;
+    healthBar->fillColor = vec4(tintColor, 1.0);
+    healthBar->sizeInPixels = vec2(25.0, 3.0);
+    // need to check if this flips orientation
+    healthBar->offsetInPixels = vec2(-12.5, 25.0);
+
+    Root::shared().getOverlay()->addRect(healthBar);
 }
 
 Unit::~Unit()
@@ -30,6 +40,9 @@ Unit::~Unit()
     if(targetUnit)
         targetUnit->release();
     object->setObsolete();
+
+    Root::shared().getOverlay()->removeRect(healthBar);
+    delete healthBar;
 }
 
 void Unit::setObject(Object* obj)
@@ -39,6 +52,8 @@ void Unit::setObject(Object* obj)
 
 void Unit::update(float timeElapsed)
 {
+    healthBar->relative = screenPosition;
+
     if(unitState == UNIT_IDLE)
         return;
 
@@ -198,7 +213,17 @@ void Unit::receiveDamage(int dmg, Unit* attacker)
     }
 
     health -= dmg;
+    if(health < 0) health = 0;
+
+    healthBar->sizeInPixels = vec2(25.0*getHealthRatio(), 3.0);
 
     if(!isAlive())
         setUnitState(UNIT_DYING);
+}
+
+vec3 Unit::setTintColor(vec3 tC)
+{
+    tintColor = tC;
+    object->setTintColor(tC);
+    healthBar->fillColor = vec4(tintColor, 1.0);
 }

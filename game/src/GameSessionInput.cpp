@@ -253,10 +253,7 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
     for(list<Unit*>::iterator it = lf->getUnits().begin();
             it != lf->getUnits().end(); ++it)
     {
-        vec4 onScreen((*it)->getObject()->getPosition(), 1.0);
-        onScreen = vpMatrix * onScreen;
-        onScreen.x /= onScreen.w;
-        onScreen.y /= onScreen.w;
+        vec2 onScreen = (*it)->getScreenPosition();
 
         if((onScreen.x > x_min && onScreen.x < x_max) && (onScreen.y > y_min && onScreen.y < y_max)) {
             (*it)->setSelected(true);

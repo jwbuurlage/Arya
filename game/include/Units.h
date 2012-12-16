@@ -3,6 +3,8 @@
 #include "Arya.h"
 
 using Arya::Object;
+using Arya::Rect;
+using Arya::Root;
 
 typedef struct
 {
@@ -57,6 +59,10 @@ class Unit
         void retain() { ++refCount; }
         void release() { --refCount; }
 
+        void setScreenPosition(vec2 sPos) { screenPosition = sPos; }
+        vec2 getScreenPosition() const { return screenPosition; }
+        vec3 setTintColor(vec3 tC);
+
     private:
         Object* object;
         UnitInfo* info;
@@ -67,9 +73,14 @@ class Unit
         Unit* targetUnit;
         UnitState unitState;
 
+        vec2 screenPosition;
+
         float health;
         float timeSinceLastAttack;
         float dyingTime;
 
         int refCount;
+        Rect* healthBar;
+
+        vec3 tintColor;
 };
