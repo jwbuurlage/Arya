@@ -50,6 +50,8 @@ void Game::run()
             if(eventManager) delete eventManager;
             eventManager = new EventManager(network);
 
+            network->setPacketHandler(eventManager);
+
             networkFrameCount = 0;
             root->addFrameListener(this);
 

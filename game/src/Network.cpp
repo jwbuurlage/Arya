@@ -1,6 +1,7 @@
 #include "../include/Network.h"
 #include "../include/Server.h"
 #include "../include/Packet.h"
+#include "../include/Events.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Exception.h"
 #include "Poco/Net/NetException.h"
@@ -20,12 +21,18 @@ class Connection
             connecting = false;
             dataBuffer = new char[bufferSizeTotal+1];
             bytesReceived = 0;
+            eventManager = 0;
         }
 
         ~Connection()
         {
             delete socket;
             delete dataBuffer;
+        }
+
+        void setEventManager(EventManager* handler)
+        {
+            eventManager = handler;
         }
 
         void connect(string host, int port)
@@ -59,11 +66,11 @@ class Connection
                     }
                     catch(TimeoutException& e)
                     {
-                        LOG_WARNING("Timeout exception when reading socket!");
+                        LOG_WARNING("Timeout exception when reading socket! Msg: " << e.message());
                     }
                     catch(NetException& e)
                     {
-                        LOG_WARNING("Net exception when reading socket");
+                        LOG_WARNING("Net exception when reading socket Msg: " << e.message());
                     }
 
                     if(n <= 0)
@@ -97,7 +104,7 @@ class Connection
                             }
                             if(bytesReceived >= packetSize)
                             {
-                                handlePacket(dataBuffer+8, packetSize - 8);
+                                handlePacket(dataBuffer, packetSize);
                                 //if there was more data in the buffer, move it
                                 //to the start of the buffer
                                 int extraSize = bytesReceived - packetSize;
@@ -119,6 +126,7 @@ class Connection
                             sendPacket(*pak);
                             delete *pak;
                             pak = packets.erase(pak);
+                            break; //next packet can be done on next frame
                         }
                         else
                         {
@@ -152,12 +160,12 @@ class Connection
                 }
                 catch(TimeoutException& e)
                 {
-                    LOG_WARNING("Timeout exception when writing to socket!");
+                    LOG_WARNING("Timeout exception when writing to socket! Msg: " << e.message());
                     break;
                 }
                 catch(NetException& e)
                 {
-                    LOG_WARNING("Net exception when writing to socket");
+                    LOG_WARNING("Net exception when writing to socket. Msg: " << e.message());
                     break;
                 }
                 if(n<=0)
@@ -176,7 +184,13 @@ class Connection
 
         void handlePacket(char* data, int packetSize)
         {
-
+            if(!eventManager)
+            {
+                LOG_WARNING("Incoming packet can not be handled because no eventmanager is set");
+                return;
+            }
+            Packet pak(data, packetSize);
+            eventManager->handlePacket(pak);
         }
 
         bool connected;
@@ -184,6 +198,8 @@ class Connection
         StreamSocket* const socket; //const so it can not be made zero
 
         vector<Packet*> packets; //outgoing packets
+
+        EventManager* eventManager;
 
         const int bufferSizeTotal;
         char* dataBuffer;
@@ -193,8 +209,9 @@ class Connection
 Network::Network()
 {
     server = 0;
-    lobbyConnection = new Connection;
-    sessionConnection = new Connection;
+    lobbyConnection = new Connection();
+    sessionConnection = new Connection();
+    eventHandler = 0;
 }
 
 Network::~Network()
@@ -202,6 +219,12 @@ Network::~Network()
     if(server) delete server;
     delete lobbyConnection;
     delete sessionConnection;
+}
+
+void Network::setPacketHandler(EventManager* handler)
+{
+    lobbyConnection->setEventManager(handler);
+    sessionConnection->setEventManager(handler);
 }
 
 void Network::startServer()
