@@ -1,4 +1,5 @@
 #include "../include/Units.h"
+#include "../include/Packet.h"
 #include <math.h>
 
 #ifdef _WIN32
@@ -13,21 +14,29 @@ Unit::Unit(UnitInfo* inf)
     object = 0;
     selected = false;
     targetPosition = vec2(0.0f);
-    speed = 30.0f;
-    yawspeed = 720.0f;
     unitState = UNIT_IDLE;
     targetUnit = 0;
 
-    health = 100;
-    damage = 20;
-
-    attackSpeed = 1.0f; 
-    // set high enough tsla, so we can start attacking
-    timeSinceLastAttack = attackSpeed + 1.0f;
-
+    health = info->maxHealth;
+    timeSinceLastAttack = info->attackSpeed + 1.0f;
     dyingTime = 0.0f;
 
     refCount = 0;
+
+    screenPosition = vec2(0.0);
+    tintColor = vec3(0.5);
+
+    // init and register health bar
+    healthBar = new Rect;
+    healthBar->fillColor = vec4(tintColor, 1.0);
+    healthBar->sizeInPixels = vec2(25.0, 3.0);
+    // need to check if this flips orientation
+    healthBar->offsetInPixels = vec2(-12.5, 25.0);
+
+    Root::shared().getOverlay()->addRect(healthBar);
+
+    id = -1;
+    factionId = -1;
 }
 
 Unit::~Unit()
@@ -35,6 +44,9 @@ Unit::~Unit()
     if(targetUnit)
         targetUnit->release();
     object->setObsolete();
+
+    Root::shared().getOverlay()->removeRect(healthBar);
+    delete healthBar;
 }
 
 void Unit::setObject(Object* obj)
@@ -44,6 +56,8 @@ void Unit::setObject(Object* obj)
 
 void Unit::update(float timeElapsed)
 {
+    healthBar->relative = screenPosition;
+
     if(unitState == UNIT_IDLE)
         return;
 
@@ -75,16 +89,16 @@ void Unit::update(float timeElapsed)
             if(unitState != UNIT_ATTACKING)
                 setUnitState(UNIT_ATTACKING);
 
-            if(timeSinceLastAttack > attackSpeed)
+            if(timeSinceLastAttack > info->attackSpeed)
             {
                 // make one attack
-                targetUnit->receiveDamage(damage, this);
+                targetUnit->receiveDamage(info->damage, this);
                 if(!(targetUnit->isAlive()))
                 {
                     targetUnit->release();
                     targetUnit = 0;
                     setUnitState(UNIT_IDLE);
-                    timeSinceLastAttack = attackSpeed + 1.0f;
+                    timeSinceLastAttack = info->attackSpeed + 1.0f;
                     return;
                 }
                 timeSinceLastAttack = 0.0f;
@@ -112,7 +126,7 @@ void Unit::update(float timeElapsed)
     if( yawDiff > 180.0f ) yawDiff -= 360.0f;
     else if( yawDiff < -180.0f ) yawDiff += 360.0f;
 
-    float deltaYaw = timeElapsed * yawspeed + 1.0f;
+    float deltaYaw = timeElapsed * info->yawSpeed + 1.0f;
     if( (yawDiff >= 0 && yawDiff < deltaYaw) || (yawDiff <= 0 && yawDiff > -deltaYaw) )
     {
         //angle is small enough (less than 1 degree) so we can start walking now
@@ -129,7 +143,7 @@ void Unit::update(float timeElapsed)
         }
         diff = glm::normalize(diff);
 
-        vec3 newPosition = object->getPosition() + timeElapsed * (speed * diff);
+        vec3 newPosition = object->getPosition() + timeElapsed * (info->speed * diff);
         newPosition.y = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(newPosition.x, newPosition.z);
         object->setPosition(newPosition);
     }
@@ -203,7 +217,29 @@ void Unit::receiveDamage(int dmg, Unit* attacker)
     }
 
     health -= dmg;
+    if(health < 0) health = 0;
+
+    healthBar->sizeInPixels = vec2(25.0*getHealthRatio(), 3.0);
 
     if(!isAlive())
         setUnitState(UNIT_DYING);
+}
+
+void Unit::setTintColor(vec3 tC)
+{
+    tintColor = tC;
+    object->setTintColor(tC);
+    healthBar->fillColor = vec4(tintColor, 1.0);
+}
+
+void Unit::serialize(Packet& pk)
+{
+    pk << id;
+    pk << factionId;
+}
+
+void Unit::deserialize(Packet& pk)
+{
+    pk >> id;
+    pk >> factionId;
 }

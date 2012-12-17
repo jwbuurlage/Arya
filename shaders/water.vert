@@ -44,8 +44,6 @@ void main()
 	vec2 texCoo;
 	texCoo = patchOffset + texCooPatch;
 	texCoord=texCoo;
-	//vec2 scaledPos = (scaleMatrix*vec4(vec2(-0.5)+texCoo, 0.0, 1.0)).xy;
-
 
 	float h=0.0;
 	float hw=heightWater(texCoo);
@@ -66,10 +64,7 @@ void main()
 		h=getWave(1000.0*texCoo);
 	}
 
-	//vec4 pos = vec4(scaledPos.x, -100.0 + 200.0*(hw+factor*0.01*h), scaledPos.y, 1.0);
-
 	vec4 pos = scaleMatrix * vec4(texCoo.x-0.5, hw+factor*0.01*h, texCoo.y-0.5, 1.0);
-	//vec4 pos = scaleMatrix * vec4(texCoo.x-0.5, heightWater(texCoo), texCoo.y-0.5, 1.0);
 
 	float infi=0.5;
 	float dfx=getWave(texCoo+vec2(infi,0))-h;

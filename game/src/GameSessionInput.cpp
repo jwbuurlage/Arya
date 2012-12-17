@@ -2,6 +2,8 @@
 #include "../include/GameSession.h"
 #include "../include/Faction.h"
 #include "../include/Units.h"
+#include "../include/Game.h"
+#include "../include/Events.h"
 #include "common/Logger.h"
 
 GameSessionInput::GameSessionInput(GameSession* ses)
@@ -66,10 +68,8 @@ void GameSessionInput::onFrame(float elapsedTime)
 
     if(doUnitSelectionNextFrame)
     {
-        if(Root::shared().isDepthAvailable()) {
-            doUnitSelectionNextFrame = false;
-            selectUnit();
-        }
+        doUnitSelectionNextFrame = false;
+        selectUnit();
     }
 
     return;
@@ -122,7 +122,6 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
         {
             if(originalMousePos == vec2(x, y))
             {
-                Root::shared().readDepthNextFrame(x, y);
                 doUnitSelectionNextFrame = true;
             }
             else
@@ -141,7 +140,6 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
     {
         draggingRightMouse = (buttonDown == true);
 
-        Root::shared().readDepthNextFrame(x, y);
         doUnitMovementNextFrame = true;
     }
 
@@ -150,12 +148,12 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
 
 bool GameSessionInput::mouseWheelMoved(int delta)
 {
-    if( delta > 0 ){
+    if(delta > 0) {
         Camera* cam = Root::shared().getScene()->getCamera();
-        if( cam ) cam->camZoomSpeed -= 50.0f;
-    }else{
+        if(cam) cam->camZoomSpeed -= 50.0f;
+    } else {
         Camera* cam = Root::shared().getScene()->getCamera();
-        if( cam ) cam->camZoomSpeed += 50.0f;
+        if(cam) cam->camZoomSpeed += 50.0f;
     }
     return false;
 }
@@ -257,10 +255,7 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
     for(list<Unit*>::iterator it = lf->getUnits().begin();
             it != lf->getUnits().end(); ++it)
     {
-        vec4 onScreen((*it)->getObject()->getPosition(), 1.0);
-        onScreen = vpMatrix * onScreen;
-        onScreen.x /= onScreen.w;
-        onScreen.y /= onScreen.w;
+        vec2 onScreen = (*it)->getScreenPosition();
 
         if((onScreen.x > x_min && onScreen.x < x_max) && (onScreen.y > y_min && onScreen.y < y_max)) {
             (*it)->setSelected(true);

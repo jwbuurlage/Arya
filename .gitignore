@@ -3,6 +3,7 @@ game/build/*
 tools/build/*
 obj/
 bin/*
+log*
 
 *.DS_Store
 

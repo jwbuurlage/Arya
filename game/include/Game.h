@@ -1,5 +1,6 @@
 #include "Arya.h"
 #include "../include/GameSession.h"
+#include "../include/Events.h"
 
 using Arya::Root;
 using Arya::Scene;
@@ -11,7 +12,10 @@ using Arya::Map;
 using Arya::Texture;
 using Arya::TextureManager;
 
-class Game : public Arya::InputListener
+class Network;
+class EventManager;
+
+class Game : public Arya::InputListener , public Arya::FrameListener, public EventHandler
 {
     public:
         Game();
@@ -24,7 +28,21 @@ class Game : public Arya::InputListener
         bool mouseWheelMoved(int delta);
         bool mouseMoved(int x, int y, int dx, int dy);
 
+        void onFrame(float elapsedTime);
+        void handleEvent(Packet& packet);
+
+        static Game& shared() { return (*singleton); }
+        EventManager* getEventManager() { return eventManager; }
+
     private:
+        static Game* singleton;
+
         Root* root;
+        Network* network;
+        EventManager* eventManager;
         GameSession* session;
+
+        //We want to check the network
+        //every 5 frames
+        float timeSinceNetworkPoll;
 };

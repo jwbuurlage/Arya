@@ -31,7 +31,7 @@ namespace Arya
             AnimationState(){}
             virtual ~AnimationState(){}
 
-            virtual void setAnimation(const char* name) = 0;
+            virtual void setAnimation(std::string name) = 0;
             virtual void updateAnimation(float elapsedTime) = 0;
 
             virtual int getCurFrame() = 0;
@@ -95,8 +95,8 @@ namespace Arya
             bool initialize();
             void cleanup();
 
-            Model* getModel(const char* filename){ return getResource(filename); }
+            Model* getModel(std::string filename){ return getResource(filename); }
         private:
-            Model* loadResource( const char* filename );
+            Model* loadResource(std::string filename );
     };
 }

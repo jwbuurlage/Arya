@@ -6,6 +6,8 @@ uniform mat4 vpMatrix;
 uniform mat4 scaleMatrix;
 
 uniform vec2 groundPosition;
+uniform float unitRadius;
+uniform float yOffset;
 
 out vec2 texcoo;
 
@@ -24,7 +26,7 @@ void main()
                         0.0,
                         groundPosition.y + 10.0*(position.y - 0.5),
                          1.0);
-    pos.y = scaleMatrix[1][1]*height(vec2(((pos.x + 1025.0) * 0.5) / 1025.0, ((pos.z + 1025.0) * 0.5) / 1025.0)) + 0.5;
+    pos.y = scaleMatrix[1][1]*height(vec2(((pos.x + 1025.0) * 0.5) / 1025.0, ((pos.z + 1025.0) * 0.5) / 1025.0)) + yOffset;
 
     texcoo = position;
     gl_Position = vpMatrix * pos;

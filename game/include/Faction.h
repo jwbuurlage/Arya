@@ -1,10 +1,12 @@
 #include "Arya.h"
 #include <list>
+
 using std::list;
 
 using Arya::Object;
 
 class Unit;
+class Packet;
 
 class Faction
 {
@@ -14,11 +16,16 @@ class Faction
 
         void addUnit(Unit* unit);
 
-        vec3 getColor() const { return color; }
-        void setColor(vec3 col) { color = col; }
+        void setColor(int col) { color = col; }
+        vec3 getColor();
 
         list<Unit*>& getUnits() { return units; }
+
+        void serialize(Packet& pk);
+        void deserialize(Packet& pk);
+
     private:
         list<Unit*> units;
-        vec3 color;
+        int color;
+        int id;
 };
