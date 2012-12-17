@@ -187,17 +187,21 @@ namespace Arya
         vec4 resultTR = camera->getInverseVPMatrix() * vec4(1.0, 1.0, depth, 1.0);
         resultTR /= resultTR.w;
 
+        float shadowBoxHalfWidth = (resultTR.x - resultBL.x) * 0.5f;
+        float shadowBoxHalfHeight = (resultBL.z - resultTR.z) * 0.5f;
+        vec3 translationToCenter = vec3(resultBL.x + shadowBoxHalfWidth, resultTR.z + shadowBoxHalfHeight, 0.0f);
+
         // shadow stuff
-        orthoShadowCubeMatrix = glm::ortho(resultBL.x, resultTR.x, 0.0f, 200.0f, resultTR.z, resultBL.z);
+        orthoShadowCubeMatrix = glm::ortho(-shadowBoxHalfWidth, shadowBoxHalfWidth, 0.0f, 200.0f, -shadowBoxHalfHeight, shadowBoxHalfHeight);
 
         rotateToLightDirMatrix = glm::rotate(mat4(1.0),
                 glm::acos(glm::dot(glm::normalize(lightDirection),
                                vec3(0.0, 0.0, 1.0))) * (180.0f / 3.141592653589793f),
                 glm::cross(lightDirection, vec3(0.0, 0.0, 1.0)));
 
-        lightOrthoMatrix = orthoShadowCubeMatrix * rotateToLightDirMatrix;
+        mat4 translationMatrix = glm::translate(mat4(1.0), -translationToCenter);
 
-
+        lightOrthoMatrix = orthoShadowCubeMatrix * rotateToLightDirMatrix; // * translationMatrix;
     }
 
     void Scene::render()

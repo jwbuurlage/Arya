@@ -183,5 +183,5 @@ void Game::handleEvent(Packet& packet)
         }
     }
     else
-        LOG_INFO("Unkown even received!");
+        LOG_INFO("Unkown event received!");
 }
