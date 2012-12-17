@@ -214,6 +214,7 @@ void Unit::receiveDamage(int dmg, Unit* attacker)
     {
         setUnitState(UNIT_ATTACKING_OUT_OF_RANGE);
         targetUnit = attacker;
+        attacker->retain();
     }
 
     health -= dmg;
