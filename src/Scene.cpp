@@ -185,13 +185,10 @@ namespace Arya
         resultBL /= resultBL.w;
         glReadPixels(Root::shared().getWindowWidth() - 1, Root::shared().getWindowHeight() - 1, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
         vec4 resultTR = camera->getInverseVPMatrix() * vec4(1.0, 1.0, depth, 1.0);
-        resultTR /= resultBL.w;
-
-        LOG_INFO("resultBL: " << resultBL.x << " " << resultBL.y << " " << resultBL.z);
-        LOG_INFO("resultTR: " << resultTR.x << " " << resultTR.y << " " << resultTR.z);
+        resultTR /= resultTR.w;
 
         // shadow stuff
-        orthoShadowCubeMatrix = glm::ortho(-200.0, 200.0, 0.0, 200.0, -200.0, 0.0);
+        orthoShadowCubeMatrix = glm::ortho(resultBL.x, resultTR.x, 0.0f, 200.0f, resultTR.z, resultBL.z);
 
         rotateToLightDirMatrix = glm::rotate(mat4(1.0),
                 glm::acos(glm::dot(glm::normalize(lightDirection),

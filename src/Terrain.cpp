@@ -318,7 +318,7 @@ namespace Arya
             return 0.0;
         }
 
-        if( x >= TERRAIN_SIZE/2.0 || x <= -TERRAIN_SIZE/2.0 || z >= TERRAIN_SIZE/2.0 || z <= -TERRAIN_SIZE/2.0 )
+        if( x >= TERRAIN_SIZE || x <= -TERRAIN_SIZE || z >= TERRAIN_SIZE || z <= -TERRAIN_SIZE )
         {
             LOG_WARNING("Querying height outside of terrain!");
             return 0.0;
