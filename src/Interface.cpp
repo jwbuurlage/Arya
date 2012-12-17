@@ -39,6 +39,7 @@ namespace Arya
             rects[i]->texOffset = vec2(q.s0, 1 - q.t0 - (q.t1 - q.t0));
             rects[i]->texSize = vec2(q.s1 - q.s0, (q.t1 - q.t0));
         }
+        return true;
     }
 
 

@@ -19,25 +19,25 @@ namespace Arya
     void cleanup();
     void onFrame(float elapsedTime);
     bool init();
-    bool visibility;
+    bool visibility //visibility of the kernel
     string currentLine;
 
-    void toggleVisbilityConsole();
+    void toggleVisibilityConsole();
     void enterInput();
 
     private:
     void consoleInfo();
-    int nrLines;
-    int searchNrLines;
-    int textWidthInPixels;
+    int nrLines; //visible number of lines of console 
+    int searchNrLines; //number of lines in which you can search, if more the first one will be kicked
+    int textWidthInPixels; //width of character
     int nrCharOnLine;
-    int pixelsInBetween;
+    int pixelsInBetween; // pixels in between lines
     int activeLine;
     vector<string> history;
     vector<string> searchHistory;
     vector<Rect*> rects;
     Font* font;
-    float time;
+    float time; // used for cursor flashing
 
     void setVisibilityConsole(bool flag);
     void addTextLine(string textToBeAdded);

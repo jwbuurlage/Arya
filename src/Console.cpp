@@ -9,15 +9,15 @@ namespace Arya
 
   Console::Console()
   {
-    nrLines = 20; //visible number of lines of console 
-    searchNrLines = 50; //number of lines in which you can search, if more the first one will be kicked
-    textWidthInPixels = 10;  //width of character
-    nrCharOnLine = (Root::shared().getWindowWidth()-(Root::shared().getWindowWidth() % textWidthInPixels))/textWidthInPixels; 
-    pixelsInBetween = 4.0; // pixels in between lines
-    visibility = false; //visibility of the kernel
+    nrLines = 20;
+    searchNrLines = 50;
+    textWidthInPixels = 10;
+    pixelsInBetween = 4.0;
+    visibility = false;
     activeLine = 0;
-    font = FontManager::shared().getFont("courier.ttf"); //font to be used
-    time = 0.0; // used for cursor flashing
+    nrCharOnLine = 0;
+    font = 0;
+    time = 0.0;
   };
 
   Console::~Console()
@@ -27,6 +27,10 @@ namespace Arya
 
   bool Console::init()
   {
+    if((!Root::shared().getWindowWidth()) || (!Root::shared().getWindowHeight())) return false;
+    nrCharOnLine = (Root::shared().getWindowWidth()-(Root::shared().getWindowWidth() % textWidthInPixels))/textWidthInPixels; 
+    font = FontManager::shared().getFont("courier.ttf"); //font to be used
+    if(!font) return false;
     Rect* rect = new Rect; // here we initialize the frame for the console itself
     rects.push_back(rect);
     rect->offsetInPixels.x = 0.0;
@@ -53,7 +57,7 @@ namespace Arya
       }
     }
 
-    for(int i = 0; i < nrCharOnLine; i++) // here, we add rectangles for the currentLine. These should be loose, because we need to be able to delete and add letters
+    for(int i = 0; i < nrCharOnLine; i++) // here, we add rectangles for the currentLine. These should be seperate, because we need to be able to delete and add letters
     {
       Rect* rect = new Rect;
       rects.push_back(rect);
@@ -69,6 +73,7 @@ namespace Arya
 
   void Console::onFrame(float elapsedTime)
   {
+    if(!visibility) return;
     time += elapsedTime;
     if(time < 2.0) // build something in for moving cursor, but need to wait with implementation untill I added some more keyboard commands.
     {
@@ -111,10 +116,7 @@ namespace Arya
         }
       }
     }
-    else
-    {
-      time = 0.0;
-    }
+    else time = 0.0;
   }
 
   void Console::cleanup(){}
@@ -124,16 +126,10 @@ namespace Arya
     visibility = flag;
   }
 
-  void Console::toggleVisbilityConsole() //toggle visibility of the console
+  void Console::toggleVisibilityConsole() //toggle visibility of the console
   {
-    if(visibility)
-    {
-      visibility = false;
-    }
-    else
-    {
-      visibility = true;
-    }
+    if(visibility) visibility = false;
+    else visibility = true;
   }
 
   void Console::addTextLine(string textToBeAdded) //add line of text to the history (as well as to the search history). If nr of lines > maxnr then the first one will be deleted
@@ -141,14 +137,8 @@ namespace Arya
     history.push_back(textToBeAdded);
     searchHistory.push_back(textToBeAdded);
     activeLine += 1;
-    if(history.size() ==  nrLines)
-    {
-      history.erase(history.begin());
-    }
-    if(searchHistory.size() == searchNrLines)
-    {
-      searchHistory.erase(searchHistory.begin());
-    }
+    if(history.size() ==  nrLines) history.erase(history.begin());
+    if(searchHistory.size() == searchNrLines) searchHistory.erase(searchHistory.begin());
   }
 
   void Console::enterInput() // When you press enter, currentLine needs to be emptied and needs to be added to the history and searchhistory
@@ -156,19 +146,4 @@ namespace Arya
     addTextLine(currentLine);
     currentLine = "";
   }
-
-  /* bool Console::searchKeyword(vector<string> searchKey)
-     {
-     for(int i = 0; i < searchKey.size(); i++)
-     {
-     if(searchHistory.at(activeLine-1).find(searchKey.at(i), 0))
-     {
-     return true;
-     }
-     else
-     {
-     return false;
-     }
-     }
-     }*/
 }

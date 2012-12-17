@@ -101,7 +101,7 @@ bool Game::keyDown(int key, bool keyDown)
 
           case 'O': glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
           case 'I': glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
-          case GLFW_KEY_F6: if(keyDown) Arya::Console::shared().toggleVisbilityConsole(); break;
+          case GLFW_KEY_F6: if(keyDown) Arya::Console::shared().toggleVisibilityConsole(); break;
           case GLFW_KEY_F11: Root::shared().setFullscreen(!Root::shared().getFullscreen()); break;
           case GLFW_KEY_ESC: Root::shared().stopRendering(); break;
           default: keyHandled = false; break;
@@ -117,7 +117,7 @@ bool Game::keyDown(int key, bool keyDown)
       {
         switch(key)
         {
-          case GLFW_KEY_F6: if(keyDown) Arya::Console::shared().toggleVisbilityConsole(); break;
+          case GLFW_KEY_F6: if(keyDown) Arya::Console::shared().toggleVisibilityConsole(); break;
           case GLFW_KEY_F11: Root::shared().setFullscreen(!Root::shared().getFullscreen()); break;
           case GLFW_KEY_ESC: Root::shared().stopRendering(); break;
           case GLFW_KEY_BACKSPACE: if(keyDown && (Arya::Console::shared().currentLine.length() > 0))

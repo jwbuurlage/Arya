@@ -85,11 +85,19 @@ namespace Arya
         if(!overlay->init()) return false;
 
         Interface* interf = new Interface;
-        interf->init();
+        if(!interf->init())
+        {
+          LOG_INFO("Could not initialize interface");
+          return false;
+        }
         addFrameListener(interf);
         
         Console* console = new Console;
-        console->init();
+        if(!console->init()) 
+        {
+          LOG_INFO("Could not initialize console");
+          return false;
+        }
         addFrameListener(console);
         LOG_INFO("Root initialized");
 
