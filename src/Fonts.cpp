@@ -50,7 +50,7 @@ namespace Arya
         unsigned char pixeldata[512*512];
         int width = 512;
         int height = 512;
-        //stbtt_bakedchar baked[100];
+        stbtt_bakedchar baked[200];
         stbtt_BakeFontBitmap((unsigned char*)file->getData(), 0, 20, pixeldata, width, height, 0, 100, font->baked);
         glGenTextures(1, &font->textureHandle);
         glBindTexture(GL_TEXTURE_2D, font->textureHandle);

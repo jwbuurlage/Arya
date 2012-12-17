@@ -11,7 +11,7 @@ namespace Arya
     class Font
     {
         public:
-            stbtt_bakedchar baked[100];
+            stbtt_bakedchar baked[200];
             Font(){textureHandle = 0;}
             ~Font(){if( textureHandle ) glDeleteTextures(1, &textureHandle);}
             GLuint textureHandle;
