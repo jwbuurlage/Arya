@@ -52,6 +52,7 @@ SET(
     "../src/Interface.cpp"
     "../src/Materials.cpp"
     "../src/common/Logger.cpp"
+    "../src/Console.cpp"
     )
 
 SET(

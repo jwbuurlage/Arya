@@ -1,4 +1,4 @@
-#version 400
+#version 140
 
 uniform sampler2D splatTexture;
 uniform sampler2D heightMap;

@@ -29,6 +29,8 @@ namespace Arya
             texOffset = vec2(0.0);
 
             screenPosition = vec2(0.0);
+
+            isVisible = true; 
         };
 
         vec2 relative; // in screen coordinates [-1, 1]
@@ -44,6 +46,9 @@ namespace Arya
 
         vec2 screenPosition; //gets set by Overlay
         vec2 screenSize; //gets set by Overlay
+
+        bool isVisible;
+
     };
 
     class Overlay

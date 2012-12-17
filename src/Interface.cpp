@@ -13,10 +13,10 @@ using std::vector;
 
 namespace Arya
 {
-    void Interface::init()
+    bool Interface::init()
     {
         Font* font = FontManager::shared().getFont("courier.ttf");
-
+        if(!font) return false;
         for(int i = 0; i < 9; i++)
         {
             Rect* rect = new Rect;

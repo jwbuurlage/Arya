@@ -9,6 +9,7 @@
 #include "Fonts.h"
 #include "Textures.h"
 #include "Scene.h"
+#include "Console.h"
 #include "Files.h"
 #include "Overlay.h"
 #include "Camera.h"
@@ -86,7 +87,10 @@ namespace Arya
         Interface* interf = new Interface;
         interf->init();
         addFrameListener(interf);
-
+        
+        Console* console = new Console;
+        console->init();
+        addFrameListener(console);
         LOG_INFO("Root initialized");
 
         return true;

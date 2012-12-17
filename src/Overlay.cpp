@@ -99,7 +99,9 @@ namespace Arya
     glActiveTexture(GL_TEXTURE0);
 
     // render all rects
-    for(int i = 0; i < rects.size(); ++i) {
+    for(int i = 0; i < rects.size(); ++i)
+    {
+      if(!(rects[i]->isVisible)) continue;
       overlayProgram->setUniform4fv("uColor", rects[i]->fillColor);
       if(rects[i]->textureHandle !=0)
       {
