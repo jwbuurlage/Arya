@@ -33,7 +33,7 @@ Unit::Unit(UnitInfo* inf)
     // need to check if this flips orientation
     healthBar->offsetInPixels = vec2(-12.5, 25.0);
 
-    Root::shared().getOverlay()->addRect(healthBar);
+    // Root::shared().getOverlay()->addRect(healthBar);
 
     id = -1;
     factionId = -1;
@@ -123,11 +123,11 @@ void Unit::update(float timeElapsed)
     float oldYaw = object->getYaw();
     float yawDiff = newYaw - oldYaw;
 
-    if( yawDiff > 180.0f ) yawDiff -= 360.0f;
-    else if( yawDiff < -180.0f ) yawDiff += 360.0f;
+    if(yawDiff > 180.0f) yawDiff -= 360.0f;
+    else if(yawDiff < -180.0f) yawDiff += 360.0f;
 
     float deltaYaw = timeElapsed * info->yawSpeed + 1.0f;
-    if( (yawDiff >= 0 && yawDiff < deltaYaw) || (yawDiff <= 0 && yawDiff > -deltaYaw) )
+    if((yawDiff >= 0 && yawDiff < deltaYaw) || (yawDiff <= 0 && yawDiff > -deltaYaw))
     {
         //angle is small enough (less than 1 degree) so we can start walking now
         object->setYaw(newYaw);
@@ -150,7 +150,7 @@ void Unit::update(float timeElapsed)
     else
     {
         //Rotate
-        if( yawDiff < 0 ) deltaYaw = -deltaYaw;
+        if(yawDiff < 0) deltaYaw = -deltaYaw;
         object->setYaw( oldYaw + deltaYaw );
     }
 
@@ -214,6 +214,7 @@ void Unit::receiveDamage(int dmg, Unit* attacker)
     {
         setUnitState(UNIT_ATTACKING_OUT_OF_RANGE);
         targetUnit = attacker;
+        attacker->retain();
     }
 
     health -= dmg;

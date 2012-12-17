@@ -4,6 +4,7 @@ tools/build/*
 obj/
 bin/*
 log*
+shaders/version_convert.rb
 
 *.DS_Store
 

@@ -91,7 +91,7 @@ namespace Arya
           return false;
         }
         addFrameListener(interf);
-        
+
         Console* console = new Console;
         if(!console->init()) 
         {
@@ -99,6 +99,7 @@ namespace Arya
           return false;
         }
         addFrameListener(console);
+        addInputListener(console);
         LOG_INFO("Root initialized");
 
         return true;
