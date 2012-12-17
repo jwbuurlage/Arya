@@ -120,7 +120,7 @@ bool Game::keyDown(int key, bool keyDown)
           case GLFW_KEY_F6: if(keyDown) Arya::Console::shared().toggleVisbilityConsole(); break;
           case GLFW_KEY_F11: Root::shared().setFullscreen(!Root::shared().getFullscreen()); break;
           case GLFW_KEY_ESC: Root::shared().stopRendering(); break;
-          case GLFW_KEY_BACKSPACE: if(keyDown)
+          case GLFW_KEY_BACKSPACE: if(keyDown && (Arya::Console::shared().currentLine.length() > 0))
           {
             Arya::Console::shared().currentLine.erase(Arya::Console::shared().currentLine.end() - 1);
           }break;
