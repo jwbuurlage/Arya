@@ -179,6 +179,17 @@ namespace Arya
             objects[i]->updateAnimation(elapsedTime);
         }
 
+        GLfloat depth;
+        glReadPixels(0, 0, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+        vec4 resultBL = camera->getInverseVPMatrix() * vec4(-1.0, -1.0, depth, 1.0);
+        resultBL /= resultBL.w;
+        glReadPixels(Root::shared().getWindowWidth() - 1, Root::shared().getWindowHeight() - 1, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+        vec4 resultTR = camera->getInverseVPMatrix() * vec4(1.0, 1.0, depth, 1.0);
+        resultTR /= resultBL.w;
+
+        LOG_INFO("resultBL: " << resultBL.x << " " << resultBL.y << " " << resultBL.z);
+        LOG_INFO("resultTR: " << resultTR.x << " " << resultTR.y << " " << resultTR.z);
+
         // shadow stuff
         orthoShadowCubeMatrix = glm::ortho(-200.0, 200.0, 0.0, 200.0, -200.0, 0.0);
 
