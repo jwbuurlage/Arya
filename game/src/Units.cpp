@@ -33,7 +33,7 @@ Unit::Unit(UnitInfo* inf)
     // need to check if this flips orientation
     healthBar->offsetInPixels = vec2(-12.5, 25.0);
 
-    Root::shared().getOverlay()->addRect(healthBar);
+    // Root::shared().getOverlay()->addRect(healthBar);
 
     id = -1;
     factionId = -1;
