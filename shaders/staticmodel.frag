@@ -1,4 +1,4 @@
-#version 140
+#version 400
 
 uniform sampler2D tex;
 uniform vec4 parameters;//specAmp, specPow, ambient, diffuse

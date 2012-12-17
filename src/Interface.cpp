@@ -29,7 +29,7 @@ namespace Arya
             Root::shared().getOverlay()->addRect(rect);
         }
 
-        float xpos = 0.0f, ypos = 0.0f;      
+        float xpos = 0.0f, ypos = 0.0f;
         stbtt_aligned_quad q;
         string s = "FPS = ";
 
@@ -39,9 +39,9 @@ namespace Arya
             rects[i]->texOffset = vec2(q.s0, 1 - q.t0 - (q.t1 - q.t0));
             rects[i]->texSize = vec2(q.s1 - q.s0, (q.t1 - q.t0));
         }
+
+        return true;
     }
-
-
 
     void Interface::onFrame(float elapsedTime)
     {	
@@ -51,7 +51,7 @@ namespace Arya
 
         if (time >= 1.0)
         {
-            float xpos = 0.0f, ypos = 0.0f;      
+            float xpos = 0.0f, ypos = 0.0f;
             std::stringstream myStream;
             myStream.fill(' ');
             myStream.width(3);
@@ -67,6 +67,5 @@ namespace Arya
             count = 0;
             time = 0.0;
         }
-
     }
 }

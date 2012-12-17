@@ -85,9 +85,11 @@ namespace Arya
         if(!overlay->init()) return false;
 
         Interface* interf = new Interface;
-        interf->init();
+        if(!interf->init())
+            return false;
+
         addFrameListener(interf);
-        
+
         Console* console = new Console;
         console->init();
         addFrameListener(console);
