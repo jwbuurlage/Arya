@@ -100,7 +100,6 @@ namespace Arya
         terrainProgram->attach(terrainFragment);
         if(!(terrainProgram->link())) return false;
 
-
 		Shader* waterVertex = new Shader(VERTEX);
         if(!(waterVertex->addSourceFile("../shaders/water.vert"))) return false;
         if(!(waterVertex->compile())) return false;
@@ -339,10 +338,18 @@ namespace Arya
 
     void Terrain::render(Camera* cam)
     {
+        static mat4 biasMatrix(
+            0.5f, 0.0f, 0.0f, 0.0f,
+            0.0f, 0.5f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.5f, 0.0f,
+            0.5f, 0.5f, 0.5f, 1.0f
+        );
+
         terrainProgram->use();
         terrainProgram->setUniformMatrix4fv("vpMatrix", cam->getVPMatrix());
 		terrainProgram->setUniformMatrix4fv("viewMatrix", cam->getVMatrix());
         terrainProgram->setUniformMatrix4fv("scaleMatrix", scaleMatrix);
+        terrainProgram->setUniformMatrix4fv("lightOrthoMatrix", biasMatrix * Root::shared().getScene()->getLightOrthoMatrix());
 		terrainProgram->setUniform3fv("lightDirection", vec3(0.7,0.7,0.0));
 
         // heightmap
@@ -376,6 +383,10 @@ namespace Arya
         terrainProgram->setUniform1i("texture4", 5);
         glActiveTexture(GL_TEXTURE5);
         glBindTexture(GL_TEXTURE_2D, tileSet[3]->texture->handle);
+
+        terrainProgram->setUniform1i("shadowMap", 7);
+        glActiveTexture(GL_TEXTURE7);
+        glBindTexture(GL_TEXTURE_2D, Root::shared().getScene()->getShadowDepthTextureHandle());
 
         for(int i = 0; i < patches.size(); ++i) {
             Patch& p = patches[i];

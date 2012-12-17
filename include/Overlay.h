@@ -48,7 +48,6 @@ namespace Arya
         vec2 screenSize; //gets set by Overlay
 
         bool isVisible;
-
     };
 
     class Overlay

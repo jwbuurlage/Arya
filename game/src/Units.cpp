@@ -119,6 +119,14 @@ void Unit::update(float timeElapsed)
     vec3 target(targetPosition.x, targeth, targetPosition.y);
     vec3 diff = target - object->getPosition();
 
+    if(glm::length(diff) < 2.0) // arbitrary closeness...
+    {
+        object->setPosition(target);
+        targetPosition = vec2(0.0);
+        setUnitState(UNIT_IDLE);
+        return;
+    }
+
     float newYaw = (180.0f/M_PI)*atan2(-diff.x, -diff.z);
     float oldYaw = object->getYaw();
     float yawDiff = newYaw - oldYaw;
@@ -134,14 +142,7 @@ void Unit::update(float timeElapsed)
         if(unitState == UNIT_ATTACKING)
             return;
 
-        if(glm::length(diff) < 0.5) // arbitrary closeness...
-        {
-            object->setPosition(target);
-            targetPosition = vec2(0.0);
-            setUnitState(UNIT_IDLE);
-            return;
-        }
-        diff = glm::normalize(diff);
+       diff = glm::normalize(diff);
 
         vec3 newPosition = object->getPosition() + timeElapsed * (info->speed * diff);
         newPosition.y = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(newPosition.x, newPosition.z);
