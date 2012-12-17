@@ -44,8 +44,6 @@ namespace Arya
             rects[i]->offsetInPixels.x = lastX;
             rects[i]->sizeInPixels = vec2(q.x1 - q.x0, (q.y1 - q.y0));
 
-            LOG_INFO("x, y, char: " << s[i] << " " << xpos << " " << ypos);
-
             lastX = xpos;
         }
 

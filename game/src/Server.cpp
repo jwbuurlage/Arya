@@ -1,8 +1,10 @@
 #include "../include/Server.h"
 #include "../include/Packet.h"
+#include "../include/EventCodes.h"
 #include "../include/ServerClientHandler.h"
 #include "Arya.h"
 #include <cstring>
+#include <iostream>
 
 #include "Poco/Exception.h"
 #include "Poco/Net/NetException.h"
@@ -58,8 +60,22 @@ void Server::runInThread()
     LOG_INFO("Server started on port " << port);
 }
 
+//------------------------------
+// SERVER LOGIC
+//------------------------------
+
 void Server::handlePacket(Packet& packet)
 {
     int id = packet.getId();
+    switch(packet.getId()) {
+    case EVENT_JOIN_GAME:
+        LOG_INFO("someone joined... what do");
+        break;
+
+    default:
+        LOG_INFO("Unknown package received..");
+        break;
+    }
+
     return;
 }
