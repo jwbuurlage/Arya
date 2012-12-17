@@ -1,6 +1,6 @@
 #include "Materials.h"
 #include "Files.h"
-#include "common/logger.h"
+#include "common/Logger.h"
 #include <vector>
 
 namespace Arya
