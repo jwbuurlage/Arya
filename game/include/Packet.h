@@ -21,6 +21,8 @@ class Packet
     private:
         friend class Connection;
         friend class Network;
+        friend class Server;
+        friend class ServerClientHandler;
 
         //For creating packets (for sending)
         Packet(int id) : data(12, 32), readPos(12), markedForSend(false) //allocate 32 bytes by default
@@ -74,6 +76,12 @@ class Packet
         inline Packet& operator<<(char val)
         {
             data.append(&val, sizeof(char));
+            return *this;
+        }
+
+        inline Packet& operator<<(float val)
+        {
+            data.append(&val, sizeof(val));
             return *this;
         }
 
