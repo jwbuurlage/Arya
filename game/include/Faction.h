@@ -24,6 +24,8 @@ class Faction
         void serialize(Packet& pk);
         void deserialize(Packet& pk);
 
+        void setId(int _id){ id = _id; }
+
     private:
         list<Unit*> units;
         int color;

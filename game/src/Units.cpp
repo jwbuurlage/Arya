@@ -43,7 +43,7 @@ Unit::~Unit()
 {
     if(targetUnit)
         targetUnit->release();
-    object->setObsolete();
+    if(object) object->setObsolete();
 
     Root::shared().getOverlay()->removeRect(healthBar);
     delete healthBar;
@@ -84,7 +84,7 @@ void Unit::update(float timeElapsed)
             return;
         }
 
-        if(glm::distance(object->getPosition(), targetUnit->getObject()->getPosition())
+        if(glm::distance(getPosition(), targetUnit->getPosition())
                 < targetUnit->getInfo()->radius) {
             if(unitState != UNIT_ATTACKING)
                 setUnitState(UNIT_ATTACKING);
@@ -109,15 +109,19 @@ void Unit::update(float timeElapsed)
         else {
             if(unitState != UNIT_ATTACKING_OUT_OF_RANGE)
                 setUnitState(UNIT_ATTACKING_OUT_OF_RANGE);
-            targetPosition = vec2(targetUnit->getObject()->getPosition().x,
-                            targetUnit->getObject()->getPosition().z);
+            targetPosition = vec2(targetUnit->getPosition().x,
+                            targetUnit->getPosition().z);
         }
     }
+
+    //No object on server
+    //Then the part below is not needed
+    if(!object) return;
 
     float targeth;
     targeth = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(targetPosition.x, targetPosition.y);
     vec3 target(targetPosition.x, targeth, targetPosition.y);
-    vec3 diff = target - object->getPosition();
+    vec3 diff = target - getPosition();
 
     float newYaw = (180.0f/M_PI)*atan2(-diff.x, -diff.z);
     float oldYaw = object->getYaw();
@@ -136,16 +140,16 @@ void Unit::update(float timeElapsed)
 
         if(glm::length(diff) < 0.5) // arbitrary closeness...
         {
-            object->setPosition(target);
+            setPosition(target);
             targetPosition = vec2(0.0);
             setUnitState(UNIT_IDLE);
             return;
         }
         diff = glm::normalize(diff);
 
-        vec3 newPosition = object->getPosition() + timeElapsed * (info->speed * diff);
+        vec3 newPosition = getPosition() + timeElapsed * (info->speed * diff);
         newPosition.y = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(newPosition.x, newPosition.z);
-        object->setPosition(newPosition);
+        setPosition(newPosition);
     }
     else
     {
@@ -162,6 +166,8 @@ void Unit::setUnitState(UnitState state)
         return;
 
     unitState = state;
+
+    if(!object) return; //server
 
     switch(unitState)
     {
@@ -229,7 +235,7 @@ void Unit::receiveDamage(int dmg, Unit* attacker)
 void Unit::setTintColor(vec3 tC)
 {
     tintColor = tC;
-    object->setTintColor(tC);
+    if(object) object->setTintColor(tC);
     healthBar->fillColor = vec4(tintColor, 1.0);
 }
 

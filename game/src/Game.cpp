@@ -159,6 +159,29 @@ void Game::onFrame(float elapsedTime)
 
 void Game::handleEvent(Packet& packet)
 {
-    if(packet.getId() == EVENT_GAME_READY)
+    int id = packet.getId();
+    if(id == EVENT_GAME_READY)
         LOG_INFO("Game is ready");
+    else if(id == EVENT_GAME_FULLSTATE)
+    {
+        int playerCount;
+        packet >> playerCount;
+        for(int i = 0; i < playerCount; ++i)
+        {
+            int clientId;
+            packet >> clientId;
+
+            //faction deserialize
+
+            int unitCount;
+            packet >> unitCount;
+            for(int i = 0; i < unitCount; ++i)
+            {
+                //create unit
+                //deserialize
+            }
+        }
+    }
+    else
+        LOG_INFO("Unkown even received!");
 }

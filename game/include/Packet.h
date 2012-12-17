@@ -25,7 +25,7 @@ class Packet
         friend class ServerClientHandler;
 
         //For creating packets (for sending)
-        Packet(int id) : data(12, 32), readPos(12), markedForSend(false) //allocate 32 bytes by default
+        Packet(int id) : data(12, 32), readPos(12), markedForSend(false), refCount(0)  //allocate 32 bytes by default
         {
             *(int*)&data[0] = PACKETMAGICINT;
             *(int*)&data[4] = 12;
@@ -33,13 +33,12 @@ class Packet
         }
 
         //For receiving packets
-        Packet(char* databuf, int size) : data(databuf, size), readPos(12), markedForSend(false) {};
+        Packet(char* databuf, int size) : data(databuf, size), readPos(12), markedForSend(false), refCount(0) {};
 
         ~Packet(){};
 
         //When getting the data, for writing it to the network, we write the size in the buffer
         char* getData() { *(int*)&data[4] = getSize(); return data.data(); }
-
     public:
         int getId() { return *(int*)&data[8]; }
 
@@ -102,5 +101,11 @@ class Packet
         buffer data;
         int readPos;
         bool markedForSend;
+
+        //The server must often send a packet to all clients
+        //In this case they all add a refcount, and only when
+        //all clients received the packet and the refcount is zero
+        //then this packet may be deleted
+        int refCount;
 };
 

@@ -137,10 +137,14 @@ class Connection
             }
             else
             {
-                while(!packets.empty())
+                if(!packets.empty())
                 {
-                    delete packets.back();
-                    packets.pop_back();
+                    LOG_WARNING("There are packets in the send queue but there is no connection!");
+                    while(!packets.empty())
+                    {
+                        delete packets.back();
+                        packets.pop_back();
+                    }
                 }
             }
         }

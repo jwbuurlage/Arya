@@ -34,6 +34,9 @@ class Unit
         Unit(UnitInfo* inf);
         ~Unit();
 
+        void setPosition(const vec3& pos) { position = pos; if(object) object->setPosition(pos); }
+        vec3 getPosition() const { return position; }
+
         void setObject(Object* obj);
         Object* getObject() const { return object; }
 
@@ -69,7 +72,8 @@ class Unit
         void deserialize(Packet& pk);
 
     private:
-        Object* object;
+        Object* object; //object->position is always the same as position
+        vec3 position; //since server has no Object, position is stored here
         UnitInfo* info;
         bool selected;
 
