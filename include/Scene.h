@@ -40,6 +40,9 @@ namespace Arya
 
             Object* createObject();
 
+            mat4 getLightOrthoMatrix() const { return lightOrthoMatrix; }
+            GLuint getShadowDepthTextureHandle() const { return shadowDepthTextureHandle; }
+
         private:
             bool initialized;
 			
@@ -59,6 +62,14 @@ namespace Arya
 
             bool init();
             bool initShaders();
+
+            // Shadows
+            bool initShadowSupport();
+            GLuint shadowFBOHandle;
+            GLuint shadowDepthTextureHandle;
+            mat4 orthoShadowCubeMatrix;
+            mat4 rotateToLightDirMatrix;
+            mat4 lightOrthoMatrix;
 
             ShaderProgram* basicProgram;
     };
