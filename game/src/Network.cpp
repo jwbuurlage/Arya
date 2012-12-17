@@ -85,7 +85,9 @@ class Connection
                         bytesReceived += n;
 
                         //Check if we received the packet header
-                        if(bytesReceived >= 12)
+                        //The while is because we often receive
+                        //multiple packets in a single receive call
+                        while(bytesReceived >= 12)
                         {
                             if( *(int*)dataBuffer != PACKETMAGICINT )
                             {
@@ -111,6 +113,10 @@ class Connection
                                 if(extraSize > 0)
                                     memmove(dataBuffer, dataBuffer + packetSize, extraSize);
                                 bytesReceived = extraSize;
+                            }
+                            else
+                            {
+                                break;
                             }
                         }
                     }

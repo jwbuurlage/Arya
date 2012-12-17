@@ -114,10 +114,6 @@ void Unit::update(float timeElapsed)
         }
     }
 
-    //No object on server
-    //Then the part below is not needed
-    if(!object) return;
-
     float targeth;
     targeth = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(targetPosition.x, targetPosition.y);
     vec3 target(targetPosition.x, targeth, targetPosition.y);
@@ -125,11 +121,13 @@ void Unit::update(float timeElapsed)
 
     if(glm::length(diff) < 2.0) // arbitrary closeness...
     {
-        object->setPosition(target);
+        setPosition(target);
         targetPosition = vec2(0.0);
         setUnitState(UNIT_IDLE);
         return;
     }
+
+    if(!object) return;
 
     float newYaw = (180.0f/M_PI)*atan2(-diff.x, -diff.z);
     float oldYaw = object->getYaw();
@@ -147,7 +145,6 @@ void Unit::update(float timeElapsed)
             return;
 
         diff = glm::normalize(diff);
-
         vec3 newPosition = getPosition() + timeElapsed * (info->speed * diff);
         newPosition.y = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(newPosition.x, newPosition.z);
         setPosition(newPosition);

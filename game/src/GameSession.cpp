@@ -109,10 +109,10 @@ bool GameSession::init()
         float heightModel = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(-100.0 + 20.0 * (i / 10), -100.0+20.0*(i % 10));
         obj = scene->createObject();
         obj->setModel(ModelManager::shared().getModel("ogros.aryamodel"));
-        obj->setPosition(vec3(-100.0 + 20 * (i / 10), heightModel, -100.0 + 20 * (i % 10)));
         obj->setAnimation("stand");
-
         unit->setObject(obj);
+        unit->setPosition(vec3(-100.0 + 20 * (i / 10), heightModel, -100.0 + 20 * (i % 10)));
+
         otherFaction->addUnit(unit);
     }
 

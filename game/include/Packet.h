@@ -39,6 +39,7 @@ class Packet
 
         //When getting the data, for writing it to the network, we write the size in the buffer
         char* getData() { *(int*)&data[4] = getSize(); return data.data(); }
+
     public:
         int getId() { return *(int*)&data[8]; }
 

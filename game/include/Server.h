@@ -41,7 +41,7 @@ class Server
         //TODO: also save Packet* list
         //in Server, and on each update
         //check for zero refcounts
-        Packet& createPacket(int id);
+        Packet* createPacket(int id);
 
         void sendToAllClients(Packet* pak);
 

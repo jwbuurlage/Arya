@@ -154,6 +154,7 @@ bool ServerClientHandler::trySendPacketData(Packet* packet, int& bytesSent)
         LOG_WARNING("Net exception when writing to socket. Msg: " << e.message());
         return false;
     }
+
     if(n<=0)
     {
         LOG_INFO("Server closed connection when writing to socket");
