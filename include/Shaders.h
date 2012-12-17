@@ -29,7 +29,7 @@ using glm::vec4;
 
 namespace Arya
 {
-    struct File;
+    class File;
 
     enum ShaderType
     {
