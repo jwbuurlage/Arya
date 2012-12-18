@@ -144,8 +144,12 @@ namespace Arya
                 double pollTime = glfwGetTime();
                 double elapsed = pollTime - oldTime;
 
-                for(std::vector<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();++it)
-                    (*it)->onFrame((float)elapsed);
+                //DO NOT USE ITERATORS HERE
+                //Some framelisteners (network update) add other framelisteners
+                //for(std::vector<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();++it)
+                //    (*it)->onFrame((float)elapsed);
+                for(unsigned int i = 0; i < frameListeners.size(); ++i)
+                    frameListeners[i]->onFrame((float)elapsed);
 
                 oldTime = pollTime;
             }
@@ -246,6 +250,7 @@ namespace Arya
         if(scene)
         {
             scene->render();
+
             for(std::vector<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();++it)
                 (*it)->onRender();
 
