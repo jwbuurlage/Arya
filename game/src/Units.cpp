@@ -178,7 +178,7 @@ void Unit::setUnitState(UnitState state)
             break;
 
         case UNIT_ATTACKING_OUT_OF_RANGE:
-            object->setAnimation("wave");
+            object->setAnimation("crouch_walk");
             break;
 
         case UNIT_ATTACKING:

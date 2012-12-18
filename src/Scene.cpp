@@ -92,7 +92,7 @@ namespace Arya
 
         glGenTextures(1, &shadowDepthTextureHandle);
         glBindTexture(GL_TEXTURE_2D, shadowDepthTextureHandle);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, 2048, 2048, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -189,19 +189,19 @@ namespace Arya
 
         float shadowBoxHalfWidth = (resultTR.x - resultBL.x) * 0.5f;
         float shadowBoxHalfHeight = (resultBL.z - resultTR.z) * 0.5f;
-        // vec3 translationToCenter = vec3(resultBL.x + shadowBoxHalfWidth, resultTR.z + shadowBoxHalfHeight, 0.0f);
+        vec3 translationToCenter = vec3(resultBL.x + shadowBoxHalfWidth, 0.0f, resultTR.z + shadowBoxHalfHeight);
 
         // shadow stuff
-        orthoShadowCubeMatrix = glm::ortho(-shadowBoxHalfWidth, shadowBoxHalfWidth, 0.0f, 200.0f, -shadowBoxHalfHeight, shadowBoxHalfHeight);
+        orthoShadowCubeMatrix = glm::ortho(-shadowBoxHalfWidth, shadowBoxHalfWidth, -300.0f, 300.0f, -shadowBoxHalfHeight, shadowBoxHalfHeight);
 
         rotateToLightDirMatrix = glm::rotate(mat4(1.0),
                 glm::acos(glm::dot(glm::normalize(lightDirection),
                                vec3(0.0, 0.0, 1.0))) * (180.0f / 3.141592653589793f),
                 glm::cross(lightDirection, vec3(0.0, 0.0, 1.0)));
 
-        // mat4 translationMatrix = glm::translate(mat4(1.0), -translationToCenter);
+        mat4 translationMatrix = glm::translate(mat4(1.0), -translationToCenter);
 
-        lightOrthoMatrix = orthoShadowCubeMatrix * rotateToLightDirMatrix; // * translationMatrix;
+        lightOrthoMatrix = orthoShadowCubeMatrix * rotateToLightDirMatrix* translationMatrix;
     }
 
     void Scene::render()
@@ -211,7 +211,7 @@ namespace Arya
         //------------------------------
 
         glBindFramebuffer(GL_FRAMEBUFFER, shadowFBOHandle);
-        glViewport(0, 0, 1024, 1024);
+        glViewport(0, 0, 2048, 2048);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

@@ -55,9 +55,7 @@ void main()
     if(!(posOnShadowTex.x < 0.0 || posOnShadowTex.x > 1.0))
         if(!(posOnShadowTex.y < 0.0 || posOnShadowTex.y > 1.0)) 
             if(!(posOnShadowTex.z < 0.0 || posOnShadowTex.z > 1.0)) 
-            {
                 if(texture(shadowMap, posOnShadowTex.xy).r < posOnShadowTex.z)
                     FragColor *= 0.5;
-            }
 
 }
