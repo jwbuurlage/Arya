@@ -6,7 +6,7 @@ namespace Arya
     class Interface : public FrameListener
     {
         public:
-            Interface(){ time = 0.0; count = 0; }
+            Interface(){ offsetFPS = 0.0; time = 0.0; count = 0; }
             ~Interface(){}
 
             void onFrame(float elapsedTime);
@@ -15,6 +15,7 @@ namespace Arya
         private:
             float time; 
             int count;
+            float offsetFPS;
 
             vector<Rect*> rects;
     };

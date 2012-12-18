@@ -140,6 +140,9 @@ void Game::handleEvent(Packet& packet)
     {
         int playerCount;
         packet >> playerCount;
+
+        LOG_INFO("Game has " << playerCount << " player(s)");
+
         for(int i = 0; i < playerCount; ++i)
         {
             int clientId;

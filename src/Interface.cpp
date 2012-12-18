@@ -11,6 +11,9 @@
 #include "../ext/stb_truetype.h"
 using std::vector;
 
+#define OFFSET_X 30.0f
+#define OFFSET_Y 30.0f
+
 namespace Arya
 {
     bool Interface::init()
@@ -21,12 +24,8 @@ namespace Arya
         {
             Rect* rect = new Rect;
             rects.push_back(rect);
-            rect->fillColor = vec4(1.0);
-            rect->offsetInPixels.x = i * 12.0;
-            rect->offsetInPixels.y = 0.0;
-            rect->sizeInPixels.x = 12.0;
-            rect->sizeInPixels.y = 12.0;
             rects[i]->textureHandle = font->textureHandle;
+            rects[i]->offsetInPixels.y = OFFSET_Y;
             Root::shared().getOverlay()->addRect(rect);
         }
 
@@ -41,11 +40,14 @@ namespace Arya
             stbtt_GetBakedQuad(font->baked, 512, 512, s[i], &xpos ,&ypos,&q,true);
             rects[i]->texOffset = vec2(q.s0, 1 - q.t0 - (q.t1 - q.t0));
             rects[i]->texSize = vec2(q.s1 - q.s0, (q.t1 - q.t0));
-            rects[i]->offsetInPixels.x = lastX;
+            rects[i]->offsetInPixels.x = OFFSET_X + lastX;
             rects[i]->sizeInPixels = vec2(q.x1 - q.x0, (q.y1 - q.y0));
+            rects[i]->offsetInPixels.y = OFFSET_Y - (rects[i]->sizeInPixels.y/2.0);
 
             lastX = xpos;
         }
+
+        offsetFPS = lastX;
 
         return true;
     }
@@ -60,16 +62,21 @@ namespace Arya
         {
             float xpos = 0.0f, ypos = 0.0f;
             std::stringstream myStream;
-            myStream.fill(' ');
+            myStream.fill('0');
             myStream.width(3);
             if(count >= 1000) count = 999;
             myStream << count;
             stbtt_aligned_quad q;
-            for(int i = 6; i < 9; i++)
+            float lastX = 0.0f;
+            for(int i = 0; i < 3; i++)
             {
-                stbtt_GetBakedQuad(font->baked, 512, 512, myStream.str()[i - 6], &xpos ,&ypos,&q,true);
-                rects[i]->texOffset = vec2(q.s0, 1 - q.t0 - (q.t1 - q.t0));
-                rects[i]->texSize = vec2(q.s1 - q.s0, (q.t1 - q.t0));
+                stbtt_GetBakedQuad(font->baked, 512, 512, myStream.str()[i], &xpos ,&ypos,&q,true);
+                rects[i + 6]->texOffset = vec2(q.s0, 1 - q.t0 - (q.t1 - q.t0));
+                rects[i + 6]->texSize = vec2(q.s1 - q.s0, (q.t1 - q.t0));
+                rects[i + 6]->sizeInPixels = vec2(q.x1 - q.x0, (q.y1 - q.y0));
+                rects[i + 6]->offsetInPixels.x = lastX + offsetFPS + OFFSET_X;
+                rects[i + 6]->offsetInPixels.y = OFFSET_Y - (rects[i + 6]->sizeInPixels.y / 2.0);
+                lastX = xpos;
             }
             count = 0;
             time = 0.0;
