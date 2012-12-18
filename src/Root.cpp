@@ -244,25 +244,26 @@ namespace Arya
         glClear(GL_DEPTH_BUFFER_BIT);
 
         if(scene)
+        {
             scene->render();
+            for(std::vector<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();++it)
+                (*it)->onRender();
 
-        GLfloat depth;
-        glReadPixels(mouseX, mouseY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+            GLfloat depth;
+            glReadPixels(mouseX, mouseY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
 
-        vec4 screenPos(2.0f * mouseX /((float)windowWidth) - 1.0f, 2.0f * mouseY/((float)windowHeight) - 1.0f, 2.0f*depth-1.0f, 1.0);
+            vec4 screenPos(2.0f * mouseX /((float)windowWidth) - 1.0f, 2.0f * mouseY/((float)windowHeight) - 1.0f, 2.0f*depth-1.0f, 1.0);
 
-        screenPos = scene->getCamera()->getInverseVPMatrix() * screenPos;
-        screenPos /= screenPos.w; 
+            screenPos = scene->getCamera()->getInverseVPMatrix() * screenPos;
+            screenPos /= screenPos.w; 
 
-        clickScreenLocation.x = screenPos.x;
-        clickScreenLocation.y = screenPos.y;
-        clickScreenLocation.z = screenPos.z;
+            clickScreenLocation.x = screenPos.x;
+            clickScreenLocation.y = screenPos.y;
+            clickScreenLocation.z = screenPos.z;
+       }
 
         if(overlay)
             overlay->render();
-
-        for(std::vector<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();++it)
-            (*it)->onRender();
 
         glfwSwapBuffers();
     }
