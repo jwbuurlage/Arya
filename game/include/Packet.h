@@ -1,5 +1,6 @@
 #pragma once
 #include "../../ext/buffer.hpp"
+#include "Arya.h" //for glm
 #include <vector>
 #include <string>
 #include <vector>
@@ -95,6 +96,12 @@ class Packet
         {
             *this << (unsigned int)val.size();
             if(!val.empty()) data.append(&val.front(), sizeof(int)*val.size());
+            return *this;
+        }
+
+        inline Packet& operator<<(const vec3& val)
+        {
+            *this << (float)val.x << (float)val.y << (float)val.z;
             return *this;
         }
 
