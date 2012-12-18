@@ -144,8 +144,12 @@ namespace Arya
                 double pollTime = glfwGetTime();
                 double elapsed = pollTime - oldTime;
 
-                for(std::vector<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();++it)
-                    (*it)->onFrame((float)elapsed);
+                //DO NOT USE ITERATORS HERE
+                //Some framelisteners (network update) add other framelisteners
+                //for(std::vector<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();++it)
+                //    (*it)->onFrame((float)elapsed);
+                for(unsigned int i = 0; i < frameListeners.size(); ++i)
+                    frameListeners[i]->onFrame((float)elapsed);
 
                 oldTime = pollTime;
             }
@@ -244,25 +248,27 @@ namespace Arya
         glClear(GL_DEPTH_BUFFER_BIT);
 
         if(scene)
+        {
             scene->render();
 
-        GLfloat depth;
-        glReadPixels(mouseX, mouseY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+            for(std::vector<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();++it)
+                (*it)->onRender();
 
-        vec4 screenPos(2.0f * mouseX /((float)windowWidth) - 1.0f, 2.0f * mouseY/((float)windowHeight) - 1.0f, 2.0f*depth-1.0f, 1.0);
+            GLfloat depth;
+            glReadPixels(mouseX, mouseY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
 
-        screenPos = scene->getCamera()->getInverseVPMatrix() * screenPos;
-        screenPos /= screenPos.w; 
+            vec4 screenPos(2.0f * mouseX /((float)windowWidth) - 1.0f, 2.0f * mouseY/((float)windowHeight) - 1.0f, 2.0f*depth-1.0f, 1.0);
 
-        clickScreenLocation.x = screenPos.x;
-        clickScreenLocation.y = screenPos.y;
-        clickScreenLocation.z = screenPos.z;
+            screenPos = scene->getCamera()->getInverseVPMatrix() * screenPos;
+            screenPos /= screenPos.w; 
+
+            clickScreenLocation.x = screenPos.x;
+            clickScreenLocation.y = screenPos.y;
+            clickScreenLocation.z = screenPos.z;
+       }
 
         if(overlay)
             overlay->render();
-
-        for(std::vector<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();++it)
-            (*it)->onRender();
 
         glfwSwapBuffers();
     }

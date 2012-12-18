@@ -42,8 +42,15 @@ void EventManager::handlePacket(Packet& packet)
 {
     int id = packet.getId();
     pair<handlerIterator, handlerIterator> range = eventHandlers.equal_range(id);
-    for(handlerIterator iter = range.first; iter != range.second; ++iter)
+    if(range.first == range.second)
     {
-        iter->second->handleEvent(packet);
+        LOG_WARNING("Event id " << id << " received but no handler registered.");
+    }
+    else
+    {
+        for(handlerIterator iter = range.first; iter != range.second; ++iter)
+        {
+            iter->second->handleEvent(packet);
+        }
     }
 }
