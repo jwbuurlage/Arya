@@ -28,7 +28,7 @@ namespace Arya
 
         private:
             void consoleInfo();
-            int nrLines; //visible number of lines of console 
+            int nrLines; //visible number of lines of console
             int searchNrLines; //number of lines in which you can search, if more the first one will be kicked
             int textWidthInPixels; //width of character
             float textHeightInPixels;
@@ -48,7 +48,8 @@ namespace Arya
             void goBackInHistory();
             void setVisibilityConsole(bool flag);
             void addTextLine(string textToBeAdded);
+            void addOutputText(string textToBeAdded);
+            bool inputRecognizer(string textToBeAdded);
             //bool searchKeyword(vector<string> searchKey);
     };
 }
-
