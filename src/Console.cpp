@@ -23,7 +23,6 @@ namespace Arya
         rShift = false;
         cLock = false;
         upCount = 0;
-        downCount = 0;
     };
 
     Console::~Console()
@@ -121,16 +120,16 @@ namespace Arya
                                                  if(cLock) cLock = false;
                                                  else cLock = true;
                                              }; break;
-                    case GLFW_KEY_UP: if(keyDown && history.size() > upCount)
+                    case GLFW_KEY_UP: if(keyDown && searchHistory.size() > upCount)
                                       {
                                           upCount += 1;
                                           goBackInHistory();
                                       }; break;
-                    case GLFW_KEY_DOWN: if(keyDown && downCount < upCount)
-                                      {
-                                          downCount += 1;
-                                          goForwardInHistory();
-                                      }; break;
+                    case GLFW_KEY_DOWN: if(keyDown && 0 < upCount)
+                                        {
+                                            upCount -= 1;
+                                            goBackInHistory();
+                                        }; break;
                     default: keyHandled = false; break;
                 }
             }
@@ -215,7 +214,6 @@ namespace Arya
     {
         addTextLine(currentLine);
         upCount = 0;
-        downCount = 0;
         currentLine = "";
     }
 
@@ -224,34 +222,10 @@ namespace Arya
         int count = 0;
         for(int j = 0; j < upCount; j++)
         {
-            bool flag = false;
-            for(int i = count; (i < searchHistory.size() && flag == false); i++)
-            {
-                if(currentLine != searchHistory[searchHistory.size() - 1 + downCount - i])
-                {
-                    count = i;
-                    flag = true;
-                }
-            }
-            currentLine = searchHistory[searchHistory.size()- 1 + downCount - count];
+            count = j;
+            currentLine = searchHistory[searchHistory.size()- 1 - count];
         }
+        LOG_INFO("size of searchhistory is: " << searchHistory.size());
     }
 
-    void Console::goForwardInHistory()
-    {
-        int count = 0;
-        for(int j = 0; j < downCount; j++)
-        {
-            bool flag = false;
-            for(int i = count; (i < upCount && flag == false); i++)
-            {
-                if(currentLine != searchHistory[searchHistory.size() - 1 - upCount + i])
-                {
-                    count = i;
-                    flag = true;
-                }
-            }
-            currentLine = searchHistory[searchHistory.size() - 1 - upCount + count];
-        }
-    }
 }
