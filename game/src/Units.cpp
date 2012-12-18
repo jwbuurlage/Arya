@@ -85,7 +85,7 @@ void Unit::update(float timeElapsed)
         }
 
         if(glm::distance(getPosition(), targetUnit->getPosition())
-                < targetUnit->getInfo()->radius) {
+                < targetUnit->getInfo()->radius + info->attackRadius) {
             if(unitState != UNIT_ATTACKING)
                 setUnitState(UNIT_ATTACKING);
 

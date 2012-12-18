@@ -9,6 +9,7 @@ using Arya::Root;
 typedef struct
 {
     float radius;
+    float attackRadius;
     float speed;
     float yawSpeed; //in degrees
 
