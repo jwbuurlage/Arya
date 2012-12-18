@@ -59,18 +59,8 @@ void Game::run()
 
         eventManager->addEventHandler(EVENT_GAME_READY, this);
 
-        if(session) delete session;
-        session = new GameSession;
-
-        if(!session->init()) {
-            LOG_ERROR("Could not start a new session");
-            Root::shared().stopRendering();
-        }
-        else
-        {
-            root->addFrameListener(this);
-            root->startRendering();
-        }
+        root->addFrameListener(this);
+        root->startRendering();
     }
 }
 
@@ -135,7 +125,17 @@ void Game::handleEvent(Packet& packet)
 {
     int id = packet.getId();
     if(id == EVENT_GAME_READY)
+    {
+        if(session) delete session;
+        session = new GameSession;
+
+        if(!session->init()) {
+            LOG_ERROR("Could not start a new session");
+            Root::shared().stopRendering();
+        }
+
         LOG_INFO("Game is ready");
+    }
     else if(id == EVENT_GAME_FULLSTATE)
     {
         int playerCount;
