@@ -127,61 +127,35 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
                 ServerGameSession* session;
                 if(sessionList.empty())
                 {
-                    session = new ServerGameSession;
+                    session = new ServerGameSession(this);
                     sessionList.insert(make_pair(sessionIdFactory++, session));
                 }
                 else
                 {
                     session = sessionList.begin()->second;
                 }
+
                 session->addClient(client);
 
-                client->createFaction();
-                client->createStartUnits();
-
-                if(session->gameReady())
+                if(session->gameReadyToLoad())
                 {
-                    pak = createPacket(EVENT_GAME_READY);
-                    //Send to all clients
-                    session->sendToAllClients(pak);
-
-                    pak = createPacket(EVENT_GAME_FULLSTATE);
-
-                    //------------------------------------
-                    // Package structure:
-                    // + joinedCount
-                    //   - clientID
-                    //   - Serialized faction
-                    //      + UnitCount
-                    //      - Serialized unit 
-                    //------------------------------------
-
-                    *pak << session->getClientCount(); //player count
-
-                    //for each player:
-                    for(clientIterator iter = clientList.begin(); iter != clientList.end(); ++iter)
-                    {
-                        if(iter->second->getClientId() == -1) continue;
-
-                        *pak << iter->second->getClientId();
-
-                        Faction* faction = iter->second->getFaction();
-                        faction->serialize(*pak);
-
-                        int unitCount = (int)faction->getUnits().size();
-
-                        *pak << unitCount;
-                        for(std::list<Unit*>::iterator iter = faction->getUnits().begin(); iter != faction->getUnits().end(); ++iter)
-                            (*iter)->serialize(*pak);
-                    }
-
-                    session->sendToAllClients(pak);
+                    session->startLoading();
                 }
                 break;
             }
 
         default:
-            LOG_INFO("Unknown package received..");
+            if(client->getClientId() == -1)
+            {
+                LOG_WARNING("Unkown packet received from client with no id");
+            }
+            else
+            {
+                if(client->getSession())
+                    client->getSession()->handlePacket(client, packet);
+                else
+                    LOG_WARNING("Unkown packet received from client with no session");
+            }
             break;
     }
 
