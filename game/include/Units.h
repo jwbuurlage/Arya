@@ -59,6 +59,7 @@ class Unit
         void setTintColor(vec3 tC);
 
         int getId() const { return id; }
+        void setId(int _id) { id = _id; }
 
         void serialize(Packet& pk);
         void deserialize(Packet& pk);
