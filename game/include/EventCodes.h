@@ -20,6 +20,7 @@ typedef enum
     EVENT_CLIENT_ID,
 
     EVENT_GAME_READY,
+    EVENT_GAME_FULLSTATE,
 
     // - clientID
     // - Serialized faction

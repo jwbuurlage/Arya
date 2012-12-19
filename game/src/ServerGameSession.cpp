@@ -13,7 +13,6 @@ void ServerGameSession::addClient(ServerClient* client)
         LOG_WARNING("ServerClient was already in a session and then added to another gamesession");
     }
     client->setSession(this);
-    clientList.push_back(client);
 
     client->createFaction();
     client->createStartUnits();
@@ -31,7 +30,32 @@ void ServerGameSession::addClient(ServerClient* client)
     for(std::list<Unit*>::iterator uiter = faction->getUnits().begin(); uiter != faction->getUnits().end(); ++uiter)
         (*uiter)->serialize(*pak);
 
+    //send the connect to all OTHER clients
     sendToAllClients(pak);
+
+    //Then ADD this new client
+    clientList.push_back(client);
+
+    //Send the full game state only to the new client
+    pak = server->createPacket(EVENT_GAME_FULLSTATE);
+
+    *pak << getClientCount(); //player count
+
+    //for each player:
+    for(clientIterator iter = clientList.begin(); iter != clientList.end(); ++iter)
+    {
+        *pak << (*iter)->getClientId();
+
+        Faction* faction = (*iter)->getFaction();
+        faction->serialize(*pak);
+
+        int unitCount = (int)faction->getUnits().size();
+
+        *pak << unitCount;
+        for(std::list<Unit*>::iterator uiter = faction->getUnits().begin(); uiter != faction->getUnits().end(); ++uiter)
+            (*uiter)->serialize(*pak);
+    }
+    client->handler->sendPacket(pak);
 }
 
 void ServerGameSession::removeClient(ServerClient* client)
@@ -88,34 +112,34 @@ void ServerGameSession::startLoading()
     Packet* pak = server->createPacket(EVENT_GAME_READY);
     sendToAllClients(pak);
 
-    //pak = server->createPacket(EVENT_GAME_FULLSTATE);
+    pak = server->createPacket(EVENT_GAME_FULLSTATE);
 
-    ////------------------------------------
-    //// Package structure:
-    //// + joinedCount
-    ////   - clientID
-    ////   - Serialized faction
-    ////      + UnitCount
-    ////      - Serialized unit 
-    ////------------------------------------
+    //------------------------------------
+    // Package structure:
+    // + joinedCount
+    //   - clientID
+    //   - Serialized faction
+    //      + UnitCount
+    //      - Serialized unit 
+    //------------------------------------
 
-    //*pak << getClientCount(); //player count
+    *pak << getClientCount(); //player count
 
-    ////for each player:
-    //for(clientIterator iter = clientList.begin(); iter != clientList.end(); ++iter)
-    //{
-    //    *pak << (*iter)->getClientId();
+    //for each player:
+    for(clientIterator iter = clientList.begin(); iter != clientList.end(); ++iter)
+    {
+        *pak << (*iter)->getClientId();
 
-    //    Faction* faction = (*iter)->getFaction();
-    //    faction->serialize(*pak);
+        Faction* faction = (*iter)->getFaction();
+        faction->serialize(*pak);
 
-    //    int unitCount = (int)faction->getUnits().size();
+        int unitCount = (int)faction->getUnits().size();
 
-    //    *pak << unitCount;
-    //    for(std::list<Unit*>::iterator uiter = faction->getUnits().begin(); uiter != faction->getUnits().end(); ++uiter)
-    //        (*uiter)->serialize(*pak);
-    //}
-    //sendToAllClients(pak);
+        *pak << unitCount;
+        for(std::list<Unit*>::iterator uiter = faction->getUnits().begin(); uiter != faction->getUnits().end(); ++uiter)
+            (*uiter)->serialize(*pak);
+    }
+    sendToAllClients(pak);
 }
 
 void ServerGameSession::startGame()
