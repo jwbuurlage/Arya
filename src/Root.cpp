@@ -16,9 +16,6 @@
 #include "common/Logger.h"
 #include "Interface.h"
 
-using std::cerr;
-using std::endl;
-
 namespace Arya
 {
     template<> Root* Singleton<Root>::singleton = 0;
@@ -35,12 +32,12 @@ namespace Arya
         oldTime = 0;
         overlay = 0;
 
-        Logger* log = new Logger();
-        FileSystem* files = new FileSystem();
-        TextureManager* tex = new TextureManager();
-		MaterialManager* matMan = new MaterialManager();
-        ModelManager* modelManager = new ModelManager();
-        FontManager* fon = new FontManager();
+        Logger::create();
+        FileSystem::create();
+        TextureManager::create();
+        MaterialManager::create();
+        ModelManager::create();
+        FontManager::create();
     }
 
     Root::~Root()
@@ -52,11 +49,12 @@ namespace Arya
         if(scene) delete scene;
         if(overlay) delete overlay;
 
-		delete &MaterialManager::shared();
-        delete &ModelManager::shared();
-        delete &FileSystem::shared();
-        delete &Logger::shared();
-        delete &TextureManager::shared();
+        FontManager::destroy();
+        ModelManager::destroy();
+        MaterialManager::destroy();
+        TextureManager::destroy();
+        FileSystem::destroy();
+        Logger::destroy();
     }
 
     bool Root::init(bool fullscr, int w, int h)
@@ -144,12 +142,11 @@ namespace Arya
                 double pollTime = glfwGetTime();
                 double elapsed = pollTime - oldTime;
 
-                //DO NOT USE ITERATORS HERE
+                //Note: it can happen that the list is modified
+                //during a call to onFrame()
                 //Some framelisteners (network update) add other framelisteners
-                //for(std::vector<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();++it)
-                //    (*it)->onFrame((float)elapsed);
-                for(unsigned int i = 0; i < frameListeners.size(); ++i)
-                    frameListeners[i]->onFrame((float)elapsed);
+                for(std::list<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();++it)
+                    (*it)->onFrame((float)elapsed);
 
                 oldTime = pollTime;
             }
@@ -192,7 +189,7 @@ namespace Arya
     {
         if(!glfwInit())
         {
-            cerr << "Could not init *glfw*" << endl;
+            LOG_ERROR("Could not init glfw!");
             return false;
         }
 
@@ -251,7 +248,7 @@ namespace Arya
         {
             scene->render();
 
-            for(std::vector<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();++it)
+            for(std::list<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();++it)
                 (*it)->onRender();
 
             GLfloat depth;
@@ -280,7 +277,7 @@ namespace Arya
 
     void Root::removeInputListener(InputListener* listener)
     {
-        for( std::vector<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ){
+        for( std::list<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ){
             if( *it == listener ) it = inputListeners.erase(it);
             else ++it;
         }
@@ -293,7 +290,7 @@ namespace Arya
 
     void Root::removeFrameListener(FrameListener* listener)
     {
-        for( std::vector<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end(); ){
+        for( std::list<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end(); ){
             if( *it == listener ) it = frameListeners.erase(it);
             else ++it;
         }
@@ -301,14 +298,14 @@ namespace Arya
 
     void Root::keyDown(int key, int action)
     {
-        for( std::vector<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
+        for( std::list<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
             if( (*it)->keyDown(key, action == GLFW_PRESS) == true ) break;
 
     }
 
     void Root::mouseDown(int button, int action)
     {
-        for( std::vector<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
+        for( std::list<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
             if( (*it)->mouseDown((MOUSEBUTTON)button, action == GLFW_PRESS, mouseX, mouseY) == true ) break;
     }
 
@@ -316,7 +313,7 @@ namespace Arya
     {
         int delta = pos - mouseWheelPos;
         mouseWheelPos = pos;
-        for( std::vector<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
+        for( std::list<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
             if( (*it)->mouseWheelMoved(delta) == true ) break;
     }
 
@@ -326,7 +323,7 @@ namespace Arya
         int dx = x - mouseX, dy = y - mouseY;
         mouseX = x; mouseY = y;
 
-        for( std::vector<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
+        for( std::list<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
             if( (*it)->mouseMoved(x, y, dx, dy) == true ) break;
     }
 

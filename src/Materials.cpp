@@ -8,7 +8,7 @@ namespace Arya
 	template<> MaterialManager* Singleton<MaterialManager>::singleton = 0;
 
 	bool MaterialManager::initialize(std::vector<std::string> filenames) {
-		for(int i=0; i<filenames.size(); i++)
+		for(unsigned int i=0; i<filenames.size(); i++)
 			getResource(filenames[i]);
 		return true;
 	}

@@ -35,7 +35,7 @@ namespace Arya
 
         float lastX = 0.0f;
 
-        for(int i = 0; (i < s.size()); i++)
+        for(unsigned int i = 0; i < s.size(); i++)
         {
             stbtt_GetBakedQuad(font->baked, 512, 512, s[i], &xpos ,&ypos,&q,true);
             rects[i]->texOffset = vec2(q.s0, 1 - q.t0 - (q.t1 - q.t0));

@@ -51,7 +51,7 @@ namespace Arya
         else 
         {
             GLchar** gl_sources = new GLchar*[sources.size()];
-            for(int i = 0; i < sources.size(); ++i)
+            for(unsigned int i = 0; i < sources.size(); ++i)
                 gl_sources[i] = sources[i]->getData();
 
             switch(type)

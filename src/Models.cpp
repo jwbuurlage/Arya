@@ -122,7 +122,7 @@ namespace Arya
 
     Model::~Model()
     {
-        for(int i = 0; i < meshes.size(); ++i)
+        for(unsigned int i = 0; i < meshes.size(); ++i)
         {
             meshes[i]->release();
             if( meshes[i]->getRefCount() <= 0 )

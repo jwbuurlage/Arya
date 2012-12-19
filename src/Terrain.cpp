@@ -75,7 +75,7 @@ namespace Arya
     {
         if(heightMapName == 0 || waterMapName == 0 || cloudMap == 0 || splatMap == 0) return false;
 
-        for(int i = 0; i < tileSet.size(); ++i) {
+        for(unsigned int i = 0; i < tileSet.size(); ++i) {
             if(!tileSet[i]) return false;
             glBindTexture(GL_TEXTURE_2D, tileSet[i]->texture->handle);
             glGenerateMipmap(GL_TEXTURE_2D);
@@ -233,7 +233,7 @@ namespace Arya
         for(int l = 0; l < levelMax; ++l)
         {
             int c = 0;
-            int levelSize = (patchSizeMax-1)/(1 << l) + 1;
+            //int levelSize = (patchSizeMax-1)/(1 << l) + 1;
             // level l
             int row = 0;
             for(int j = 0; j < patchSizeMax - 1; j += 1 << l) {
@@ -247,7 +247,8 @@ namespace Arya
                         indices[c++] = j*patchSizeMax + patchSizeMax - 1 - i;
                         indices[c++] = (j+(1 << l))*patchSizeMax + patchSizeMax - 1 - i;
                     }
-                indices[c++] = indices[c - 2];
+                indices[c] = indices[c-1];
+                c++;
             }
 
             indexCount[l] = c;
@@ -293,7 +294,7 @@ namespace Arya
         // update patches LOD
         vec3 camPos = curScene->getCamera()->getRealCameraPosition();
 
-        for(int i = 0; i < patches.size(); ++i) {
+        for(unsigned int i = 0; i < patches.size(); ++i) {
             Patch& p = patches[i];
             vec3 pPos = vec3(p.position.x, -100.0f, p.position.y);
             if(distance(pPos, camPos) < 300.0f)
@@ -388,7 +389,7 @@ namespace Arya
         glActiveTexture(GL_TEXTURE7);
         glBindTexture(GL_TEXTURE_2D, Root::shared().getScene()->getShadowDepthTextureHandle());
 
-        for(int i = 0; i < patches.size(); ++i) {
+        for(unsigned int i = 0; i < patches.size(); ++i) {
             Patch& p = patches[i];
             if(p.lod < 0) continue;
             terrainProgram->setUniform2fv("patchOffset", p.offset);
@@ -421,7 +422,7 @@ namespace Arya
 		glActiveTexture(GL_TEXTURE7);
         glBindTexture(GL_TEXTURE_2D, cloudMap->handle);
 
-		for(int i = 0; i < patches.size(); ++i) {
+		for(unsigned int i = 0; i < patches.size(); ++i) {
             Patch& p = patches[i];
             if(p.lod < 0) continue;
             waterProgram->setUniform2fv("patchOffset", p.offset);
