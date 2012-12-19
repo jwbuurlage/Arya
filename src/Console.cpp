@@ -235,7 +235,7 @@ namespace Arya
         if(history.size() == (unsigned)nrLines - 1) history.erase(history.begin());
     }
 
-    bool Console::inputRecognizer(string textToBeAdded)
+    bool Console::inputRecognizer(string command)
     {
         return false;
     }

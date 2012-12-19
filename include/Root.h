@@ -13,7 +13,7 @@ namespace Arya
     class Scene;
     class Overlay;
 
-    class Root : public Singleton<Root>
+    class Root : public Singleton<Root>, public CommandListener
     {
         public:
             Root();
@@ -62,6 +62,7 @@ namespace Arya
 
             std::vector<FrameListener*> frameListeners;
             std::vector<InputListener*> inputListeners;
+            std::vector<CommandListener*> commandListeners;
             void keyDown(int key, int action);
             void mouseDown(int button, int action);
             void mouseWheelMoved(int pos);

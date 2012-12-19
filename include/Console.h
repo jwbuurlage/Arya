@@ -25,6 +25,7 @@ namespace Arya
 
             void toggleVisibilityConsole();
             void enterInput();
+            void addOutputText(string textToBeAdded);
 
         private:
             void consoleInfo();
@@ -48,8 +49,7 @@ namespace Arya
             void goBackInHistory();
             void setVisibilityConsole(bool flag);
             void addTextLine(string textToBeAdded);
-            void addOutputText(string textToBeAdded);
-            bool inputRecognizer(string textToBeAdded);
+            bool inputRecognizer(string command);
             //bool searchKeyword(vector<string> searchKey);
     };
 }
