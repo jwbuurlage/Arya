@@ -107,7 +107,7 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
     clientIterator iter = clientList.find(clienthandler);
     if(iter == clientList.end())
     {
-        LOG_WARNING("Received packet from unkown client!");
+        LOG_WARNING("Received packet (id = " << packet.getId() << ") from unkown client!");
         return;
     }
     ServerClient* client = iter->second;
@@ -147,17 +147,16 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
         default:
             if(client->getClientId() == -1)
             {
-                LOG_WARNING("Unkown packet received from client with no id");
+                LOG_WARNING("Unkown packet (id = " << packet.getId() << ") received from client with no id");
             }
             else
             {
                 if(client->getSession())
                     client->getSession()->handlePacket(client, packet);
                 else
-                    LOG_WARNING("Unkown packet received from client with no session");
+                    LOG_WARNING("Unkown packet (id = " << packet.getId() << ") received from client with no session");
             }
             break;
     }
-
     return;
 }
