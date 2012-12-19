@@ -8,12 +8,41 @@ typedef enum
     //ranking queries
     //room queries, room joins
     //chats
+    //hacks
+    //god mode
 
     // Session
     EVENT_JOIN_GAME = 2001,
-    EVENT_CLIENT_ID, //server sends client his client id in response to JOIN_GAME
+
+    //------------------------
+    // - The clients his ID
+    //------------------------
+    EVENT_CLIENT_ID,
+
     EVENT_GAME_READY,
     EVENT_GAME_FULLSTATE,
 
-    EVENT_MOVE_UNIT = 3000
+    //------------------------
+    // - Number of units NUM
+    // - NUM Unit IDs
+    // - NUM (vec2) positions
+    //------------------------
+    EVENT_MOVE_UNIT_REQUEST = 3000,
+
+    //------------------------
+    // - ...
+    //------------------------
+    EVENT_MOVE_UNIT,
+
+    //------------------------
+    // - Number of units
+    // - Unit IDs
+    // - Targetunit ID
+    //------------------------
+    EVENT_ATTACK_MOVE_UNIT_REQUEST,
+
+    //------------------------
+    // - ...
+    //------------------------
+    EVENT_ATTACK_MOVE_UNIT,
 } EventCode;

@@ -285,39 +285,49 @@ void GameSessionInput::moveSelectedUnits()
                     && dist < best_distance) {
                 best_distance = dist; 
                 best_unit = (*it);
-                //from_faction = session->getFactions()[j];
             }
         }
     }
 
+    vector<int> unitIDs;
+    for(list<Unit*>::iterator it = lf->getUnits().begin();
+            it != lf->getUnits().end(); ++it)
+        if((*it)->isSelected())
+            unitIDs.push_back((*it)->getID());
+
+    int numSelected = unitIDs.size();
+
     if(best_unit)
     {
-        for(list<Unit*>::iterator it = lf->getUnits().begin();
-                it != lf->getUnits().end(); ++it)
-            if((*it)->isSelected())
-                (*it)->setTargetUnit(best_unit);
+        Event& ev = Game::shared().getEventManager()->createEvent(EVENT_ATTACK_MOVE_UNIT_REQUEST);
+
+        ev << numSelected;
+        for(int i = 0; i < unitIDs.size(); ++i)
+            ev << unitIDs[i];
+
+        ev << best_unit->getID();
+        ev.send();
 
         return;
     }
 
-    int numSelected = 0;
-    for(list<Unit*>::iterator it = lf->getUnits().begin();
-            it != lf->getUnits().end(); ++it)
-        if((*it)->isSelected())
-            ++numSelected;
+    Event& ev = Game::shared().getEventManager()->createEvent(EVENT_MOVE_UNIT_REQUEST);
+    ev << numSelected;
+    for(int i = 0; i < unitIDs.size(); ++i)
+        ev << unitIDs[i];
+
 
     int perRow = (int)(glm::sqrt((float)numSelected));
     int currentIndex = 0;
     float spread = 10.0f;
 
-    for(list<Unit*>::iterator it = lf->getUnits().begin();
-            it != lf->getUnits().end(); ++it)
-        if((*it)->isSelected()) {
-            (*it)->setTargetPosition(vec2(clickPos.x + spread*((currentIndex % perRow) - perRow / 2), 
-                        clickPos.z + spread*(currentIndex / perRow - perRow / 2)));
-            ++currentIndex;
-        }
+    for(int i = 0; i < numSelected; ++i)
+        ev << vec2(clickPos.x + spread*((i % perRow) - perRow / 2),
+                        clickPos.z + spread*(i / perRow - perRow / 2));
+
+    ev.send();
 }
+
 
 void GameSessionInput::selectUnit()
 {

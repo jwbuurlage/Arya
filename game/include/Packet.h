@@ -116,6 +116,12 @@ class Packet
             return *this;
         }
 
+        inline Packet& operator>>(vec2& val)
+        {
+            *this >> val.x >> val.y;
+            return *this;
+        }
+
         //WRITE functions
 
         inline Packet& operator<<(unsigned int val)
@@ -160,6 +166,13 @@ class Packet
             *this << (float)val.x << (float)val.y << (float)val.z;
             return *this;
         }
+
+        inline Packet& operator<<(const vec2& val)
+        {
+            *this << (float)val.x << (float)val.y;
+            return *this;
+        }
+
 
     private:
         buffer data;
