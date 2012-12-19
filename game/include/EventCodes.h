@@ -28,10 +28,6 @@ typedef enum
     // - NUM (vec2) positions
     //------------------------
     EVENT_MOVE_UNIT_REQUEST = 3000,
-
-    //------------------------
-    // - ...
-    //------------------------
     EVENT_MOVE_UNIT,
 
     //------------------------
@@ -40,9 +36,5 @@ typedef enum
     // - Targetunit ID
     //------------------------
     EVENT_ATTACK_MOVE_UNIT_REQUEST,
-
-    //------------------------
-    // - ...
-    //------------------------
     EVENT_ATTACK_MOVE_UNIT,
 } EventCode;
