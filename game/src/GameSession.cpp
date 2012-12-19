@@ -41,7 +41,9 @@ GameSession::~GameSession()
 
 bool GameSession::init()
 {
-    Game::shared().getEventManager()->addEventHandler(EVENT_GAME_FULLSTATE, this);
+    Game::shared().getEventManager()->addEventHandler(EVENT_CLIENT_CONNECTED, this);
+    Game::shared().getEventManager()->addEventHandler(EVENT_CLIENT_DISCONNECTED, this);
+    //Game::shared().getEventManager()->addEventHandler(EVENT_GAME_FULLSTATE, this);
     Game::shared().getEventManager()->addEventHandler(EVENT_MOVE_UNIT, this);
     Game::shared().getEventManager()->addEventHandler(EVENT_ATTACK_MOVE_UNIT, this);
 
@@ -197,13 +199,7 @@ void GameSession::handleEvent(Packet& packet)
     int id = packet.getId();
     switch(id)
     {
-        case EVENT_GAME_FULLSTATE:
-            int playerCount;
-            packet >> playerCount;
-
-            LOG_INFO("Game has " << playerCount << " player(s)");
-
-            for(int i = 0; i < playerCount; ++i)
+        case EVENT_CLIENT_CONNECTED:
             {
                 int clientId;
                 packet >> clientId;
@@ -234,10 +230,26 @@ void GameSession::handleEvent(Packet& packet)
                             unit->getPosition().x, unit->getPosition().z);
 
                     unit->setPosition(vec3(unit->getPosition().x,
-                            heightModel,
-                            unit->getPosition().z));
+                                heightModel,
+                                unit->getPosition().z));
 
                     faction->addUnit(unit);
+                }
+            }
+            break;
+
+        case EVENT_CLIENT_DISCONNECTED:
+            {
+                int id;
+                packet >> id;
+                //TODO: look up factions with this ClientID
+                //Currently this is the same as faction ID
+                for(unsigned int i = 0; i < factions.size(); ++i)
+                {
+                    if( factions[i]->getId() == id )
+                    {
+                        delete factions[i];
+                    }
                 }
             }
             break;
