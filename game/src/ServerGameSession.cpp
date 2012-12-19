@@ -106,6 +106,13 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
 {
     switch(packet.getId())
     {
+        case EVENT_MOVE_UNIT_REQUEST:
+            {
+                Packet* pak = server->createPacket(EVENT_MOVE_UNIT);
+                pak->copyPacketData(packet);
+                sendToAllClients(pak);
+            }
+            break;
         default:
             break;
     }
