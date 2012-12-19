@@ -242,13 +242,63 @@ void GameSession::handleEvent(Packet& packet)
             }
             break;
 
-        case EVENT_MOVE_UNIT:
-            LOG_INFO("WORK THEM PACKAGES");
-            break;
+        case EVENT_MOVE_UNIT: {
+            int facID;
+            packet >> facID;
 
-        case EVENT_ATTACK_MOVE_UNIT:
-            LOG_INFO("ATTACK THEM PACKAGES");
+            Faction* f;
+
+            for(int i = 0; i < factions.size(); ++i)
+                if(factions[i].getID() == facID)
+                    f = factions[i];
+
+            int numUnits;
+            packet >> numUnits;
+
+            int unitID;
+            vec3 unitTargetPosition;
+            // TODO: need to optimize with map
+            for(int i = 0; i < numUnits; ++i) {
+                packet >> unitID;
+                packet >> unitTargetPosition;
+                for(int j = 0; j < f->getUnits().size(); ++j)
+                    if(f->getUnits[j].getID() == unitID)
+                        f->getUnits[j]->setTargetPosition(unitTargetPosition);
+            }
+
             break;
+        }
+
+        case EVENT_ATTACK_MOVE_UNIT: {
+            int facID;
+            packet >> facID;
+
+            Faction* f;
+
+            for(int i = 0; i < factions.size(); ++i)
+                if(factions[i].getID() == facID)
+                    f = factions[i];
+
+            int targetID;
+            packet >> targetID;
+            Unit* targetUnit;
+
+            // TODO: optimize
+            for(int i = 0; i < factions.size(); ++i)
+                for(int j = 0; j < factions[i].getUnits().size(); ++j)
+                    if(factions[i].getUnits()[j].getID() == targetID)
+                        targetunit = factions[i].getUnits()[j];
+
+            int unitID;
+            for(int i = 0; i < numUnits; ++i) {
+                packet >> unitID;
+                for(int j = 0; j < f->getUnits().size(); ++j)
+                    if(f->getUnits[j].getID() == unitID)
+                        f->getUnits[j]->setTargetUnit(targetID);
+            }
+
+            break;
+         }
 
         default:
             LOG_INFO("GameSession: unknown event received! (" << id << ")");

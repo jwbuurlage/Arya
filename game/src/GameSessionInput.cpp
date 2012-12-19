@@ -140,7 +140,8 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
     {
         draggingRightMouse = (buttonDown == true);
 
-        doUnitMovementNextFrame = true;
+        if(!draggingRightMouse)
+            doUnitMovementNextFrame = true;
     }
 
     return false;
@@ -301,27 +302,25 @@ void GameSessionInput::moveSelectedUnits()
     {
         Event& ev = Game::shared().getEventManager()->createEvent(EVENT_ATTACK_MOVE_UNIT_REQUEST);
 
+        ev << best_unit->getID();
+
         ev << numSelected;
         for(int i = 0; i < unitIDs.size(); ++i)
             ev << unitIDs[i];
 
-        ev << best_unit->getID();
         ev.send();
 
         return;
     }
 
-    Event& ev = Game::shared().getEventManager()->createEvent(EVENT_MOVE_UNIT_REQUEST);
-    ev << numSelected;
-    for(int i = 0; i < unitIDs.size(); ++i)
-        ev << unitIDs[i];
-
     int perRow = (int)(glm::sqrt((float)numSelected));
     int currentIndex = 0;
     float spread = 10.0f;
 
-    for(int i = 0; i < numSelected; ++i)
-        ev << vec2(clickPos.x + spread*((i % perRow) - perRow / 2),
+    Event& ev = Game::shared().getEventManager()->createEvent(EVENT_MOVE_UNIT_REQUEST);
+    ev << numSelected;
+    for(int i = 0; i < unitIDs.size(); ++i)
+        ev << unitIDs[i] << vec2(clickPos.x + spread*((i % perRow) - perRow / 2),
                         clickPos.z + spread*(i / perRow - perRow / 2));
 
     ev.send();

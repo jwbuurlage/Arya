@@ -15,7 +15,7 @@ typedef enum
     EVENT_JOIN_GAME = 2001,
 
     //------------------------
-    // - The clients his ID
+    // - The client his ID
     //------------------------
     EVENT_CLIENT_ID,
 
@@ -28,13 +28,27 @@ typedef enum
     // - NUM (vec2) positions
     //------------------------
     EVENT_MOVE_UNIT_REQUEST = 3000,
+
+    //------------------------
+    // - Faction ID
+    // - Number of units NUM
+    //   - Unit ID
+    //   - (vec2) position
+    //------------------------
     EVENT_MOVE_UNIT,
 
     //------------------------
+    // - Targetunit ID
     // - Number of units
     // - Unit IDs
-    // - Targetunit ID
     //------------------------
     EVENT_ATTACK_MOVE_UNIT_REQUEST,
-    EVENT_ATTACK_MOVE_UNIT,
+
+    //------------------------
+    // - Faction ID
+    // - Targetunit ID
+    // - Number of units
+    // - Unit IDs
+    //------------------------
+    EVENT_ATTACK_MOVE_UNIT
 } EventCode;

@@ -24,6 +24,7 @@ class Faction
         void serialize(Packet& pk);
         void deserialize(Packet& pk);
 
+        int getId() const { return id; }
         void setId(int _id){ id = _id; }
 
     private:
