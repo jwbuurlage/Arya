@@ -15,5 +15,5 @@ typedef enum
     EVENT_GAME_READY,
     EVENT_GAME_FULLSTATE,
 
-    EVENT_MOVE_UNIT = 2001
+    EVENT_MOVE_UNIT = 3000
 } EventCode;

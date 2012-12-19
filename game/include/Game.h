@@ -34,6 +34,8 @@ class Game : public Arya::InputListener , public Arya::FrameListener, public Eve
         static Game& shared() { return (*singleton); }
         EventManager* getEventManager() { return eventManager; }
 
+        int getClientId() const { return clientId; }
+
     private:
         static Game* singleton;
 
@@ -41,6 +43,8 @@ class Game : public Arya::InputListener , public Arya::FrameListener, public Eve
         Network* network;
         EventManager* eventManager;
         GameSession* session;
+
+        int clientId;
 
         //We want to check the network
         //every 5 frames

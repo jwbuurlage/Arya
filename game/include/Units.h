@@ -44,7 +44,7 @@ class Unit
         void setUnitState(UnitState state);
         UnitState getUnitState() const { return unitState; }
 
-        void receiveDamage(int dmg, Unit* attacker);
+        void receiveDamage(float dmg, Unit* attacker);
         float getHealthRatio() const { return health / infoForUnitType[type].maxHealth; }
 
         bool isAlive() const { return (health > 0); }
