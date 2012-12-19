@@ -1,9 +1,7 @@
 #include "../include/Game.h"
-#include "Console.h"
 #include "../include/GameSession.h"
 #include "../include/Network.h"
 #include "../include/Events.h"
-#include "common/Logger.h"
 
 Game* Game::singleton = 0;
 
@@ -136,29 +134,6 @@ void Game::handleEvent(Packet& packet)
 
         LOG_INFO("Game is ready");
     }
-    else if(id == EVENT_GAME_FULLSTATE)
-    {
-        int playerCount;
-        packet >> playerCount;
-
-        LOG_INFO("Game has " << playerCount << " player(s)");
-
-        for(int i = 0; i < playerCount; ++i)
-        {
-            int clientId;
-            packet >> clientId;
-
-            //faction deserialize
-
-            int unitCount;
-            packet >> unitCount;
-            for(int i = 0; i < unitCount; ++i)
-            {
-                //create unit
-                //deserialize
-            }
-        }
-    }
-    else
+   else
         LOG_INFO("Unkown event received!");
 }

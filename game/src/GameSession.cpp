@@ -1,4 +1,5 @@
 #include "Arya.h"
+#include "../include/Game.h"
 #include "../include/GameSession.h"
 #include "../include/GameSessionInput.h"
 #include "../include/Faction.h"
@@ -40,6 +41,8 @@ GameSession::~GameSession()
 
 bool GameSession::init()
 {
+    Game::shared().getEventManager()->addEventHandler(EVENT_GAME_FULLSTATE, this);
+
     input = new GameSessionInput(this);
     input->init();
 
@@ -75,7 +78,7 @@ bool GameSession::init()
     vector<Arya::Material*> tileSet;
     tileSet.push_back(Arya::MaterialManager::shared().getMaterial("grass.tga"));
     tileSet.push_back(Arya::MaterialManager::shared().getMaterial("rock.tga"));
-	tileSet.push_back(Arya::MaterialManager::shared().getMaterial("snow.tga"));
+    tileSet.push_back(Arya::MaterialManager::shared().getMaterial("snow.tga"));
     tileSet.push_back(Arya::MaterialManager::shared().getMaterial("dirt.tga"));
     if(!scene->setMap("heightmap.raw", "watermap.raw", tileSet, Arya::TextureManager::shared().getTexture("clouds.jpg"), Arya::TextureManager::shared().getTexture("splatmap.tga")))
         return false;
@@ -256,4 +259,39 @@ void GameSession::onRender()
     glDisable(GL_BLEND);
     glDisable(GL_ALPHA_TEST);
     glEnable(GL_CULL_FACE);
+}
+
+void GameSession::handleEvent(Packet& packet)
+{
+    int id = packet.getId();
+    switch(id) 
+    {
+        case EVENT_GAME_FULLSTATE:
+            int playerCount;
+            packet >> playerCount;
+
+            LOG_INFO("Game has " << playerCount << " player(s)");
+
+            for(int i = 0; i < playerCount; ++i)
+            {
+                int clientId;
+                packet >> clientId;
+
+                //faction deserialize
+
+                int unitCount;
+                packet >> unitCount;
+                for(int i = 0; i < unitCount; ++i)
+                {
+                    //create unit
+                    //deserialize
+                }
+            }
+            break;
+
+        default:
+            LOG_INFO("GameSession: unknown event received! (" << id << ")");
+            break;
+    }
+
 }

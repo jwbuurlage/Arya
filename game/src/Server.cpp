@@ -80,15 +80,15 @@ void Server::sendToAllClients(Packet* pak)
 // SERVER LOGIC
 //------------------------------
 
-void Server::newClient(ServerClientHandler* client)
+void Server::newClient(ServerClientHandler* clientHandler)
 {
-    ServerClient* cl = new ServerClient(this, client);
-    clientList.insert(std::make_pair(client, cl));
+    ServerClient* cl = new ServerClient(this, clientHandler);
+    clientList.insert(std::make_pair(clientHandler, cl));
 }
 
-void Server::removeClient(ServerClientHandler* client)
+void Server::removeClient(ServerClientHandler* clientHandler)
 {
-    clientIterator cl = clientList.find(client);
+    clientIterator cl = clientList.find(clientHandler);
     if(cl != clientList.end() )
     {
         //TODO:
@@ -114,60 +114,61 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
     ServerClient* client = iter->second;
 
     switch(packet.getId()){
-    case EVENT_JOIN_GAME:
-        {
-            client->setClientId(clientIdFactory++);
-
-            Packet* pak = createPacket(EVENT_CLIENT_ID);
-            *pak << client->getClientId();
-            clienthandler->sendPacket(pak);
-
-            //Create faction
-            client->createFaction();
-            client->createStartUnits();
-
-            int joinedCount = 0;
-            for(clientIterator iter = clientList.begin(); iter != clientList.end(); ++iter)
+        case EVENT_JOIN_GAME:
             {
-                if( iter->second->getClientId() != -1 ) ++joinedCount;
-            }
+                client->setClientId(clientIdFactory++);
 
-            LOG_INFO("Clients joined: " << joinedCount);
-            if(joinedCount >= 1)
-            {
-                pak = createPacket(EVENT_GAME_READY);
-                //Send to all clients
-                sendToAllClients(pak);
+                Packet* pak = createPacket(EVENT_CLIENT_ID);
+                *pak << client->getClientId();
+                clienthandler->sendPacket(pak);
 
-                pak = createPacket(EVENT_GAME_FULLSTATE);
+                //Create faction
+                client->createFaction();
+                client->createStartUnits();
 
-                *pak << joinedCount; //player count
-                //for each player:
+                int joinedCount = 0;
                 for(clientIterator iter = clientList.begin(); iter != clientList.end(); ++iter)
                 {
-                    if(iter->second->getClientId() == -1) continue;
-
-                    *pak << iter->second->getClientId();
-
-                    Faction* faction = iter->second->getFaction();
-                    faction->serialize(*pak);
-
-                    int unitCount = (int)faction->getUnits().size();
-
-                    *pak << unitCount;
-                    for(std::list<Unit*>::iterator iter = faction->getUnits().begin(); iter != faction->getUnits().end(); ++iter)
-                    {
-                        (*iter)->serialize(*pak);
-                    }
+                    if( iter->second->getClientId() != -1 ) ++joinedCount;
                 }
 
-                sendToAllClients(pak);
+                LOG_INFO("Clients joined: " << joinedCount);
+                if(joinedCount >= 1)
+                {
+                    pak = createPacket(EVENT_GAME_READY);
+                    //Send to all clients
+                    sendToAllClients(pak);
+
+                    pak = createPacket(EVENT_GAME_FULLSTATE);
+
+                    *pak << joinedCount; //player count
+                    //for each player:
+                    for(clientIterator iter = clientList.begin(); iter != clientList.end(); ++iter)
+                    {
+                        if(iter->second->getClientId() == -1) continue;
+
+                        *pak << iter->second->getClientId();
+
+                        Faction* faction = iter->second->getFaction();
+                        faction->serialize(*pak);
+
+                        int unitCount = (int)faction->getUnits().size();
+
+                        *pak << unitCount;
+                        for(std::list<Unit*>::iterator iter = faction->getUnits().begin(); iter != faction->getUnits().end(); ++iter)
+                        {
+                            (*iter)->serialize(*pak);
+                        }
+                    }
+
+                    sendToAllClients(pak);
+                }
+                break;
             }
+
+        default:
+            LOG_INFO("Unknown package received..");
             break;
-        }
-    default:
-        LOG_INFO("Unknown package received..");
-        break;
     }
 
     return;

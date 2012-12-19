@@ -242,6 +242,7 @@ namespace Arya
                 nameBuf[count++] = 'g';
                 nameBuf[count++] = 'a';
                 nameBuf[count++] = 0;
+                
                 Material* mat = MaterialManager::shared().getMaterial(nameBuf);
                 model->addMaterial(mat);
             }

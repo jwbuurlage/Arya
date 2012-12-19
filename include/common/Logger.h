@@ -39,6 +39,7 @@ namespace Arya
 		//combine the flags like DEBUG | ERROR | CRITICALERROR
 		int consoleLogLevel;
 		int fileLogLevel;
+        int gameConsoleLogLevel;
 
 		//This can be used instead of the << operators
 		//It will append a newline
