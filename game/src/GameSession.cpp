@@ -83,20 +83,9 @@ bool GameSession::init()
     if(!scene->setMap("heightmap.raw", "watermap.raw", tileSet, Arya::TextureManager::shared().getTexture("clouds.jpg"), Arya::TextureManager::shared().getTexture("splatmap.tga")))
         return false;
 
-    // TODO: This is a memleak, but we will load info in from a file somewhere
-    // and this will fix this issue
-    UnitInfo* info = new UnitInfo;
-    info->radius = 5.0f;
-    info->attackRadius = 5.0f;
-    info->maxHealth = 100.0f;
-    info->speed = 30.0f;
-    info->yawSpeed = 720.0f;
-    info->damage = 20.0f;
-    info->attackSpeed = 1.0f;
-
     for(int i = 0; i < 30; ++ i) 
     {
-        Unit* unit = new Unit(info);
+        Unit* unit = new Unit(0);
         float heightModel = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(20.0 * (i / 10), -50.0+20.0*(i % 10));
         obj = scene->createObject();
         obj->setModel(ModelManager::shared().getModel("ogros.aryamodel"));
@@ -109,7 +98,7 @@ bool GameSession::init()
 
     for(int i = 0; i < 30; ++ i) 
     {
-        Unit* unit = new Unit(info);
+        Unit* unit = new Unit(0);
         float heightModel = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(-100.0 + 20.0 * (i / 10), -100.0+20.0*(i % 10));
         obj = scene->createObject();
         obj->setModel(ModelManager::shared().getModel("ogros.aryamodel"));
@@ -120,18 +109,9 @@ bool GameSession::init()
         otherFaction->addUnit(unit);
     }
 
-    info = new UnitInfo;
-    info->radius = 5.0f;
-    info->attackRadius = 50.0f;
-    info->maxHealth = 60.0f;
-    info->speed = 30.0f;
-    info->yawSpeed = 720.0f;
-    info->damage = 30.0f;
-    info->attackSpeed = 1.0f;
-
     for(int i = 0; i < 10; ++ i) 
     {
-        Unit* unit = new Unit(info);
+        Unit* unit = new Unit(1);
         float heightModel = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(-200.0 + 20.0 * (i / 10), -50.0+20.0*(i % 10));
         obj = scene->createObject();
         obj->setModel(ModelManager::shared().getModel("hep.aryamodel"));

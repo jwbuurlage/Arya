@@ -1,22 +1,11 @@
 #pragma once 
 
 #include "Arya.h"
+#include "UnitTypes.h"
 
 using Arya::Object;
 using Arya::Rect;
 using Arya::Root;
-
-typedef struct
-{
-    float radius;
-    float attackRadius;
-    float speed;
-    float yawSpeed; //in degrees
-
-    float maxHealth;
-    float damage;
-    float attackSpeed; //the time one attack takes
-} UnitInfo;
 
 typedef enum
 {
@@ -32,7 +21,7 @@ class Packet;
 class Unit
 {
     public:
-        Unit(UnitInfo* inf);
+        Unit(int _type);
         ~Unit();
 
         void setPosition(const vec3& pos) { position = pos; if(object) object->setPosition(pos); }
@@ -41,8 +30,8 @@ class Unit
         void setObject(Object* obj);
         Object* getObject() const { return object; }
 
-        UnitInfo* getInfo() const { return info; }
-        void setInfo(UnitInfo* unitInfo) { info = unitInfo; }
+        int getType() const { return type; }
+        void setType(int _type) { type = _type; }
 
         void setSelected(bool sel) { selected = sel; }
         bool isSelected() { return selected; }
@@ -56,7 +45,7 @@ class Unit
         UnitState getUnitState() const { return unitState; }
 
         void receiveDamage(int dmg, Unit* attacker);
-        float getHealthRatio() const { return health / info->maxHealth; }
+        float getHealthRatio() const { return health / infoForUnitType[type].maxHealth; }
 
         bool isAlive() const { return (health > 0); }
         bool obsolete() { return !isAlive() && (dyingTime > 0.8f); }
@@ -75,7 +64,7 @@ class Unit
     private:
         Object* object; //object->position is always the same as position
         vec3 position; //since server has no Object, position is stored here
-        UnitInfo* info;
+        int type;
         bool selected;
 
         // movement and attack

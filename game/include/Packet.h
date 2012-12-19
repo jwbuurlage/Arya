@@ -120,13 +120,13 @@ class Packet
 
         inline Packet& operator<<(unsigned int val)
         {
-            data.append(&val, sizeof(unsigned int));
+            //data.append(&val, sizeof(unsigned int));
             return *this;
         }
 
         inline Packet& operator<<(int val)
         {
-            data.append(&val, sizeof(int));
+            //data.append(&val, sizeof(int));
             return *this;
         }
 

@@ -281,7 +281,7 @@ void GameSessionInput::moveSelectedUnits()
                 it != session->getFactions()[j]->getUnits().end(); ++it)
         {
             dist = glm::distance((*it)->getPosition(), clickPos);
-            if(dist < 2.0 * (*it)->getInfo()->radius
+            if(dist < 2.0 * infoForUnitType[(*it)->getType()].radius
                     && dist < best_distance) {
                 best_distance = dist; 
                 best_unit = (*it);
@@ -338,7 +338,7 @@ void GameSessionInput::selectUnit()
             it != lf->getUnits().end(); ++it)
     {
         dist = glm::distance((*it)->getPosition(), clickPos);
-        if(dist < 2.0 * (*it)->getInfo()->radius
+        if(dist < 2.0 * infoForUnitType[(*it)->getType()].radius
                 && dist < best_distance) {
             best_distance = dist; 
             best_unit = (*it);

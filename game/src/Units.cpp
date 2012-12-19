@@ -8,17 +8,17 @@
 
 using Arya::Root;
 
-Unit::Unit(UnitInfo* inf)
+Unit::Unit(int _type)
 {
-    info = inf;
+    type = _type;
     object = 0;
     selected = false;
     targetPosition = vec2(0.0f);
     unitState = UNIT_IDLE;
     targetUnit = 0;
 
-    health = info->maxHealth;
-    timeSinceLastAttack = info->attackSpeed + 1.0f;
+    health = infoForUnitType[type].maxHealth;
+    timeSinceLastAttack = infoForUnitType[type].attackSpeed + 1.0f;
     dyingTime = 0.0f;
 
     refCount = 0;
@@ -85,20 +85,20 @@ void Unit::update(float timeElapsed)
         }
 
         if(glm::distance(getPosition(), targetUnit->getPosition())
-                < targetUnit->getInfo()->radius + info->attackRadius) {
+                < infoForUnitType[targetUnit->getType()].radius + infoForUnitType[type].attackRadius) {
             if(unitState != UNIT_ATTACKING)
                 setUnitState(UNIT_ATTACKING);
 
-            if(timeSinceLastAttack > info->attackSpeed)
+            if(timeSinceLastAttack > infoForUnitType[type].attackSpeed)
             {
                 // make one attack
-                targetUnit->receiveDamage(info->damage, this);
+                targetUnit->receiveDamage(infoForUnitType[type].damage, this);
                 if(!(targetUnit->isAlive()))
                 {
                     targetUnit->release();
                     targetUnit = 0;
                     setUnitState(UNIT_IDLE);
-                    timeSinceLastAttack = info->attackSpeed + 1.0f;
+                    timeSinceLastAttack = infoForUnitType[type].attackSpeed + 1.0f;
                     return;
                 }
                 timeSinceLastAttack = 0.0f;
@@ -136,7 +136,7 @@ void Unit::update(float timeElapsed)
     if(yawDiff > 180.0f) yawDiff -= 360.0f;
     else if(yawDiff < -180.0f) yawDiff += 360.0f;
 
-    float deltaYaw = timeElapsed * info->yawSpeed + 1.0f;
+    float deltaYaw = timeElapsed * infoForUnitType[type].yawSpeed + 1.0f;
     if((yawDiff >= 0 && yawDiff < deltaYaw) || (yawDiff <= 0 && yawDiff > -deltaYaw))
     {
         //angle is small enough (less than 1 degree) so we can start walking now
@@ -145,7 +145,7 @@ void Unit::update(float timeElapsed)
             return;
 
         diff = glm::normalize(diff);
-        vec3 newPosition = getPosition() + timeElapsed * (info->speed * diff);
+        vec3 newPosition = getPosition() + timeElapsed * (infoForUnitType[type].speed * diff);
         newPosition.y = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(newPosition.x, newPosition.z);
         setPosition(newPosition);
     }
@@ -241,10 +241,14 @@ void Unit::serialize(Packet& pk)
 {
     pk << id;
     pk << factionId;
+    pk << position;
+    pk << type;
 }
 
 void Unit::deserialize(Packet& pk)
 {
     pk >> id;
     pk >> factionId;
+    pk >> position;
+    pk >> type;
 }

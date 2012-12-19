@@ -12,6 +12,7 @@ SET(
     "../src/GameSessionInput.cpp"
     "../src/Faction.cpp"
     "../src/Units.cpp"
+    "../src/UnitTypes.cpp"
     "../src/Network.cpp"
     "../src/Server.cpp"
     "../src/Events.cpp"
