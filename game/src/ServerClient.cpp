@@ -22,7 +22,7 @@ void ServerClient::createStartUnits()
     for(int i = 0; i < 30; ++ i) 
     {
         Unit* unit = new Unit(0);
-        unit->setPosition(vec3(20 * (i / 10), 10, -50 + 20 * (i % 10)));
+        unit->setPosition(vec3(20.0f * (i / 10), 0.0f, -50.0f + 20.0f * (i % 10)));
         faction->addUnit(unit);
     }
     return;
