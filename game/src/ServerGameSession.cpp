@@ -108,6 +108,7 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
     {
         case EVENT_MOVE_UNIT_REQUEST:
             {
+                LOG_INFO("Move request accepted");
                 Packet* pak = server->createPacket(EVENT_MOVE_UNIT);
                 pak->copyPacketData(packet);
                 sendToAllClients(pak);
