@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Arya.h"
+#include "Events.h"
 
 #include <vector>
 using std::vector;
@@ -20,7 +21,7 @@ using Arya::ShaderProgram;
 class Faction;
 class GameSessionInput;
 
-class GameSession : public Arya::FrameListener
+class GameSession : public Arya::FrameListener, public EventHandler
 {
     public:
         GameSession();
@@ -36,6 +37,8 @@ class GameSession : public Arya::FrameListener
         // FrameListener
         void onFrame(float elapsedTime);
         void onRender();
+
+        void handleEvent(Packet& packet);
 
     private:
         GameSessionInput* input;

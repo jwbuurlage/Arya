@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+using std::string;
 
 namespace Arya
 {
@@ -23,5 +25,11 @@ namespace Arya
             //Time is since previous frame
             virtual void onFrame(float elapsedTime) { return; }
             virtual void onRender() { return; }
+    };
+
+    class CommandListener
+    {
+        public:
+            virtual bool onCommand(string command) {return false;}
     };
 }

@@ -94,11 +94,11 @@ namespace Arya
             {
                 if((rShift && !cLock) || (lShift && !cLock) || (cLock && !lShift) || (cLock && !rShift))
                 {
-                    if(keyDown && (currentLine.length() < nrCharOnLine)) currentLine.push_back(key);
+                    if(keyDown && (currentLine.length() < (unsigned)nrCharOnLine)) currentLine.push_back(key);
                 }
                 else
                 {
-                    if((keyDown && currentLine.length() < nrCharOnLine)) currentLine.push_back(key - 'A' + 'a');
+                    if((keyDown && currentLine.length() < (unsigned)nrCharOnLine)) currentLine.push_back(key - 'A' + 'a');
                 }
             }
             else
@@ -120,7 +120,7 @@ namespace Arya
                                                  if(cLock) cLock = false;
                                                  else cLock = true;
                                              }; break;
-                    case GLFW_KEY_UP: if(keyDown && searchHistory.size() > upCount)
+                    case GLFW_KEY_UP: if(keyDown && searchHistory.size() > (unsigned)upCount)
                                       {
                                           upCount += 1;
                                           goBackInHistory();
@@ -147,9 +147,9 @@ namespace Arya
             rects[0]->isVisible = visibility;
             if(history.empty() == false)
             {
-                for(int i = 0; (i < nrLines && i < history.size()); i++) // fills the rectangles that need to be filled
+                for(int i = 0; (i < nrLines && (unsigned)i < history.size()); i++) // fills the rectangles that need to be filled
                 {
-                    for(int j = 0; j < history[i].length(); j++)
+                    for(int j = 0; (unsigned)j < history[i].length(); j++)
                     {
                         rects[i*nrCharOnLine + j + 1]->isVisible = visibility; // + 1 because of the console rect
                         stbtt_GetBakedQuad(font->baked, 512, 512, history[i].at(j),&xpos ,&ypos,&q,true);
@@ -157,15 +157,15 @@ namespace Arya
                         rects[i*nrCharOnLine + j + 1]->texSize = vec2(q.s1 - q.s0, (q.t1 - q.t0));
                     }
                 }
-                for(int i = 0; (i < nrLines && i < history.size()); i++) // clears the fonttextures of the rectangles that do not need to be filled
+                for(int i = 0; (i < nrLines && (unsigned)i < history.size()); i++) // clears the fonttextures of the rectangles that do not need to be filled
                 {
                     for(int j = 0; j < nrCharOnLine; j++)
                     {
-                        if(history[i].length() <= j) rects[i*nrCharOnLine + j + 1]->isVisible = false;
+                        if(history[i].length() <= (unsigned)j) rects[i*nrCharOnLine + j + 1]->isVisible = false;
                     }
                 }
             }
-            for(int j = 0; j < currentLine.length(); j++)
+            for(int j = 0; (unsigned)j < currentLine.length(); j++)
             {
                 rects[nrLines * nrCharOnLine + j + 1]->textureHandle = font->textureHandle;
                 rects[nrLines * nrCharOnLine + j + 1]->isVisible = visibility; // + 1 because of the console rect
@@ -176,7 +176,7 @@ namespace Arya
             }
             for(int j = 0; j < nrCharOnLine; j++)
             {
-                if(currentLine.size() <= j) rects[nrLines * nrCharOnLine + j + 1]->isVisible = false;
+                if(currentLine.size() <= (unsigned)j) rects[nrLines * nrCharOnLine + j + 1]->isVisible = false;
             }
         }
         else time = 0.0;
@@ -184,7 +184,7 @@ namespace Arya
 
     void Console::cleanup()
     {
-        for(int i = 0; i < rects.size(); i++)
+        for(int i = 0; (unsigned)i < rects.size(); i++)
         {
             Root::shared().getOverlay()->removeRect(rects[i]);
         }
@@ -206,13 +206,14 @@ namespace Arya
         history.push_back(textToBeAdded);
         searchHistory.push_back(textToBeAdded);
         activeLine += 1;
-        if(history.size() == nrLines - 1) history.erase(history.begin());
-        if(searchHistory.size() == searchNrLines) searchHistory.erase(searchHistory.begin());
+        if(history.size() == (unsigned)nrLines - 1) history.erase(history.begin());
+        if(searchHistory.size() == (unsigned)searchNrLines) searchHistory.erase(searchHistory.begin());
     }
 
     void Console::enterInput() // When you press enter, currentLine needs to be emptied and needs to be added to the history and searchhistory
     {
         addTextLine(currentLine);
+        if(!inputRecognizer(currentLine)) addOutputText("Command not found!");
         upCount = 0;
         currentLine = "";
     }
@@ -225,7 +226,17 @@ namespace Arya
             count = j;
             currentLine = searchHistory[searchHistory.size()- 1 - count];
         }
-        LOG_INFO("size of searchhistory is: " << searchHistory.size());
     }
 
+    void Console::addOutputText(string textToBeAdded)
+    {
+        history.push_back(textToBeAdded);
+        activeLine += 1;
+        if(history.size() == (unsigned)nrLines - 1) history.erase(history.begin());
+    }
+
+    bool Console::inputRecognizer(string command)
+    {
+        return false;
+    }
 }
