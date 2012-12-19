@@ -58,6 +58,8 @@ class Unit
         vec2 getScreenPosition() const { return screenPosition; }
         void setTintColor(vec3 tC);
 
+        int getID() const { return id; }
+
         void serialize(Packet& pk);
         void deserialize(Packet& pk);
 
