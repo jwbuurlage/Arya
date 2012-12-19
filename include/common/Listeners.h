@@ -30,6 +30,6 @@ namespace Arya
     class CommandListener
     {
         public:
-            virtual bool onCommand(string command) {return false;}
+            virtual bool handleCommand(string command) {return false;}
     };
 }
