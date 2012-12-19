@@ -140,7 +140,8 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
     {
         draggingRightMouse = (buttonDown == true);
 
-        doUnitMovementNextFrame = true;
+        if(!draggingRightMouse)
+            doUnitMovementNextFrame = true;
     }
 
     return false;
@@ -285,39 +286,46 @@ void GameSessionInput::moveSelectedUnits()
                     && dist < best_distance) {
                 best_distance = dist; 
                 best_unit = (*it);
-                //from_faction = session->getFactions()[j];
             }
         }
     }
 
-    if(best_unit)
-    {
-        for(list<Unit*>::iterator it = lf->getUnits().begin();
-                it != lf->getUnits().end(); ++it)
-            if((*it)->isSelected())
-                (*it)->setTargetUnit(best_unit);
-
-        return;
-    }
-
-    int numSelected = 0;
+    vector<int> unitIds;
     for(list<Unit*>::iterator it = lf->getUnits().begin();
             it != lf->getUnits().end(); ++it)
         if((*it)->isSelected())
-            ++numSelected;
+            unitIds.push_back((*it)->getId());
+
+    int numSelected = unitIds.size();
+
+    if(best_unit)
+    {
+        Event& ev = Game::shared().getEventManager()->createEvent(EVENT_ATTACK_MOVE_UNIT_REQUEST);
+
+        ev << best_unit->getId();
+
+        ev << numSelected;
+        for(int i = 0; i < unitIds.size(); ++i)
+            ev << unitIds[i];
+
+        ev.send();
+
+        return;
+    }
 
     int perRow = (int)(glm::sqrt((float)numSelected));
     int currentIndex = 0;
     float spread = 10.0f;
 
-    for(list<Unit*>::iterator it = lf->getUnits().begin();
-            it != lf->getUnits().end(); ++it)
-        if((*it)->isSelected()) {
-            (*it)->setTargetPosition(vec2(clickPos.x + spread*((currentIndex % perRow) - perRow / 2), 
-                        clickPos.z + spread*(currentIndex / perRow - perRow / 2)));
-            ++currentIndex;
-        }
+    Event& ev = Game::shared().getEventManager()->createEvent(EVENT_MOVE_UNIT_REQUEST);
+    ev << numSelected;
+    for(int i = 0; i < unitIds.size(); ++i)
+        ev << unitIds[i] << vec2(clickPos.x + spread*((i % perRow) - perRow / 2),
+                        clickPos.z + spread*(i / perRow - perRow / 2));
+
+    ev.send();
 }
+
 
 void GameSessionInput::selectUnit()
 {

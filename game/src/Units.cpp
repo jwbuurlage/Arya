@@ -212,7 +212,7 @@ void Unit::setTargetPosition(vec2 target)
     setUnitState(UNIT_RUNNING);
 }
 
-void Unit::receiveDamage(int dmg, Unit* attacker)
+void Unit::receiveDamage(float dmg, Unit* attacker)
 {
     if(unitState == UNIT_IDLE) 
     {

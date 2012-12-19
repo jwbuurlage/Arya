@@ -41,7 +41,11 @@ GameSession::~GameSession()
 
 bool GameSession::init()
 {
+    Game::shared().getEventManager()->addEventHandler(EVENT_CLIENT_CONNECTED, this);
+    Game::shared().getEventManager()->addEventHandler(EVENT_CLIENT_DISCONNECTED, this);
     Game::shared().getEventManager()->addEventHandler(EVENT_GAME_FULLSTATE, this);
+    Game::shared().getEventManager()->addEventHandler(EVENT_MOVE_UNIT, this);
+    Game::shared().getEventManager()->addEventHandler(EVENT_ATTACK_MOVE_UNIT, this);
 
     input = new GameSessionInput(this);
     input->init();
@@ -53,15 +57,6 @@ bool GameSession::init()
     Root::shared().addFrameListener(input);
     Root::shared().addFrameListener(this);
 
-    // init factions
-    localFaction = new Faction;
-    localFaction->setColor(0);
-    factions.push_back(localFaction);
-
-    Faction* otherFaction = new Faction;
-    otherFaction->setColor(1);
-    factions.push_back(otherFaction);
-
     Scene* scene = Root::shared().makeDefaultScene();
     if(!scene)
         return false;
@@ -72,8 +67,6 @@ bool GameSession::init()
     cam->setCameraAngle(0.0f, -60.0f);
     cam->setZoom(300.0f);
 
-    Object* obj;
-
     // init map
     vector<Arya::Material*> tileSet;
     tileSet.push_back(Arya::MaterialManager::shared().getMaterial("grass.tga"));
@@ -82,45 +75,6 @@ bool GameSession::init()
     tileSet.push_back(Arya::MaterialManager::shared().getMaterial("dirt.tga"));
     if(!scene->setMap("heightmap.raw", "watermap.raw", tileSet, Arya::TextureManager::shared().getTexture("clouds.jpg"), Arya::TextureManager::shared().getTexture("splatmap.tga")))
         return false;
-
-    for(int i = 0; i < 30; ++ i) 
-    {
-        Unit* unit = new Unit(0);
-        float heightModel = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(20.0 * (i / 10), -50.0+20.0*(i % 10));
-        obj = scene->createObject();
-        obj->setModel(ModelManager::shared().getModel("ogros.aryamodel"));
-        obj->setAnimation("stand");
-        unit->setObject(obj);
-        unit->setPosition(vec3(20 * (i / 10), heightModel, -50 + 20 * (i % 10)));
-
-        localFaction->addUnit(unit);
-    }
-
-    for(int i = 0; i < 30; ++ i) 
-    {
-        Unit* unit = new Unit(0);
-        float heightModel = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(-100.0 + 20.0 * (i / 10), -100.0+20.0*(i % 10));
-        obj = scene->createObject();
-        obj->setModel(ModelManager::shared().getModel("ogros.aryamodel"));
-        obj->setAnimation("stand");
-        unit->setObject(obj);
-        unit->setPosition(vec3(-100.0 + 20 * (i / 10), heightModel, -100.0 + 20 * (i % 10)));
-
-        otherFaction->addUnit(unit);
-    }
-
-    for(int i = 0; i < 10; ++ i) 
-    {
-        Unit* unit = new Unit(1);
-        float heightModel = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(-200.0 + 20.0 * (i / 10), -50.0+20.0*(i % 10));
-        obj = scene->createObject();
-        obj->setModel(ModelManager::shared().getModel("hep.aryamodel"));
-        obj->setAnimation("stand");
-        unit->setObject(obj);
-        unit->setPosition(vec3(-200.0 + 20 * (i / 10), heightModel, -50 + 20 * (i % 10)));
-
-        localFaction->addUnit(unit);
-    }
 
     selectionDecalHandle = 0;
     Texture* selectionTex = TextureManager::shared().getTexture("selection.png");
@@ -200,6 +154,8 @@ void GameSession::onFrame(float elapsedTime)
 
 void GameSession::onRender()
 {
+    if(!localFaction) return;
+
     glDisable(GL_CULL_FACE);
     glEnable(GL_ALPHA_TEST);
     glEnable(GL_BLEND);
@@ -243,30 +199,183 @@ void GameSession::onRender()
 void GameSession::handleEvent(Packet& packet)
 {
     int id = packet.getId();
-    switch(id) 
+    switch(id)
     {
         case EVENT_GAME_FULLSTATE:
-            int playerCount;
-            packet >> playerCount;
+            {
+                int count;
+                packet >> count;
+                for(int i = 0; i < count; ++i)
+                {
+                    int clientId;
+                    packet >> clientId;
 
-            LOG_INFO("Game has " << playerCount << " player(s)");
+                    Faction* faction = 0;
+                    for(unsigned int i = 0; i < factions.size(); ++i)
+                    {
+                        if( factions[i]->getId() == id )
+                        {
+                            faction = factions[i];
+                        }
+                    }
+                    if(!faction)
+                    {
+                        faction = new Faction;
+                        factions.push_back(faction);
+                    }
 
-            for(int i = 0; i < playerCount; ++i)
+                    //faction deserialize
+                    faction->deserialize(packet);
+
+                    if(clientId == Game::shared().getClientId())
+                        localFaction = faction;
+
+                    int unitCount;
+                    packet >> unitCount;
+                    for(int i = 0; i < unitCount; ++i)
+                    {
+                        Unit* unit = new Unit(0);
+                        unit->deserialize(packet);
+
+                        Object* obj = Root::shared().getScene()->createObject();
+                        string s(infoForUnitType[unit->getType()].name);
+                        obj->setModel(ModelManager::shared().getModel(s + ".aryamodel"));
+                        obj->setAnimation("stand");
+
+                        unit->setObject(obj);
+
+                        float heightModel = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(
+                                unit->getPosition().x, unit->getPosition().z);
+
+                        unit->setPosition(vec3(unit->getPosition().x,
+                                    heightModel,
+                                    unit->getPosition().z));
+
+                        faction->addUnit(unit);
+                    }
+                }
+            }
+            break;
+
+        case EVENT_CLIENT_CONNECTED:
             {
                 int clientId;
                 packet >> clientId;
 
                 //faction deserialize
+                Faction* faction = new Faction;
+                faction->deserialize(packet);
+                factions.push_back(faction);
+
+                if(clientId == Game::shared().getClientId())
+                    localFaction = faction;
 
                 int unitCount;
                 packet >> unitCount;
                 for(int i = 0; i < unitCount; ++i)
                 {
-                    //create unit
-                    //deserialize
+                    Unit* unit = new Unit(0);
+                    unit->deserialize(packet);
+
+                    Object* obj = Root::shared().getScene()->createObject();
+                    string s(infoForUnitType[unit->getType()].name);
+                    obj->setModel(ModelManager::shared().getModel(s + ".aryamodel"));
+                    obj->setAnimation("stand");
+
+                    unit->setObject(obj);
+
+                    float heightModel = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(
+                            unit->getPosition().x, unit->getPosition().z);
+
+                    unit->setPosition(vec3(unit->getPosition().x,
+                                heightModel,
+                                unit->getPosition().z));
+
+                    faction->addUnit(unit);
                 }
             }
             break;
+
+        case EVENT_CLIENT_DISCONNECTED:
+            {
+                int id;
+                packet >> id;
+                //TODO: look up factions with this ClientID
+                //Currently this is the same as faction ID
+                for(vector<Faction*>::iterator iter = factions.begin(); iter != factions.end(); ++iter)
+                {
+                    if( (*iter)->getId() == id )
+                    {
+                        delete *iter;
+                        iter = factions.erase(iter);
+                        break;
+                    }
+                }
+            }
+            break;
+
+        case EVENT_MOVE_UNIT: {
+            int facId;
+            packet >> facId;
+
+            Faction* f;
+
+            for(int i = 0; i < factions.size(); ++i)
+                if(factions[i]->getId() == facId)
+                    f = factions[i];
+
+            int numUnits;
+            packet >> numUnits;
+
+            int unitId;
+            vec2 unitTargetPosition;
+            // TODO: need to optimize with map
+            for(int i = 0; i < numUnits; ++i) {
+                packet >> unitId;
+                packet >> unitTargetPosition;
+                for(list<Unit*>::iterator it = f->getUnits().begin();
+                        it != f->getUnits().end(); ++it)
+                    if((*it)->getId() == unitId)
+                        (*it)->setTargetPosition(unitTargetPosition);
+            }
+
+            break;
+        }
+
+        case EVENT_ATTACK_MOVE_UNIT: {
+            int facId;
+            packet >> facId;
+
+            Faction* f;
+
+            for(int i = 0; i < factions.size(); ++i)
+                if(factions[i]->getId() == facId)
+                    f = factions[i];
+
+            int targetId;
+            packet >> targetId;
+            Unit* targetUnit;
+
+            for(int i = 0; i < factions.size(); ++i)
+                for(list<Unit*>::iterator it = factions[i]->getUnits().begin();
+                        it != factions[i]->getUnits().end(); ++it)
+                    if((*it)->getId() == targetId)
+                            targetUnit = (*it);
+
+            int numUnits;
+            packet >> numUnits;
+
+            int unitId;
+            for(int i = 0; i < numUnits; ++i) {
+                packet >> unitId;
+                for(list<Unit*>::iterator it = f->getUnits().begin();
+                        it != f->getUnits().end(); ++it)
+                    if((*it)->getId() == unitId)
+                            (*it)->setTargetUnit(targetUnit);
+            }
+
+            break;
+         }
 
         default:
             LOG_INFO("GameSession: unknown event received! (" << id << ")");

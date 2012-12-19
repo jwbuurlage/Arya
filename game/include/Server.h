@@ -14,6 +14,7 @@ class ConnectionAcceptor;
 class Packet;
 class Server;
 class ServerClient;
+class ServerGameSession;
 
 class Server
 {
@@ -27,13 +28,6 @@ class Server
         void removeClient(ServerClientHandler* client);
         void handlePacket(ServerClientHandler* client, Packet& packet);
 
-    private:
-        Poco::Thread thread;
-        Poco::Net::ServerSocket* serverSocket;
-        Poco::Net::SocketReactor* reactor;
-        ConnectionAcceptor* acceptor;
-        int port;
-
         //When creating a packet
         //it MUST be added to at least
         //one ServerClientHandler or
@@ -43,11 +37,21 @@ class Server
         //check for zero refcounts
         Packet* createPacket(int id);
 
-        void sendToAllClients(Packet* pak);
+    private:
+        Poco::Thread thread;
+        Poco::Net::ServerSocket* serverSocket;
+        Poco::Net::SocketReactor* reactor;
+        ConnectionAcceptor* acceptor;
+        int port;
 
+        //List of all clients, can be in any game session
+        //ServerClient contains a pointer to their game session
+        map<ServerClientHandler*,ServerClient*> clientList;
+        typedef map<ServerClientHandler*,ServerClient*>::iterator clientIterator;
         int clientIdFactory;
 
-        map<ServerClientHandler*,ServerClient*> clientList;
-
-        typedef map<ServerClientHandler*,ServerClient*>::iterator clientIterator;
+        //GameSession contains a list of ServerClients
+        map<int,ServerGameSession*> sessionList;
+        typedef map<int,ServerGameSession*>::iterator sessionIterator;
+        int sessionIdFactory;
 };

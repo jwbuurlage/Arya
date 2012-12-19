@@ -13,6 +13,7 @@ Game::Game()
     session = 0;
     eventManager = 0;
     network = 0;
+    clientId = 0;
 
     timeSinceNetworkPoll = 1.0f;
 
@@ -43,7 +44,7 @@ void Game::run()
 
         network->startServer();
 
-        network->connectToSessionServer("127.0.0.1", 1337);
+        network->connectToSessionServer("131.211.239.144", 1337);
 
         if(eventManager) delete eventManager;
         eventManager = new EventManager(network);
@@ -56,6 +57,7 @@ void Game::run()
         joinEvent.send();
 
         eventManager->addEventHandler(EVENT_GAME_READY, this);
+        eventManager->addEventHandler(EVENT_CLIENT_ID, this);
 
         root->addFrameListener(this);
         root->startRendering();
@@ -122,18 +124,26 @@ void Game::onFrame(float elapsedTime)
 void Game::handleEvent(Packet& packet)
 {
     int id = packet.getId();
-    if(id == EVENT_GAME_READY)
+    switch(id)
     {
-        if(session) delete session;
-        session = new GameSession;
+        case EVENT_CLIENT_ID:
+            packet >> clientId;
+            break;
 
-        if(!session->init()) {
-            LOG_ERROR("Could not start a new session");
-            Root::shared().stopRendering();
-        }
+        case EVENT_GAME_READY:
+            if(session) delete session;
+            session = new GameSession;
 
-        LOG_INFO("Game is ready");
+            if(!session->init()) {
+                LOG_ERROR("Could not start a new session");
+                Root::shared().stopRendering();
+            }
+
+            LOG_INFO("Game is ready");
+            break;
+
+        default:
+            LOG_INFO("Game: unknown event received! (" << id << ")");
+            break;
     }
-   else
-        LOG_INFO("Unkown event received!");
 }

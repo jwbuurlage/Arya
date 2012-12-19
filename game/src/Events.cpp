@@ -48,8 +48,14 @@ void EventManager::handlePacket(Packet& packet)
     }
     else
     {
+        //Important: some handlers add new handlers
+        //Iterators are NOT invalidated but the following can happen:
+        //range.second pointed to end() but then higher IDs were added
+        //so then it also starts looping over those IDs
+        //To fix this we have the extra IF statement
         for(handlerIterator iter = range.first; iter != range.second; ++iter)
         {
+            if(iter->first != id) break;
             iter->second->handleEvent(packet);
         }
     }

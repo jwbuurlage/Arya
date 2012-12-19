@@ -48,6 +48,15 @@ class Packet
 
         void send() { markedForSend = true; }
 
+        //Copy all except ID
+        void copyPacketData(Packet& other)
+        {
+            //save the ID
+            int id = getId();
+            data = other.data;
+            *(int*)&data[8] = id;
+        }
+
         //READ functions
 
         inline Packet& operator>>(int& val)
@@ -116,17 +125,23 @@ class Packet
             return *this;
         }
 
+        inline Packet& operator>>(vec2& val)
+        {
+            *this >> val.x >> val.y;
+            return *this;
+        }
+
         //WRITE functions
 
         inline Packet& operator<<(unsigned int val)
         {
-            //data.append(&val, sizeof(unsigned int));
+            data.append(&val, sizeof(unsigned int));
             return *this;
         }
 
         inline Packet& operator<<(int val)
         {
-            //data.append(&val, sizeof(int));
+            data.append(&val, sizeof(int));
             return *this;
         }
 
@@ -160,6 +175,13 @@ class Packet
             *this << (float)val.x << (float)val.y << (float)val.z;
             return *this;
         }
+
+        inline Packet& operator<<(const vec2& val)
+        {
+            *this << (float)val.x << (float)val.y;
+            return *this;
+        }
+
 
     private:
         buffer data;
