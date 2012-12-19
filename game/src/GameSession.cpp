@@ -302,11 +302,13 @@ void GameSession::handleEvent(Packet& packet)
                 packet >> id;
                 //TODO: look up factions with this ClientID
                 //Currently this is the same as faction ID
-                for(unsigned int i = 0; i < factions.size(); ++i)
+                for(vector<Faction*>::iterator iter = factions.begin(); iter != factions.end(); ++iter)
                 {
-                    if( factions[i]->getId() == id )
+                    if( (*iter)->getId() == id )
                     {
-                        delete factions[i];
+                        delete *iter;
+                        iter = factions.erase(iter);
+                        break;
                     }
                 }
             }
