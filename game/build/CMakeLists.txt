@@ -17,6 +17,7 @@ SET(
     "../src/Events.cpp"
     "../src/ServerClientHandler.cpp"
     "../src/ServerClient.cpp"
+    "../src/ServerGameSession.cpp"
 	"../src/main.cpp"
 )
 

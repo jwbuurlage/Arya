@@ -14,6 +14,7 @@ class ConnectionAcceptor;
 class Packet;
 class Server;
 class ServerClient;
+class ServerGameSession;
 
 class Server
 {
@@ -43,11 +44,14 @@ class Server
         //check for zero refcounts
         Packet* createPacket(int id);
 
-        void sendToAllClients(Packet* pak);
-
+        //List of all clients, can be in any game session
+        //ServerClient contains a pointer to their game session
+        map<ServerClientHandler*,ServerClient*> clientList;
+        typedef map<ServerClientHandler*,ServerClient*>::iterator clientIterator;
         int clientIdFactory;
 
-        map<ServerClientHandler*,ServerClient*> clientList;
-
-        typedef map<ServerClientHandler*,ServerClient*>::iterator clientIterator;
+        //GameSession contains a list of ServerClients
+        map<int,ServerGameSession*> sessionList;
+        typedef map<int,ServerGameSession*>::iterator sessionIterator;
+        int sessionIdFactory;
 };

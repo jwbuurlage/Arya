@@ -2,6 +2,7 @@
 #include "../include/Packet.h"
 #include "../include/EventCodes.h"
 #include "../include/ServerClientHandler.h"
+#include "../include/ServerGameSession.h"
 #include "../include/ServerClient.h"
 #include "../include/Units.h"
 #include "Arya.h"
@@ -15,6 +16,7 @@
 #include "Poco/Net/SocketReactor.h"
 #include "Poco/Net/SocketAcceptor.h"
 
+using std::make_pair;
 using namespace Poco;
 using namespace Poco::Net;
 
@@ -25,6 +27,7 @@ Server::Server()
     acceptor = 0;
     port = 1337;
     clientIdFactory = 100;
+    sessionIdFactory = 100;
 }
 
 Server::~Server()
@@ -38,6 +41,17 @@ Server::~Server()
     if(acceptor) delete acceptor;
     if(reactor) delete reactor;
     if(serverSocket) delete serverSocket;
+
+    for(sessionIterator session = sessionList.begin(); session != sessionList.end(); ++session)
+    {
+        delete session->second;
+    }
+    sessionList.clear();
+    for(clientIterator cl = clientList.begin(); cl != clientList.end(); ++cl)
+    {
+        delete cl->second;
+    }
+    clientList.clear();
 }
 
 void Server::runInThread()
@@ -68,14 +82,6 @@ Packet* Server::createPacket(int id)
     return new Packet(id);
 }
 
-void Server::sendToAllClients(Packet* pak)
-{
-    for(clientIterator iter = clientList.begin(); iter != clientList.end(); ++iter)
-    {
-        iter->second->handler->sendPacket(pak);
-    }
-}
-
 //------------------------------
 // SERVER LOGIC
 //------------------------------
@@ -91,14 +97,7 @@ void Server::removeClient(ServerClientHandler* clientHandler)
     clientIterator cl = clientList.find(clientHandler);
     if(cl != clientList.end() )
     {
-        //TODO:
-        //Lots of stuff like sending a message
-        //to everyone about the client being disconnected
-        //Distribute their resources accross allies
-        //and so on
-        //This could be done in the deconstructor
-        //if wanted
-        delete cl->second;
+        delete cl->second; //this will call GameSession::removeClient which will take care of ingame stuff
         clientList.erase(cl);
     }
 }
@@ -116,20 +115,34 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
     switch(packet.getId()){
         case EVENT_JOIN_GAME:
             {
-                client->setClientId(clientIdFactory++); Packet* pak = createPacket(EVENT_CLIENT_ID); *pak << client->getClientId(); clienthandler->sendPacket(pak); //Create faction client->createFaction(); client->createStartUnits();
+                client->setClientId(clientIdFactory++);
+                Packet* pak = createPacket(EVENT_CLIENT_ID);
+                *pak << client->getClientId();
+                clienthandler->sendPacket(pak);
 
-                int joinedCount = 0;
-                for(clientIterator iter = clientList.begin(); iter != clientList.end(); ++iter)
+                //TODO: Check which session the client wants to join
+                //For now: create a session if it doesnt exist
+                //and else join the existing session
+                ServerGameSession* session;
+                if(sessionList.empty())
                 {
-                    if( iter->second->getClientId() != -1 ) ++joinedCount;
+                    session = new ServerGameSession;
+                    sessionList.insert(make_pair(sessionIdFactory++, session));
                 }
+                else
+                {
+                    session = sessionList.begin()->second;
+                }
+                session->addClient(client);
 
-                LOG_INFO("Clients joined: " << joinedCount);
-                if(joinedCount >= 1)
+                client->createFaction();
+                client->createStartUnits();
+
+                if(session->gameReady())
                 {
                     pak = createPacket(EVENT_GAME_READY);
                     //Send to all clients
-                    sendToAllClients(pak);
+                    session->sendToAllClients(pak);
 
                     pak = createPacket(EVENT_GAME_FULLSTATE);
 
@@ -142,7 +155,7 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
                     //      - Serialized unit 
                     //------------------------------------
 
-                    *pak << joinedCount; //player count
+                    *pak << session->getClientCount(); //player count
 
                     //for each player:
                     for(clientIterator iter = clientList.begin(); iter != clientList.end(); ++iter)
@@ -161,7 +174,7 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
                             (*iter)->serialize(*pak);
                     }
 
-                    sendToAllClients(pak);
+                    session->sendToAllClients(pak);
                 }
                 break;
             }
