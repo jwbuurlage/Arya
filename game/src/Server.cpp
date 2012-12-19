@@ -139,9 +139,8 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
                 clienthandler->sendPacket(pak);
 
                 session->addClient(client);
-                break;
             }
-
+            break;
         default:
             if(client->getClientId() == -1)
             {

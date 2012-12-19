@@ -44,7 +44,7 @@ void Game::run()
 
         network->startServer();
 
-        network->connectToSessionServer("localhost", 1337);
+        network->connectToSessionServer("131.211.239.144", 1337);
 
         if(eventManager) delete eventManager;
         eventManager = new EventManager(network);

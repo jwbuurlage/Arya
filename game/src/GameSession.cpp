@@ -43,7 +43,7 @@ bool GameSession::init()
 {
     Game::shared().getEventManager()->addEventHandler(EVENT_CLIENT_CONNECTED, this);
     Game::shared().getEventManager()->addEventHandler(EVENT_CLIENT_DISCONNECTED, this);
-    //Game::shared().getEventManager()->addEventHandler(EVENT_GAME_FULLSTATE, this);
+    Game::shared().getEventManager()->addEventHandler(EVENT_GAME_FULLSTATE, this);
     Game::shared().getEventManager()->addEventHandler(EVENT_MOVE_UNIT, this);
     Game::shared().getEventManager()->addEventHandler(EVENT_ATTACK_MOVE_UNIT, this);
 
@@ -154,6 +154,8 @@ void GameSession::onFrame(float elapsedTime)
 
 void GameSession::onRender()
 {
+    if(!localFaction) return;
+
     glDisable(GL_CULL_FACE);
     glEnable(GL_ALPHA_TEST);
     glEnable(GL_BLEND);
@@ -199,6 +201,62 @@ void GameSession::handleEvent(Packet& packet)
     int id = packet.getId();
     switch(id)
     {
+        case EVENT_GAME_FULLSTATE:
+            {
+                int count;
+                packet >> count;
+                for(int i = 0; i < count; ++i)
+                {
+                    int clientId;
+                    packet >> clientId;
+
+                    Faction* faction = 0;
+                    for(unsigned int i = 0; i < factions.size(); ++i)
+                    {
+                        if( factions[i]->getId() == id )
+                        {
+                            faction = factions[i];
+                        }
+                    }
+                    if(!faction)
+                    {
+                        faction = new Faction;
+                        factions.push_back(faction);
+                    }
+
+                    //faction deserialize
+                    faction->deserialize(packet);
+
+                    if(clientId == Game::shared().getClientId())
+                        localFaction = faction;
+
+                    int unitCount;
+                    packet >> unitCount;
+                    for(int i = 0; i < unitCount; ++i)
+                    {
+                        Unit* unit = new Unit(0);
+                        unit->deserialize(packet);
+
+                        Object* obj = Root::shared().getScene()->createObject();
+                        string s(infoForUnitType[unit->getType()].name);
+                        obj->setModel(ModelManager::shared().getModel(s + ".aryamodel"));
+                        obj->setAnimation("stand");
+
+                        unit->setObject(obj);
+
+                        float heightModel = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(
+                                unit->getPosition().x, unit->getPosition().z);
+
+                        unit->setPosition(vec3(unit->getPosition().x,
+                                    heightModel,
+                                    unit->getPosition().z));
+
+                        faction->addUnit(unit);
+                    }
+                }
+            }
+            break;
+
         case EVENT_CLIENT_CONNECTED:
             {
                 int clientId;
