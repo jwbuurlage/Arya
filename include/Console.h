@@ -44,10 +44,8 @@ namespace Arya
             Font* font;
             float time; // used for cursor flashing
             int upCount; // counts how many times we pressed up before pressing enter
-            int downCount; // counts how many times we pressed down before pressing enter
 
             void goBackInHistory();
-            void goForwardInHistory();
             void setVisibilityConsole(bool flag);
             void addTextLine(string textToBeAdded);
             //bool searchKeyword(vector<string> searchKey);
