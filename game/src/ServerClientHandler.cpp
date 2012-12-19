@@ -1,6 +1,7 @@
 #include "../include/ServerClientHandler.h"
 #include "../include/Server.h"
 #include "Arya.h"
+#include "../include/ServerLogger.h"
 #include <cstring>
 
 #include "Poco/Exception.h"
