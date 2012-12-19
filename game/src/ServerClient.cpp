@@ -8,13 +8,13 @@ void ServerClient::createFaction()
     faction->setColor(clientId%5);
 }
 
-UnitInfo unitinfo;
+UnitInfo unitInfo;
 
 void ServerClient::createStartUnits()
 {
     if(!faction) return;
 
-    UnitInfo* info = &unitinfo;
+    UnitInfo* info = &unitInfo;
     info->radius = 5.0f;
     info->maxHealth = 100.0f;
     info->speed = 30.0f;

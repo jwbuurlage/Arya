@@ -116,15 +116,7 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
     switch(packet.getId()){
         case EVENT_JOIN_GAME:
             {
-                client->setClientId(clientIdFactory++);
-
-                Packet* pak = createPacket(EVENT_CLIENT_ID);
-                *pak << client->getClientId();
-                clienthandler->sendPacket(pak);
-
-                //Create faction
-                client->createFaction();
-                client->createStartUnits();
+                client->setClientId(clientIdFactory++); Packet* pak = createPacket(EVENT_CLIENT_ID); *pak << client->getClientId(); clienthandler->sendPacket(pak); //Create faction client->createFaction(); client->createStartUnits();
 
                 int joinedCount = 0;
                 for(clientIterator iter = clientList.begin(); iter != clientList.end(); ++iter)
@@ -141,7 +133,17 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
 
                     pak = createPacket(EVENT_GAME_FULLSTATE);
 
+                    //------------------------------------
+                    // Package structure:
+                    // + joinedCount
+                    //   - clientID
+                    //   - Serialized faction
+                    //      + UnitCount
+                    //      - Serialized unit 
+                    //------------------------------------
+
                     *pak << joinedCount; //player count
+
                     //for each player:
                     for(clientIterator iter = clientList.begin(); iter != clientList.end(); ++iter)
                     {
@@ -156,9 +158,7 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
 
                         *pak << unitCount;
                         for(std::list<Unit*>::iterator iter = faction->getUnits().begin(); iter != faction->getUnits().end(); ++iter)
-                        {
                             (*iter)->serialize(*pak);
-                        }
                     }
 
                     sendToAllClients(pak);
