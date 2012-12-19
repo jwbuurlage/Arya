@@ -13,6 +13,7 @@ class ServerGameSession
         ServerGameSession(Server* serv) : server(serv)
         {
             gameState = STATE_CREATED;
+            idFactory = 1;
         }
         ~ServerGameSession()
         {
@@ -22,6 +23,8 @@ class ServerGameSession
         void removeClient(ServerClient* client);
 
         void handlePacket(ServerClient* client, Packet& packet);
+
+        int getNewId() { return idFactory++; }
 
         unsigned int getClientCount() const { return clientList.size(); }
 
@@ -33,6 +36,7 @@ class ServerGameSession
         void startGame();
     private:
         Server* const server;
+        int idFactory;
 
         vector<ServerClient*> clientList;
         typedef vector<ServerClient*>::iterator clientIterator;
