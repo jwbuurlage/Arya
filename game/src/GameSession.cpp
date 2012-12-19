@@ -243,58 +243,64 @@ void GameSession::handleEvent(Packet& packet)
             break;
 
         case EVENT_MOVE_UNIT: {
-            int facID;
-            packet >> facID;
+            int facId;
+            packet >> facId;
 
             Faction* f;
 
             for(int i = 0; i < factions.size(); ++i)
-                if(factions[i].getID() == facID)
+                if(factions[i]->getId() == facId)
                     f = factions[i];
 
             int numUnits;
             packet >> numUnits;
 
-            int unitID;
-            vec3 unitTargetPosition;
+            int unitId;
+            vec2 unitTargetPosition;
             // TODO: need to optimize with map
             for(int i = 0; i < numUnits; ++i) {
-                packet >> unitID;
+                packet >> unitId;
                 packet >> unitTargetPosition;
-                for(int j = 0; j < f->getUnits().size(); ++j)
-                    if(f->getUnits[j].getID() == unitID)
-                        f->getUnits[j]->setTargetPosition(unitTargetPosition);
+                for(list<Unit*>::iterator it = f->getUnits().begin();
+                        it != f->getUnits().end(); ++it)
+                    if((*it)->getId() == unitId)
+                        (*it)->setTargetPosition(unitTargetPosition);
             }
 
             break;
         }
 
         case EVENT_ATTACK_MOVE_UNIT: {
-            int facID;
-            packet >> facID;
+            int facId;
+            packet >> facId;
 
             Faction* f;
 
             for(int i = 0; i < factions.size(); ++i)
-                if(factions[i].getID() == facID)
+                if(factions[i]->getId() == facId)
                     f = factions[i];
 
-            int targetID;
-            packet >> targetID;
+            int targetId;
+            packet >> targetId;
             Unit* targetUnit;
 
-            // TODO: optimize
             for(int i = 0; i < factions.size(); ++i)
-                for(int j = 0; j < factions[i].getUnits().size(); ++j)
-                    if(factions[i].getUnits()[j].getID() == targetID)
-                        targetunit = factions[i].getUnits()[j];
+                for(list<Unit*>::iterator it = factions[i]->getUnits().begin();
+                        it != factions[i]->getUnits().end(); ++it)
+                    if((*it)->getId() == targetId)
+                            targetUnit = (*it);
 
-            int unitID;
+            int numUnits;
+            packet >> numUnits;
+
+            int unitId;
             for(int i = 0; i < numUnits; ++i) {
-                packet >> unitID;
-                for(int j = 0; j < f->getUnits().size(); ++j)
-                    if(f->getUnits[j].getID() == unitID)
-                        f->getUnits[j]->setTargetUnit(targetID);
+                packet >> unitId;
+                for(list<Unit*>::iterator it = f->getUnits().begin();
+                        it != f->getUnits().end(); ++it)
+                    if((*it)->getId() == unitId)
+                            (*it)->setTargetUnit(targetUnit);
+
             }
 
             break;

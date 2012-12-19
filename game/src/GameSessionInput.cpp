@@ -290,23 +290,23 @@ void GameSessionInput::moveSelectedUnits()
         }
     }
 
-    vector<int> unitIDs;
+    vector<int> unitIds;
     for(list<Unit*>::iterator it = lf->getUnits().begin();
             it != lf->getUnits().end(); ++it)
         if((*it)->isSelected())
-            unitIDs.push_back((*it)->getID());
+            unitIds.push_back((*it)->getId());
 
-    int numSelected = unitIDs.size();
+    int numSelected = unitIds.size();
 
     if(best_unit)
     {
         Event& ev = Game::shared().getEventManager()->createEvent(EVENT_ATTACK_MOVE_UNIT_REQUEST);
 
-        ev << best_unit->getID();
+        ev << best_unit->getId();
 
         ev << numSelected;
-        for(int i = 0; i < unitIDs.size(); ++i)
-            ev << unitIDs[i];
+        for(int i = 0; i < unitIds.size(); ++i)
+            ev << unitIds[i];
 
         ev.send();
 
@@ -319,8 +319,8 @@ void GameSessionInput::moveSelectedUnits()
 
     Event& ev = Game::shared().getEventManager()->createEvent(EVENT_MOVE_UNIT_REQUEST);
     ev << numSelected;
-    for(int i = 0; i < unitIDs.size(); ++i)
-        ev << unitIDs[i] << vec2(clickPos.x + spread*((i % perRow) - perRow / 2),
+    for(int i = 0; i < unitIds.size(); ++i)
+        ev << unitIds[i] << vec2(clickPos.x + spread*((i % perRow) - perRow / 2),
                         clickPos.z + spread*(i / perRow - perRow / 2));
 
     ev.send();
