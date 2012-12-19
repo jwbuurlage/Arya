@@ -3,6 +3,8 @@
 #include "Overlay.h"
 #include "Fonts.h"
 #include "common/Logger.h"
+#include <sstream>
+using std::stringstream;
 namespace Arya
 {
     template<> Console* Singleton<Console>::singleton = 0;
@@ -15,7 +17,6 @@ namespace Arya
         textHeightInPixels = 10.0;
         pixelsInBetween = 4.0;
         visibility = false;
-        activeLine = 0;
         nrCharOnLine = 0;
         font = 0;
         time = 0.0;
@@ -74,12 +75,30 @@ namespace Arya
             rect->isVisible = false;
             Root::shared().getOverlay()->addRect(rect);
         }
+        addCommandListener("consoleColor", this);
         return true;
     }
 
+    bool Console::handleCommand(string command)
+    {
+        bool flag = true;
+        if(splitLineCommand(command) == "consoleColor")
+        {
+            float float1 = 0.0f;
+            float float2 = 0.0f;
+            float float3 = 0.0f;
+            stringstream parser;
+            parser << splitLineParameters(command);
+            parser >> float1 >> float2 >> float3;
+            changeConsoleColor(float1, float2, float3);
+        }
+        else flag == false;
+        return flag;
+    }
     bool Console::keyDown(int key, bool keyDown)
     {
         bool keyHandled = true;
+        LOG_INFO(key);
         if(visibility == false)
         {
             switch(key)
@@ -101,6 +120,7 @@ namespace Arya
                     if((keyDown && currentLine.length() < (unsigned)nrCharOnLine)) currentLine.push_back(key - 'A' + 'a');
                 }
             }
+            if(key >= '0' && key <= '9' && keyDown && (currentLine.length() < (unsigned)nrCharOnLine)) currentLine.push_back(key);
             else
             {
                 switch(key)
@@ -205,7 +225,6 @@ namespace Arya
     {
         history.push_back(textToBeAdded);
         searchHistory.push_back(textToBeAdded);
-        activeLine += 1;
         if(history.size() == (unsigned)nrLines - 1) history.erase(history.begin());
         if(searchHistory.size() == (unsigned)searchNrLines) searchHistory.erase(searchHistory.begin());
     }
@@ -213,7 +232,7 @@ namespace Arya
     void Console::enterInput() // When you press enter, currentLine needs to be emptied and needs to be added to the history and searchhistory
     {
         addTextLine(currentLine);
-        if(!inputRecognizer(currentLine)) addOutputText("Command not found!");
+        onCommand(currentLine);
         upCount = 0;
         currentLine = "";
     }
@@ -230,13 +249,85 @@ namespace Arya
 
     void Console::addOutputText(string textToBeAdded)
     {
-        history.push_back(textToBeAdded);
-        activeLine += 1;
+        if(textToBeAdded.length() <= nrCharOnLine) history.push_back(textToBeAdded);
+        else
+        {
+            int count = 0;
+            for(int i = 1; (textToBeAdded.length() > (i * nrCharOnLine)); i++)
+                count = i;
+
+            for(int i = 0; i < count - 2; i++)
+            {
+                history.push_back(textToBeAdded.substr(i * nrCharOnLine, (i + 1)* nrCharOnLine));
+            }
+            history.push_back(textToBeAdded.substr((count - 1) * nrCharOnLine, (textToBeAdded.length() % nrCharOnLine)));
+        }
         if(history.size() == (unsigned)nrLines - 1) history.erase(history.begin());
     }
 
-    bool Console::inputRecognizer(string command)
+
+    void Console::addCommandListener(string command, CommandListener* listener)
     {
-        return false;
+        commandListeners.insert(make_pair(command, listener));
+    }
+
+    void Console::removeCommandListener(string command, CommandListener* listener)
+    {
+        pair<commandListenerIterator, commandListenerIterator> range = commandListeners.equal_range(command);
+        for(commandListenerIterator iter = range.first; iter != range.second; ++iter)
+        {
+            if( iter->second == listener )
+            {
+                commandListeners.erase(iter);
+            }
+        }
+    }
+
+    void Console::onCommand(string command) // alleen op eerste woord zoeken
+    {
+        pair<commandListenerIterator, commandListenerIterator> range = commandListeners.equal_range(splitLineCommand(command));
+        if(range.first == range.second)
+        {
+            LOG_WARNING("Command"  << command << " received but no command registered");
+        }
+        else
+        {
+            for(commandListenerIterator iter = range.first; iter != range.second; ++iter)
+            {
+                iter->second->handleCommand(command);
+            }
+        }
+    }
+
+    bool Console::changeConsoleColor(float r, float g, float b)
+    {
+        bool flag = true;
+        if( r >= 0.0f && r <= 1.0f && g >= 0.0f && g <= 1.0f && b >= 0.0f && g <= 1.0f ) rects[0]->fillColor = vec4(r,g,b,0.4f);
+        else flag = false;
+        return flag;
+    }
+
+    string Console::splitLineCommand(string command)
+    {
+        int spaceFinder = 0;
+        spaceFinder = command.find(" ", 0);
+        if(spaceFinder == std::string::npos)
+        {
+            return command;
+        }
+        int spaceCount = command.find_first_of(" ", 0);
+        return command.substr(0, spaceCount);
+    }
+
+    string Console::splitLineParameters(string command)
+    {
+        int spaceFinder = 0;
+        spaceFinder = command.find(" ", 0);
+        if(spaceFinder == std::string::npos)
+        {
+            return "";
+        }
+        int spaceCount = command.find_first_of(" ", 0);
+        return command.substr(spaceCount, currentLine.length() - spaceCount - 1);
     }
 }
