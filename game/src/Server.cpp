@@ -116,6 +116,7 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
         case EVENT_JOIN_GAME:
             {
                 client->setClientId(clientIdFactory++);
+
                 Packet* pak = createPacket(EVENT_CLIENT_ID);
                 *pak << client->getClientId();
                 clienthandler->sendPacket(pak);

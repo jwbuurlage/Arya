@@ -44,6 +44,7 @@ class GameSession : public Arya::FrameListener, public EventHandler
         GameSessionInput* input;
         Faction* localFaction;
         vector<Faction*> factions;
+        vector<int> clients;
 
         ShaderProgram* decalProgram;
         GLuint decalVao;
