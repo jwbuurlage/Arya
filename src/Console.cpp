@@ -98,7 +98,6 @@ namespace Arya
     bool Console::keyDown(int key, bool keyDown)
     {
         bool keyHandled = true;
-        LOG_INFO(key);
         if(visibility == false)
         {
             switch(key)
@@ -120,7 +119,8 @@ namespace Arya
                     if((keyDown && currentLine.length() < (unsigned)nrCharOnLine)) currentLine.push_back(key - 'A' + 'a');
                 }
             }
-            if(key >= '0' && key <= '9' && keyDown && (currentLine.length() < (unsigned)nrCharOnLine)) currentLine.push_back(key);
+            else if(key >= '0' && key <= '9' && keyDown && (currentLine.length() < (unsigned)nrCharOnLine)) currentLine.push_back(key);
+            else if(key >= GLFW_KEY_KP_0  && key <= GLFW_KEY_KP_9  && keyDown && (currentLine.length() < (unsigned)nrCharOnLine)) currentLine.push_back(key + 2);
             else
             {
                 switch(key)
