@@ -5,6 +5,7 @@
 #include "../include/EventCodes.h"
 #include "../include/Units.h"
 #include "Arya.h"
+#include "../include/ServerLogger.h"
 
 void ServerGameSession::addClient(ServerClient* client)
 {

@@ -1,5 +1,7 @@
 #pragma once
 
+//The singleton MUST be made with the create method
+
 namespace Arya
 {
     template <typename T> class Singleton{
@@ -11,10 +13,10 @@ namespace Arya
         protected:
             static T* singleton;
             Singleton(){
-                singleton = static_cast<T*>(this);
+                if(!singleton) singleton = static_cast<T*>(this);
             }
             ~Singleton(){
-                singleton = 0;
+                if(this == singleton) singleton = 0;
             }
 
         public:

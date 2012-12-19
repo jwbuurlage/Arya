@@ -6,6 +6,7 @@
 #include "../include/ServerClient.h"
 #include "../include/Units.h"
 #include "Arya.h"
+#include "../include/ServerLogger.h"
 #include <cstring>
 #include <algorithm>
 
@@ -28,6 +29,7 @@ Server::Server()
     port = 1337;
     clientIdFactory = 100;
     sessionIdFactory = 100;
+    if(ServerLogger == 0) ServerLogger = new Arya::Logger;
 }
 
 Server::~Server()
