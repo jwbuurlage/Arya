@@ -143,7 +143,7 @@ void Game::handleEvent(Packet& packet)
             break;
 
         default:
-            LOG_INFO("Unkown event received!");
+            LOG_INFO("Game: unknown event received! (" << id << ")");
             break;
     }
 }

@@ -48,6 +48,15 @@ class Packet
 
         void send() { markedForSend = true; }
 
+        //Copy all except ID
+        void copyPacketData(Packet& other)
+        {
+            //save the ID
+            int id = getId();
+            data = other.data;
+            *(int*)&data[8] = id;
+        }
+
         //READ functions
 
         inline Packet& operator>>(int& val)

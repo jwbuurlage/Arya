@@ -28,13 +28,6 @@ class Server
         void removeClient(ServerClientHandler* client);
         void handlePacket(ServerClientHandler* client, Packet& packet);
 
-    private:
-        Poco::Thread thread;
-        Poco::Net::ServerSocket* serverSocket;
-        Poco::Net::SocketReactor* reactor;
-        ConnectionAcceptor* acceptor;
-        int port;
-
         //When creating a packet
         //it MUST be added to at least
         //one ServerClientHandler or
@@ -43,6 +36,13 @@ class Server
         //in Server, and on each update
         //check for zero refcounts
         Packet* createPacket(int id);
+
+    private:
+        Poco::Thread thread;
+        Poco::Net::ServerSocket* serverSocket;
+        Poco::Net::SocketReactor* reactor;
+        ConnectionAcceptor* acceptor;
+        int port;
 
         //List of all clients, can be in any game session
         //ServerClient contains a pointer to their game session

@@ -1,6 +1,9 @@
+#include "../include/Server.h"
 #include "../include/ServerGameSession.h"
 #include "../include/ServerClient.h"
 #include "../include/ServerClientHandler.h"
+#include "../include/EventCodes.h"
+#include "../include/Units.h"
 #include "Arya.h"
 
 void ServerGameSession::addClient(ServerClient* client)
@@ -38,7 +41,80 @@ void ServerGameSession::sendToAllClients(Packet* pak)
     }
 }
 
-bool ServerGameSession::gameReady() const
+bool ServerGameSession::gameReadyToLoad() const
 {
-    return true;
+    //TODO: Check if all players joined that needed to join
+    return gameState == STATE_CREATED;
+}
+
+bool ServerGameSession::gameReadyToStart() const
+{
+    return gameState == STATE_LOADING;
+}
+
+void ServerGameSession::startLoading()
+{
+    if(gameState != STATE_CREATED)
+    {
+        LOG_WARNING("startLoading() called when already loaded");
+        return;
+    }
+    gameState = STATE_LOADING;
+
+    Packet* pak = server->createPacket(EVENT_GAME_READY);
+    sendToAllClients(pak);
+
+    pak = server->createPacket(EVENT_GAME_FULLSTATE);
+
+    //------------------------------------
+    // Package structure:
+    // + joinedCount
+    //   - clientID
+    //   - Serialized faction
+    //      + UnitCount
+    //      - Serialized unit 
+    //------------------------------------
+
+    *pak << getClientCount(); //player count
+
+    //for each player:
+    for(clientIterator iter = clientList.begin(); iter != clientList.end(); ++iter)
+    {
+        (*iter)->createFaction();
+        (*iter)->createStartUnits();
+
+        *pak << (*iter)->getClientId();
+
+        Faction* faction = (*iter)->getFaction();
+        faction->serialize(*pak);
+
+        int unitCount = (int)faction->getUnits().size();
+
+        *pak << unitCount;
+        for(std::list<Unit*>::iterator uiter = faction->getUnits().begin(); uiter != faction->getUnits().end(); ++uiter)
+            (*uiter)->serialize(*pak);
+    }
+    sendToAllClients(pak);
+}
+
+void ServerGameSession::startGame()
+{
+
+}
+
+void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
+{
+    switch(packet.getId())
+    {
+        case EVENT_MOVE_UNIT_REQUEST:
+            {
+                Packet* pak = server->createPacket(EVENT_MOVE_UNIT);
+                pak->copyPacketData(packet);
+                sendToAllClients(pak);
+            }
+            break;
+        default:
+            break;
+    }
+    return;
 }

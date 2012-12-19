@@ -316,7 +316,6 @@ void GameSessionInput::moveSelectedUnits()
     for(int i = 0; i < unitIDs.size(); ++i)
         ev << unitIDs[i];
 
-
     int perRow = (int)(glm::sqrt((float)numSelected));
     int currentIndex = 0;
     float spread = 10.0f;

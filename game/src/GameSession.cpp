@@ -42,6 +42,8 @@ GameSession::~GameSession()
 bool GameSession::init()
 {
     Game::shared().getEventManager()->addEventHandler(EVENT_GAME_FULLSTATE, this);
+    Game::shared().getEventManager()->addEventHandler(EVENT_MOVE_UNIT, this);
+    Game::shared().getEventManager()->addEventHandler(EVENT_ATTACK_MOVE_UNIT, this);
 
     input = new GameSessionInput(this);
     input->init();
@@ -238,6 +240,14 @@ void GameSession::handleEvent(Packet& packet)
                     faction->addUnit(unit);
                 }
             }
+            break;
+
+        case EVENT_MOVE_UNIT:
+            LOG_INFO("WORK THEM PACKAGES");
+            break;
+
+        case EVENT_ATTACK_MOVE_UNIT:
+            LOG_INFO("ATTACK THEM PACKAGES");
             break;
 
         default:
