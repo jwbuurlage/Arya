@@ -104,12 +104,11 @@ void ServerGameSession::startGame()
 
 void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
 {
+    Faction* faction = client->getFaction();
     switch(packet.getId())
     {
         case EVENT_MOVE_UNIT_REQUEST:
             {
-                LOG_INFO("Move request accepted");
-                Faction* faction = client->getFaction();
                 if(faction)
                 {
                     Packet* outPak = server->createPacket(EVENT_MOVE_UNIT);
@@ -124,6 +123,26 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
                         vec2 targetPos;
                         packet >> unitId >> targetPos;
                         *outPak << unitId << targetPos;
+                    }
+                    sendToAllClients(outPak);
+                }
+            }
+            break;
+        case EVENT_ATTACK_MOVE_UNIT_REQUEST:
+            {
+                if(faction)
+                {
+                    Packet* outPak = server->createPacket(EVENT_ATTACK_MOVE_UNIT);
+                    *outPak << faction->getId();
+
+                    int count;
+                    packet >> count;
+                    *outPak << count;
+                    for(int i = 0; i < count; ++i)
+                    {
+                        int unitId, targetUnitId;
+                        packet >> unitId >> targetUnitId;
+                        *outPak << unitId << targetUnitId;
                     }
                     sendToAllClients(outPak);
                 }
