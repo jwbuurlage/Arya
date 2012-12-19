@@ -28,7 +28,7 @@ GameSession::~GameSession()
         delete input;
     }
 
-    for(int i = 0; i < factions.size(); ++i)
+    for(unsigned int i = 0; i < factions.size(); ++i)
         delete factions[i];
     factions.clear();
 
@@ -194,7 +194,8 @@ bool GameSession::initVertices()
 void GameSession::onFrame(float elapsedTime)
 {
     // update units
-    for(int i = 0; i < factions.size(); ++i)
+    mat4 vpMatrix = Root::shared().getScene()->getCamera()->getVPMatrix();
+    for(unsigned int i = 0; i < factions.size(); ++i)
     {
         for(list<Unit*>::iterator it = factions[i]->getUnits().begin();
                 it != factions[i]->getUnits().end(); )
@@ -204,8 +205,6 @@ void GameSession::onFrame(float elapsedTime)
                 it = factions[i]->getUnits().erase(it);
             }
             else {
-                mat4 vpMatrix = Root::shared().getScene()->getCamera()->getVPMatrix();
-
                 vec4 onScreen((*it)->getObject()->getPosition(), 1.0);
                 onScreen = vpMatrix * onScreen;
                 onScreen.x /= onScreen.w;

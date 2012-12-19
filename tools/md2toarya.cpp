@@ -213,7 +213,7 @@ int main(int argc, char* argv[])
 
     ModelHeader* header = (ModelHeader*)inputData;
 
-    if( inputFilesize < sizeof(ModelHeader) || header->identity != MD2_IDENTITY || header->version != MD2_VERSION )
+    if( (unsigned int)inputFilesize < sizeof(ModelHeader) || header->identity != MD2_IDENTITY || header->version != MD2_VERSION )
     {
         cerr << "File is not a valid MD2 model file: " << argv[1] << endl;
         return -1;

@@ -248,8 +248,6 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
     if(!leftShiftPressed)
         unselectAll();
 
-    mat4 vpMatrix = Root::shared().getScene()->getCamera()->getVPMatrix();
-
     Faction* lf = session->getLocalFaction();
 
     for(list<Unit*>::iterator it = lf->getUnits().begin();
@@ -273,11 +271,10 @@ void GameSessionInput::moveSelectedUnits()
     // did we click on an enemy unit
     Unit* best_unit = 0;
     float best_distance = 100.0;
-    Faction* from_faction = 0;
-
+    //Faction* from_faction = 0;
 
     float dist;
-    for(int j = 0; j < session->getFactions().size(); ++j) {
+    for(unsigned int j = 0; j < session->getFactions().size(); ++j) {
         if(session->getFactions()[j] == lf) continue;
 
         for(list<Unit*>::iterator it = session->getFactions()[j]->getUnits().begin();
@@ -288,7 +285,7 @@ void GameSessionInput::moveSelectedUnits()
                     && dist < best_distance) {
                 best_distance = dist; 
                 best_unit = (*it);
-                from_faction = session->getFactions()[j];
+                //from_faction = session->getFactions()[j];
             }
         }
     }
@@ -335,7 +332,6 @@ void GameSessionInput::selectUnit()
     Unit* best_unit = 0;
     float best_distance = 100.0;
 
-    int numSelected = 0;
     float dist;
 
     for(list<Unit*>::iterator it = lf->getUnits().begin();
