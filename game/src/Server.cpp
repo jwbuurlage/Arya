@@ -135,12 +135,10 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
                     session = sessionList.begin()->second;
                 }
 
-                session->addClient(client);
+                pak = createPacket(EVENT_GAME_READY);
+                clienthandler->sendPacket(pak);
 
-                if(session->gameReadyToLoad())
-                {
-                    session->startLoading();
-                }
+                session->addClient(client);
                 break;
             }
 

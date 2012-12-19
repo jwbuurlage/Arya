@@ -20,7 +20,15 @@ typedef enum
     EVENT_CLIENT_ID,
 
     EVENT_GAME_READY,
-    EVENT_GAME_FULLSTATE,
+
+    // - clientID
+    // - Serialized faction
+    //    + UnitCount
+    //    - Serialized unit 
+    EVENT_CLIENT_CONNECTED,
+
+    // - Client ID
+    EVENT_CLIENT_DISCONNECTED,
 
     //------------------------
     // - Number of units NUM
