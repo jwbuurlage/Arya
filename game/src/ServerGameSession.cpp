@@ -44,7 +44,7 @@ void ServerGameSession::sendToAllClients(Packet* pak)
 bool ServerGameSession::gameReadyToLoad() const
 {
     //TODO: Check if all players joined that needed to join
-    return gameState == STATE_CREATED && clientList.size() >= 1;
+    return gameState == STATE_CREATED && clientList.size() >= 2;
 }
 
 bool ServerGameSession::gameReadyToStart() const

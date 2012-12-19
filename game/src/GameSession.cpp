@@ -300,7 +300,6 @@ void GameSession::handleEvent(Packet& packet)
                         it != f->getUnits().end(); ++it)
                     if((*it)->getId() == unitId)
                             (*it)->setTargetUnit(targetUnit);
-
             }
 
             break;
