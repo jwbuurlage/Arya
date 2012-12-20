@@ -26,7 +26,7 @@ Server::Server()
     serverSocket = 0;
     reactor = 0;
     acceptor = 0;
-    port = 1337;
+    port = 13337;
     clientIdFactory = 100;
     sessionIdFactory = 100;
     if(ServerLogger == 0) ServerLogger = new Arya::Logger;
