@@ -22,6 +22,7 @@ class Server
         Server();
         ~Server();
 
+        void run();
         void runInThread();
 
         void newClient(ServerClientHandler* client);
@@ -43,6 +44,7 @@ class Server
         Poco::Net::SocketReactor* reactor;
         ConnectionAcceptor* acceptor;
         int port;
+        void prepareServer();
 
         //List of all clients, can be in any game session
         //ServerClient contains a pointer to their game session

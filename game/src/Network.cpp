@@ -244,6 +244,13 @@ void Network::startServer()
     server->runInThread();
 }
 
+void Network::runServer()
+{
+    if(server) delete server;
+    server = new Server;
+    server->run();
+}
+
 void Network::connectToLobbyServer(string host, int port)
 {
     lobbyConnection->connect(host,port);

@@ -56,7 +56,22 @@ Server::~Server()
     clientList.clear();
 }
 
+
+void Server::run()
+{
+    prepareServer();
+    LOG_INFO("Server started on port " << port);
+    reactor->run();
+}
+
 void Server::runInThread()
+{
+    prepareServer();
+    thread.start(*reactor);
+    LOG_INFO("Server started on port " << port);
+}
+
+void Server::prepareServer()
 {
     if(acceptor) delete acceptor;
     if(reactor) delete reactor;
@@ -74,9 +89,6 @@ void Server::runInThread()
     //Create the acceptor that will listen on the server socket
     //It will register to the reactor
     acceptor = new ConnectionAcceptor(*serverSocket, *reactor, this);
-
-    thread.start(*reactor);
-    LOG_INFO("Server started on port " << port);
 }
 
 Packet* Server::createPacket(int id)
