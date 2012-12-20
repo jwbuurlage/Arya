@@ -73,9 +73,12 @@ void ServerGameSession::removeClient(ServerClient* client)
         {
             clientList.erase(iter);
 
-            Packet* pak = server->createPacket(EVENT_CLIENT_DISCONNECTED);
-            *pak << id;
-            sendToAllClients(pak);
+            if(!clientList.empty())
+            {
+                Packet* pak = server->createPacket(EVENT_CLIENT_DISCONNECTED);
+                *pak << id;
+                sendToAllClients(pak);
+            }
 
             break;
         }
