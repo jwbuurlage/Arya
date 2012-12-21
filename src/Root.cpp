@@ -32,7 +32,6 @@ namespace Arya
         oldTime = 0;
         overlay = 0;
 
-        Logger::create();
         FileSystem::create();
         TextureManager::create();
         MaterialManager::create();
@@ -54,7 +53,6 @@ namespace Arya
         MaterialManager::destroy();
         TextureManager::destroy();
         FileSystem::destroy();
-        Logger::destroy();
     }
 
     bool Root::init(bool fullscr, int w, int h)

@@ -258,7 +258,7 @@ namespace Arya
             }
             else
             {
-                Logger::shared() << Logger::L_INFO << "Model has " << animationCount << " animations: ";
+                AryaLogger << Logger::L_INFO << "Model has " << animationCount << " animations: ";
 
                 animData = new VertexAnimationData;
                 model->animationData = animData;
@@ -271,7 +271,7 @@ namespace Arya
                     nameBuf[0] = *pointer++;
                     while(nameBuf[count]){ ++count; nameBuf[count] = *pointer++; }
 
-                    Logger::shared() << nameBuf << " ";
+                    AryaLogger << nameBuf << " ";
 
                     newAnim.frameTimes.clear();
                     newAnim.startFrame = *(int*)pointer; pointer += 4;
@@ -287,7 +287,7 @@ namespace Arya
                         animData->animations.insert(animMapType(nameBuf, newAnim));
                 }
 
-                Logger::shared() << endLog;
+                AryaLogger << endLog;
             }
 
             delete[] nameBuf;
