@@ -17,6 +17,7 @@ Unit* UnitFactory::createUnit(int id, int type)
         return unit;
     }
     unit = new Unit(type, id, this);
+    LOG_INFO("TEST " << id << " = " << unit->getId());
     unitMap.insert(pair<int,Unit*>(unit->getId(),unit));
     return unit;
 }
@@ -41,10 +42,9 @@ Unit* UnitFactory::getUnitById(int id)
     return iter->second;
 }
 
-Unit::Unit(int _type, int _id, UnitFactory* factory)
+Unit::Unit(int _type, int _id, UnitFactory* factory) : id(_id)
 {
     type = _type;
-    id = _id;
     unitFactory = factory;
 
     object = 0;
@@ -71,7 +71,6 @@ Unit::Unit(int _type, int _id, UnitFactory* factory)
 
     // Root::shared().getOverlay()->addRect(healthBar);
 
-    id = -1;
     factionId = -1;
 
     //Register at Game session unit id map

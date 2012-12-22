@@ -95,7 +95,7 @@ class Unit
         Object* object; //object->position is always the same as position
         vec3 position; //since server has no Object, position is stored here
         int type;
-        int id;
+        const int id;
         int factionId;
 
         // movement and attack
