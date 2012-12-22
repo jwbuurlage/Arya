@@ -3,6 +3,10 @@
 #include "Arya.h"
 #include "UnitTypes.h"
 
+#include <map>
+using std::map;
+using std::pair;
+
 using Arya::Object;
 using Arya::Rect;
 using Arya::Root;
@@ -18,11 +22,35 @@ typedef enum
 
 class Packet;
 
-class Unit
+class Unit;
+
+//Factory design pattern
+class UnitFactory
 {
     public:
-        Unit(int _type);
-        ~Unit();
+        UnitFactory(){}
+        virtual ~UnitFactory(){}
+
+        //destory units by calling delete on them
+        Unit* createUnit(int id, int type);
+        Unit* getUnitById(int id);
+    private:
+        map<int,Unit*> unitMap;
+        typedef map<int,Unit*>::iterator unitMapIterator;
+
+        friend class Unit;
+        void destroyUnit(int id);
+};
+
+class Unit
+{
+    private:
+        friend class UnitFactory;
+        UnitFactory* unitFactory;
+
+        Unit(int _type, int id, UnitFactory* factory);
+    public:
+        ~Unit(); //unregisters itself at unit factory
 
         void setPosition(const vec3& pos) { position = pos; if(object) object->setPosition(pos); }
         vec3 getPosition() const { return position; }
@@ -59,7 +87,6 @@ class Unit
         void setTintColor(vec3 tC);
 
         int getId() const { return id; }
-        void setId(int _id) { id = _id; }
 
         void serialize(Packet& pk);
         void deserialize(Packet& pk);
@@ -68,12 +95,14 @@ class Unit
         Object* object; //object->position is always the same as position
         vec3 position; //since server has no Object, position is stored here
         int type;
-        bool selected;
+        int id;
+        int factionId;
 
         // movement and attack
         vec2 targetPosition;
         Unit* targetUnit;
         UnitState unitState;
+        bool selected;
 
         vec2 screenPosition;
 
@@ -86,6 +115,4 @@ class Unit
 
         vec3 tintColor;
 
-        int id;
-        int factionId;
 };

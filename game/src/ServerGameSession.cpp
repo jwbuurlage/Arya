@@ -29,7 +29,10 @@ void ServerGameSession::addClient(ServerClient* client)
 
     *pak << unitCount;
     for(std::list<Unit*>::iterator uiter = faction->getUnits().begin(); uiter != faction->getUnits().end(); ++uiter)
+    {
+        *pak << (*uiter)->getId();
         (*uiter)->serialize(*pak);
+    }
 
     //send the connect to all OTHER clients
     sendToAllClients(pak);
@@ -54,7 +57,10 @@ void ServerGameSession::addClient(ServerClient* client)
 
         *pak << unitCount;
         for(std::list<Unit*>::iterator uiter = faction->getUnits().begin(); uiter != faction->getUnits().end(); ++uiter)
+        {
+            *pak << (*uiter)->getId();
             (*uiter)->serialize(*pak);
+        }
     }
     client->handler->sendPacket(pak);
 }
@@ -141,7 +147,10 @@ void ServerGameSession::startLoading()
 
         *pak << unitCount;
         for(std::list<Unit*>::iterator uiter = faction->getUnits().begin(); uiter != faction->getUnits().end(); ++uiter)
+        {
+            (*uiter)->getId();
             (*uiter)->serialize(*pak);
+        }
     }
     sendToAllClients(pak);
 }
@@ -202,3 +211,5 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
     }
     return;
 }
+
+

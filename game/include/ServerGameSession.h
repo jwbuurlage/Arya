@@ -1,13 +1,13 @@
 #pragma once
+#include "Units.h"
 #include <vector>
-
 using std::vector;
 
 class Server;
 class ServerClient;
 class Packet;
 
-class ServerGameSession
+class ServerGameSession : public UnitFactory
 {
     public:
         ServerGameSession(Server* serv) : server(serv)
@@ -25,6 +25,7 @@ class ServerGameSession
         void handlePacket(ServerClient* client, Packet& packet);
 
         int getNewId() { return idFactory++; }
+        Unit* createUnit(int type){ return UnitFactory::createUnit(getNewId(),type); }
 
         unsigned int getClientCount() const { return clientList.size(); }
 
@@ -34,6 +35,7 @@ class ServerGameSession
         bool gameReadyToStart() const;
         void startLoading();
         void startGame();
+
     private:
         Server* const server;
         int idFactory;

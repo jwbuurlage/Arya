@@ -8,9 +8,45 @@
 
 using Arya::Root;
 
-Unit::Unit(int _type)
+Unit* UnitFactory::createUnit(int id, int type)
+{
+    Unit* unit = getUnitById(id);
+    if(unit)
+    {
+        LOG_WARNING("Trying to create unit with duplicate id");
+        return unit;
+    }
+    unit = new Unit(type, id, this);
+    unitMap.insert(pair<int,Unit*>(unit->getId(),unit));
+    return unit;
+}
+
+//Called from Unit deconstructor
+void UnitFactory::destroyUnit(int id)
+{
+    unitMapIterator iter = unitMap.find(id);
+    if(iter == unitMap.end())
+    {
+        LOG_WARNING("Trying to destory unexisting unit id");
+        return;
+    }
+    unitMap.erase(iter);
+    return;
+}
+
+Unit* UnitFactory::getUnitById(int id)
+{
+    unitMapIterator iter = unitMap.find(id);
+    if(iter == unitMap.end()) return 0;
+    return iter->second;
+}
+
+Unit::Unit(int _type, int _id, UnitFactory* factory)
 {
     type = _type;
+    id = _id;
+    unitFactory = factory;
+
     object = 0;
     selected = false;
     targetPosition = vec2(0.0f);
@@ -37,6 +73,8 @@ Unit::Unit(int _type)
 
     id = -1;
     factionId = -1;
+
+    //Register at Game session unit id map
 }
 
 Unit::~Unit()
@@ -45,8 +83,11 @@ Unit::~Unit()
         targetUnit->release();
     if(object) object->setObsolete();
 
-    Root::shared().getOverlay()->removeRect(healthBar);
-    delete healthBar;
+    unitFactory->destroyUnit(id);
+
+    //NOT IN SERVER:
+    //Root::shared().getOverlay()->removeRect(healthBar);
+    //delete healthBar;
 }
 
 void Unit::setObject(Object* obj)
@@ -239,7 +280,8 @@ void Unit::setTintColor(vec3 tC)
 
 void Unit::serialize(Packet& pk)
 {
-    pk << id;
+    //id is written by caller
+    //pk << id;
     pk << factionId;
     pk << position;
     pk << type;
@@ -247,7 +289,9 @@ void Unit::serialize(Packet& pk)
 
 void Unit::deserialize(Packet& pk)
 {
-    pk >> id;
+    //id is read by unit creator to supply it
+    //to the constructor
+    //pk >> id;
     pk >> factionId;
     pk >> position;
     pk >> type;

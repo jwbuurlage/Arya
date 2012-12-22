@@ -234,7 +234,9 @@ void GameSession::handleEvent(Packet& packet)
                     packet >> unitCount;
                     for(int i = 0; i < unitCount; ++i)
                     {
-                        Unit* unit = new Unit(0);
+                        int id;
+                        packet >> id;
+                        Unit* unit = createUnit(id, 0);
                         unit->deserialize(packet);
 
                         Object* obj = Root::shared().getScene()->createObject();
@@ -274,7 +276,9 @@ void GameSession::handleEvent(Packet& packet)
                 packet >> unitCount;
                 for(int i = 0; i < unitCount; ++i)
                 {
-                    Unit* unit = new Unit(0);
+                    int id;
+                    packet >> id;
+                    Unit* unit = createUnit(id, 0);
                     unit->deserialize(packet);
 
                     Object* obj = Root::shared().getScene()->createObject();
@@ -320,7 +324,7 @@ void GameSession::handleEvent(Packet& packet)
 
             Faction* f;
 
-            for(int i = 0; i < factions.size(); ++i)
+            for(unsigned int i = 0; i < factions.size(); ++i)
                 if(factions[i]->getId() == facId)
                     f = factions[i];
 
@@ -348,7 +352,7 @@ void GameSession::handleEvent(Packet& packet)
 
             Faction* f;
 
-            for(int i = 0; i < factions.size(); ++i)
+            for(unsigned int i = 0; i < factions.size(); ++i)
                 if(factions[i]->getId() == facId)
                     f = factions[i];
 
@@ -356,7 +360,7 @@ void GameSession::handleEvent(Packet& packet)
             packet >> targetId;
             Unit* targetUnit;
 
-            for(int i = 0; i < factions.size(); ++i)
+            for(unsigned int i = 0; i < factions.size(); ++i)
                 for(list<Unit*>::iterator it = factions[i]->getUnits().begin();
                         it != factions[i]->getUnits().end(); ++it)
                     if((*it)->getId() == targetId)
@@ -383,3 +387,4 @@ void GameSession::handleEvent(Packet& packet)
     }
 
 }
+
