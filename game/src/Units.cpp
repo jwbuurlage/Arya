@@ -17,7 +17,6 @@ Unit* UnitFactory::createUnit(int id, int type)
         return unit;
     }
     unit = new Unit(type, id, this);
-    LOG_INFO("TEST " << id << " = " << unit->getId());
     unitMap.insert(pair<int,Unit*>(unit->getId(),unit));
     return unit;
 }
