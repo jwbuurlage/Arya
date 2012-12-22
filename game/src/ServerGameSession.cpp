@@ -18,30 +18,33 @@ void ServerGameSession::addClient(ServerClient* client)
     client->createFaction();
     client->createStartUnits();
 
-    Packet* pak = server->createPacket(EVENT_CLIENT_CONNECTED);
-
-    *pak << client->getClientId();
-
-    Faction* faction = client->getFaction();
-    faction->serialize(*pak);
-
-    int unitCount = (int)faction->getUnits().size();
-
-    *pak << unitCount;
-    for(std::list<Unit*>::iterator uiter = faction->getUnits().begin(); uiter != faction->getUnits().end(); ++uiter)
+    if(!clientList.empty())
     {
-        *pak << (*uiter)->getId();
-        (*uiter)->serialize(*pak);
-    }
+        //send the connect to all OTHER clients
+        Packet* pak = server->createPacket(EVENT_CLIENT_CONNECTED);
 
-    //send the connect to all OTHER clients
-    sendToAllClients(pak);
+        *pak << client->getClientId();
+
+        Faction* faction = client->getFaction();
+        faction->serialize(*pak);
+
+        int unitCount = (int)faction->getUnits().size();
+
+        *pak << unitCount;
+        for(std::list<Unit*>::iterator uiter = faction->getUnits().begin(); uiter != faction->getUnits().end(); ++uiter)
+        {
+            *pak << (*uiter)->getId();
+            (*uiter)->serialize(*pak);
+        }
+
+        sendToAllClients(pak);
+    }
 
     //Then ADD this new client
     clientList.push_back(client);
 
     //Send the full game state only to the new client
-    pak = server->createPacket(EVENT_GAME_FULLSTATE);
+    Packet* pak = server->createPacket(EVENT_GAME_FULLSTATE);
 
     *pak << getClientCount(); //player count
 
@@ -93,6 +96,11 @@ void ServerGameSession::removeClient(ServerClient* client)
 
 void ServerGameSession::sendToAllClients(Packet* pak)
 {
+    if(clientList.empty())
+    {
+        LOG_WARNING("calling sendToAllClients but client list is empty. This means the packet is NOT added to any queue and the pointer is probably lost");
+        return;
+    }
     for(clientIterator iter = clientList.begin(); iter != clientList.end(); ++iter)
     {
         (*iter)->handler->sendPacket(pak);

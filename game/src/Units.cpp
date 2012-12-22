@@ -13,7 +13,7 @@ Unit* UnitFactory::createUnit(int id, int type)
     Unit* unit = getUnitById(id);
     if(unit)
     {
-        LOG_WARNING("Trying to create unit with duplicate id");
+        LOG_WARNING("Trying to create unit with duplicate id (" << id << ")");
         return unit;
     }
     unit = new Unit(type, id, this);
