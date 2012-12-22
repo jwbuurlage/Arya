@@ -20,6 +20,7 @@ class ServerGameSession : public UnitFactory, public FactionFactory
         {
         }
 
+        void update(float elapsedTime);
         void addClient(ServerClient* client);
         void removeClient(ServerClient* client);
 

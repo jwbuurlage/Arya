@@ -79,7 +79,7 @@ void Server::prepareServer()
 
     //Multiple acceptors can register to the reactor: one for every port for example
     //Only a single reactor can run at a single moment
-    reactor = new SocketReactor;
+    reactor = new ServerReactor(this);
 
     //Create the server socket
     IPAddress any_address;
@@ -99,6 +99,20 @@ Packet* Server::createPacket(int id)
 //------------------------------
 // SERVER LOGIC
 //------------------------------
+
+void Server::update()
+{
+    //diff is an 64 bit signed integer
+    //with the elapsed time in microseconds
+    Timestamp oldTime(timer);
+    timer.update();
+    Timestamp::TimeDiff diff = timer - oldTime;
+
+    for(sessionIterator iter = sessionList.begin(); iter != sessionList.end(); ++iter)
+    {
+        iter->second->update((float)diff);
+    }
+}
 
 void Server::newClient(ServerClientHandler* clientHandler)
 {

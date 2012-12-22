@@ -177,6 +177,11 @@ void ServerClientHandler::handlePacket(char* data, int packetSize)
     server->handlePacket(this, pak);
 }
 
+void ServerReactor::onBusy()
+{
+    server->update();
+}
+
 ConnectionAcceptor::ConnectionAcceptor(ServerSocket& socket, SocketReactor& reactor, Server* serv) : SocketAcceptor(socket, reactor), server(serv)
 {
 }
