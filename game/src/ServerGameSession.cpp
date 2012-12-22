@@ -26,6 +26,7 @@ void ServerGameSession::addClient(ServerClient* client)
         *pak << client->getClientId();
 
         Faction* faction = client->getFaction();
+        *pak << faction->getId();
         faction->serialize(*pak);
 
         int unitCount = (int)faction->getUnits().size();
@@ -54,6 +55,7 @@ void ServerGameSession::addClient(ServerClient* client)
         *pak << (*iter)->getClientId();
 
         Faction* faction = (*iter)->getFaction();
+        *pak << faction->getId();
         faction->serialize(*pak);
 
         int unitCount = (int)faction->getUnits().size();
@@ -149,6 +151,7 @@ void ServerGameSession::startLoading()
         *pak << (*iter)->getClientId();
 
         Faction* faction = (*iter)->getFaction();
+        *pak << faction->getId();
         faction->serialize(*pak);
 
         int unitCount = (int)faction->getUnits().size();
@@ -156,7 +159,7 @@ void ServerGameSession::startLoading()
         *pak << unitCount;
         for(std::list<Unit*>::iterator uiter = faction->getUnits().begin(); uiter != faction->getUnits().end(); ++uiter)
         {
-            (*uiter)->getId();
+            *pak << (*uiter)->getId();
             (*uiter)->serialize(*pak);
         }
     }
@@ -177,20 +180,38 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
             {
                 if(faction)
                 {
-                    Packet* outPak = server->createPacket(EVENT_MOVE_UNIT);
-                    *outPak << faction->getId();
-
                     int count;
                     packet >> count;
-                    *outPak << count;
+
+                    vector<Unit*> validUnits;
+                    validUnits.reserve(count);
                     for(int i = 0; i < count; ++i)
                     {
                         int unitId;
                         vec2 targetPos;
                         packet >> unitId >> targetPos;
-                        *outPak << unitId << targetPos;
+
+                        Unit* unit = getUnitById(unitId);
+                        if(unit)
+                        {
+                            //TODO: check if valid movement
+                            unit->setTargetPosition(targetPos);
+                            validUnits.push_back(unit);
+                        }
                     }
-                    sendToAllClients(outPak);
+
+                    if(!validUnits.empty())
+                    {
+                        Packet* outPak = server->createPacket(EVENT_MOVE_UNIT);
+                        *outPak << faction->getId();
+
+                        *outPak << (int)validUnits.size();
+                        for(unsigned int i = 0; i < validUnits.size(); ++i)
+                        {
+                            *outPak << validUnits[i]->getId() << validUnits[i]->getTargetPosition();
+                        }
+                        sendToAllClients(outPak);
+                    }
                 }
             }
             break;
@@ -198,19 +219,37 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
             {
                 if(faction)
                 {
-                    Packet* outPak = server->createPacket(EVENT_ATTACK_MOVE_UNIT);
-                    *outPak << faction->getId();
-
                     int count;
                     packet >> count;
-                    *outPak << count;
+
+                    vector<Unit*> validUnits;
+                    validUnits.reserve(count);
                     for(int i = 0; i < count; ++i)
                     {
                         int unitId, targetUnitId;
                         packet >> unitId >> targetUnitId;
-                        *outPak << unitId << targetUnitId;
+                        Unit* unit = getUnitById(unitId);
+                        Unit* target = getUnitById(targetUnitId);
+                        if(unit && target)
+                        {
+                            //TODO: check if valid movement
+                            unit->setTargetUnit(target);
+                            validUnits.push_back(unit);
+                        }
                     }
-                    sendToAllClients(outPak);
+
+                    if(!validUnits.empty())
+                    {
+                        Packet* outPak = server->createPacket(EVENT_ATTACK_MOVE_UNIT);
+                        *outPak << faction->getId();
+
+                        *outPak << (int)validUnits.size();
+                        for(unsigned int i = 0; i < validUnits.size(); ++i)
+                        {
+                            *outPak << validUnits[i]->getId() << validUnits[i]->getTargetUnit()->getId();
+                        }
+                        sendToAllClients(outPak);
+                    }
                 }
             }
             break;

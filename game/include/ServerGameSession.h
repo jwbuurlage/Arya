@@ -1,5 +1,6 @@
 #pragma once
 #include "Units.h"
+#include "Faction.h"
 #include <vector>
 using std::vector;
 
@@ -7,7 +8,7 @@ class Server;
 class ServerClient;
 class Packet;
 
-class ServerGameSession : public UnitFactory
+class ServerGameSession : public UnitFactory, public FactionFactory
 {
     public:
         ServerGameSession(Server* serv) : server(serv)
@@ -26,6 +27,7 @@ class ServerGameSession : public UnitFactory
 
         int getNewId() { return idFactory++; }
         Unit* createUnit(int type){ return UnitFactory::createUnit(getNewId(),type); }
+        Faction* createFaction(){ return FactionFactory::createFaction(getNewId()); }
 
         unsigned int getClientCount() const { return clientList.size(); }
 

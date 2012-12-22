@@ -3,6 +3,7 @@
 #include "Arya.h"
 #include "Events.h"
 #include "Units.h"
+#include "Faction.h"
 
 #include <vector>
 using std::vector;
@@ -19,11 +20,13 @@ using Arya::TextureManager;
 using Arya::Shader;
 using Arya::ShaderProgram;
 
-class Faction;
 class GameSessionInput;
-class Unit;
 
-class GameSession : public Arya::FrameListener, public EventHandler, public UnitFactory
+class GameSession :
+    public Arya::FrameListener,
+    public EventHandler,
+    public UnitFactory,
+    public FactionFactory
 {
     public:
         GameSession();

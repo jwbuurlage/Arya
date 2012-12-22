@@ -66,7 +66,9 @@ class Unit
 
         void update(float elapsedTime);
 
+        vec2 getTargetPosition() const { return targetPosition; }
         void setTargetPosition(vec2 target);
+        Unit* getTargetUnit() const { return targetUnit; }
         void setTargetUnit(Unit* unit);
 
         void setUnitState(UnitState state);

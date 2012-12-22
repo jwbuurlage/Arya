@@ -3,9 +3,41 @@
 #include "../include/Packet.h"
 #include "../include/FactionColors.h"
 
-Faction::Faction()
+Faction* FactionFactory::createFaction(int id)
 {
-    id = -1;
+    Faction* faction = getFactionById(id);
+    if(faction)
+    {
+        LOG_WARNING("Trying to create faction with duplicate id (" << id << ")");
+        return faction;
+    }
+    faction = new Faction(id, this);
+    factionMap.insert(pair<int,Faction*>(faction->getId(),faction));
+    return faction;
+}
+
+//Called from faction deconstructor
+void FactionFactory::destroyFaction(int id)
+{
+    factionMapIterator iter = factionMap.find(id);
+    if(iter == factionMap.end())
+    {
+        LOG_WARNING("Trying to destory unexisting faction id");
+        return;
+    }
+    factionMap.erase(iter);
+    return;
+}
+
+Faction* FactionFactory::getFactionById(int id)
+{
+    factionMapIterator iter = factionMap.find(id);
+    if(iter == factionMap.end()) return 0;
+    return iter->second;
+}
+
+Faction::Faction(int _id, FactionFactory* _factory) : factory(_factory), id(_id)
+{
     color = 0;
 }
 
@@ -17,6 +49,7 @@ Faction::~Faction()
         delete *it;
         it = units.erase(it);
     }
+    factory->destroyFaction(id);
 }
 
 void Faction::addUnit(Unit* unit)
@@ -32,12 +65,12 @@ vec3 Faction::getColor()
 
 void Faction::serialize(Packet& pk)
 {
-    pk << id;
+    //pk << id; //written by caller
     pk << color;
 }
 
 void Faction::deserialize(Packet& pk)
 {
-    pk >> id;
+    //pk >> id; //read by caller
     pk >> color;
 }

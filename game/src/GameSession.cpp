@@ -210,21 +210,16 @@ void GameSession::handleEvent(Packet& packet)
                     int clientId;
                     packet >> clientId;
 
-                    Faction* faction = 0;
-                    for(unsigned int i = 0; i < factions.size(); ++i)
-                    {
-                        if( factions[i]->getId() == id )
-                        {
-                            faction = factions[i];
-                        }
-                    }
+                    int factionId;
+                    packet >> factionId;
+
+                    Faction* faction = getFactionById(factionId);
                     if(!faction)
                     {
-                        faction = new Faction;
+                        faction = createFaction(factionId);
                         factions.push_back(faction);
                     }
 
-                    //faction deserialize
                     faction->deserialize(packet);
 
                     if(clientId == Game::shared().getClientId())
@@ -264,8 +259,10 @@ void GameSession::handleEvent(Packet& packet)
                 int clientId;
                 packet >> clientId;
 
-                //faction deserialize
-                Faction* faction = new Faction;
+                int factionId;
+                packet >> factionId;
+
+                Faction* faction = createFaction(factionId);
                 faction->deserialize(packet);
                 factions.push_back(faction);
 
@@ -304,11 +301,9 @@ void GameSession::handleEvent(Packet& packet)
             {
                 int id;
                 packet >> id;
-                //TODO: look up factions with this ClientID
-                //Currently this is the same as faction ID
                 for(vector<Faction*>::iterator iter = factions.begin(); iter != factions.end(); ++iter)
                 {
-                    if( (*iter)->getId() == id )
+                    if( (*iter)->getClientId() == id )
                     {
                         delete *iter;
                         iter = factions.erase(iter);
@@ -322,25 +317,18 @@ void GameSession::handleEvent(Packet& packet)
             int facId;
             packet >> facId;
 
-            Faction* f;
-
-            for(unsigned int i = 0; i < factions.size(); ++i)
-                if(factions[i]->getId() == facId)
-                    f = factions[i];
+            Faction* faction = getFactionById(facId);
 
             int numUnits;
             packet >> numUnits;
 
             int unitId;
             vec2 unitTargetPosition;
-            // TODO: need to optimize with map
             for(int i = 0; i < numUnits; ++i) {
                 packet >> unitId;
                 packet >> unitTargetPosition;
-                for(list<Unit*>::iterator it = f->getUnits().begin();
-                        it != f->getUnits().end(); ++it)
-                    if((*it)->getId() == unitId)
-                        (*it)->setTargetPosition(unitTargetPosition);
+                Unit* unit = getUnitById(unitId);
+                if(unit) unit->setTargetPosition(unitTargetPosition);
             }
 
             break;
@@ -350,32 +338,17 @@ void GameSession::handleEvent(Packet& packet)
             int facId;
             packet >> facId;
 
-            Faction* f;
-
-            for(unsigned int i = 0; i < factions.size(); ++i)
-                if(factions[i]->getId() == facId)
-                    f = factions[i];
-
-            int targetId;
-            packet >> targetId;
-            Unit* targetUnit;
-
-            for(unsigned int i = 0; i < factions.size(); ++i)
-                for(list<Unit*>::iterator it = factions[i]->getUnits().begin();
-                        it != factions[i]->getUnits().end(); ++it)
-                    if((*it)->getId() == targetId)
-                            targetUnit = (*it);
+            Faction* faction = getFactionById(facId);
 
             int numUnits;
             packet >> numUnits;
 
-            int unitId;
+            int unitId, targetUnitId;
             for(int i = 0; i < numUnits; ++i) {
-                packet >> unitId;
-                for(list<Unit*>::iterator it = f->getUnits().begin();
-                        it != f->getUnits().end(); ++it)
-                    if((*it)->getId() == unitId)
-                            (*it)->setTargetUnit(targetUnit);
+                packet >> unitId >> targetUnitId;
+                Unit* unit = getUnitById(unitId);
+                Unit* targetUnit = getUnitById(targetUnitId);
+                if(unit && targetUnit) unit->setTargetUnit(targetUnit);
             }
 
             break;
@@ -385,6 +358,5 @@ void GameSession::handleEvent(Packet& packet)
             LOG_INFO("GameSession: unknown event received! (" << id << ")");
             break;
     }
-
 }
 
