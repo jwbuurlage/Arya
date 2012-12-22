@@ -147,12 +147,12 @@ bool ServerClientHandler::trySendPacketData(Packet* packet, int& bytesSent)
     }
     catch(TimeoutException& e)
     {
-        LOG_WARNING("Timeout exception when writing to socket! Msg: " << e.message());
+        LOG_WARNING("Timeout exception when writing to socket! Msg: " << e.displayText());
         return false;
     }
     catch(NetException& e)
     {
-        LOG_WARNING("Net exception when writing to socket. Msg: " << e.message());
+        LOG_WARNING("Net exception when writing to socket. Msg: " << e.displayText());
         return false;
     }
 
