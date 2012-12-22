@@ -61,14 +61,13 @@ Unit::Unit(int _type, int _id, UnitFactory* factory) : id(_id)
     screenPosition = vec2(0.0);
     tintColor = vec3(0.5);
 
-    // init and register health bar
-    healthBar = new Rect;
-    healthBar->fillColor = vec4(tintColor, 1.0);
-    healthBar->sizeInPixels = vec2(25.0, 3.0);
-    // need to check if this flips orientation
-    healthBar->offsetInPixels = vec2(-12.5, 25.0);
-
-    // Root::shared().getOverlay()->addRect(healthBar);
+    ////init and register health bar
+    //healthBar = new Rect;
+    //healthBar->fillColor = vec4(tintColor, 1.0);
+    //healthBar->sizeInPixels = vec2(25.0, 3.0);
+    //// need to check if this flips orientation
+    //healthBar->offsetInPixels = vec2(-12.5, 25.0);
+    //Root::shared().getOverlay()->addRect(healthBar);
 
     factionId = -1;
 
