@@ -47,6 +47,9 @@ Unit::Unit(int _type, int _id, UnitFactory* factory) : id(_id)
     unitFactory = factory;
 
     object = 0;
+    position = vec3(0.0f);
+    yaw = 0.0f;
+
     selected = false;
     targetPosition = vec2(0.0f);
     unitState = UNIT_IDLE;
@@ -94,7 +97,7 @@ void Unit::setObject(Object* obj)
 
 void Unit::update(float timeElapsed)
 {
-    healthBar->relative = screenPosition;
+    //healthBar->relative = screenPosition;
 
     if(unitState == UNIT_IDLE)
         return;
