@@ -25,6 +25,7 @@ class Map
         Scene* scene;
         Arya::File* hFile;
         int terrainSize;
+        vec3 scaleVector;
 
         bool terrainInitialized;
 };

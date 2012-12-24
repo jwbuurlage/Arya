@@ -30,12 +30,14 @@ bool Map::initHeightData()
         LOG_WARNING("Unable to load heightmap data!");
         return false;
     }
+    scaleVector = vec3((float)terrainSize * 2.0f, 300.0f, (float)terrainSize * 2.0);
     return true;
 }
 
 bool Map::initGraphics(Scene* sc)
 {
     if(terrainInitialized) return true;
+    if(!hFile) return false;
     if(!sc) return false;
     scene = sc;
 
@@ -48,6 +50,9 @@ bool Map::initGraphics(Scene* sc)
 
     if(!scene->setTerrain(hFile->getData(), terrainSize, "watermap.raw", tileSet, Arya::TextureManager::shared().getTexture("clouds.jpg"), Arya::TextureManager::shared().getTexture("splatmap.tga")))
         return false;
+
+    mat4 scaleMatrix = glm::scale(mat4(1.0), scaleVector);
+    scene->getTerrain()->setScaleMatrix(scaleMatrix);
 
     terrainInitialized = true;
     return true;
@@ -71,6 +76,6 @@ float Map::heightAtGroundPosition(float x, float z)
 
     int index = (int)((z + terrainSize)/2.0)*terrainSize + (int)((x + (terrainSize))/2.0);
     h = heights[index];
-    return scene->getTerrain()->getScaleMatrix()[1][1]*(h / 65535.0);
+    return scaleVector.y*(h / 65535.0);
 }
 
