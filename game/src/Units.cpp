@@ -170,10 +170,8 @@ void Unit::update(float timeElapsed, Map* map)
         return;
     }
 
-    if(!object) return;
-
     float newYaw = (180.0f/M_PI)*atan2(-diff.x, -diff.z);
-    float oldYaw = object->getYaw();
+    float oldYaw = getYaw();
     float yawDiff = newYaw - oldYaw;
 
     if(yawDiff > 180.0f) yawDiff -= 360.0f;
@@ -183,7 +181,7 @@ void Unit::update(float timeElapsed, Map* map)
     if((yawDiff >= 0 && yawDiff < deltaYaw) || (yawDiff <= 0 && yawDiff > -deltaYaw))
     {
         //angle is small enough (less than 1 degree) so we can start walking now
-        object->setYaw(newYaw);
+        setYaw(newYaw);
         if(unitState == UNIT_ATTACKING)
             return;
 
@@ -196,7 +194,7 @@ void Unit::update(float timeElapsed, Map* map)
     {
         //Rotate
         if(yawDiff < 0) deltaYaw = -deltaYaw;
-        object->setYaw( oldYaw + deltaYaw );
+        setYaw( oldYaw + deltaYaw );
     }
 
 }
