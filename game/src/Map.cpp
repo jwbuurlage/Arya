@@ -4,7 +4,7 @@ Map::Map()
 {
     scene = 0;
     hFile = 0;
-    terrainSize = 1025;
+    heightMapSize = 1025;
     terrainInitialized = false;
 }
 
@@ -30,7 +30,8 @@ bool Map::initHeightData()
         LOG_WARNING("Unable to load heightmap data!");
         return false;
     }
-    scaleVector = vec3((float)terrainSize * 2.0f, 300.0f, (float)terrainSize * 2.0);
+    heightMapSize = 1025;
+    scaleVector = vec3(4000.0f, 300.0f, 4000.0f);
     return true;
 }
 
@@ -41,14 +42,13 @@ bool Map::initGraphics(Scene* sc)
     if(!sc) return false;
     scene = sc;
 
-    terrainSize = 1025;
     vector<Arya::Material*> tileSet;
     tileSet.push_back(Arya::MaterialManager::shared().getMaterial("grass.tga"));
     tileSet.push_back(Arya::MaterialManager::shared().getMaterial("rock.tga"));
     tileSet.push_back(Arya::MaterialManager::shared().getMaterial("snow.tga"));
     tileSet.push_back(Arya::MaterialManager::shared().getMaterial("dirt.tga"));
 
-    if(!scene->setTerrain(hFile->getData(), terrainSize, "watermap.raw", tileSet, Arya::TextureManager::shared().getTexture("clouds.jpg"), Arya::TextureManager::shared().getTexture("splatmap.tga")))
+    if(!scene->setTerrain(hFile->getData(), heightMapSize, "watermap.raw", tileSet, Arya::TextureManager::shared().getTexture("clouds.jpg"), Arya::TextureManager::shared().getTexture("splatmap.tga")))
         return false;
 
     mat4 scaleMatrix = glm::scale(mat4(1.0), scaleVector);
@@ -66,17 +66,26 @@ float Map::heightAtGroundPosition(float x, float z)
         return 0.0;
     }
 
-    if( x >= terrainSize || x <= -terrainSize || z >= terrainSize || z <= -terrainSize )
+    x = (x/scaleVector.x) + 0.5;
+    z = (z/scaleVector.z) + 0.5;
+
+    //x,z are in [0,1]x[0,1] now
+
+    //first convert to integers before doing the
+    //comparisons so that we can not get floating
+    //point rounding bugs
+    int index1 = (int)(z*heightMapSize);
+    int index2 = (int)(x*heightMapSize);
+
+    if( index1 >= heightMapSize || index1 <= 0 || index2 >= heightMapSize || index2 <= 0 )
     {
         LOG_WARNING("Querying height outside of terrain!");
         return 0.0;
     }
 
-    unsigned short h;
     unsigned short* heights = (unsigned short*)hFile->getData();
 
-    int index = (int)((z + terrainSize)/2.0)*terrainSize + (int)((x + (terrainSize))/2.0);
-    h = heights[index];
-    return scaleVector.y*(h / 65535.0);
+    int index = index1*heightMapSize + index2;
+    return scaleVector.y*(heights[index] / 65535.0);
 }
 

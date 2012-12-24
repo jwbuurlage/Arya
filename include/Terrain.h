@@ -42,8 +42,7 @@ namespace Arya
 
             GLuint getHeightMapHandle() const { return heightMapHandle; }
 
-            //By default the terrain is a 1x1x1 unit cube multiplied by the scale matrix
-            //On initalization the scale matrix will be set to terrainSize x terrainSize x 300
+            //By default the terrain is [-0.5,0.5]x[0,1]x[-0.5,0.5] multiplied by the scale matrix
             void setScaleMatrix(const mat4& newMat) { scaleMatrix = newMat; }
             const mat4& getScaleMatrix() const { return scaleMatrix; }
 
