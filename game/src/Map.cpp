@@ -60,7 +60,8 @@ bool Map::initGraphics(Scene* sc)
 
 float Map::heightAtGroundPosition(float x, float z)
 {
-    if(!hFile || !scene->getTerrain()) {
+    if(!hFile)
+    {
         LOG_WARNING("Querying height, but no heightmap set");
         return 0.0;
     }
