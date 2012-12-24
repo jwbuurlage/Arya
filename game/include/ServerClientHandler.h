@@ -73,7 +73,7 @@ class ServerReactor : public SocketReactor
         ServerReactor(Server* serv) : server(serv) {}
         ~ServerReactor() {}
 
-        void onTimeout();
+        void onBusy();
 
     private:
         Server* server;

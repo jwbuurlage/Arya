@@ -177,7 +177,7 @@ void ServerClientHandler::handlePacket(char* data, int packetSize)
     server->handlePacket(this, pak);
 }
 
-void ServerReactor::onTimeout()
+void ServerReactor::onBusy()
 {
     server->update();
 }
