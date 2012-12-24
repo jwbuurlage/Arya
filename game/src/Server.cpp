@@ -119,7 +119,7 @@ void Server::update()
 
     for(sessionIterator iter = sessionList.begin(); iter != sessionList.end(); ++iter)
     {
-        iter->second->update((float)diff);
+        iter->second->update((float)(diff/1000.0f));
     }
 }
 
