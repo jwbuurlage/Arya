@@ -81,6 +81,9 @@ void Server::prepareServer()
     //Only a single reactor can run at a single moment
     reactor = new ServerReactor(this);
 
+    //20 ms frametime
+    reactor->setTimeout(20);
+
     //Create the server socket
     IPAddress any_address;
     SocketAddress serveraddr(any_address, port);
