@@ -182,7 +182,8 @@ void ServerGameSession::update(float elapsedTime)
         for(list<Unit*>::iterator it = faction->getUnits().begin();
                 it != faction->getUnits().end(); )
         {
-            if((*it)->obsolete() && (*it)->readyToDelete()) {
+            if((*it)->obsolete() && (*it)->readyToDelete())
+            {
                 delete *it;
                 it = faction->getUnits().erase(it);
             }

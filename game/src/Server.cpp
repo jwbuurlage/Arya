@@ -89,6 +89,12 @@ void Server::prepareServer()
     //Create the acceptor that will listen on the server socket
     //It will register to the reactor
     acceptor = new ConnectionAcceptor(*serverSocket, *reactor, this);
+
+    //TODO: better solution
+    //Arya::FileSystem should be made threadsafe?
+    //By having two instances of FileSystem we would load many files
+    //twice which would be stupid
+    if(&Arya::FileSystem::shared() == 0) Arya::FileSystem::create();
 }
 
 Packet* Server::createPacket(int id)
