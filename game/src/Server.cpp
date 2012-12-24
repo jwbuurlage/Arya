@@ -93,6 +93,9 @@ void Server::prepareServer()
     //It will register to the reactor
     acceptor = new ConnectionAcceptor(*serverSocket, *reactor, this);
 
+    timer.update();
+    timerDiff = 0;
+
     //TODO: better solution
     //Arya::FileSystem should be made threadsafe?
     //By having two instances of FileSystem we would load many files
@@ -115,11 +118,15 @@ void Server::update()
     //with the elapsed time in microseconds
     Timestamp oldTime(timer);
     timer.update();
-    Timestamp::TimeDiff diff = timer - oldTime;
+    timerDiff += timer - oldTime;
 
-    for(sessionIterator iter = sessionList.begin(); iter != sessionList.end(); ++iter)
+    while(timerDiff >= 50)
     {
-        iter->second->update((float)(diff/1000.0f));
+        timerDiff -= 50;
+        for(sessionIterator iter = sessionList.begin(); iter != sessionList.end(); ++iter)
+        {
+            iter->second->update((float)(50.0f/1000.0f));
+        }
     }
 }
 

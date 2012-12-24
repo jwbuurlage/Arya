@@ -46,6 +46,7 @@ class Server
         ServerReactor* reactor;
         ConnectionAcceptor* acceptor;
         Poco::Timestamp timer;
+        Poco::Timestamp::TimeDiff timerDiff;
         int port;
         void prepareServer();
 
