@@ -2,12 +2,14 @@
 #include "../include/Game.h"
 #include "../include/GameSession.h"
 #include "../include/GameSessionInput.h"
+#include "../include/Map.h"
 #include "../include/Faction.h"
 #include "../include/Units.h"
 
 GameSession::GameSession()
 {
     input = 0;
+    map = 0;
     localFaction = 0;
 
     decalVao = 0;
@@ -31,6 +33,8 @@ GameSession::~GameSession()
     for(unsigned int i = 0; i < factions.size(); ++i)
         delete factions[i];
     factions.clear();
+
+    if(map) delete map;
 
     Root::shared().removeFrameListener(this);
 
@@ -67,13 +71,11 @@ bool GameSession::init()
     cam->setCameraAngle(0.0f, -60.0f);
     cam->setZoom(300.0f);
 
-    // init map
-    vector<Arya::Material*> tileSet;
-    tileSet.push_back(Arya::MaterialManager::shared().getMaterial("grass.tga"));
-    tileSet.push_back(Arya::MaterialManager::shared().getMaterial("rock.tga"));
-    tileSet.push_back(Arya::MaterialManager::shared().getMaterial("snow.tga"));
-    tileSet.push_back(Arya::MaterialManager::shared().getMaterial("dirt.tga"));
-    if(!scene->setMap("heightmap.raw", "watermap.raw", tileSet, Arya::TextureManager::shared().getTexture("clouds.jpg"), Arya::TextureManager::shared().getTexture("splatmap.tga")))
+    if(!map) map = new Map;
+
+    if(!map->initHeightData())
+        return false;
+    if(!map->initGraphics(scene))
         return false;
 
     selectionDecalHandle = 0;
@@ -145,7 +147,7 @@ void GameSession::onFrame(float elapsedTime)
                 onScreen.y /= onScreen.w;
                 (*it)->setScreenPosition(vec2(onScreen.x, onScreen.y));
 
-                (*it)->update(elapsedTime);
+                (*it)->update(elapsedTime, map);
                 ++it;
             }
         }
@@ -165,12 +167,12 @@ void GameSession::onRender()
 
     decalProgram->setUniform1f("yOffset", 0.5);
     decalProgram->setUniformMatrix4fv("vpMatrix", Root::shared().getScene()->getCamera()->getVPMatrix());
-    decalProgram->setUniformMatrix4fv("scaleMatrix", Root::shared().getScene()->getMap()->getTerrain()->getScaleMatrix());
+    decalProgram->setUniformMatrix4fv("scaleMatrix", Root::shared().getScene()->getTerrain()->getScaleMatrix());
 
     // heightmap
     decalProgram->setUniform1i("heightMap", 0);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, Root::shared().getScene()->getMap()->getTerrain()->getHeightMapHandle());
+    glBindTexture(GL_TEXTURE_2D, Root::shared().getScene()->getTerrain()->getHeightMapHandle());
 
     // selection
     decalProgram->setUniform1i("selectionTexture", 1);
@@ -241,8 +243,7 @@ void GameSession::handleEvent(Packet& packet)
 
                         unit->setObject(obj);
 
-                        float heightModel = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(
-                                unit->getPosition().x, unit->getPosition().z);
+                        float heightModel = map->heightAtGroundPosition(unit->getPosition().x, unit->getPosition().z);
 
                         unit->setPosition(vec3(unit->getPosition().x,
                                     heightModel,
@@ -285,8 +286,7 @@ void GameSession::handleEvent(Packet& packet)
 
                     unit->setObject(obj);
 
-                    float heightModel = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(
-                            unit->getPosition().x, unit->getPosition().z);
+                    float heightModel = map->heightAtGroundPosition(unit->getPosition().x, unit->getPosition().z);
 
                     unit->setPosition(vec3(unit->getPosition().x,
                                 heightModel,

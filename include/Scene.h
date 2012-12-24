@@ -16,7 +16,7 @@ namespace Arya
 {
     class Model;
     class Object;
-    class Map;
+    class Terrain;
     class Camera;
     class Shader;
     class ShaderProgram;
@@ -34,8 +34,9 @@ namespace Arya
 
             void onFrame(float elapsedTime);
 
-            bool setMap(const char* hm, const char* wm, vector<Material*> ts, Texture* cm, Texture* sm);
-            Map* getMap() const { return currentMap; };
+            bool setTerrain(char* heightData, int terrainSize, const char* waterMap, const vector<Material*>& tileSet, Texture* cloudMap, Texture* splatMap);
+            Terrain* getTerrain() const { return currentTerrain; };
+
             Camera* getCamera() { return camera; };
 
             Object* createObject();
@@ -57,7 +58,7 @@ namespace Arya
             vector<Object*> objects;
 			vec3 lightDirection;
 
-            Map* currentMap;
+            Terrain* currentTerrain;
             Camera* camera;
 
             bool init();

@@ -24,6 +24,8 @@ class Packet;
 
 class Unit;
 
+class Map;
+
 //Factory design pattern
 class UnitFactory
 {
@@ -67,7 +69,7 @@ class Unit
         void setSelected(bool sel) { selected = sel; }
         bool isSelected() { return selected; }
 
-        void update(float elapsedTime);
+        void update(float elapsedTime, Map* map);
 
         vec2 getTargetPosition() const { return targetPosition; }
         void setTargetPosition(vec2 target);

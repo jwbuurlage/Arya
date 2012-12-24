@@ -4,6 +4,7 @@
 #include "../include/ServerClientHandler.h"
 #include "../include/EventCodes.h"
 #include "../include/Units.h"
+#include "../include/Map.h"
 #include "Arya.h"
 #include "../include/ServerLogger.h"
 
@@ -187,7 +188,7 @@ void ServerGameSession::update(float elapsedTime)
             }
             else
             {
-                (*it)->update(elapsedTime);
+                (*it)->update(elapsedTime, map);
                 ++it;
             }
         }
@@ -282,4 +283,15 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
     return;
 }
 
-
+void ServerGameSession::initMap()
+{
+    if(!map)
+    {
+        map = new Map;
+        if(!map->initHeightData())
+        {
+            delete map;
+            map = 0;
+        }
+    }
+}

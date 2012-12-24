@@ -47,7 +47,6 @@ SET(
     "../src/Terrain.cpp"
     "../src/Textures.cpp"
     "../src/Fonts.cpp"
-    "../src/Map.cpp"
     "../src/Overlay.cpp"
     "../src/Interface.cpp"
     "../src/Materials.cpp"

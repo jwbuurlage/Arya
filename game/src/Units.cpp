@@ -95,7 +95,7 @@ void Unit::setObject(Object* obj)
     object = obj;
 }
 
-void Unit::update(float timeElapsed)
+void Unit::update(float timeElapsed, Map* map)
 {
     //healthBar->relative = screenPosition;
 
@@ -155,8 +155,10 @@ void Unit::update(float timeElapsed)
         }
     }
 
+    if(!map) return;
+
     float targeth;
-    targeth = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(targetPosition.x, targetPosition.y);
+    targeth = map->heightAtGroundPosition(targetPosition.x, targetPosition.y);
     vec3 target(targetPosition.x, targeth, targetPosition.y);
     vec3 diff = target - getPosition();
 
@@ -187,7 +189,7 @@ void Unit::update(float timeElapsed)
 
         diff = glm::normalize(diff);
         vec3 newPosition = getPosition() + timeElapsed * (infoForUnitType[type].speed * diff);
-        newPosition.y = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(newPosition.x, newPosition.z);
+        newPosition.y = map->heightAtGroundPosition(newPosition.x, newPosition.z);
         setPosition(newPosition);
     }
     else
@@ -265,7 +267,7 @@ void Unit::receiveDamage(float dmg, Unit* attacker)
     health -= dmg;
     if(health < 0) health = 0;
 
-    healthBar->sizeInPixels = vec2(25.0*getHealthRatio(), 3.0);
+    //healthBar->sizeInPixels = vec2(25.0*getHealthRatio(), 3.0);
 
     if(!isAlive())
         setUnitState(UNIT_DYING);
@@ -275,7 +277,7 @@ void Unit::setTintColor(vec3 tC)
 {
     tintColor = tC;
     if(object) object->setTintColor(tC);
-    healthBar->fillColor = vec4(tintColor, 1.0);
+    //healthBar->fillColor = vec4(tintColor, 1.0);
 }
 
 void Unit::serialize(Packet& pk)

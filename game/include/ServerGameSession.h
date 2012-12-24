@@ -4,6 +4,7 @@
 #include <vector>
 using std::vector;
 
+class Map;
 class Server;
 class ServerClient;
 class Packet;
@@ -15,6 +16,9 @@ class ServerGameSession : public UnitFactory, public FactionFactory
         {
             gameState = STATE_CREATED;
             idFactory = 1;
+            map = 0;
+            //TODO: this should only happen when the game actually starts, not when the room/session is created
+            initMap();
         }
         ~ServerGameSession()
         {
@@ -56,4 +60,6 @@ class ServerGameSession : public UnitFactory, public FactionFactory
             STATE_STARTED = 2
         } gameState;
 
+        Map* map;
+        void initMap();
 };

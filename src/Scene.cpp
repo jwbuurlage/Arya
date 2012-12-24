@@ -9,7 +9,6 @@
 #include "Models.h"
 #include "Scene.h"
 #include "Fonts.h"
-#include "Map.h"
 #include "Terrain.h"
 #include "Textures.h"
 #include "Camera.h"
@@ -29,7 +28,7 @@ namespace Arya
     Scene::Scene()
     {
         initialized = false;
-        currentMap = 0; 
+        currentTerrain = 0; 
         camera = 0;
         basicProgram = 0;
         lightDirection=vec3(0.7,0.7,0.0);
@@ -140,12 +139,23 @@ namespace Arya
         return true;
     }
 
-    bool Scene::setMap(const char* hm, const char* wm, vector<Material*> ts, Texture* cm, Texture* sm)
+    bool Scene::setTerrain(char* heightData, int terrainSize, const char* waterMap, const vector<Material*>& tileSet, Texture* cloudMap, Texture* splatMap)
     {
-        if(currentMap)
-            delete currentMap;
-        currentMap = new Map();
-        if(!currentMap->init(hm, wm, ts, cm, sm)) return false;
+        if(currentTerrain) delete currentTerrain;
+        currentTerrain = 0;
+
+        if(!heightData || !terrainSize || !waterMap || tileSet.empty() || !cloudMap || !splatMap)
+        {
+            return false;
+        }
+
+        currentTerrain = new Terrain(heightData, terrainSize, waterMap, tileSet, cloudMap, splatMap);
+        if(!currentTerrain->init())
+        {
+            delete currentTerrain;
+            currentTerrain = 0;
+            return false;
+        }
         return true;
     }
 
@@ -154,8 +164,8 @@ namespace Arya
         if(camera) delete camera;
         camera = 0;
 
-        if(currentMap) delete currentMap;
-        currentMap = 0;
+        if(currentTerrain) delete currentTerrain;
+        currentTerrain = 0;
 
         if(basicProgram) delete basicProgram;
         basicProgram = 0;
@@ -170,7 +180,7 @@ namespace Arya
     void Scene::onFrame(float elapsedTime)
     {
         camera->update(elapsedTime);
-        currentMap->update(elapsedTime, this);
+        currentTerrain->update(elapsedTime, this);
         //We might want to let the Game loop on all
         //the objects and animate them. This way the game
         //has more control: it could slow animations down for example
@@ -305,6 +315,6 @@ namespace Arya
             }
         }
 
-        currentMap->render(camera);
+        currentTerrain->render(camera);
     }
 }
