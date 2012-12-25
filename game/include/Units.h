@@ -24,6 +24,8 @@ class Packet;
 
 class Unit;
 
+class Map;
+
 //Factory design pattern
 class UnitFactory
 {
@@ -55,6 +57,9 @@ class Unit
         void setPosition(const vec3& pos) { position = pos; if(object) object->setPosition(pos); }
         vec3 getPosition() const { return position; }
 
+        void setYaw(float y){ yaw = y; if(object) object->setYaw(y); }
+        float getYaw() const { return yaw; }
+
         void setObject(Object* obj);
         Object* getObject() const { return object; }
 
@@ -64,7 +69,7 @@ class Unit
         void setSelected(bool sel) { selected = sel; }
         bool isSelected() { return selected; }
 
-        void update(float elapsedTime);
+        void update(float elapsedTime, Map* map);
 
         vec2 getTargetPosition() const { return targetPosition; }
         void setTargetPosition(vec2 target);
@@ -94,8 +99,10 @@ class Unit
         void deserialize(Packet& pk);
 
     private:
-        Object* object; //object->position is always the same as position
+        Object* object; //object->position and object->yaw are always the same as Unit::position and Unit::yaw
         vec3 position; //since server has no Object, position is stored here
+        float yaw;
+
         int type;
         const int id;
         int factionId;

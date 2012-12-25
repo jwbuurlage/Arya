@@ -14,13 +14,13 @@ using Arya::Object;
 using Arya::Model;
 using Arya::ModelManager;
 using Arya::Camera;
-using Arya::Map;
 using Arya::Texture;
 using Arya::TextureManager;
 using Arya::Shader;
 using Arya::ShaderProgram;
 
 class GameSessionInput;
+class Map;
 
 class GameSession :
     public Arya::FrameListener,
@@ -47,6 +47,7 @@ class GameSession :
 
      private:
         GameSessionInput* input;
+        Map* map;
         Faction* localFaction;
         vector<Faction*> factions;
         vector<int> clients;

@@ -21,13 +21,12 @@ using glm::vec3;
 using glm::vec4;
 using glm::distance;
 
-#define TERRAIN_SIZE 1025
-
 namespace Arya
 {
-    Terrain::Terrain(const char* hm, const char* wm, vector<Material*> ts, Texture* cm, Texture* sm) 
+    Terrain::Terrain(const char* _heightData, int _terrainSize, const char* wm, vector<Material*> ts, Texture* cm, Texture* sm) 
     {
-        heightMapName = hm;
+        heightData = _heightData;
+        terrainSize = _terrainSize;
 		waterMapName = wm;
         tileSet = ts;
         if(!(tileSet.size() == 4))
@@ -44,7 +43,7 @@ namespace Arya
 
         heightMapHandle = 0;
 		waterMapHandle = 0;
-        hFile = 0;
+        //hFile = 0;
 		this->lightDirection=lightDirection;
 
 		time=0;
@@ -73,7 +72,7 @@ namespace Arya
 
     bool Terrain::init()
     {
-        if(heightMapName == 0 || waterMapName == 0 || cloudMap == 0 || splatMap == 0) return false;
+        if(heightData == 0 || waterMapName == 0 || cloudMap == 0 || splatMap == 0) return false;
 
         for(unsigned int i = 0; i < tileSet.size(); ++i) {
             if(!tileSet[i]) return false;
@@ -113,12 +112,11 @@ namespace Arya
         waterProgram->attach(waterFragment);
         if(!(waterProgram->link())) return false;
 
-
-        // load in heightmap
-        string heightMapString(heightMapName);
-        heightMapString.insert(0, "textures/");
-        hFile = FileSystem::shared().getFile(heightMapString);
-        if(!hFile) return false;
+        //This happens in the game engine now
+        //string heightMapString(heightMapName);
+        //heightMapString.insert(0, "textures/");
+        //hFile = FileSystem::shared().getFile(heightMapString);
+        //if(!hFile) return false;
 
         glGenTextures(1, &heightMapHandle);
         glBindTexture(GL_TEXTURE_2D, heightMapHandle);
@@ -128,8 +126,7 @@ namespace Arya
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, TERRAIN_SIZE, TERRAIN_SIZE, 0, GL_RED, GL_UNSIGNED_SHORT, hFile->getData());
-
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, terrainSize, terrainSize, 0, GL_RED, GL_UNSIGNED_SHORT, heightData);
 
 		// load in watermap
         string waterMapString(waterMapName);
@@ -146,7 +143,7 @@ namespace Arya
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_R16,TERRAIN_SIZE, TERRAIN_SIZE, 0, GL_RED, GL_UNSIGNED_SHORT, wFile->getData());
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, terrainSize, terrainSize, 0, GL_RED, GL_UNSIGNED_SHORT, wFile->getData());
 		
 
 
@@ -164,8 +161,8 @@ namespace Arya
     bool Terrain::generate()
     {
         int w, h;
-        w = TERRAIN_SIZE;
-        h = TERRAIN_SIZE;
+        w = terrainSize;
+        h = terrainSize;
 
         if(!(((w-1) & (w-2)) == 0) || w != h) {
             LOG_WARNING("Heightmap is of the wrong size. Must be of the form 2^n + 1, and square.");
@@ -179,7 +176,6 @@ namespace Arya
 
         GLfloat* vertexData = new GLfloat[patchSizeMax*patchSizeMax * 2];
 
-        scaleMatrix = glm::scale(mat4(1.0), vec3((float)w * 2.0f, 300.0f, (float)w * 2.0));
         float perVertex = (1.0f / ((patchSizeMax - 1) * patchCount));
 
         for(int i = 0; i < patchSizeMax; ++i)
@@ -310,27 +306,6 @@ namespace Arya
             else
                 p.lod = levelMax -1;
         }
-    }
-
-    float Terrain::heightAtGroundPosition(float x, float z)
-    {
-        if(!hFile) {
-            LOG_WARNING("Querying height, but no heightmap set");
-            return 0.0;
-        }
-
-        if( x >= TERRAIN_SIZE || x <= -TERRAIN_SIZE || z >= TERRAIN_SIZE || z <= -TERRAIN_SIZE )
-        {
-            LOG_WARNING("Querying height outside of terrain!");
-            return 0.0;
-        }
-
-        unsigned short h;
-        unsigned short* heights = (unsigned short*)hFile->getData();
-
-        int index = (int)((z + TERRAIN_SIZE)/2.0)*TERRAIN_SIZE + (int)((x + (TERRAIN_SIZE))/2.0);
-        h = heights[index];
-        return scaleMatrix[1][1]*(h / 65535.0);
     }
 
     //---------------------------------------

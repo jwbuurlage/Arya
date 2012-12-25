@@ -31,32 +31,34 @@ namespace Arya
     {
         public:
             // Tileset needs to have 4 elements
-            Terrain(const char* hm, const char* wm, vector<Material*> ts, Texture* cm, Texture* sm);
+            // heightData is considered to be terrainSize*terrainSize unsigned shorts, with no padding
+            Terrain(const char* heightData, int terrainSize, const char* wm, vector<Material*> ts, Texture* cm, Texture* sm);
             ~Terrain(); 
 			
             void render(Camera* cam);
             void update(float dt, Scene* curScene);
 
-            float heightAtGroundPosition(float x, float z);
-
             bool init();
 
             GLuint getHeightMapHandle() const { return heightMapHandle; }
-            mat4 getScaleMatrix() const { return scaleMatrix; }
+
+            //By default the terrain is [-0.5,0.5]x[0,1]x[-0.5,0.5] multiplied by the scale matrix
+            void setScaleMatrix(const mat4& newMat) { scaleMatrix = newMat; }
+            const mat4& getScaleMatrix() const { return scaleMatrix; }
 
         private:
             bool generate();
             bool generateIndices();
             bool generateVAO();
 
-            const char* heightMapName;
+            const char* heightData;
 			const char* waterMapName;
+            int terrainSize;
             vector<Material*> tileSet;
 			Texture* cloudMap;
             Texture* splatMap;
             GLuint heightMapHandle;
 			GLuint waterMapHandle;
-            File* hFile;
 
             mat4 scaleMatrix;
 

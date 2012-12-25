@@ -4,6 +4,7 @@
 #include "../include/ServerClientHandler.h"
 #include "../include/EventCodes.h"
 #include "../include/Units.h"
+#include "../include/Map.h"
 #include "Arya.h"
 #include "../include/ServerLogger.h"
 
@@ -171,6 +172,30 @@ void ServerGameSession::startGame()
 
 }
 
+void ServerGameSession::update(float elapsedTime)
+{
+    for(clientIterator clientIter = clientList.begin(); clientIter != clientList.end(); ++clientIter)
+    {
+        Faction* faction = (*clientIter)->getFaction();
+        if(!faction) continue;
+
+        for(list<Unit*>::iterator it = faction->getUnits().begin();
+                it != faction->getUnits().end(); )
+        {
+            if((*it)->obsolete() && (*it)->readyToDelete())
+            {
+                delete *it;
+                it = faction->getUnits().erase(it);
+            }
+            else
+            {
+                (*it)->update(elapsedTime, map);
+                ++it;
+            }
+        }
+    }
+}
+
 void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
 {
     Faction* faction = client->getFaction();
@@ -259,4 +284,15 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
     return;
 }
 
-
+void ServerGameSession::initMap()
+{
+    if(!map)
+    {
+        map = new Map;
+        if(!map->initHeightData())
+        {
+            delete map;
+            map = 0;
+        }
+    }
+}

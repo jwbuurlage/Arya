@@ -47,6 +47,9 @@ Unit::Unit(int _type, int _id, UnitFactory* factory) : id(_id)
     unitFactory = factory;
 
     object = 0;
+    position = vec3(0.0f);
+    yaw = 0.0f;
+
     selected = false;
     targetPosition = vec2(0.0f);
     unitState = UNIT_IDLE;
@@ -61,14 +64,13 @@ Unit::Unit(int _type, int _id, UnitFactory* factory) : id(_id)
     screenPosition = vec2(0.0);
     tintColor = vec3(0.5);
 
-    // init and register health bar
-    healthBar = new Rect;
-    healthBar->fillColor = vec4(tintColor, 1.0);
-    healthBar->sizeInPixels = vec2(25.0, 3.0);
-    // need to check if this flips orientation
-    healthBar->offsetInPixels = vec2(-12.5, 25.0);
-
-    // Root::shared().getOverlay()->addRect(healthBar);
+    ////init and register health bar
+    //healthBar = new Rect;
+    //healthBar->fillColor = vec4(tintColor, 1.0);
+    //healthBar->sizeInPixels = vec2(25.0, 3.0);
+    //// need to check if this flips orientation
+    //healthBar->offsetInPixels = vec2(-12.5, 25.0);
+    //Root::shared().getOverlay()->addRect(healthBar);
 
     factionId = -1;
 
@@ -93,9 +95,9 @@ void Unit::setObject(Object* obj)
     object = obj;
 }
 
-void Unit::update(float timeElapsed)
+void Unit::update(float timeElapsed, Map* map)
 {
-    healthBar->relative = screenPosition;
+    //healthBar->relative = screenPosition;
 
     if(unitState == UNIT_IDLE)
         return;
@@ -153,8 +155,10 @@ void Unit::update(float timeElapsed)
         }
     }
 
+    if(!map) return;
+
     float targeth;
-    targeth = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(targetPosition.x, targetPosition.y);
+    targeth = map->heightAtGroundPosition(targetPosition.x, targetPosition.y);
     vec3 target(targetPosition.x, targeth, targetPosition.y);
     vec3 diff = target - getPosition();
 
@@ -166,10 +170,8 @@ void Unit::update(float timeElapsed)
         return;
     }
 
-    if(!object) return;
-
     float newYaw = (180.0f/M_PI)*atan2(-diff.x, -diff.z);
-    float oldYaw = object->getYaw();
+    float oldYaw = getYaw();
     float yawDiff = newYaw - oldYaw;
 
     if(yawDiff > 180.0f) yawDiff -= 360.0f;
@@ -179,20 +181,20 @@ void Unit::update(float timeElapsed)
     if((yawDiff >= 0 && yawDiff < deltaYaw) || (yawDiff <= 0 && yawDiff > -deltaYaw))
     {
         //angle is small enough (less than 1 degree) so we can start walking now
-        object->setYaw(newYaw);
+        setYaw(newYaw);
         if(unitState == UNIT_ATTACKING)
             return;
 
         diff = glm::normalize(diff);
         vec3 newPosition = getPosition() + timeElapsed * (infoForUnitType[type].speed * diff);
-        newPosition.y = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(newPosition.x, newPosition.z);
+        newPosition.y = map->heightAtGroundPosition(newPosition.x, newPosition.z);
         setPosition(newPosition);
     }
     else
     {
         //Rotate
         if(yawDiff < 0) deltaYaw = -deltaYaw;
-        object->setYaw( oldYaw + deltaYaw );
+        setYaw( oldYaw + deltaYaw );
     }
 
 }
@@ -263,7 +265,7 @@ void Unit::receiveDamage(float dmg, Unit* attacker)
     health -= dmg;
     if(health < 0) health = 0;
 
-    healthBar->sizeInPixels = vec2(25.0*getHealthRatio(), 3.0);
+    //healthBar->sizeInPixels = vec2(25.0*getHealthRatio(), 3.0);
 
     if(!isAlive())
         setUnitState(UNIT_DYING);
@@ -273,7 +275,7 @@ void Unit::setTintColor(vec3 tC)
 {
     tintColor = tC;
     if(object) object->setTintColor(tC);
-    healthBar->fillColor = vec4(tintColor, 1.0);
+    //healthBar->fillColor = vec4(tintColor, 1.0);
 }
 
 void Unit::serialize(Packet& pk)

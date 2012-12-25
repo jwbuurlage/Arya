@@ -79,7 +79,10 @@ void Server::prepareServer()
 
     //Multiple acceptors can register to the reactor: one for every port for example
     //Only a single reactor can run at a single moment
-    reactor = new SocketReactor;
+    reactor = new ServerReactor(this);
+
+    //20 ms frametime
+    reactor->setTimeout(20);
 
     //Create the server socket
     IPAddress any_address;
@@ -89,6 +92,15 @@ void Server::prepareServer()
     //Create the acceptor that will listen on the server socket
     //It will register to the reactor
     acceptor = new ConnectionAcceptor(*serverSocket, *reactor, this);
+
+    timer.update();
+    timerDiff = 0;
+
+    //TODO: better solution
+    //Arya::FileSystem should be made threadsafe?
+    //By having two instances of FileSystem we would load many files
+    //twice which would be stupid
+    if(&Arya::FileSystem::shared() == 0) Arya::FileSystem::create();
 }
 
 Packet* Server::createPacket(int id)
@@ -99,6 +111,24 @@ Packet* Server::createPacket(int id)
 //------------------------------
 // SERVER LOGIC
 //------------------------------
+
+void Server::update()
+{
+    //diff is an 64 bit signed integer
+    //with the elapsed time in microseconds
+    Timestamp oldTime(timer);
+    timer.update();
+    timerDiff += timer - oldTime;
+
+    while(timerDiff >= 50)
+    {
+        timerDiff -= 50;
+        for(sessionIterator iter = sessionList.begin(); iter != sessionList.end(); ++iter)
+        {
+            iter->second->update((float)(50.0f/1000.0f));
+        }
+    }
+}
 
 void Server::newClient(ServerClientHandler* clientHandler)
 {

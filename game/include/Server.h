@@ -3,14 +3,15 @@
 #include <vector>
 
 #include "Poco/Thread.h"
+#include "Poco/Timestamp.h"
 #include "Poco/Net/ServerSocket.h"
-#include "Poco/Net/SocketReactor.h"
 
 using std::vector;
 using std::map;
 
 class ServerClientHandler;
 class ConnectionAcceptor;
+class ServerReactor;
 class Packet;
 class Server;
 class ServerClient;
@@ -25,6 +26,7 @@ class Server
         void run();
         void runInThread();
 
+        void update(); //called periodically by reactor
         void newClient(ServerClientHandler* client);
         void removeClient(ServerClientHandler* client);
         void handlePacket(ServerClientHandler* client, Packet& packet);
@@ -41,8 +43,10 @@ class Server
     private:
         Poco::Thread thread;
         Poco::Net::ServerSocket* serverSocket;
-        Poco::Net::SocketReactor* reactor;
+        ServerReactor* reactor;
         ConnectionAcceptor* acceptor;
+        Poco::Timestamp timer;
+        Poco::Timestamp::TimeDiff timerDiff;
         int port;
         void prepareServer();
 

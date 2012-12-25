@@ -10,6 +10,7 @@ SET(
     "../src/Game.cpp"
     "../src/GameSession.cpp"
     "../src/GameSessionInput.cpp"
+    "../src/Map.cpp"
     "../src/Faction.cpp"
     "../src/Units.cpp"
     "../src/UnitTypes.cpp"
