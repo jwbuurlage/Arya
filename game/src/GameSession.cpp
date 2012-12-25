@@ -169,12 +169,6 @@ void GameSession::onRender()
     decalProgram->setUniformMatrix4fv("vpMatrix", Root::shared().getScene()->getCamera()->getVPMatrix());
     decalProgram->setUniformMatrix4fv("scaleMatrix", Root::shared().getScene()->getTerrain()->getScaleMatrix());
 
-    // heightmap
-    decalProgram->setUniform1i("heightMap", 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, Root::shared().getScene()->getTerrain()->getHeightMapHandle());
-
-    // selection
     decalProgram->setUniform1i("selectionTexture", 1);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, selectionDecalHandle);
@@ -184,12 +178,14 @@ void GameSession::onRender()
     for(list<Unit*>::iterator it = localFaction->getUnits().begin();
             it != localFaction->getUnits().end(); ++it)
     {
+        decalProgram->setUniform1f("unitRadius", (*it)->getRadius());
         if(!((*it)->isSelected()))
             continue;
 
-        vec2 groundPos = vec2((*it)->getObject()->getPosition().x,
+        vec3 groundPos = vec3((*it)->getObject()->getPosition().x,
+                map->heightAtGroundPosition((*it)->getObject()->getPosition().x, (*it)->getObject()->getPosition().z),
                 (*it)->getObject()->getPosition().z);
-        decalProgram->setUniform2fv("groundPosition", groundPos);
+        decalProgram->setUniform3fv("groundPosition", groundPos);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 

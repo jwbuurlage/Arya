@@ -95,6 +95,8 @@ class Unit
 
         int getId() const { return id; }
 
+        float getRadius() const { return infoForUnitType[type].radius; }
+
         void serialize(Packet& pk);
         void deserialize(Packet& pk);
 
