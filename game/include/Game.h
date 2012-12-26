@@ -8,7 +8,6 @@ using Arya::Object;
 using Arya::Model;
 using Arya::ModelManager;
 using Arya::Camera;
-using Arya::Map;
 using Arya::Texture;
 using Arya::TextureManager;
 

@@ -66,11 +66,11 @@ class Connection
                     }
                     catch(TimeoutException& e)
                     {
-                        LOG_WARNING("Timeout exception when reading socket! Msg: " << e.message());
+                        LOG_WARNING("Timeout exception when reading socket! Msg: " << e.displayText());
                     }
                     catch(NetException& e)
                     {
-                        LOG_WARNING("Net exception when reading socket Msg: " << e.message());
+                        LOG_WARNING("Net exception when reading socket Msg: " << e.displayText());
                     }
 
                     if(n <= 0)
@@ -170,12 +170,12 @@ class Connection
                 }
                 catch(TimeoutException& e)
                 {
-                    LOG_WARNING("Timeout exception when writing to socket! Msg: " << e.message());
+                    LOG_WARNING("Timeout exception when writing to socket! Msg: " << e.displayText());
                     break;
                 }
                 catch(NetException& e)
                 {
-                    LOG_WARNING("Net exception when writing to socket. Msg: " << e.message());
+                    LOG_WARNING("Net exception when writing to socket. Msg: " << e.displayText());
                     break;
                 }
                 if(n<=0)
@@ -242,6 +242,13 @@ void Network::startServer()
     if(server) delete server;
     server = new Server;
     server->runInThread();
+}
+
+void Network::runServer()
+{
+    if(server) delete server;
+    server = new Server;
+    server->run();
 }
 
 void Network::connectToLobbyServer(string host, int port)

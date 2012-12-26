@@ -8,10 +8,48 @@
 
 using Arya::Root;
 
-Unit::Unit(int _type)
+Unit* UnitFactory::createUnit(int id, int type)
+{
+    Unit* unit = getUnitById(id);
+    if(unit)
+    {
+        LOG_WARNING("Trying to create unit with duplicate id (" << id << ")");
+        return unit;
+    }
+    unit = new Unit(type, id, this);
+    unitMap.insert(pair<int,Unit*>(unit->getId(),unit));
+    return unit;
+}
+
+//Called from Unit deconstructor
+void UnitFactory::destroyUnit(int id)
+{
+    unitMapIterator iter = unitMap.find(id);
+    if(iter == unitMap.end())
+    {
+        LOG_WARNING("Trying to destory unexisting unit id");
+        return;
+    }
+    unitMap.erase(iter);
+    return;
+}
+
+Unit* UnitFactory::getUnitById(int id)
+{
+    unitMapIterator iter = unitMap.find(id);
+    if(iter == unitMap.end()) return 0;
+    return iter->second;
+}
+
+Unit::Unit(int _type, int _id, UnitFactory* factory) : id(_id)
 {
     type = _type;
+    unitFactory = factory;
+
     object = 0;
+    position = vec3(0.0f);
+    yaw = 0.0f;
+
     selected = false;
     targetPosition = vec2(0.0f);
     unitState = UNIT_IDLE;
@@ -26,17 +64,17 @@ Unit::Unit(int _type)
     screenPosition = vec2(0.0);
     tintColor = vec3(0.5);
 
-    // init and register health bar
-    healthBar = new Rect;
-    healthBar->fillColor = vec4(tintColor, 1.0);
-    healthBar->sizeInPixels = vec2(25.0, 3.0);
-    // need to check if this flips orientation
-    healthBar->offsetInPixels = vec2(-12.5, 25.0);
+    ////init and register health bar
+    //healthBar = new Rect;
+    //healthBar->fillColor = vec4(tintColor, 1.0);
+    //healthBar->sizeInPixels = vec2(25.0, 3.0);
+    //// need to check if this flips orientation
+    //healthBar->offsetInPixels = vec2(-12.5, 25.0);
+    //Root::shared().getOverlay()->addRect(healthBar);
 
-    // Root::shared().getOverlay()->addRect(healthBar);
-
-    id = -1;
     factionId = -1;
+
+    //Register at Game session unit id map
 }
 
 Unit::~Unit()
@@ -45,8 +83,11 @@ Unit::~Unit()
         targetUnit->release();
     if(object) object->setObsolete();
 
-    Root::shared().getOverlay()->removeRect(healthBar);
-    delete healthBar;
+    unitFactory->destroyUnit(id);
+
+    //NOT IN SERVER:
+    //Root::shared().getOverlay()->removeRect(healthBar);
+    //delete healthBar;
 }
 
 void Unit::setObject(Object* obj)
@@ -54,9 +95,9 @@ void Unit::setObject(Object* obj)
     object = obj;
 }
 
-void Unit::update(float timeElapsed)
+void Unit::update(float timeElapsed, Map* map)
 {
-    healthBar->relative = screenPosition;
+    //healthBar->relative = screenPosition;
 
     if(unitState == UNIT_IDLE)
         return;
@@ -114,8 +155,10 @@ void Unit::update(float timeElapsed)
         }
     }
 
+    if(!map) return;
+
     float targeth;
-    targeth = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(targetPosition.x, targetPosition.y);
+    targeth = map->heightAtGroundPosition(targetPosition.x, targetPosition.y);
     vec3 target(targetPosition.x, targeth, targetPosition.y);
     vec3 diff = target - getPosition();
 
@@ -127,10 +170,8 @@ void Unit::update(float timeElapsed)
         return;
     }
 
-    if(!object) return;
-
     float newYaw = (180.0f/M_PI)*atan2(-diff.x, -diff.z);
-    float oldYaw = object->getYaw();
+    float oldYaw = getYaw();
     float yawDiff = newYaw - oldYaw;
 
     if(yawDiff > 180.0f) yawDiff -= 360.0f;
@@ -140,20 +181,20 @@ void Unit::update(float timeElapsed)
     if((yawDiff >= 0 && yawDiff < deltaYaw) || (yawDiff <= 0 && yawDiff > -deltaYaw))
     {
         //angle is small enough (less than 1 degree) so we can start walking now
-        object->setYaw(newYaw);
+        setYaw(newYaw);
         if(unitState == UNIT_ATTACKING)
             return;
 
         diff = glm::normalize(diff);
         vec3 newPosition = getPosition() + timeElapsed * (infoForUnitType[type].speed * diff);
-        newPosition.y = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(newPosition.x, newPosition.z);
+        newPosition.y = map->heightAtGroundPosition(newPosition.x, newPosition.z);
         setPosition(newPosition);
     }
     else
     {
         //Rotate
         if(yawDiff < 0) deltaYaw = -deltaYaw;
-        object->setYaw( oldYaw + deltaYaw );
+        setYaw( oldYaw + deltaYaw );
     }
 
 }
@@ -224,7 +265,7 @@ void Unit::receiveDamage(float dmg, Unit* attacker)
     health -= dmg;
     if(health < 0) health = 0;
 
-    healthBar->sizeInPixels = vec2(25.0*getHealthRatio(), 3.0);
+    //healthBar->sizeInPixels = vec2(25.0*getHealthRatio(), 3.0);
 
     if(!isAlive())
         setUnitState(UNIT_DYING);
@@ -234,12 +275,13 @@ void Unit::setTintColor(vec3 tC)
 {
     tintColor = tC;
     if(object) object->setTintColor(tC);
-    healthBar->fillColor = vec4(tintColor, 1.0);
+    //healthBar->fillColor = vec4(tintColor, 1.0);
 }
 
 void Unit::serialize(Packet& pk)
 {
-    pk << id;
+    //id is written by caller
+    //pk << id;
     pk << factionId;
     pk << position;
     pk << type;
@@ -247,7 +289,9 @@ void Unit::serialize(Packet& pk)
 
 void Unit::deserialize(Packet& pk)
 {
-    pk >> id;
+    //id is read by unit creator to supply it
+    //to the constructor
+    //pk >> id;
     pk >> factionId;
     pk >> position;
     pk >> type;

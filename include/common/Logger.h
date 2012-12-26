@@ -1,7 +1,5 @@
-//Singleton
-
 //USAGE:
-//Logger::shared() << Logger::WARNING << "Texture not found. File: " << someVariable << ". Try again!" << endLog;
+//AryaLogger << Logger::L_WARNING << "Texture not found. File: " << someVariable << ". Try again!" << endLog;
 //Do NOT forget the endLog at the end of a log message.
 //OR use
 //LOG_WARNING("Texture not found. File: " << someVariable << ". Try again!");
@@ -12,15 +10,15 @@
 #include <fstream>
 
 //Note: the ; at the end is left out so that you can use this as a function with a ; at the end:  LOG_WARNING("Hello");
-#define LOG_WARNING(MSG)		Arya::Logger::shared() << Arya::Logger::L_WARNING		<< MSG << Arya::endLog
-#define LOG_ERROR(MSG)			Arya::Logger::shared() << Arya::Logger::L_ERROR		<< MSG << Arya::endLog
-#define LOG_CRITICALERROR(MSG)	Arya::Logger::shared() << Arya::Logger::L_CRITICALERROR	<< MSG << Arya::endLog
-#define LOG_INFO(MSG)			Arya::Logger::shared() << Arya::Logger::L_INFO		<< MSG << Arya::endLog
-#define LOG_DEBUG(MSG)			Arya::Logger::shared() << Arya::Logger::L_DEBUG		<< MSG << Arya::endLog
+#define LOG_WARNING(MSG)		AryaLogger << Arya::Logger::L_WARNING	<< MSG << Arya::endLog
+#define LOG_ERROR(MSG)			AryaLogger << Arya::Logger::L_ERROR		<< MSG << Arya::endLog
+#define LOG_CRITICALERROR(MSG)	AryaLogger << Arya::Logger::L_CRITICALERROR	<< MSG << Arya::endLog
+#define LOG_INFO(MSG)			AryaLogger << Arya::Logger::L_INFO		<< MSG << Arya::endLog
+#define LOG_DEBUG(MSG)			AryaLogger << Arya::Logger::L_DEBUG		<< MSG << Arya::endLog
 
 namespace Arya
 {
-	class Logger : public Singleton<Logger>
+	class Logger
 	{
 	public:
 		Logger();
@@ -106,3 +104,5 @@ namespace Arya
 	}
 
 }
+
+extern Arya::Logger AryaLogger;

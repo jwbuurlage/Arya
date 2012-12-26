@@ -26,7 +26,7 @@ Server::Server()
     serverSocket = 0;
     reactor = 0;
     acceptor = 0;
-    port = 1337;
+    port = 13337;
     clientIdFactory = 100;
     sessionIdFactory = 100;
     if(ServerLogger == 0) ServerLogger = new Arya::Logger;
@@ -56,7 +56,22 @@ Server::~Server()
     clientList.clear();
 }
 
+
+void Server::run()
+{
+    prepareServer();
+    LOG_INFO("Server started on port " << port);
+    reactor->run();
+}
+
 void Server::runInThread()
+{
+    prepareServer();
+    thread.start(*reactor);
+    LOG_INFO("Server started on port " << port);
+}
+
+void Server::prepareServer()
 {
     if(acceptor) delete acceptor;
     if(reactor) delete reactor;
@@ -64,7 +79,10 @@ void Server::runInThread()
 
     //Multiple acceptors can register to the reactor: one for every port for example
     //Only a single reactor can run at a single moment
-    reactor = new SocketReactor;
+    reactor = new ServerReactor(this);
+
+    //20 ms frametime
+    reactor->setTimeout(20);
 
     //Create the server socket
     IPAddress any_address;
@@ -75,8 +93,14 @@ void Server::runInThread()
     //It will register to the reactor
     acceptor = new ConnectionAcceptor(*serverSocket, *reactor, this);
 
-    thread.start(*reactor);
-    LOG_INFO("Server started on port " << port);
+    timer.update();
+    timerDiff = 0;
+
+    //TODO: better solution
+    //Arya::FileSystem should be made threadsafe?
+    //By having two instances of FileSystem we would load many files
+    //twice which would be stupid
+    if(&Arya::FileSystem::shared() == 0) Arya::FileSystem::create();
 }
 
 Packet* Server::createPacket(int id)
@@ -87,6 +111,24 @@ Packet* Server::createPacket(int id)
 //------------------------------
 // SERVER LOGIC
 //------------------------------
+
+void Server::update()
+{
+    //diff is an 64 bit signed integer
+    //with the elapsed time in microseconds
+    Timestamp oldTime(timer);
+    timer.update();
+    timerDiff += timer - oldTime;
+
+    while(timerDiff >= 50)
+    {
+        timerDiff -= 50;
+        for(sessionIterator iter = sessionList.begin(); iter != sessionList.end(); ++iter)
+        {
+            iter->second->update((float)(50.0f/1000.0f));
+        }
+    }
+}
 
 void Server::newClient(ServerClientHandler* clientHandler)
 {

@@ -147,12 +147,12 @@ bool ServerClientHandler::trySendPacketData(Packet* packet, int& bytesSent)
     }
     catch(TimeoutException& e)
     {
-        LOG_WARNING("Timeout exception when writing to socket! Msg: " << e.message());
+        LOG_WARNING("Timeout exception when writing to socket! Msg: " << e.displayText());
         return false;
     }
     catch(NetException& e)
     {
-        LOG_WARNING("Net exception when writing to socket. Msg: " << e.message());
+        LOG_WARNING("Net exception when writing to socket. Msg: " << e.displayText());
         return false;
     }
 
@@ -175,6 +175,11 @@ void ServerClientHandler::handlePacket(char* data, int packetSize)
 {
     Packet pak(data, packetSize);
     server->handlePacket(this, pak);
+}
+
+void ServerReactor::onBusy()
+{
+    server->update();
 }
 
 ConnectionAcceptor::ConnectionAcceptor(ServerSocket& socket, SocketReactor& reactor, Server* serv) : SocketAcceptor(socket, reactor), server(serv)

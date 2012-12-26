@@ -10,6 +10,7 @@ SET(
     "../src/Game.cpp"
     "../src/GameSession.cpp"
     "../src/GameSessionInput.cpp"
+    "../src/Map.cpp"
     "../src/Faction.cpp"
     "../src/Units.cpp"
     "../src/UnitTypes.cpp"
@@ -35,6 +36,9 @@ SET(
     "PocoNet"
     "PocoFoundation"
 )
+
+ADD_DEFINITIONS(-DPOCO_NO_AUTOMATIC_LIBS)
+ADD_DEFINITIONS(-DPOCO_STATIC)
 
 INCLUDE_DIRECTORIES( ${PROJECT_INCLUDES} )
 ADD_EXECUTABLE( ${PROJECT_NAME} ${PROJECT_SOURCES} )

@@ -3,6 +3,10 @@
 #include "Arya.h"
 #include "UnitTypes.h"
 
+#include <map>
+using std::map;
+using std::pair;
+
 using Arya::Object;
 using Arya::Rect;
 using Arya::Root;
@@ -18,14 +22,43 @@ typedef enum
 
 class Packet;
 
-class Unit
+class Unit;
+
+class Map;
+
+//Factory design pattern
+class UnitFactory
 {
     public:
-        Unit(int _type);
-        ~Unit();
+        UnitFactory(){}
+        virtual ~UnitFactory(){}
+
+        //destory units by calling delete on them
+        Unit* createUnit(int id, int type);
+        Unit* getUnitById(int id);
+    private:
+        map<int,Unit*> unitMap;
+        typedef map<int,Unit*>::iterator unitMapIterator;
+
+        friend class Unit;
+        void destroyUnit(int id);
+};
+
+class Unit
+{
+    private:
+        friend class UnitFactory;
+        UnitFactory* unitFactory;
+
+        Unit(int _type, int id, UnitFactory* factory);
+    public:
+        ~Unit(); //unregisters itself at unit factory
 
         void setPosition(const vec3& pos) { position = pos; if(object) object->setPosition(pos); }
         vec3 getPosition() const { return position; }
+
+        void setYaw(float y){ yaw = y; if(object) object->setYaw(y); }
+        float getYaw() const { return yaw; }
 
         void setObject(Object* obj);
         Object* getObject() const { return object; }
@@ -36,9 +69,11 @@ class Unit
         void setSelected(bool sel) { selected = sel; }
         bool isSelected() { return selected; }
 
-        void update(float elapsedTime);
+        void update(float elapsedTime, Map* map);
 
+        vec2 getTargetPosition() const { return targetPosition; }
         void setTargetPosition(vec2 target);
+        Unit* getTargetUnit() const { return targetUnit; }
         void setTargetUnit(Unit* unit);
 
         void setUnitState(UnitState state);
@@ -59,21 +94,26 @@ class Unit
         void setTintColor(vec3 tC);
 
         int getId() const { return id; }
-        void setId(int _id) { id = _id; }
+
+        float getRadius() const { return infoForUnitType[type].radius; }
 
         void serialize(Packet& pk);
         void deserialize(Packet& pk);
 
     private:
-        Object* object; //object->position is always the same as position
+        Object* object; //object->position and object->yaw are always the same as Unit::position and Unit::yaw
         vec3 position; //since server has no Object, position is stored here
+        float yaw;
+
         int type;
-        bool selected;
+        const int id;
+        int factionId;
 
         // movement and attack
         vec2 targetPosition;
         Unit* targetUnit;
         UnitState unitState;
+        bool selected;
 
         vec2 screenPosition;
 
@@ -86,6 +126,4 @@ class Unit
 
         vec3 tintColor;
 
-        int id;
-        int factionId;
 };

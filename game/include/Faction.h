@@ -1,3 +1,4 @@
+#pragma once
 #include "Arya.h"
 #include <list>
 
@@ -8,11 +9,35 @@ using Arya::Object;
 class Unit;
 class Packet;
 
-class Faction
+class Faction;
+
+//Factory design pattern
+class FactionFactory
 {
     public:
-        Faction();
-        ~Faction();
+        FactionFactory(){}
+        virtual ~FactionFactory(){}
+
+        //destory factions by calling delete on them
+        Faction* createFaction(int id);
+        Faction* getFactionById(int id);
+    private:
+        map<int,Faction*> factionMap;
+        typedef map<int,Faction*>::iterator factionMapIterator;
+
+        friend class Faction;
+        void destroyFaction(int id);
+};
+
+class Faction
+{
+    private:
+        friend class FactionFactory;
+        FactionFactory* const factory;
+
+        Faction(int id, FactionFactory* factory);
+    public:
+        ~Faction(); //unregisters itself at factory
 
         void addUnit(Unit* unit);
 
@@ -25,10 +50,13 @@ class Faction
         void deserialize(Packet& pk);
 
         int getId() const { return id; }
-        void setId(int _id){ id = _id; }
+        int getClientId() const { return clientId; }
+        void setClientId(int id) { clientId = id; }
 
     private:
+        const int id;
+        int clientId;
+
         list<Unit*> units;
         int color;
-        int id;
 };

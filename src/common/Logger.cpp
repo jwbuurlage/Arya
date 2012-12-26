@@ -3,10 +3,10 @@
 #include <sstream>
 #include <iostream>
 
+Arya::Logger AryaLogger;
+
 namespace Arya
 {
-	template<> Logger* Singleton<Logger>::singleton = 0;
-
 	Logger::Logger(void)
 	{
 		consoleLogLevel = L_INFO | L_WARNING | L_ERROR | L_CRITICALERROR | L_DEBUG;

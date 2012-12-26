@@ -1,30 +1,38 @@
 #pragma once
+#include "Units.h"
+#include "Faction.h"
 #include <vector>
-
 using std::vector;
 
+class Map;
 class Server;
 class ServerClient;
 class Packet;
 
-class ServerGameSession
+class ServerGameSession : public UnitFactory, public FactionFactory
 {
     public:
         ServerGameSession(Server* serv) : server(serv)
         {
             gameState = STATE_CREATED;
             idFactory = 1;
+            map = 0;
+            //TODO: this should only happen when the game actually starts, not when the room/session is created
+            initMap();
         }
         ~ServerGameSession()
         {
         }
 
+        void update(float elapsedTime);
         void addClient(ServerClient* client);
         void removeClient(ServerClient* client);
 
         void handlePacket(ServerClient* client, Packet& packet);
 
         int getNewId() { return idFactory++; }
+        Unit* createUnit(int type){ return UnitFactory::createUnit(getNewId(),type); }
+        Faction* createFaction(){ return FactionFactory::createFaction(getNewId()); }
 
         unsigned int getClientCount() const { return clientList.size(); }
 
@@ -34,6 +42,7 @@ class ServerGameSession
         bool gameReadyToStart() const;
         void startLoading();
         void startGame();
+
     private:
         Server* const server;
         int idFactory;
@@ -51,4 +60,6 @@ class ServerGameSession
             STATE_STARTED = 2
         } gameState;
 
+        Map* map;
+        void initMap();
 };

@@ -67,4 +67,14 @@ class ConnectionAcceptor : public SocketAcceptor<ServerClientHandler>
         Server* server;
 };
 
+class ServerReactor : public SocketReactor
+{
+    public:
+        ServerReactor(Server* serv) : server(serv) {}
+        ~ServerReactor() {}
 
+        void onBusy();
+
+    private:
+        Server* server;
+};

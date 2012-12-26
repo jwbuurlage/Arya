@@ -2,6 +2,8 @@
 
 #include "Arya.h"
 #include "Events.h"
+#include "Units.h"
+#include "Faction.h"
 
 #include <vector>
 using std::vector;
@@ -12,16 +14,19 @@ using Arya::Object;
 using Arya::Model;
 using Arya::ModelManager;
 using Arya::Camera;
-using Arya::Map;
 using Arya::Texture;
 using Arya::TextureManager;
 using Arya::Shader;
 using Arya::ShaderProgram;
 
-class Faction;
 class GameSessionInput;
+class Map;
 
-class GameSession : public Arya::FrameListener, public EventHandler
+class GameSession :
+    public Arya::FrameListener,
+    public EventHandler,
+    public UnitFactory,
+    public FactionFactory
 {
     public:
         GameSession();
@@ -40,8 +45,9 @@ class GameSession : public Arya::FrameListener, public EventHandler
 
         void handleEvent(Packet& packet);
 
-    private:
+     private:
         GameSessionInput* input;
+        Map* map;
         Faction* localFaction;
         vector<Faction*> factions;
         vector<int> clients;

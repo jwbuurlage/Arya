@@ -302,11 +302,9 @@ void GameSessionInput::moveSelectedUnits()
     {
         Event& ev = Game::shared().getEventManager()->createEvent(EVENT_ATTACK_MOVE_UNIT_REQUEST);
 
-        ev << best_unit->getId();
-
         ev << numSelected;
         for(int i = 0; i < unitIds.size(); ++i)
-            ev << unitIds[i];
+            ev << unitIds[i] << best_unit->getId();
 
         ev.send();
 

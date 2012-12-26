@@ -2,12 +2,14 @@
 #include "../include/Game.h"
 #include "../include/GameSession.h"
 #include "../include/GameSessionInput.h"
+#include "../include/Map.h"
 #include "../include/Faction.h"
 #include "../include/Units.h"
 
 GameSession::GameSession()
 {
     input = 0;
+    map = 0;
     localFaction = 0;
 
     decalVao = 0;
@@ -31,6 +33,8 @@ GameSession::~GameSession()
     for(unsigned int i = 0; i < factions.size(); ++i)
         delete factions[i];
     factions.clear();
+
+    if(map) delete map;
 
     Root::shared().removeFrameListener(this);
 
@@ -67,13 +71,11 @@ bool GameSession::init()
     cam->setCameraAngle(0.0f, -60.0f);
     cam->setZoom(300.0f);
 
-    // init map
-    vector<Arya::Material*> tileSet;
-    tileSet.push_back(Arya::MaterialManager::shared().getMaterial("grass.tga"));
-    tileSet.push_back(Arya::MaterialManager::shared().getMaterial("rock.tga"));
-    tileSet.push_back(Arya::MaterialManager::shared().getMaterial("snow.tga"));
-    tileSet.push_back(Arya::MaterialManager::shared().getMaterial("dirt.tga"));
-    if(!scene->setMap("heightmap.raw", "watermap.raw", tileSet, Arya::TextureManager::shared().getTexture("clouds.jpg"), Arya::TextureManager::shared().getTexture("splatmap.tga")))
+    if(!map) map = new Map;
+
+    if(!map->initHeightData())
+        return false;
+    if(!map->initGraphics(scene))
         return false;
 
     selectionDecalHandle = 0;
@@ -145,7 +147,7 @@ void GameSession::onFrame(float elapsedTime)
                 onScreen.y /= onScreen.w;
                 (*it)->setScreenPosition(vec2(onScreen.x, onScreen.y));
 
-                (*it)->update(elapsedTime);
+                (*it)->update(elapsedTime, map);
                 ++it;
             }
         }
@@ -165,14 +167,8 @@ void GameSession::onRender()
 
     decalProgram->setUniform1f("yOffset", 0.5);
     decalProgram->setUniformMatrix4fv("vpMatrix", Root::shared().getScene()->getCamera()->getVPMatrix());
-    decalProgram->setUniformMatrix4fv("scaleMatrix", Root::shared().getScene()->getMap()->getTerrain()->getScaleMatrix());
+    decalProgram->setUniformMatrix4fv("scaleMatrix", Root::shared().getScene()->getTerrain()->getScaleMatrix());
 
-    // heightmap
-    decalProgram->setUniform1i("heightMap", 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, Root::shared().getScene()->getMap()->getTerrain()->getHeightMapHandle());
-
-    // selection
     decalProgram->setUniform1i("selectionTexture", 1);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, selectionDecalHandle);
@@ -182,12 +178,14 @@ void GameSession::onRender()
     for(list<Unit*>::iterator it = localFaction->getUnits().begin();
             it != localFaction->getUnits().end(); ++it)
     {
+        decalProgram->setUniform1f("unitRadius", (*it)->getRadius());
         if(!((*it)->isSelected()))
             continue;
 
-        vec2 groundPos = vec2((*it)->getObject()->getPosition().x,
+        vec3 groundPos = vec3((*it)->getObject()->getPosition().x,
+                map->heightAtGroundPosition((*it)->getObject()->getPosition().x, (*it)->getObject()->getPosition().z),
                 (*it)->getObject()->getPosition().z);
-        decalProgram->setUniform2fv("groundPosition", groundPos);
+        decalProgram->setUniform3fv("groundPosition", groundPos);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 
@@ -210,21 +208,16 @@ void GameSession::handleEvent(Packet& packet)
                     int clientId;
                     packet >> clientId;
 
-                    Faction* faction = 0;
-                    for(unsigned int i = 0; i < factions.size(); ++i)
-                    {
-                        if( factions[i]->getId() == id )
-                        {
-                            faction = factions[i];
-                        }
-                    }
+                    int factionId;
+                    packet >> factionId;
+
+                    Faction* faction = getFactionById(factionId);
                     if(!faction)
                     {
-                        faction = new Faction;
+                        faction = createFaction(factionId);
                         factions.push_back(faction);
                     }
 
-                    //faction deserialize
                     faction->deserialize(packet);
 
                     if(clientId == Game::shared().getClientId())
@@ -234,7 +227,9 @@ void GameSession::handleEvent(Packet& packet)
                     packet >> unitCount;
                     for(int i = 0; i < unitCount; ++i)
                     {
-                        Unit* unit = new Unit(0);
+                        int id;
+                        packet >> id;
+                        Unit* unit = createUnit(id, 0);
                         unit->deserialize(packet);
 
                         Object* obj = Root::shared().getScene()->createObject();
@@ -244,8 +239,7 @@ void GameSession::handleEvent(Packet& packet)
 
                         unit->setObject(obj);
 
-                        float heightModel = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(
-                                unit->getPosition().x, unit->getPosition().z);
+                        float heightModel = map->heightAtGroundPosition(unit->getPosition().x, unit->getPosition().z);
 
                         unit->setPosition(vec3(unit->getPosition().x,
                                     heightModel,
@@ -262,8 +256,10 @@ void GameSession::handleEvent(Packet& packet)
                 int clientId;
                 packet >> clientId;
 
-                //faction deserialize
-                Faction* faction = new Faction;
+                int factionId;
+                packet >> factionId;
+
+                Faction* faction = createFaction(factionId);
                 faction->deserialize(packet);
                 factions.push_back(faction);
 
@@ -274,7 +270,9 @@ void GameSession::handleEvent(Packet& packet)
                 packet >> unitCount;
                 for(int i = 0; i < unitCount; ++i)
                 {
-                    Unit* unit = new Unit(0);
+                    int id;
+                    packet >> id;
+                    Unit* unit = createUnit(id, 0);
                     unit->deserialize(packet);
 
                     Object* obj = Root::shared().getScene()->createObject();
@@ -284,8 +282,7 @@ void GameSession::handleEvent(Packet& packet)
 
                     unit->setObject(obj);
 
-                    float heightModel = Root::shared().getScene()->getMap()->getTerrain()->heightAtGroundPosition(
-                            unit->getPosition().x, unit->getPosition().z);
+                    float heightModel = map->heightAtGroundPosition(unit->getPosition().x, unit->getPosition().z);
 
                     unit->setPosition(vec3(unit->getPosition().x,
                                 heightModel,
@@ -300,11 +297,9 @@ void GameSession::handleEvent(Packet& packet)
             {
                 int id;
                 packet >> id;
-                //TODO: look up factions with this ClientID
-                //Currently this is the same as faction ID
                 for(vector<Faction*>::iterator iter = factions.begin(); iter != factions.end(); ++iter)
                 {
-                    if( (*iter)->getId() == id )
+                    if( (*iter)->getClientId() == id )
                     {
                         delete *iter;
                         iter = factions.erase(iter);
@@ -318,25 +313,18 @@ void GameSession::handleEvent(Packet& packet)
             int facId;
             packet >> facId;
 
-            Faction* f;
-
-            for(int i = 0; i < factions.size(); ++i)
-                if(factions[i]->getId() == facId)
-                    f = factions[i];
+            Faction* faction = getFactionById(facId);
 
             int numUnits;
             packet >> numUnits;
 
             int unitId;
             vec2 unitTargetPosition;
-            // TODO: need to optimize with map
             for(int i = 0; i < numUnits; ++i) {
                 packet >> unitId;
                 packet >> unitTargetPosition;
-                for(list<Unit*>::iterator it = f->getUnits().begin();
-                        it != f->getUnits().end(); ++it)
-                    if((*it)->getId() == unitId)
-                        (*it)->setTargetPosition(unitTargetPosition);
+                Unit* unit = getUnitById(unitId);
+                if(unit) unit->setTargetPosition(unitTargetPosition);
             }
 
             break;
@@ -346,32 +334,17 @@ void GameSession::handleEvent(Packet& packet)
             int facId;
             packet >> facId;
 
-            Faction* f;
-
-            for(int i = 0; i < factions.size(); ++i)
-                if(factions[i]->getId() == facId)
-                    f = factions[i];
-
-            int targetId;
-            packet >> targetId;
-            Unit* targetUnit;
-
-            for(int i = 0; i < factions.size(); ++i)
-                for(list<Unit*>::iterator it = factions[i]->getUnits().begin();
-                        it != factions[i]->getUnits().end(); ++it)
-                    if((*it)->getId() == targetId)
-                            targetUnit = (*it);
+            Faction* faction = getFactionById(facId);
 
             int numUnits;
             packet >> numUnits;
 
-            int unitId;
+            int unitId, targetUnitId;
             for(int i = 0; i < numUnits; ++i) {
-                packet >> unitId;
-                for(list<Unit*>::iterator it = f->getUnits().begin();
-                        it != f->getUnits().end(); ++it)
-                    if((*it)->getId() == unitId)
-                            (*it)->setTargetUnit(targetUnit);
+                packet >> unitId >> targetUnitId;
+                Unit* unit = getUnitById(unitId);
+                Unit* targetUnit = getUnitById(targetUnitId);
+                if(unit && targetUnit) unit->setTargetUnit(targetUnit);
             }
 
             break;
@@ -381,5 +354,5 @@ void GameSession::handleEvent(Packet& packet)
             LOG_INFO("GameSession: unknown event received! (" << id << ")");
             break;
     }
-
 }
+
