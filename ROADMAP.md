@@ -5,11 +5,15 @@
 Target: *01-04-2012*
 
 - CTF-style multiplayer game
-    - All graphics features in the engine
+    - Graphics features all built into the engine
+        - Models
+        - Lightning model
+        - Shadows
+        - ...
     - Combat
     - Fog of war
     - Victory conditions
-- Working server accissable using the console
+- Working server accessible using the console
 
 ### Milestone 2:
 - ...
