@@ -20,7 +20,7 @@ SET(
     "../src/ServerClientHandler.cpp"
     "../src/ServerClient.cpp"
     "../src/ServerGameSession.cpp"
-    "../src/ServerLogger.cpp"
+    "../src/common/GameLogger.cpp"
 	"../src/main.cpp"
 )
 

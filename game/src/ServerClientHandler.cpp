@@ -1,7 +1,7 @@
+#include "../include/common/GameLogger.h"
 #include "../include/ServerClientHandler.h"
 #include "../include/Server.h"
 #include "Arya.h"
-#include "../include/ServerLogger.h"
 #include <cstring>
 
 #include "Poco/Exception.h"
@@ -12,7 +12,7 @@ ServerClientHandler::ServerClientHandler(StreamSocket& _socket, SocketReactor& _
 {
     //Note that 'server' is not yet set here due to the way Poco works
     //The call to server->newClient is done in the connection acceptor.
-    LOG_INFO("ServerClientHandler()");
+    GAME_LOG_INFO("ServerClientHandler()");
     NObserver<ServerClientHandler, ReadableNotification> readObserver(*this, &ServerClientHandler::onReadable);
     NObserver<ServerClientHandler, WritableNotification> writeObserver(*this, &ServerClientHandler::onWritable);
     NObserver<ServerClientHandler, ShutdownNotification> shutdownObserver(*this, &ServerClientHandler::onShutdown);
@@ -26,7 +26,7 @@ ServerClientHandler::ServerClientHandler(StreamSocket& _socket, SocketReactor& _
 
 ServerClientHandler::~ServerClientHandler()
 {
-    LOG_INFO("~ServerClientHandler()");
+    GAME_LOG_INFO("~ServerClientHandler()");
     server->removeClient(this);
     NObserver<ServerClientHandler, ReadableNotification> readObserver(*this, &ServerClientHandler::onReadable);
     NObserver<ServerClientHandler, WritableNotification> writeObserver(*this, &ServerClientHandler::onWritable);
@@ -46,16 +46,16 @@ void ServerClientHandler::onReadable(const AutoPtr<ReadableNotification>& notifi
     }
     catch(TimeoutException& e)
     {
-        LOG_WARNING("Timeout exception when reading socket!");
+        GAME_LOG_WARNING("Timeout exception when reading socket!");
     }
     catch(NetException& e)
     {
-        LOG_WARNING("Net exception when reading socket");
+        GAME_LOG_WARNING("Net exception when reading socket");
     }
 
     if(n <= 0)
     {
-        LOG_INFO("Client closed connection");
+        GAME_LOG_INFO("Client closed connection");
         delete this;
     }
     else
@@ -67,14 +67,14 @@ void ServerClientHandler::onReadable(const AutoPtr<ReadableNotification>& notifi
         {
             if( *(int*)dataBuffer != PACKETMAGICINT )
             {
-                LOG_WARNING("Invalid packet header! Removing client");
+                GAME_LOG_WARNING("Invalid packet header! Removing client");
                 terminate();
                 return;
             }
             int packetSize = *(int*)(dataBuffer + 4); //this is including the header
             if(packetSize > bufferSizeTotal)
             {
-                LOG_WARNING("Packet does not fit in buffer. Possible hack attempt. Removing client. Packet size = " << packetSize);
+                GAME_LOG_WARNING("Packet does not fit in buffer. Possible hack attempt. Removing client. Packet size = " << packetSize);
                 terminate();
                 return;
             }
@@ -118,7 +118,7 @@ void ServerClientHandler::onWritable(const AutoPtr<WritableNotification>& notifi
 
 void ServerClientHandler::onShutdown(const AutoPtr<ShutdownNotification>& notification)
 {
-    LOG_INFO("Shutdown notification");
+    GAME_LOG_INFO("Shutdown notification");
     delete this;
 }
 
@@ -147,18 +147,18 @@ bool ServerClientHandler::trySendPacketData(Packet* packet, int& bytesSent)
     }
     catch(TimeoutException& e)
     {
-        LOG_WARNING("Timeout exception when writing to socket! Msg: " << e.displayText());
+        GAME_LOG_WARNING("Timeout exception when writing to socket! Msg: " << e.displayText());
         return false;
     }
     catch(NetException& e)
     {
-        LOG_WARNING("Net exception when writing to socket. Msg: " << e.displayText());
+        GAME_LOG_WARNING("Net exception when writing to socket. Msg: " << e.displayText());
         return false;
     }
 
     if(n<=0)
     {
-        LOG_INFO("Server closed connection when writing to socket");
+        GAME_LOG_INFO("Server closed connection when writing to socket");
         terminate();
         return true;
     }

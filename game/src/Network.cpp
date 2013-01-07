@@ -1,3 +1,4 @@
+#include "../include/common/GameLogger.h"
 #include "../include/Network.h"
 #include "../include/Server.h"
 #include "../include/Packet.h"
@@ -41,7 +42,7 @@ class Connection
             socket->connectNB(SocketAddress(host,port));
             connected = false;
             connecting = true;
-            LOG_INFO("Started connection to " << host);
+            GAME_LOG_INFO("Started connection to " << host);
         }
 
         void update()
@@ -50,7 +51,7 @@ class Connection
             {
                 if(socket->poll(0, StreamSocket::SELECT_WRITE))
                 {
-                    LOG_INFO("Connected to server!");
+                    GAME_LOG_INFO("Connected to server!");
                     connected = true;
                     connecting = false;
                 }
@@ -66,16 +67,16 @@ class Connection
                     }
                     catch(TimeoutException& e)
                     {
-                        LOG_WARNING("Timeout exception when reading socket! Msg: " << e.displayText());
+                        GAME_LOG_WARNING("Timeout exception when reading socket! Msg: " << e.displayText());
                     }
                     catch(NetException& e)
                     {
-                        LOG_WARNING("Net exception when reading socket Msg: " << e.displayText());
+                        GAME_LOG_WARNING("Net exception when reading socket Msg: " << e.displayText());
                     }
 
                     if(n <= 0)
                     {
-                        LOG_INFO("Server closed connection");
+                        GAME_LOG_INFO("Server closed connection");
                         socket->close();
                         connected = false;
                         return;
@@ -91,7 +92,7 @@ class Connection
                         {
                             if( *(int*)dataBuffer != PACKETMAGICINT )
                             {
-                                LOG_WARNING("Invalid packet header! Closing connection.");
+                                GAME_LOG_WARNING("Invalid packet header! Closing connection.");
                                 socket->close();
                                 connected = false;
                                 return;
@@ -99,7 +100,7 @@ class Connection
                             int packetSize = *(int*)(dataBuffer + 4); //this is including the header
                             if(packetSize > bufferSizeTotal)
                             {
-                                LOG_WARNING("Packet does not fit in buffer. Possible hack attempt. Removing client. Packet size = " << packetSize);
+                                GAME_LOG_WARNING("Packet does not fit in buffer. Possible hack attempt. Removing client. Packet size = " << packetSize);
                                 socket->close();
                                 connected = false;
                                 return;
@@ -145,7 +146,7 @@ class Connection
             {
                 if(!packets.empty())
                 {
-                    LOG_WARNING("There are packets in the send queue but there is no connection!");
+                    GAME_LOG_WARNING("There are packets in the send queue but there is no connection!");
                     while(!packets.empty())
                     {
                         delete packets.back();
@@ -170,17 +171,17 @@ class Connection
                 }
                 catch(TimeoutException& e)
                 {
-                    LOG_WARNING("Timeout exception when writing to socket! Msg: " << e.displayText());
+                    GAME_LOG_WARNING("Timeout exception when writing to socket! Msg: " << e.displayText());
                     break;
                 }
                 catch(NetException& e)
                 {
-                    LOG_WARNING("Net exception when writing to socket. Msg: " << e.displayText());
+                    GAME_LOG_WARNING("Net exception when writing to socket. Msg: " << e.displayText());
                     break;
                 }
                 if(n<=0)
                 {
-                    LOG_INFO("Server closed connection when writing to socket");
+                    GAME_LOG_INFO("Server closed connection when writing to socket");
                     socket->close();
                     connected = false;
                     break;
@@ -196,7 +197,7 @@ class Connection
         {
             if(!eventManager)
             {
-                LOG_WARNING("Incoming packet can not be handled because no eventmanager is set");
+                GAME_LOG_WARNING("Incoming packet can not be handled because no eventmanager is set");
                 return;
             }
             Packet pak(data, packetSize);
