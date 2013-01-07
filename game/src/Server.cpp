@@ -1,3 +1,4 @@
+#include "../include/common/GameLogger.h"
 #include "../include/Server.h"
 #include "../include/Packet.h"
 #include "../include/EventCodes.h"
@@ -6,7 +7,6 @@
 #include "../include/ServerClient.h"
 #include "../include/Units.h"
 #include "Arya.h"
-#include "../include/ServerLogger.h"
 #include <cstring>
 #include <algorithm>
 
@@ -29,14 +29,13 @@ Server::Server()
     port = 13337;
     clientIdFactory = 100;
     sessionIdFactory = 100;
-    if(ServerLogger == 0) ServerLogger = new Arya::Logger;
 }
 
 Server::~Server()
 {
     if(thread.isRunning())
     {
-        LOG_INFO("Waiting for server to finish");
+        GAME_LOG_INFO("Waiting for server to finish");
         reactor->stop();
         thread.join();
     }
@@ -60,7 +59,7 @@ Server::~Server()
 void Server::run()
 {
     prepareServer();
-    LOG_INFO("Server started on port " << port);
+    GAME_LOG_INFO("Server started on port " << port);
     reactor->run();
 }
 
@@ -68,7 +67,7 @@ void Server::runInThread()
 {
     prepareServer();
     thread.start(*reactor);
-    LOG_INFO("Server started on port " << port);
+    GAME_LOG_INFO("Server started on port " << port);
 }
 
 void Server::prepareServer()
@@ -151,7 +150,7 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
     clientIterator iter = clientList.find(clienthandler);
     if(iter == clientList.end())
     {
-        LOG_WARNING("Received packet (id = " << packet.getId() << ") from unkown client!");
+        GAME_LOG_WARNING("Received packet (id = " << packet.getId() << ") from unkown client!");
         return;
     }
     ServerClient* client = iter->second;
@@ -188,14 +187,14 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
         default:
             if(client->getClientId() == -1)
             {
-                LOG_WARNING("Unkown packet (id = " << packet.getId() << ") received from client with no id");
+                GAME_LOG_WARNING("Unkown packet (id = " << packet.getId() << ") received from client with no id");
             }
             else
             {
                 if(client->getSession())
                     client->getSession()->handlePacket(client, packet);
                 else
-                    LOG_WARNING("Unkown packet (id = " << packet.getId() << ") received from client with no session");
+                    GAME_LOG_WARNING("Unkown packet (id = " << packet.getId() << ") received from client with no session");
             }
             break;
     }

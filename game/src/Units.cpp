@@ -1,3 +1,4 @@
+#include "../include/common/GameLogger.h"
 #include "../include/Units.h"
 #include "../include/Packet.h"
 #include <math.h>
@@ -13,7 +14,7 @@ Unit* UnitFactory::createUnit(int id, int type)
     Unit* unit = getUnitById(id);
     if(unit)
     {
-        LOG_WARNING("Trying to create unit with duplicate id (" << id << ")");
+        GAME_LOG_WARNING("Trying to create unit with duplicate id (" << id << ")");
         return unit;
     }
     unit = new Unit(type, id, this);
@@ -27,7 +28,7 @@ void UnitFactory::destroyUnit(int id)
     unitMapIterator iter = unitMap.find(id);
     if(iter == unitMap.end())
     {
-        LOG_WARNING("Trying to destory unexisting unit id");
+        GAME_LOG_WARNING("Trying to destory unexisting unit id");
         return;
     }
     unitMap.erase(iter);
@@ -112,7 +113,7 @@ void Unit::update(float timeElapsed, Map* map)
             unitState == UNIT_ATTACKING_OUT_OF_RANGE)
     {
         if(!targetUnit) {
-            LOG_WARNING("Attacking, but no target unit");
+            GAME_LOG_WARNING("Attacking, but no target unit");
             setUnitState(UNIT_IDLE);
             return;
         }

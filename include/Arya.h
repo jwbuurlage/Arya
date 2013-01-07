@@ -11,8 +11,8 @@
 #include "Objects.h"
 #include "Scene.h"
 #include "Shaders.h"
+#include "Console.h"
 #include "common/Singleton.h"
-#include "common/Logger.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

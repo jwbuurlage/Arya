@@ -1,4 +1,5 @@
 #include "Arya.h"
+#include "../include/common/GameLogger.h"
 #include "../include/Game.h"
 #include "../include/GameSession.h"
 #include "../include/GameSessionInput.h"
@@ -40,7 +41,7 @@ GameSession::~GameSession()
 
     Root::shared().removeScene();
 
-    LOG_INFO("Ended session");
+    GAME_LOG_INFO("Ended session");
 }
 
 bool GameSession::init()
@@ -351,7 +352,7 @@ void GameSession::handleEvent(Packet& packet)
          }
 
         default:
-            LOG_INFO("GameSession: unknown event received! (" << id << ")");
+            GAME_LOG_INFO("GameSession: unknown event received! (" << id << ")");
             break;
     }
 }
