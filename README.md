@@ -9,7 +9,7 @@ Building Borea on Linux requires the following libraries:
 
 Also `CMake` is required for building
 
-Simply navigate to the map and run
+Simply navigate to the root directory of the repository and run
 
     $ cd build
     $ cmake .

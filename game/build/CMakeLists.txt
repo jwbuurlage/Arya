@@ -20,7 +20,7 @@ SET(
     "../src/ServerClientHandler.cpp"
     "../src/ServerClient.cpp"
     "../src/ServerGameSession.cpp"
-    "../src/ServerLogger.cpp"
+    "../src/common/GameLogger.cpp"
 	"../src/main.cpp"
 )
 
@@ -35,6 +35,7 @@ SET(
 	"Arya"
     "PocoNet"
     "PocoFoundation"
+    "pthread"
 )
 
 ADD_DEFINITIONS(-DPOCO_NO_AUTOMATIC_LIBS)

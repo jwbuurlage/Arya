@@ -1,3 +1,4 @@
+#include "../include/common/GameLogger.h"
 #include "../include/Server.h"
 #include "../include/ServerGameSession.h"
 #include "../include/ServerClient.h"
@@ -6,13 +7,12 @@
 #include "../include/Units.h"
 #include "../include/Map.h"
 #include "Arya.h"
-#include "../include/ServerLogger.h"
 
 void ServerGameSession::addClient(ServerClient* client)
 {
     if(client->getSession())
     {
-        LOG_WARNING("ServerClient was already in a session and then added to another gamesession");
+        GAME_LOG_WARNING("ServerClient was already in a session and then added to another gamesession");
     }
     client->setSession(this);
 
@@ -101,7 +101,7 @@ void ServerGameSession::sendToAllClients(Packet* pak)
 {
     if(clientList.empty())
     {
-        LOG_WARNING("calling sendToAllClients but client list is empty. This means the packet is NOT added to any queue and the pointer is probably lost");
+        GAME_LOG_WARNING("calling sendToAllClients but client list is empty. This means the packet is NOT added to any queue and the pointer is probably lost");
         return;
     }
     for(clientIterator iter = clientList.begin(); iter != clientList.end(); ++iter)
@@ -125,7 +125,7 @@ void ServerGameSession::startLoading()
 {
     if(gameState != STATE_CREATED)
     {
-        LOG_WARNING("startLoading() called when already loaded");
+        GAME_LOG_WARNING("startLoading() called when already loaded");
         return;
     }
     gameState = STATE_LOADING;
