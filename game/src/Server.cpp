@@ -55,7 +55,6 @@ Server::~Server()
     clientList.clear();
 }
 
-
 void Server::run()
 {
     prepareServer();

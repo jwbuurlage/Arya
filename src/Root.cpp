@@ -130,7 +130,7 @@ namespace Arya
 
     void Root::startRendering()
     {
-        LOG_INFO("start rendering");        
+        LOG_INFO("start rendering");
         running = true;
         while(running)
         {

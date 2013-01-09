@@ -4,7 +4,7 @@
 #include "Poco/ThreadLocal.h"
 #include <iostream>
 
-GameLogger GameLoggerInstance;
+GameLogger* GameLoggerInstance;
 
 class InternalStream
 {
@@ -14,6 +14,7 @@ class InternalStream
 
 GameLogger::GameLogger(void)
 {
+    if(!GameLoggerInstance) GameLoggerInstance = this;
     internalStream = new InternalStream;
     consoleLogLevel = L_INFO | L_WARNING | L_ERROR | L_CRITICALERROR | L_DEBUG;
     fileLogLevel = L_WARNING | L_ERROR | L_CRITICALERROR;
