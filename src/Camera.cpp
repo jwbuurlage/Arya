@@ -29,6 +29,12 @@ namespace Arya
 
     Camera::~Camera()
     {
+
+    }
+
+    bool Camera::isBoxVisible(int minX, int maxX, int minY, int maxY, int minZ, int maxZ)
+    {
+        return false;
     }
 
     void Camera::setProjectionMatrix(float fov, float aspect, float near, float far)

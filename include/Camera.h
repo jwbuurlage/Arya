@@ -40,6 +40,9 @@ namespace Arya
             //(not by the application)
             void update(float elapsedTime);
 
+            //Checks if a box is visible, used for culling
+            bool isBoxVisible(int minX, int maxX, int minY, int maxY, int minZ, int maxZ);
+
 
             //
             //These should be called by the mouse handler
