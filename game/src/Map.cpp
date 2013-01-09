@@ -1,4 +1,5 @@
 #include "../include/Map.h"
+#include "../include/common/GameLogger.h"
 
 Map::Map()
 {
@@ -27,7 +28,7 @@ bool Map::initHeightData()
     hFile = Arya::FileSystem::shared().getFile(heightMapString);
     if(!hFile)
     {
-        LOG_WARNING("Unable to load heightmap data!");
+        GAME_LOG_WARNING("Unable to load heightmap data!");
         return false;
     }
     heightMapSize = 1025;
@@ -62,7 +63,7 @@ float Map::heightAtGroundPosition(float x, float z)
 {
     if(!hFile)
     {
-        LOG_WARNING("Querying height, but no heightmap set");
+        GAME_LOG_WARNING("Querying height, but no heightmap set");
         return 0.0;
     }
 
@@ -79,7 +80,7 @@ float Map::heightAtGroundPosition(float x, float z)
 
     if( index1 >= heightMapSize || index1 <= 0 || index2 >= heightMapSize || index2 <= 0 )
     {
-        LOG_WARNING("Querying height outside of terrain!");
+        GAME_LOG_WARNING("Querying height outside of terrain!");
         return 0.0;
     }
 

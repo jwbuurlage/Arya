@@ -1,3 +1,4 @@
+#include "../include/common/GameLogger.h"
 #include "../include/Events.h"
 #include "../include/Network.h"
 #include "Arya.h"
@@ -44,7 +45,7 @@ void EventManager::handlePacket(Packet& packet)
     pair<handlerIterator, handlerIterator> range = eventHandlers.equal_range(id);
     if(range.first == range.second)
     {
-        LOG_WARNING("Event id " << id << " received but no handler registered.");
+        GAME_LOG_WARNING("Event id " << id << " received but no handler registered.");
     }
     else
     {

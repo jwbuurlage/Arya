@@ -1,3 +1,4 @@
+#include "../include/common/GameLogger.h"
 #include "../include/Faction.h"
 #include "../include/Units.h"
 #include "../include/Packet.h"
@@ -8,7 +9,7 @@ Faction* FactionFactory::createFaction(int id)
     Faction* faction = getFactionById(id);
     if(faction)
     {
-        LOG_WARNING("Trying to create faction with duplicate id (" << id << ")");
+        GAME_LOG_WARNING("Trying to create faction with duplicate id (" << id << ")");
         return faction;
     }
     faction = new Faction(id, this);
@@ -22,7 +23,7 @@ void FactionFactory::destroyFaction(int id)
     factionMapIterator iter = factionMap.find(id);
     if(iter == factionMap.end())
     {
-        LOG_WARNING("Trying to destory unexisting faction id");
+        GAME_LOG_WARNING("Trying to destory unexisting faction id");
         return;
     }
     factionMap.erase(iter);

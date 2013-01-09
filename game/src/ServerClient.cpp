@@ -1,3 +1,4 @@
+#include "../include/common/GameLogger.h"
 #include "../include/ServerClient.h"
 #include "../include/ServerGameSession.h"
 #include "../include/Units.h"

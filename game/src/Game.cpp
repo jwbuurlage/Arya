@@ -1,3 +1,4 @@
+#include "../include/common/GameLogger.h"
 #include "../include/Game.h"
 #include "../include/GameSession.h"
 #include "../include/Network.h"
@@ -33,7 +34,7 @@ void Game::run()
     root = new Root;
 
     if(!(root->init(false, 800, 600))) {
-        LOG_ERROR("Unable to init root");
+        GAME_LOG_ERROR("Unable to init root");
     }
     else
     {
@@ -42,10 +43,9 @@ void Game::run()
         if(network) delete network;
         network = new Network;
 
-        network->startServer();
-
-        //network->connectToSessionServer("94.210.208.103", 13337);
-        network->connectToSessionServer("localhost", 13337);
+        network->connectToSessionServer("94.210.208.103", 13337);
+        //network->startServer();
+        //network->connectToSessionServer("localhost", 13337);
 
         if(eventManager) delete eventManager;
         eventManager = new EventManager(network);
@@ -74,7 +74,7 @@ bool Game::keyDown(int key, bool keyDown)
                 if(session) delete session;
                 session = new GameSession;
                 if(!session->init()) {
-                    LOG_ERROR("Could not start a new session");
+                    GAME_LOG_ERROR("Could not start a new session");
                     Root::shared().stopRendering();
                 }
             }
@@ -136,15 +136,15 @@ void Game::handleEvent(Packet& packet)
             session = new GameSession;
 
             if(!session->init()) {
-                LOG_ERROR("Could not start a new session");
+                GAME_LOG_ERROR("Could not start a new session");
                 Root::shared().stopRendering();
             }
 
-            LOG_INFO("Game is ready");
+            GAME_LOG_INFO("Game is ready");
             break;
 
         default:
-            LOG_INFO("Game: unknown event received! (" << id << ")");
+            GAME_LOG_INFO("Game: unknown event received! (" << id << ")");
             break;
     }
 }

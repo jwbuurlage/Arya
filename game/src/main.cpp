@@ -1,3 +1,4 @@
+#include "../include/common/GameLogger.h"
 #include "../include/Game.h"
 #include "../include/Network.h"
 #include <cstring>
@@ -5,6 +6,8 @@
 int main(int argc, char* argv[])
 {
     bool serverOnly = false;
+
+    GameLoggerInstance = new GameLogger;
 
     if(argc >= 2)
     {
@@ -25,5 +28,8 @@ int main(int argc, char* argv[])
         game->run();
         delete game;
     }
+
+    delete GameLoggerInstance;
+
     return 0;
 }
