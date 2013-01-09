@@ -15,7 +15,10 @@ struct QuadTree
         size = _size;
     }
 
-    ~QuadTree() { };
+    ~QuadTree() 
+    {
+
+    };
 
     // these will be in world coordinates
     vec2 position;

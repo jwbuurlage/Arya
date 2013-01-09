@@ -5,6 +5,7 @@
 #include "../include/Map.h"
 #include "../include/Faction.h"
 #include "../include/Units.h"
+#include "../include/common/QuadTree.h"
 
 GameSession::GameSession()
 {
@@ -146,6 +147,8 @@ void GameSession::onFrame(float elapsedTime)
                 onScreen.x /= onScreen.w;
                 onScreen.y /= onScreen.w;
                 (*it)->setScreenPosition(vec2(onScreen.x, onScreen.y));
+
+                // place in proper QuadTree
 
                 (*it)->update(elapsedTime, map);
                 ++it;

@@ -1,4 +1,4 @@
-## Building on a Linux PC
+## Building on Linux
 
 Building Borea on Linux requires the following libraries:
 
