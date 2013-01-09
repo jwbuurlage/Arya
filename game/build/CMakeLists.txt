@@ -35,6 +35,7 @@ SET(
 	"Arya"
     "PocoNet"
     "PocoFoundation"
+    "pthread"
 )
 
 ADD_DEFINITIONS(-DPOCO_NO_AUTOMATIC_LIBS)
