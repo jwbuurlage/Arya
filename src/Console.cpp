@@ -4,7 +4,9 @@
 #include "Fonts.h"
 #include "common/Logger.h"
 #include <sstream>
+
 using std::stringstream;
+
 namespace Arya
 {
     template<> Console* Singleton<Console>::singleton = 0;
@@ -13,6 +15,7 @@ namespace Arya
     {
         nrLines = 20;
         searchNrLines = 50;
+        heightKernel = 270.0;
         textWidthInPixels = 10;
         textHeightInPixels = 10.0;
         pixelsInBetween = 4.0;
@@ -41,9 +44,9 @@ namespace Arya
         Rect* rect = new Rect; // here we initialize the frame for the console itself
         rects.push_back(rect);
         rect->offsetInPixels.x = 0.0;
-        rect->offsetInPixels.y = Root::shared().getWindowHeight() - 270.0;
+        rect->offsetInPixels.y = Root::shared().getWindowHeight() - heightKernel;
         rect->sizeInPixels.x = Root::shared().getWindowWidth() + 0.0;
-        rect->sizeInPixels.y = 270.0; // height of kernel in pixels
+        rect->sizeInPixels.y = heightKernel; // height of kernel in pixels
         rect->fillColor = vec4(0.0, 0.0, 0.0, 0.4);
         rect->isVisible = false;
         Root::shared().getOverlay()->addRect(rect);
@@ -76,6 +79,7 @@ namespace Arya
             Root::shared().getOverlay()->addRect(rect);
         }
         addCommandListener("consoleColor", this);
+        addCommandListener("hide", this);
         return true;
     }
 
@@ -92,7 +96,11 @@ namespace Arya
             parser >> float1 >> float2 >> float3;
             changeConsoleColor(float1, float2, float3);
         }
-        else flag == false;
+        if(splitLineCommand(command) == "hide")
+        {
+            if(splitLineParameters(command) == "console") toggleVisibilityConsole();
+        }
+        else flag = false;
         return flag;
     }
     bool Console::keyDown(int key, bool keyDown)
@@ -100,9 +108,15 @@ namespace Arya
         bool keyHandled = true;
         if(visibility == false)
         {
+            glfwDisable(GLFW_KEY_REPEAT);
             switch(key)
             {
-                case GLFW_KEY_F6: if(keyDown) toggleVisibilityConsole(); break;
+                case GLFW_KEY_F6: if(keyDown) 
+                                  {
+                                      glfwEnable(GLFW_KEY_REPEAT);
+                                      toggleVisibilityConsole();
+                                  }
+                                  break;
                 default: keyHandled = false; break;
             }
         }
@@ -120,13 +134,20 @@ namespace Arya
                 }
             }
             else if(key >= '0' && key <= '9' && keyDown && (currentLine.length() < (unsigned)nrCharOnLine)) currentLine.push_back(key);
-            else if(key >= GLFW_KEY_KP_0  && key <= GLFW_KEY_KP_9  && keyDown && (currentLine.length() < (unsigned)nrCharOnLine)) currentLine.push_back(key + 2);
+            else if(key >= GLFW_KEY_KP_0  && key <= GLFW_KEY_KP_9  && keyDown && (currentLine.length() < (unsigned)nrCharOnLine)) currentLine.push_back(key - 2);
+            else if (keyDown && key == GLFW_KEY_KP_ADD && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == GLFW_KEY_KP_SUBTRACT && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == GLFW_KEY_KP_MULTIPLY && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == GLFW_KEY_KP_DIVIDE && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == GLFW_KEY_KP_EQUAL && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == GLFW_KEY_KP_DECIMAL && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
             else
             {
                 switch(key)
                 {
                     case GLFW_KEY_ESC:
                     case GLFW_KEY_F6: if(keyDown) toggleVisibilityConsole(); break;
+                    case GLFW_KEY_KP_ENTER:
                     case GLFW_KEY_ENTER: if(keyDown) enterInput(); break;
                     case GLFW_KEY_BACKSPACE: if(keyDown && currentLine.length() > 0)
                                              {
@@ -249,7 +270,7 @@ namespace Arya
 
     void Console::addOutputText(string textToBeAdded)
     {
-        if(textToBeAdded.length() <= nrCharOnLine) history.push_back(textToBeAdded);
+        if(textToBeAdded.length() <= (unsigned)nrCharOnLine) history.push_back(textToBeAdded);
         else
         {
             int count = 0;
@@ -288,7 +309,7 @@ namespace Arya
         pair<commandListenerIterator, commandListenerIterator> range = commandListeners.equal_range(splitLineCommand(command));
         if(range.first == range.second)
         {
-            LOG_WARNING("Command"  << command << " received but no command registered");
+            LOG_WARNING("Command " << command << " received but no command registered");
         }
         else
         {
@@ -311,7 +332,7 @@ namespace Arya
     {
         int spaceFinder = 0;
         spaceFinder = command.find(" ", 0);
-        if(spaceFinder == std::string::npos)
+        if((unsigned)spaceFinder == std::string::npos)
         {
             return command;
         }
@@ -323,11 +344,11 @@ namespace Arya
     {
         int spaceFinder = 0;
         spaceFinder = command.find(" ", 0);
-        if(spaceFinder == std::string::npos)
+        if((unsigned)spaceFinder == std::string::npos)
         {
             return "";
         }
         int spaceCount = command.find_first_of(" ", 0);
-        return command.substr(spaceCount, currentLine.length() - spaceCount - 1);
+        return command.substr(spaceCount + 1, currentLine.length() - spaceCount - 1);
     }
 }

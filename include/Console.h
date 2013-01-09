@@ -42,6 +42,7 @@ namespace Arya
             int textWidthInPixels; //width of character
             float textHeightInPixels;
             int nrCharOnLine;
+            float heightKernel;
             int pixelsInBetween; // pixels in between lines
             bool lShift; // used for key input
             bool rShift; // used for key input
