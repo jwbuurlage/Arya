@@ -34,7 +34,7 @@ struct QuadTree
     QuadTree* children[4];
     QuadTree* parent;
 
-    void insert(int id, vec2 position)
+    /* void insert(int id, vec2 position)
     {
         if(level == maxLevel)
             //insert
@@ -57,5 +57,5 @@ struct QuadTree
         if(level)
             for(int i = 0; i < 4; ++i)
                 children[i].setFlag(_flag);
-    }
+    } */
 };
