@@ -43,7 +43,7 @@ void Game::run()
         if(network) delete network;
         network = new Network;
 
-        network->connectToSessionServer("94.210.208.103", 13337);
+        network->connectToSessionServer("balubu.com", 13337);
         //network->startServer();
         //network->connectToSessionServer("localhost", 13337);
 
