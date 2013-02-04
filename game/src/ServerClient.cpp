@@ -11,7 +11,7 @@ ServerClient::~ServerClient()
 
 void ServerClient::createFaction()
 {
-    if(!faction) faction = gameSession->createFaction(clientId);
+    if(!faction) faction = gameSession->createFaction();
     faction->setColor(clientId%5);
 }
 

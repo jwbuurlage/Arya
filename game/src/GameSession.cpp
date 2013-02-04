@@ -209,17 +209,18 @@ void GameSession::handleEvent(Packet& packet)
                     int clientId;
                     packet >> clientId;
 
-                    //int factionId;
-                    //packet >> factionId; //same as client id now
+                    int factionId;
+                    packet >> factionId;
 
-                    Faction* faction = getFactionById(clientId);
+                    Faction* faction = getFactionById(factionId);
                     if(!faction)
                     {
-                        faction = createFaction(clientId);
+                        faction = createFaction(factionId);
                         factions.push_back(faction);
                     }
 
                     faction->deserialize(packet);
+                    faction->setClientId(clientId);
 
                     if(clientId == Game::shared().getClientId())
                         localFaction = faction;
@@ -257,11 +258,12 @@ void GameSession::handleEvent(Packet& packet)
                 int clientId;
                 packet >> clientId;
 
-                //int factionId;
-                //packet >> factionId; //same as client id now
+                int factionId;
+                packet >> factionId;
 
                 Faction* faction = createFaction(clientId);
                 faction->deserialize(packet);
+                faction->setClientId(clientId);
                 factions.push_back(faction);
 
                 if(clientId == Game::shared().getClientId())

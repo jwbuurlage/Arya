@@ -32,7 +32,7 @@ class ServerGameSession : public UnitFactory, public FactionFactory
 
         int getNewId() { return idFactory++; }
         Unit* createUnit(int type){ return UnitFactory::createUnit(getNewId(),type); }
-        Faction* createFaction(int clientId){ return FactionFactory::createFaction(clientId); }
+        Faction* createFaction(){ return FactionFactory::createFaction(getNewId()); }
 
         unsigned int getClientCount() const { return clientList.size(); }
 
