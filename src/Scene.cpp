@@ -179,15 +179,24 @@ namespace Arya
 
     void Scene::onFrame(float elapsedTime)
     {
-        camera->update(elapsedTime);
-        currentTerrain->update(elapsedTime, this);
         //We might want to let the Game loop on all
         //the objects and animate them. This way the game
         //has more control: it could slow animations down for example
-        for(unsigned int i = 0; i < objects.size(); ++i)
+        for(vector<Object*>::iterator iter = objects.begin(); iter != objects.end(); )
         {
-            objects[i]->updateAnimation(elapsedTime);
+            if( (*iter)->isObsolete() )
+            {
+                delete *iter;
+                iter = objects.erase(iter);
+            }
+            else
+            {
+                (*iter)->updateAnimation(elapsedTime);
+                ++iter;
+            }
         }
+        camera->update(elapsedTime);
+        currentTerrain->update(elapsedTime, this);
 
         GLfloat depth;
         glReadPixels(0, 0, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);

@@ -27,7 +27,7 @@ void ServerGameSession::addClient(ServerClient* client)
         *pak << client->getClientId();
 
         Faction* faction = client->getFaction();
-        *pak << faction->getId();
+        //*pak << faction->getId(); //same as client id now
         faction->serialize(*pak);
 
         int unitCount = (int)faction->getUnits().size();
@@ -56,7 +56,7 @@ void ServerGameSession::addClient(ServerClient* client)
         *pak << (*iter)->getClientId();
 
         Faction* faction = (*iter)->getFaction();
-        *pak << faction->getId();
+        //*pak << faction->getId(); //same as client id now
         faction->serialize(*pak);
 
         int unitCount = (int)faction->getUnits().size();

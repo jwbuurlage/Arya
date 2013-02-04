@@ -19,6 +19,7 @@ namespace Arya
 
     Object::~Object()
     {
+        if(animState) delete animState;
     }
 
     const mat4& Object::getMoveMatrix()

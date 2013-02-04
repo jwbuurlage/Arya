@@ -37,6 +37,7 @@ namespace Arya
             AnimationState* getAnimationState() const { return animState; }
             void updateAnimation(float elapsedTime);
 
+            //Scene will delete the object on next frame update
             void setObsolete() { obsolete = true; }
             bool isObsolete() { return obsolete; }
 
