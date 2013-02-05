@@ -7,11 +7,11 @@
 #include <fstream>
 
 //Note: the ; at the end is left out so that you can use this as a function with a ; at the end:  LOG_WARNING("Hello");
-#define GAME_LOG_WARNING(MSG)		GameLoggerInstance << GameLogger::L_WARNING	<< MSG << Arya::endLog
-#define GAME_LOG_ERROR(MSG)			GameLoggerInstance << GameLogger::L_ERROR		<< MSG << Arya::endLog
-#define GAME_LOG_CRITICALERROR(MSG)	GameLoggerInstance << GameLogger::L_CRITICALERROR	<< MSG << Arya::endLog
-#define GAME_LOG_INFO(MSG)			GameLoggerInstance << GameLogger::L_INFO		<< MSG << Arya::endLog
-#define GAME_LOG_DEBUG(MSG)			GameLoggerInstance << GameLogger::L_DEBUG		<< MSG << Arya::endLog
+#define GAME_LOG_WARNING(MSG)		*GameLoggerInstance << GameLogger::L_WARNING	<< MSG << endLog
+#define GAME_LOG_ERROR(MSG)			*GameLoggerInstance << GameLogger::L_ERROR		<< MSG << endLog
+#define GAME_LOG_CRITICALERROR(MSG)	*GameLoggerInstance << GameLogger::L_CRITICALERROR	<< MSG << endLog
+#define GAME_LOG_INFO(MSG)			*GameLoggerInstance << GameLogger::L_INFO		<< MSG << endLog
+#define GAME_LOG_DEBUG(MSG)			*GameLoggerInstance << GameLogger::L_DEBUG		<< MSG << endLog
 
 class GameLogger
 {
@@ -102,4 +102,4 @@ inline GameLogger& operator<<(GameLogger& logger, const T& t){
     return logger;
 }
 
-extern GameLogger GameLoggerInstance;
+extern GameLogger* GameLoggerInstance;

@@ -220,6 +220,7 @@ void GameSession::handleEvent(Packet& packet)
                     }
 
                     faction->deserialize(packet);
+                    faction->setClientId(clientId);
 
                     if(clientId == Game::shared().getClientId())
                         localFaction = faction;
@@ -260,8 +261,9 @@ void GameSession::handleEvent(Packet& packet)
                 int factionId;
                 packet >> factionId;
 
-                Faction* faction = createFaction(factionId);
+                Faction* faction = createFaction(clientId);
                 faction->deserialize(packet);
+                faction->setClientId(clientId);
                 factions.push_back(faction);
 
                 if(clientId == Game::shared().getClientId())
@@ -298,10 +300,12 @@ void GameSession::handleEvent(Packet& packet)
             {
                 int id;
                 packet >> id;
+                GAME_LOG_INFO("Client " << id << " disconnected.");
                 for(vector<Faction*>::iterator iter = factions.begin(); iter != factions.end(); ++iter)
                 {
                     if( (*iter)->getClientId() == id )
                     {
+                        GAME_LOG_INFO("Client " << id << " removed from game session. Removing faction...");
                         delete *iter;
                         iter = factions.erase(iter);
                         break;
