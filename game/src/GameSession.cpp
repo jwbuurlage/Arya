@@ -225,21 +225,41 @@ void GameSession::handleEvent(Packet& packet)
                     if(clientId == Game::shared().getClientId())
                         localFaction = faction;
 
+					//If any of the units that we have was NOT sent in this list they must be deleted
+					//So we keep a list of IDs that we have and check which ones are in the packet
+					//This method might be a bit slow but this process only happens in rare situations
+					//so we do not bother adding extra member variables to the unit class to accomplish this
+					vector<int> allIDs;
+					for(list<Unit*>::iterator it = factions[i]->getUnits().begin(); it != factions[i]->getUnits().end(); ++it)
+						allIDs.push_back((*it)->getId());
+
                     int unitCount;
                     packet >> unitCount;
                     for(int i = 0; i < unitCount; ++i)
                     {
                         int id;
                         packet >> id;
-                        Unit* unit = createUnit(id, 0);
+
+						for(vector<int>::iterator iter = allIDs.begin(); iter != allIDs.end(); ++iter)
+							if( *iter == id ){ allIDs.erase(iter); break; }
+
+						Unit* unit = getUnitById(id);
+						bool newUnit = false;
+						if(!unit)
+						{
+							newUnit = true;
+							unit = createUnit(id, 0);
+						}
                         unit->deserialize(packet);
 
-                        Object* obj = Root::shared().getScene()->createObject();
-                        string s(infoForUnitType[unit->getType()].name);
-                        obj->setModel(ModelManager::shared().getModel(s + ".aryamodel"));
-                        obj->setAnimation("stand");
+						Object* obj = unit->getObject();
+						if(!obj) obj = Root::shared().getScene()->createObject();
 
-                        unit->setObject(obj);
+						string s(infoForUnitType[unit->getType()].name);
+						obj->setModel(ModelManager::shared().getModel(s + ".aryamodel"));
+						obj->setAnimation("stand");
+
+						unit->setObject(obj);
 
                         float heightModel = map->heightAtGroundPosition(unit->getPosition().x, unit->getPosition().z);
 
@@ -247,8 +267,17 @@ void GameSession::handleEvent(Packet& packet)
                                     heightModel,
                                     unit->getPosition().z));
 
-                        faction->addUnit(unit);
+                        if(newUnit) faction->addUnit(unit);
                     }
+
+					//now allIDs contains a list of units that were not in the packet so they must be deleted
+					//note that we can not just delete them because of reference counts and so on.
+					//we make them obsolte so that they are deleted next frame
+					for(vector<int>::iterator iter = allIDs.begin(); iter != allIDs.end(); ++iter)
+					{
+						Unit* unit = getUnitById(*iter); //if unit == 0 then there are some serious issues
+						if(unit) unit->makeObsolete();
+					}
                 }
             }
             break;

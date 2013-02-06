@@ -118,9 +118,9 @@ void Server::update()
     timer.update();
     timerDiff += timer - oldTime;
 
-    while(timerDiff >= 100)
+    while(timerDiff >= 100000) //100 ms
     {
-        timerDiff -= 100;
+        timerDiff -= 100000;
         for(sessionIterator iter = sessionList.begin(); iter != sessionList.end(); ++iter)
         {
             iter->second->update((float)(100.0f/1000.0f));

@@ -28,6 +28,8 @@ class ServerGameSession : public UnitFactory, public FactionFactory
         void addClient(ServerClient* client);
         void removeClient(ServerClient* client);
 
+		Packet* createFullStatePacket();
+
         void handlePacket(ServerClient* client, Packet& packet);
 
         int getNewId() { return idFactory++; }

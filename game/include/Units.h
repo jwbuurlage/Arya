@@ -85,6 +85,7 @@ class Unit
         float getHealthRatio() const { return health / infoForUnitType[type].maxHealth; }
 
         bool isAlive() const { return (health > 0); }
+		void makeObsolete(){ health = 0; dyingTime = 1.0f; }
         bool obsolete() { return !isAlive() && (dyingTime > 0.8f); }
         bool readyToDelete() { return refCount <= 0; }
 

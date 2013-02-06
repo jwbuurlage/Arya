@@ -231,6 +231,8 @@ void Unit::serverUpdate(float timeElapsed, Map* map, ServerGameSession* serverSe
             if(unitState != UNIT_ATTACKING)
                 setUnitState(UNIT_ATTACKING);
 
+			GAME_LOG_INFO("Unit " << id << " is attacking and stuff...");
+
             if(timeSinceLastAttack > infoForUnitType[type].attackSpeed)
             {
                 // make one attack
@@ -242,13 +244,15 @@ void Unit::serverUpdate(float timeElapsed, Map* map, ServerGameSession* serverSe
 					*pak << targetUnit->id;
 					serverSession->sendToAllClients(pak);
 
+					GAME_LOG_INFO("Sending death packet!");
+
                     targetUnit->release();
                     targetUnit = 0;
                     setUnitState(UNIT_IDLE);
                     timeSinceLastAttack = infoForUnitType[type].attackSpeed + 1.0f;
                     return;
                 }
-                timeSinceLastAttack = 0.0f;
+                timeSinceLastAttack -= infoForUnitType[type].attackSpeed;
             }
             else
                 timeSinceLastAttack += timeElapsed;
@@ -386,19 +390,22 @@ void Unit::setTintColor(vec3 tC)
 
 void Unit::serialize(Packet& pk)
 {
-    //id is written by caller
-    //pk << id;
+    pk << type;
     pk << factionId;
     pk << position;
-    pk << type;
+	pk << (int)unitState;
+	pk << targetPosition;
+	pk << (targetUnit ? targetUnit->getId() : 0);
 }
 
 void Unit::deserialize(Packet& pk)
 {
-    //id is read by unit creator to supply it
-    //to the constructor
-    //pk >> id;
+    pk >> type;
     pk >> factionId;
     pk >> position;
-    pk >> type;
+	pk >> (int&)unitState;
+	pk >> targetPosition;
+	int targetUnitId;
+	pk >> targetUnitId;
+	if(targetUnitId) targetUnit = unitFactory->getUnitById(targetUnitId);
 }
