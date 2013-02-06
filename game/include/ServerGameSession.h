@@ -36,6 +36,7 @@ class ServerGameSession : public UnitFactory, public FactionFactory
 
         unsigned int getClientCount() const { return clientList.size(); }
 
+		Packet* createPacket(int id);
         void sendToAllClients(Packet* pak);
 
         bool gameReadyToLoad() const;

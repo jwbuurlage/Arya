@@ -97,6 +97,11 @@ void ServerGameSession::removeClient(ServerClient* client)
     }
 }
 
+Packet* ServerGameSession::createPacket(int id)
+{
+	return server->createPacket(id);
+}
+
 void ServerGameSession::sendToAllClients(Packet* pak)
 {
     if(clientList.empty())
@@ -228,7 +233,6 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
                     if(!validUnits.empty())
                     {
                         Packet* outPak = server->createPacket(EVENT_MOVE_UNIT);
-                        *outPak << faction->getId();
 
                         *outPak << (int)validUnits.size();
                         for(unsigned int i = 0; i < validUnits.size(); ++i)
@@ -266,7 +270,6 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
                     if(!validUnits.empty())
                     {
                         Packet* outPak = server->createPacket(EVENT_ATTACK_MOVE_UNIT);
-                        *outPak << faction->getId();
 
                         *outPak << (int)validUnits.size();
                         for(unsigned int i = 0; i < validUnits.size(); ++i)

@@ -1,6 +1,8 @@
 #include "../include/common/GameLogger.h"
 #include "../include/Units.h"
 #include "../include/Packet.h"
+#include "../include/EventCodes.h"
+#include "../include/ServerGameSession.h"
 #include <math.h>
 
 #ifdef _WIN32
@@ -137,6 +139,109 @@ void Unit::update(float timeElapsed, Map* map)
                 targetUnit->receiveDamage(infoForUnitType[type].damage, this);
                 if(!(targetUnit->isAlive()))
                 {
+                    targetUnit->release();
+                    targetUnit = 0;
+                    setUnitState(UNIT_IDLE);
+                    timeSinceLastAttack = infoForUnitType[type].attackSpeed + 1.0f;
+                    return;
+                }
+                timeSinceLastAttack = 0.0f;
+            }
+            else
+                timeSinceLastAttack += timeElapsed;
+        }
+        else {
+            if(unitState != UNIT_ATTACKING_OUT_OF_RANGE)
+                setUnitState(UNIT_ATTACKING_OUT_OF_RANGE);
+            targetPosition = vec2(targetUnit->getPosition().x,
+                            targetUnit->getPosition().z);
+        }
+    }
+
+    if(!map) return;
+
+    float targeth;
+    targeth = map->heightAtGroundPosition(targetPosition.x, targetPosition.y);
+    vec3 target(targetPosition.x, targeth, targetPosition.y);
+    vec3 diff = target - getPosition();
+
+    if(glm::length(diff) < 2.0) // arbitrary closeness...
+    {
+        setPosition(target);
+        targetPosition = vec2(0.0);
+        setUnitState(UNIT_IDLE);
+        return;
+    }
+
+    float newYaw = (180.0f/M_PI)*atan2(-diff.x, -diff.z);
+    float oldYaw = getYaw();
+    float yawDiff = newYaw - oldYaw;
+
+    if(yawDiff > 180.0f) yawDiff -= 360.0f;
+    else if(yawDiff < -180.0f) yawDiff += 360.0f;
+
+    float deltaYaw = timeElapsed * infoForUnitType[type].yawSpeed + 1.0f;
+    if((yawDiff >= 0 && yawDiff < deltaYaw) || (yawDiff <= 0 && yawDiff > -deltaYaw))
+    {
+        //angle is small enough (less than 1 degree) so we can start walking now
+        setYaw(newYaw);
+        if(unitState == UNIT_ATTACKING)
+            return;
+
+        diff = glm::normalize(diff);
+        vec3 newPosition = getPosition() + timeElapsed * (infoForUnitType[type].speed * diff);
+        newPosition.y = map->heightAtGroundPosition(newPosition.x, newPosition.z);
+        setPosition(newPosition);
+    }
+    else
+    {
+        //Rotate
+        if(yawDiff < 0) deltaYaw = -deltaYaw;
+        setYaw( oldYaw + deltaYaw );
+    }
+
+}
+
+void Unit::serverUpdate(float timeElapsed, Map* map, ServerGameSession* serverSession)
+{
+    if(unitState == UNIT_IDLE)
+        return;
+
+    if(unitState == UNIT_ATTACKING || 
+            unitState == UNIT_ATTACKING_OUT_OF_RANGE)
+    {
+        if(!targetUnit) {
+            GAME_LOG_WARNING("Unit (" << id << ") is attacking, but no target unit");
+            setUnitState(UNIT_IDLE);
+            return;
+        }
+
+        if(!(targetUnit->isAlive()) || targetUnit->obsolete())
+        {
+            targetUnit->release();
+            targetUnit = 0;
+            setUnitState(UNIT_IDLE);
+            return;
+        }
+
+		//Unit is alive here
+
+        if(glm::distance(getPosition(), targetUnit->getPosition())
+                < infoForUnitType[targetUnit->getType()].radius + infoForUnitType[type].attackRadius) {
+            if(unitState != UNIT_ATTACKING)
+                setUnitState(UNIT_ATTACKING);
+
+            if(timeSinceLastAttack > infoForUnitType[type].attackSpeed)
+            {
+                // make one attack
+                targetUnit->receiveDamage(infoForUnitType[type].damage, this);
+                if(!(targetUnit->isAlive()))
+                {
+					//Unit died because of this attack. Send death packet
+					Packet* pak = serverSession->createPacket(EVENT_UNIT_DIED);
+					*pak << targetUnit->id;
+					serverSession->sendToAllClients(pak);
+
                     targetUnit->release();
                     targetUnit = 0;
                     setUnitState(UNIT_IDLE);

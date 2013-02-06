@@ -315,11 +315,6 @@ void GameSession::handleEvent(Packet& packet)
             break;
 
         case EVENT_MOVE_UNIT: {
-            int facId;
-            packet >> facId;
-
-            Faction* faction = getFactionById(facId);
-
             int numUnits;
             packet >> numUnits;
 
@@ -336,11 +331,6 @@ void GameSession::handleEvent(Packet& packet)
         }
 
         case EVENT_ATTACK_MOVE_UNIT: {
-            int facId;
-            packet >> facId;
-
-            Faction* faction = getFactionById(facId);
-
             int numUnits;
             packet >> numUnits;
 
