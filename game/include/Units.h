@@ -57,6 +57,7 @@ class Unit
 
         void setPosition(const vec3& pos) { position = pos; if(object) object->setPosition(pos); }
         vec3 getPosition() const { return position; }
+		vec2 getPosition2() const { return vec2(position.x, position.z); }
 
         void setYaw(float y){ yaw = y; if(object) object->setYaw(y); }
         float getYaw() const { return yaw; }
@@ -85,7 +86,8 @@ class Unit
         float getHealthRatio() const { return health / infoForUnitType[type].maxHealth; }
 
         bool isAlive() const { return (health > 0); }
-		void makeObsolete(){ health = 0; dyingTime = 1.0f; }
+		void makeDead(){ health = 0; setUnitState(UNIT_DYING); dyingTime = 0.0f; }; //will show death animation and then delete unit
+		void makeObsolete(){ health = 0; dyingTime = 1.0f; } //will delete unit immediately (on next frame when refcount reaches zero)
         bool obsolete() { return !isAlive() && (dyingTime > 0.8f); }
         bool readyToDelete() { return refCount <= 0; }
 

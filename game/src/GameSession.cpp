@@ -51,6 +51,7 @@ bool GameSession::init()
     Game::shared().getEventManager()->addEventHandler(EVENT_GAME_FULLSTATE, this);
     Game::shared().getEventManager()->addEventHandler(EVENT_MOVE_UNIT, this);
     Game::shared().getEventManager()->addEventHandler(EVENT_ATTACK_MOVE_UNIT, this);
+    Game::shared().getEventManager()->addEventHandler(EVENT_UNIT_DIED, this);
 
     input = new GameSessionInput(this);
     input->init();
@@ -359,20 +360,30 @@ void GameSession::handleEvent(Packet& packet)
             break;
         }
 
-        case EVENT_ATTACK_MOVE_UNIT: {
-            int numUnits;
-            packet >> numUnits;
+        case EVENT_ATTACK_MOVE_UNIT:
+		{
+			int numUnits;
+			packet >> numUnits;
 
-            int unitId, targetUnitId;
-            for(int i = 0; i < numUnits; ++i) {
-                packet >> unitId >> targetUnitId;
-                Unit* unit = getUnitById(unitId);
-                Unit* targetUnit = getUnitById(targetUnitId);
-                if(unit && targetUnit) unit->setTargetUnit(targetUnit);
-            }
+			int unitId, targetUnitId;
+			for(int i = 0; i < numUnits; ++i) {
+				packet >> unitId >> targetUnitId;
+				Unit* unit = getUnitById(unitId);
+				Unit* targetUnit = getUnitById(targetUnitId);
+				if(unit && targetUnit) unit->setTargetUnit(targetUnit);
+			}
 
-            break;
-         }
+			break;
+		}
+
+		case EVENT_UNIT_DIED:
+		{
+			int id;
+			packet >> id;
+			Unit* unit = getUnitById(id);
+			if(unit) unit->makeDead();
+		}
+		break;
 
         default:
             GAME_LOG_INFO("GameSession: unknown event received! (" << id << ")");

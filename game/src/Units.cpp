@@ -128,7 +128,7 @@ void Unit::update(float timeElapsed, Map* map)
             return;
         }
 
-        if(glm::distance(getPosition(), targetUnit->getPosition())
+        if(glm::distance(getPosition2(), targetUnit->getPosition2())
                 < infoForUnitType[targetUnit->getType()].radius + infoForUnitType[type].attackRadius) {
             if(unitState != UNIT_ATTACKING)
                 setUnitState(UNIT_ATTACKING);
@@ -226,12 +226,10 @@ void Unit::serverUpdate(float timeElapsed, Map* map, ServerGameSession* serverSe
 
 		//Unit is alive here
 
-        if(glm::distance(getPosition(), targetUnit->getPosition())
+        if(glm::distance(getPosition2(), targetUnit->getPosition2())
                 < infoForUnitType[targetUnit->getType()].radius + infoForUnitType[type].attackRadius) {
             if(unitState != UNIT_ATTACKING)
                 setUnitState(UNIT_ATTACKING);
-
-			GAME_LOG_INFO("Unit " << id << " is attacking and stuff...");
 
             if(timeSinceLastAttack > infoForUnitType[type].attackSpeed)
             {
@@ -239,15 +237,16 @@ void Unit::serverUpdate(float timeElapsed, Map* map, ServerGameSession* serverSe
                 targetUnit->receiveDamage(infoForUnitType[type].damage, this);
                 if(!(targetUnit->isAlive()))
                 {
-					//Unit died because of this attack. Send death packet
+					//Note that the unit was alive before this damage so this must have killed it
+					//Therefore we can send the death packet here
 					Packet* pak = serverSession->createPacket(EVENT_UNIT_DIED);
 					*pak << targetUnit->id;
 					serverSession->sendToAllClients(pak);
-
-					GAME_LOG_INFO("Sending death packet!");
-
+					//Kill the unit
+					targetUnit->makeObsolete();
                     targetUnit->release();
                     targetUnit = 0;
+
                     setUnitState(UNIT_IDLE);
                     timeSinceLastAttack = infoForUnitType[type].attackSpeed + 1.0f;
                     return;
@@ -311,8 +310,8 @@ void Unit::serverUpdate(float timeElapsed, Map* map, ServerGameSession* serverSe
 
 void Unit::setUnitState(UnitState state)
 {
-    if(unitState == UNIT_DYING)
-        return;
+    //if(unitState == UNIT_DYING)
+    //    return;
 
     unitState = state;
 
