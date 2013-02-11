@@ -1,4 +1,4 @@
-#version 400
+#version 140
 
 uniform mat4 vpMatrix;
 uniform mat4 scaleMatrix;

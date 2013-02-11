@@ -2,6 +2,7 @@
 #include "Root.h"
 #include "Overlay.h"
 #include "Fonts.h"
+#include "Config.h"
 #include "common/Logger.h"
 #include <sstream>
 
@@ -95,6 +96,7 @@ namespace Arya
             parser << splitLineParameters(command);
             parser >> float1 >> float2 >> float3;
             changeConsoleColor(float1, float2, float3);
+            Config::shared().editConfigFile(command);
         }
         if(splitLineCommand(command) == "hide")
         {

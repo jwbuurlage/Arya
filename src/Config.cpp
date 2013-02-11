@@ -3,6 +3,7 @@
 #include "Config.h"
 #include "Console.h"
 using std::stringstream;
+using std::fstream;
 namespace Arya
 {
     template<> Config* Singleton<Config>::singleton = 0;
@@ -43,5 +44,44 @@ namespace Arya
             Console::shared().onCommand(regel);
         }
         return true;
+    }
+
+    void Config::editConfigFile(string edit)
+    {
+        bool flag = false;
+        std::ofstream outputFile((FileSystem::shared().getApplicationPath() + "config.txt").c_str());
+        if(!outputFile.is_open()) 
+        {
+            LOG_WARNING("Could not open output config file!");
+            return;
+        }
+        string editCommand = edit.substr(0, edit.find_first_of(" "));
+        std::stringstream fileStream(configFile->getData());
+        string regel;
+        while(true)
+        {
+            getline(fileStream,regel);
+            if(!fileStream.good()) break;
+            if(regel.empty())
+            {
+                outputFile << regel;
+                continue;
+            }
+            else
+            {
+                string regelCommand = regel.substr(0, edit.find_first_of(" "));
+                if(regelCommand == editCommand)
+                {
+                    outputFile << edit;
+                    flag = true;
+                }
+                else
+                {
+                    outputFile << regel;
+                }
+            }
+        }
+        if(flag == false) outputFile << edit;
+        outputFile.close();
     }
 }

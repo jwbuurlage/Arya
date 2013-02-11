@@ -12,6 +12,7 @@ namespace Arya
 
             bool init();
             void cleanup();
+            void editConfigFile(string edit);
 
         private:
             bool loadConfigFile(string configFileName);
