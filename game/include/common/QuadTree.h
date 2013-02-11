@@ -1,19 +1,21 @@
+#pragma once
+
 #include <glm/glm.hpp>
 #include <vector>
 
 using std::vector;
 using glm::vec2;
 
-struct Point
+struct TreePoint
 {
-    Point(int _i, int _p)
+    TreePoint(int _i, vec2 _p)
     {
         id = _i;
         pos = _p;
     }
 
     int id;
-    int pos;
+    vec2 pos;
 };
 
 struct QuadTree 
@@ -29,10 +31,10 @@ struct QuadTree
         // make children and grid
         if(level != maxLevel)
         {
-            children[0] = new QuadTree();
-            children[1] = new QuadTree();
-            children[2] = new QuadTree();
-            children[3] = new QuadTree();
+            children[0] = new QuadTree(level + 1, maxLevel, vec2(position.x - 0.25f*size.x, position.y - 0.25f*size.y), 0.5f*size);
+            children[1] = new QuadTree(level + 1, maxLevel, vec2(position.x - 0.25f*size.x, position.y + 0.25f*size.y), 0.5f*size);
+            children[2] = new QuadTree(level + 1, maxLevel, vec2(position.x + 0.25f*size.x, position.y - 0.25f*size.y), 0.5f*size);
+            children[3] = new QuadTree(level + 1, maxLevel, vec2(position.x + 0.25f*size.x, position.y + 0.25f*size.y), 0.5f*size);
         }
     }
 
@@ -65,33 +67,60 @@ struct QuadTree
     void insert(int id, vec2 insertPosition)
     {
         if(level == maxLevel)
-            refs.push_back(Point(id, insertPosition));
+            refs.push_back(TreePoint(id, insertPosition));
         else
         {
             if((insertPosition.x <= position.x) && (insertPosition.y <= position.y))
-                children[0].insert(id, insertPosition);
+                children[0]->insert(id, insertPosition);
             else if((insertPosition.x <= position.x) && (insertPosition.y >= position.y))
-                children[1].insert(id, insertPosition);
+                children[1]->insert(id, insertPosition);
             else if((insertPosition.x >= position.x) && (insertPosition.y <= position.y))
-                children[2].insert(id, insertPosition);
+                children[2]->insert(id, insertPosition);
             else if((insertPosition.x >= position.x) && (insertPosition.y >= position.y))
-                children[3].insert(id, insertPosition);
+                children[3]->insert(id, insertPosition);
         }
     }
 
     void clear()
     {
-        // clear all levels
+        if(level == maxLevel)
+            refs.clear();
+        else
+            for(int i = 0; i < 4; ++i)
+                children[i]->clear();
     }
 
-    int closestId(vec2 position)
+    int closestId(vec2 insertPosition)
     {
-        return 1;
+        if(level == maxLevel)
+        {
+            int currentClosestId;
+            float currentClosestDistance = 100000.0f;
+            for(int i = 0; i < refs.size(); ++i)
+            {
+                if(glm::distance(position, refs[i].pos) < currentClosestDistance)
+                {
+                    currentClosestDistance = glm::distance(position, refs[i].pos);
+                    currentClosestId = refs[i].id;
+                }
+            }
+        }
+        else
+        {
+            if((insertPosition.x <= position.x) && (insertPosition.y <= position.y))
+                return children[0]->closestId(position);
+            else if((insertPosition.x <= position.x) && (insertPosition.y >= position.y))
+                return children[1]->closestId(position);
+            else if((insertPosition.x >= position.x) && (insertPosition.y <= position.y))
+                return children[2]->closestId(position);
+            else if((insertPosition.x >= position.x) && (insertPosition.y >= position.y))
+                return children[3]->closestId(position);
+        }
     }
 
     // This vector can be used to store
     // for example Unit ids
-    vector<Point> refs;
+    vector<TreePoint> refs;
 
     // This can be used to store for example
     // whether a quad is invisible
@@ -101,6 +130,6 @@ struct QuadTree
         flag = _flag;
         if(level != maxLevel)
             for(int i = 0; i < 4; ++i)
-                children[i].setFlag(_flag);
+                children[i]->setFlag(_flag);
     }
 };

@@ -104,7 +104,10 @@ void Unit::checkForEnemies(QuadTree* qt)
     if(unitState != UNIT_IDLE)
         return;
 
-    qt->closestId(this->getGroundPosition());
+    // shoot the damn guy
+    Unit* closestUnit = unitFactory->getUnitById(qt->closestId(getPosition2()));
+    if(glm::distance(getPosition(), closestUnit->getPosition()) < infoForUnitType[type].attackRadius)
+        setTargetUnit(closestUnit);
 }
 
 void Unit::update(float timeElapsed, Map* map)
@@ -314,7 +317,6 @@ void Unit::serverUpdate(float timeElapsed, Map* map, ServerGameSession* serverSe
         if(yawDiff < 0) deltaYaw = -deltaYaw;
         setYaw( oldYaw + deltaYaw );
     }
-
 }
 
 void Unit::setUnitState(UnitState state)
