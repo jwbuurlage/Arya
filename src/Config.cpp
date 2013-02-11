@@ -64,7 +64,7 @@ namespace Arya
             if(!fileStream.good()) break;
             if(regel.empty())
             {
-                outputFile << regel;
+                outputFile << regel << std::endl;
                 continue;
             }
             else
@@ -72,16 +72,16 @@ namespace Arya
                 string regelCommand = regel.substr(0, edit.find_first_of(" "));
                 if(regelCommand == editCommand)
                 {
-                    outputFile << edit;
+                    outputFile << edit << std::endl;
                     flag = true;
                 }
                 else
                 {
-                    outputFile << regel;
+                    outputFile << regel << std::endl;
                 }
             }
         }
-        if(flag == false) outputFile << edit;
+        if(flag == false) outputFile << edit << std::endl;
         outputFile.close();
     }
 }
