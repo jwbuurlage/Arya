@@ -66,12 +66,10 @@ vec3 Faction::getColor()
 
 void Faction::serialize(Packet& pk)
 {
-    //pk << id; //written by caller
     pk << color;
 }
 
 void Faction::deserialize(Packet& pk)
 {
-    //pk >> id; //read by caller
     pk >> color;
 }

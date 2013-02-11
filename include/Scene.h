@@ -25,7 +25,7 @@ namespace Arya
     {
         public:
             Scene();
-            ~Scene();
+            virtual ~Scene();
 
             bool isInitialized() const { return initialized; }
 

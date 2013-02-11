@@ -51,6 +51,7 @@ bool GameSession::init()
     Game::shared().getEventManager()->addEventHandler(EVENT_GAME_FULLSTATE, this);
     Game::shared().getEventManager()->addEventHandler(EVENT_MOVE_UNIT, this);
     Game::shared().getEventManager()->addEventHandler(EVENT_ATTACK_MOVE_UNIT, this);
+    Game::shared().getEventManager()->addEventHandler(EVENT_UNIT_DIED, this);
 
     input = new GameSessionInput(this);
     input->init();
@@ -220,9 +221,18 @@ void GameSession::handleEvent(Packet& packet)
                     }
 
                     faction->deserialize(packet);
+                    faction->setClientId(clientId);
 
                     if(clientId == Game::shared().getClientId())
                         localFaction = faction;
+
+					//If any of the units that we have was NOT sent in this list they must be deleted
+					//So we keep a list of IDs that we have and check which ones are in the packet
+					//This method might be a bit slow but this process only happens in rare situations
+					//so we do not bother adding extra member variables to the unit class to accomplish this
+					vector<int> allIDs;
+					for(list<Unit*>::iterator it = factions[i]->getUnits().begin(); it != factions[i]->getUnits().end(); ++it)
+						allIDs.push_back((*it)->getId());
 
                     int unitCount;
                     packet >> unitCount;
@@ -230,15 +240,27 @@ void GameSession::handleEvent(Packet& packet)
                     {
                         int id;
                         packet >> id;
-                        Unit* unit = createUnit(id, 0);
+
+						for(vector<int>::iterator iter = allIDs.begin(); iter != allIDs.end(); ++iter)
+							if( *iter == id ){ allIDs.erase(iter); break; }
+
+						Unit* unit = getUnitById(id);
+						bool newUnit = false;
+						if(!unit)
+						{
+							newUnit = true;
+							unit = createUnit(id, 0);
+						}
                         unit->deserialize(packet);
 
-                        Object* obj = Root::shared().getScene()->createObject();
-                        string s(infoForUnitType[unit->getType()].name);
-                        obj->setModel(ModelManager::shared().getModel(s + ".aryamodel"));
-                        obj->setAnimation("stand");
+						Object* obj = unit->getObject();
+						if(!obj) obj = Root::shared().getScene()->createObject();
 
-                        unit->setObject(obj);
+						string s(infoForUnitType[unit->getType()].name);
+						obj->setModel(ModelManager::shared().getModel(s + ".aryamodel"));
+						obj->setAnimation("stand");
+
+						unit->setObject(obj);
 
                         float heightModel = map->heightAtGroundPosition(unit->getPosition().x, unit->getPosition().z);
 
@@ -246,8 +268,17 @@ void GameSession::handleEvent(Packet& packet)
                                     heightModel,
                                     unit->getPosition().z));
 
-                        faction->addUnit(unit);
+                        if(newUnit) faction->addUnit(unit);
                     }
+
+					//now allIDs contains a list of units that were not in the packet so they must be deleted
+					//note that we can not just delete them because of reference counts and so on.
+					//we make them obsolte so that they are deleted next frame
+					for(vector<int>::iterator iter = allIDs.begin(); iter != allIDs.end(); ++iter)
+					{
+						Unit* unit = getUnitById(*iter); //if unit == 0 then there are some serious issues
+						if(unit) unit->makeObsolete();
+					}
                 }
             }
             break;
@@ -260,8 +291,9 @@ void GameSession::handleEvent(Packet& packet)
                 int factionId;
                 packet >> factionId;
 
-                Faction* faction = createFaction(factionId);
+                Faction* faction = createFaction(clientId);
                 faction->deserialize(packet);
+                faction->setClientId(clientId);
                 factions.push_back(faction);
 
                 if(clientId == Game::shared().getClientId())
@@ -298,10 +330,12 @@ void GameSession::handleEvent(Packet& packet)
             {
                 int id;
                 packet >> id;
+                GAME_LOG_INFO("Client " << id << " disconnected.");
                 for(vector<Faction*>::iterator iter = factions.begin(); iter != factions.end(); ++iter)
                 {
                     if( (*iter)->getClientId() == id )
                     {
+                        GAME_LOG_INFO("Client " << id << " removed from game session. Removing faction...");
                         delete *iter;
                         iter = factions.erase(iter);
                         break;
@@ -311,11 +345,6 @@ void GameSession::handleEvent(Packet& packet)
             break;
 
         case EVENT_MOVE_UNIT: {
-            int facId;
-            packet >> facId;
-
-            Faction* faction = getFactionById(facId);
-
             int numUnits;
             packet >> numUnits;
 
@@ -331,25 +360,30 @@ void GameSession::handleEvent(Packet& packet)
             break;
         }
 
-        case EVENT_ATTACK_MOVE_UNIT: {
-            int facId;
-            packet >> facId;
+        case EVENT_ATTACK_MOVE_UNIT:
+		{
+			int numUnits;
+			packet >> numUnits;
 
-            Faction* faction = getFactionById(facId);
+			int unitId, targetUnitId;
+			for(int i = 0; i < numUnits; ++i) {
+				packet >> unitId >> targetUnitId;
+				Unit* unit = getUnitById(unitId);
+				Unit* targetUnit = getUnitById(targetUnitId);
+				if(unit && targetUnit) unit->setTargetUnit(targetUnit);
+			}
 
-            int numUnits;
-            packet >> numUnits;
+			break;
+		}
 
-            int unitId, targetUnitId;
-            for(int i = 0; i < numUnits; ++i) {
-                packet >> unitId >> targetUnitId;
-                Unit* unit = getUnitById(unitId);
-                Unit* targetUnit = getUnitById(targetUnitId);
-                if(unit && targetUnit) unit->setTargetUnit(targetUnit);
-            }
-
-            break;
-         }
+		case EVENT_UNIT_DIED:
+		{
+			int id;
+			packet >> id;
+			Unit* unit = getUnitById(id);
+			if(unit) unit->makeDead();
+		}
+		break;
 
         default:
             GAME_LOG_INFO("GameSession: unknown event received! (" << id << ")");

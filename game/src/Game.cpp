@@ -43,9 +43,9 @@ void Game::run()
         if(network) delete network;
         network = new Network;
 
-        network->connectToSessionServer("94.210.208.103", 13337);
+        //network->connectToSessionServer("balubu.com", 13337);
         //network->startServer();
-        //network->connectToSessionServer("localhost", 13337);
+        network->connectToSessionServer("localhost", 13337);
 
         if(eventManager) delete eventManager;
         eventManager = new EventManager(network);
@@ -87,6 +87,14 @@ bool Game::keyDown(int key, bool keyDown)
                 session = 0;
             }
             break;
+
+		case '8':
+			if(keyDown)
+			{
+				Event& ev = getEventManager()->createEvent(EVENT_GAME_FULLSTATE_REQUEST);
+				ev.send();
+			}
+			break;
 
         case 'O': glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
         case 'I': glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;

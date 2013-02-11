@@ -79,8 +79,8 @@ void Server::prepareServer()
     //Only a single reactor can run at a single moment
     reactor = new ServerReactor(this);
 
-    //20 ms frametime
-    reactor->setTimeout(20);
+    //50 ms frametime
+    reactor->setTimeout(50);
 
     //Create the server socket
     IPAddress any_address;
@@ -118,14 +118,17 @@ void Server::update()
     timer.update();
     timerDiff += timer - oldTime;
 
-    while(timerDiff >= 50)
+    while(timerDiff >= 100000) //100 ms
     {
-        timerDiff -= 50;
+        timerDiff -= 100000;
         for(sessionIterator iter = sessionList.begin(); iter != sessionList.end(); ++iter)
         {
-            iter->second->update((float)(50.0f/1000.0f));
+            iter->second->update((float)(100.0f/1000.0f));
         }
     }
+
+    //save some cpu time
+    Poco::Thread::yield();
 }
 
 void Server::newClient(ServerClientHandler* clientHandler)

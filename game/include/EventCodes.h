@@ -20,6 +20,7 @@ typedef enum
     EVENT_CLIENT_ID,
 
     EVENT_GAME_READY,
+	EVENT_GAME_FULLSTATE_REQUEST,
     EVENT_GAME_FULLSTATE,
 
     // - clientID
@@ -39,7 +40,6 @@ typedef enum
     EVENT_MOVE_UNIT_REQUEST = 3000,
 
     //------------------------
-    // - Faction ID
     // - Number of units NUM
     //   - Unit ID
     //   - (vec2) position
@@ -54,10 +54,14 @@ typedef enum
     EVENT_ATTACK_MOVE_UNIT_REQUEST,
 
     //------------------------
-    // - Faction ID
     // - Targetunit ID
     // - Number of units
     // - Unit IDs
     //------------------------
-    EVENT_ATTACK_MOVE_UNIT
+    EVENT_ATTACK_MOVE_UNIT,
+
+	//------------------------
+	// - Unit ID
+	//------------------------
+	EVENT_UNIT_DIED
 } EventCode;

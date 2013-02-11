@@ -8,7 +8,7 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/NObserver.h"
 
-ServerClientHandler::ServerClientHandler(StreamSocket& _socket, SocketReactor& _reactor) : socket(_socket), reactor(_reactor), bufferSizeTotal(1024)
+ServerClientHandler::ServerClientHandler(StreamSocket& _socket, SocketReactor& _reactor) : socket(_socket), reactor(_reactor), bufferSizeTotal(4024)
 {
     //Note that 'server' is not yet set here due to the way Poco works
     //The call to server->newClient is done in the connection acceptor.
@@ -74,7 +74,7 @@ void ServerClientHandler::onReadable(const AutoPtr<ReadableNotification>& notifi
             int packetSize = *(int*)(dataBuffer + 4); //this is including the header
             if(packetSize > bufferSizeTotal)
             {
-                GAME_LOG_WARNING("Packet does not fit in buffer. Possible hack attempt. Removing client. Packet size = " << packetSize);
+                GAME_LOG_WARNING("Packet does not fit in buffer. Possible hack attempt. Removing client. Packet size = " << packetSize << ". Packet id = " << *(int*)(dataBuffer+8) );
                 terminate();
                 return;
             }
@@ -158,7 +158,7 @@ bool ServerClientHandler::trySendPacketData(Packet* packet, int& bytesSent)
 
     if(n<=0)
     {
-        GAME_LOG_INFO("Server closed connection when writing to socket");
+        GAME_LOG_INFO("Client closed connection when writing to socket");
         terminate();
         return true;
     }

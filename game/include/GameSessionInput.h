@@ -7,7 +7,7 @@ class GameSessionInput : public Arya::InputListener, public Arya::FrameListener
 {
     public:
         GameSessionInput(GameSession* ses);
-        ~GameSessionInput();
+        virtual ~GameSessionInput();
 
         void init();
 

@@ -28,6 +28,8 @@ class ServerGameSession : public UnitFactory, public FactionFactory
         void addClient(ServerClient* client);
         void removeClient(ServerClient* client);
 
+		Packet* createFullStatePacket();
+
         void handlePacket(ServerClient* client, Packet& packet);
 
         int getNewId() { return idFactory++; }
@@ -36,6 +38,7 @@ class ServerGameSession : public UnitFactory, public FactionFactory
 
         unsigned int getClientCount() const { return clientList.size(); }
 
+		Packet* createPacket(int id);
         void sendToAllClients(Packet* pak);
 
         bool gameReadyToLoad() const;

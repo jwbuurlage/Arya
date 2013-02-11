@@ -18,7 +18,7 @@ class Game : public Arya::InputListener , public Arya::FrameListener, public Eve
 {
     public:
         Game();
-        ~Game();
+        virtual ~Game();
 
         void run();
 
