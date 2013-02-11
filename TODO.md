@@ -12,6 +12,3 @@
 [ ] Collisions
 [ ] Pathfinding
 [ ] Map editor
-
-**Abe**
-[ ] Weather system

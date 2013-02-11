@@ -2,6 +2,7 @@
 
 #include "Arya.h"
 #include "UnitTypes.h"
+#include "common/QuadTree.h"
 
 #include <map>
 using std::map;
@@ -19,6 +20,13 @@ typedef enum
     UNIT_ATTACKING,
     UNIT_DYING
 } UnitState;
+
+typedef enum
+{
+    STANCE_AGGRESSIVE,
+    STANCE_DEFENSIVE,
+    STANCE_PASSIVE
+} UnitStance;
 
 class Packet;
 
@@ -70,6 +78,7 @@ class Unit
         bool isSelected() { return selected; }
 
         void update(float elapsedTime, Map* map);
+        void checkForEnemies(QuadTree* qt);
 
         vec2 getTargetPosition() const { return targetPosition; }
         void setTargetPosition(vec2 target);

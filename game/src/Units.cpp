@@ -1,6 +1,7 @@
 #include "../include/common/GameLogger.h"
 #include "../include/Units.h"
 #include "../include/Packet.h"
+#include "../include/Map.h"
 #include <math.h>
 
 #ifdef _WIN32
@@ -94,6 +95,14 @@ Unit::~Unit()
 void Unit::setObject(Object* obj)
 {
     object = obj;
+}
+
+void Unit::checkForEnemies(QuadTree* qt)
+{
+    if(unitState != UNIT_IDLE)
+        return;
+
+    qt->closestId(this->getGroundPosition());
 }
 
 void Unit::update(float timeElapsed, Map* map)

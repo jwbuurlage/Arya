@@ -4,6 +4,7 @@
 #include "Events.h"
 #include "Units.h"
 #include "Faction.h"
+#include "common/QuadTree.h"
 
 #include <vector>
 using std::vector;
@@ -44,6 +45,7 @@ class GameSession :
         void onRender();
 
         void handleEvent(Packet& packet);
+        QuadTree* unitTree;
 
      private:
         GameSessionInput* input;
