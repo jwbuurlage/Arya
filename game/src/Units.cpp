@@ -105,9 +105,13 @@ void Unit::checkForEnemies(QuadTree* qt)
         return;
 
     // shoot the damn guy
-    Unit* closestUnit = unitFactory->getUnitById(qt->closestId(getPosition2()));
-    if(glm::distance(getPosition(), closestUnit->getPosition()) < infoForUnitType[type].attackRadius)
-        setTargetUnit(closestUnit);
+    int cId = qt->closestId(getPosition2());
+    if(cId > 0)
+    {
+        Unit* closestUnit = unitFactory->getUnitById(cId);
+        if(glm::distance(getPosition(), closestUnit->getPosition()) < infoForUnitType[type].attackRadius)
+            setTargetUnit(closestUnit);
+    }
 }
 
 void Unit::update(float timeElapsed, Map* map)

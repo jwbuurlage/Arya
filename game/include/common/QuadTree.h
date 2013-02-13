@@ -94,7 +94,7 @@ struct QuadTree
     {
         if(level == maxLevel)
         {
-            int currentClosestId;
+            int currentClosestId = -1;
             float currentClosestDistance = 100000.0f;
             for(int i = 0; i < refs.size(); ++i)
             {
@@ -104,6 +104,7 @@ struct QuadTree
                     currentClosestId = refs[i].id;
                 }
             }
+            return currentClosestId;
         }
         else
         {
@@ -116,6 +117,7 @@ struct QuadTree
             else if((insertPosition.x >= position.x) && (insertPosition.y >= position.y))
                 return children[3]->closestId(position);
         }
+
     }
 
     // This vector can be used to store
