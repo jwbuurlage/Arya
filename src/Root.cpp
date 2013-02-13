@@ -10,6 +10,7 @@
 #include "Textures.h"
 #include "Scene.h"
 #include "Console.h"
+#include "Config.h"
 #include "Files.h"
 #include "Overlay.h"
 #include "Camera.h"
@@ -96,6 +97,14 @@ namespace Arya
         }
         addFrameListener(console);
         addInputListener(console);
+
+        Config* config = new Config;
+        if(!config->init())
+        {
+            LOG_INFO("Could not configure settings");
+            return false;
+        }
+
         LOG_INFO("Root initialized");
 
         return true;

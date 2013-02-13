@@ -44,8 +44,8 @@ void Game::run()
         network = new Network;
 
         network->connectToSessionServer("balubu.com", 13337);
-        // network->startServer();
-        // network->connectToSessionServer("localhost", 13337);
+        //network->startServer();
+        //network->connectToSessionServer("localhost", 13337);
 
         if(eventManager) delete eventManager;
         eventManager = new EventManager(network);
