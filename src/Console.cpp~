@@ -2,12 +2,7 @@
 #include "Root.h"
 #include "Overlay.h"
 #include "Fonts.h"
-#include "Config.h"
 #include "common/Logger.h"
-#include <sstream>
-
-using std::stringstream;
-
 namespace Arya
 {
     template<> Console* Singleton<Console>::singleton = 0;
@@ -16,11 +11,11 @@ namespace Arya
     {
         nrLines = 20;
         searchNrLines = 50;
-        heightKernel = 270.0;
         textWidthInPixels = 10;
         textHeightInPixels = 10.0;
         pixelsInBetween = 4.0;
         visibility = false;
+        activeLine = 0;
         nrCharOnLine = 0;
         font = 0;
         time = 0.0;
@@ -28,6 +23,7 @@ namespace Arya
         rShift = false;
         cLock = false;
         upCount = 0;
+        oneUpCount == false;
     };
 
     Console::~Console()
@@ -45,9 +41,9 @@ namespace Arya
         Rect* rect = new Rect; // here we initialize the frame for the console itself
         rects.push_back(rect);
         rect->offsetInPixels.x = 0.0;
-        rect->offsetInPixels.y = Root::shared().getWindowHeight() - heightKernel;
+        rect->offsetInPixels.y = Root::shared().getWindowHeight() - 270.0;
         rect->sizeInPixels.x = Root::shared().getWindowWidth() + 0.0;
-        rect->sizeInPixels.y = heightKernel; // height of kernel in pixels
+        rect->sizeInPixels.y = 270.0; // height of kernel in pixels
         rect->fillColor = vec4(0.0, 0.0, 0.0, 0.4);
         rect->isVisible = false;
         Root::shared().getOverlay()->addRect(rect);
@@ -79,46 +75,17 @@ namespace Arya
             rect->isVisible = false;
             Root::shared().getOverlay()->addRect(rect);
         }
-        addCommandListener("consoleColor", this);
-        addCommandListener("hide", this);
         return true;
     }
 
-    bool Console::handleCommand(string command)
-    {
-        bool flag = true;
-        if(splitLineCommand(command) == "consoleColor")
-        {
-            float float1 = 0.0f;
-            float float2 = 0.0f;
-            float float3 = 0.0f;
-            stringstream parser;
-            parser << splitLineParameters(command);
-            parser >> float1 >> float2 >> float3;
-            changeConsoleColor(float1, float2, float3);
-            Config::shared().editConfigFile(command);
-        }
-        if(splitLineCommand(command) == "hide")
-        {
-            if(splitLineParameters(command) == "console") toggleVisibilityConsole();
-        }
-        else flag = false;
-        return flag;
-    }
     bool Console::keyDown(int key, bool keyDown)
     {
         bool keyHandled = true;
         if(visibility == false)
         {
-            glfwDisable(GLFW_KEY_REPEAT);
             switch(key)
             {
-                case GLFW_KEY_F6: if(keyDown) 
-                                  {
-                                      glfwEnable(GLFW_KEY_REPEAT);
-                                      toggleVisibilityConsole();
-                                  }
-                                  break;
+                case GLFW_KEY_F6: if(keyDown) toggleVisibilityConsole(); break;
                 default: keyHandled = false; break;
             }
         }
@@ -128,28 +95,19 @@ namespace Arya
             {
                 if((rShift && !cLock) || (lShift && !cLock) || (cLock && !lShift) || (cLock && !rShift))
                 {
-                    if(keyDown && (currentLine.length() < (unsigned)nrCharOnLine)) currentLine.push_back(key);
+                    if(keyDown && (currentLine.length() < nrCharOnLine)) currentLine.push_back(key);
                 }
                 else
                 {
-                    if((keyDown && currentLine.length() < (unsigned)nrCharOnLine)) currentLine.push_back(key - 'A' + 'a');
+                    if((keyDown && currentLine.length() < nrCharOnLine)) currentLine.push_back(key - 'A' + 'a');
                 }
             }
-            else if(key >= '0' && key <= '9' && keyDown && (currentLine.length() < (unsigned)nrCharOnLine)) currentLine.push_back(key);
-            else if(key >= GLFW_KEY_KP_0  && key <= GLFW_KEY_KP_9  && keyDown && (currentLine.length() < (unsigned)nrCharOnLine)) currentLine.push_back(key - 2);
-            else if (keyDown && key == GLFW_KEY_KP_ADD && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
-            else if (keyDown && key == GLFW_KEY_KP_SUBTRACT && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
-            else if (keyDown && key == GLFW_KEY_KP_MULTIPLY && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
-            else if (keyDown && key == GLFW_KEY_KP_DIVIDE && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
-            else if (keyDown && key == GLFW_KEY_KP_EQUAL && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
-            else if (keyDown && key == GLFW_KEY_KP_DECIMAL && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
             else
             {
                 switch(key)
                 {
                     case GLFW_KEY_ESC:
                     case GLFW_KEY_F6: if(keyDown) toggleVisibilityConsole(); break;
-                    case GLFW_KEY_KP_ENTER:
                     case GLFW_KEY_ENTER: if(keyDown) enterInput(); break;
                     case GLFW_KEY_BACKSPACE: if(keyDown && currentLine.length() > 0)
                                              {
@@ -163,12 +121,13 @@ namespace Arya
                                                  if(cLock) cLock = false;
                                                  else cLock = true;
                                              }; break;
-                    case GLFW_KEY_UP: if(keyDown && searchHistory.size() > (unsigned)upCount)
+                    case GLFW_KEY_UP: if(keyDown && searchHistory.size() > upCount)
                                       {
                                           upCount += 1;
                                           goBackInHistory();
+                                          oneUpCount == true;
                                       }; break;
-                    case GLFW_KEY_DOWN: if(keyDown && 0 < upCount)
+                    case GLFW_KEY_DOWN: if(keyDown && 0 < upCount + 1)
                                         {
                                             upCount -= 1;
                                             goBackInHistory();
@@ -190,9 +149,9 @@ namespace Arya
             rects[0]->isVisible = visibility;
             if(history.empty() == false)
             {
-                for(int i = 0; (i < nrLines && (unsigned)i < history.size()); i++) // fills the rectangles that need to be filled
+                for(int i = 0; (i < nrLines && i < history.size()); i++) // fills the rectangles that need to be filled
                 {
-                    for(int j = 0; (unsigned)j < history[i].length(); j++)
+                    for(int j = 0; j < history[i].length(); j++)
                     {
                         rects[i*nrCharOnLine + j + 1]->isVisible = visibility; // + 1 because of the console rect
                         stbtt_GetBakedQuad(font->baked, 512, 512, history[i].at(j),&xpos ,&ypos,&q,true);
@@ -200,15 +159,15 @@ namespace Arya
                         rects[i*nrCharOnLine + j + 1]->texSize = vec2(q.s1 - q.s0, (q.t1 - q.t0));
                     }
                 }
-                for(int i = 0; (i < nrLines && (unsigned)i < history.size()); i++) // clears the fonttextures of the rectangles that do not need to be filled
+                for(int i = 0; (i < nrLines && i < history.size()); i++) // clears the fonttextures of the rectangles that do not need to be filled
                 {
                     for(int j = 0; j < nrCharOnLine; j++)
                     {
-                        if(history[i].length() <= (unsigned)j) rects[i*nrCharOnLine + j + 1]->isVisible = false;
+                        if(history[i].length() <= j) rects[i*nrCharOnLine + j + 1]->isVisible = false;
                     }
                 }
             }
-            for(int j = 0; (unsigned)j < currentLine.length(); j++)
+            for(int j = 0; j < currentLine.length(); j++)
             {
                 rects[nrLines * nrCharOnLine + j + 1]->textureHandle = font->textureHandle;
                 rects[nrLines * nrCharOnLine + j + 1]->isVisible = visibility; // + 1 because of the console rect
@@ -219,7 +178,7 @@ namespace Arya
             }
             for(int j = 0; j < nrCharOnLine; j++)
             {
-                if(currentLine.size() <= (unsigned)j) rects[nrLines * nrCharOnLine + j + 1]->isVisible = false;
+                if(currentLine.size() <= j) rects[nrLines * nrCharOnLine + j + 1]->isVisible = false;
             }
         }
         else time = 0.0;
@@ -227,7 +186,7 @@ namespace Arya
 
     void Console::cleanup()
     {
-        for(int i = 0; (unsigned)i < rects.size(); i++)
+        for(int i = 0; i < rects.size(); i++)
         {
             Root::shared().getOverlay()->removeRect(rects[i]);
         }
@@ -248,14 +207,15 @@ namespace Arya
     {
         history.push_back(textToBeAdded);
         searchHistory.push_back(textToBeAdded);
-        if(history.size() == (unsigned)nrLines - 1) history.erase(history.begin());
-        if(searchHistory.size() == (unsigned)searchNrLines) searchHistory.erase(searchHistory.begin());
+        activeLine += 1;
+        if(history.size() == nrLines - 1) history.erase(history.begin());
+        if(searchHistory.size() == searchNrLines) searchHistory.erase(searchHistory.begin());
     }
 
     void Console::enterInput() // When you press enter, currentLine needs to be emptied and needs to be added to the history and searchhistory
     {
         addTextLine(currentLine);
-        onCommand(currentLine);
+        if(upCount != 0) searchHistory.erase(searchHistory.end());
         upCount = 0;
         currentLine = "";
     }
@@ -263,6 +223,7 @@ namespace Arya
     void Console::goBackInHistory()
     {
         int count = 0;
+        if(upCount == 1 && oneUpCount == false) searchHistory.push_back(currentLine);
         for(int j = 0; j < upCount; j++)
         {
             count = j;
@@ -270,87 +231,4 @@ namespace Arya
         }
     }
 
-    void Console::addOutputText(string textToBeAdded)
-    {
-        if(textToBeAdded.length() <= (unsigned)nrCharOnLine) history.push_back(textToBeAdded);
-        else
-        {
-            int count = 0;
-            for(int i = 1; (textToBeAdded.length() > (i * nrCharOnLine)); i++)
-                count = i;
-
-            for(int i = 0; i < count - 2; i++)
-            {
-                history.push_back(textToBeAdded.substr(i * nrCharOnLine, (i + 1)* nrCharOnLine));
-            }
-            history.push_back(textToBeAdded.substr((count - 1) * nrCharOnLine, (textToBeAdded.length() % nrCharOnLine)));
-        }
-        if(history.size() == (unsigned)nrLines - 1) history.erase(history.begin());
-    }
-
-
-    void Console::addCommandListener(string command, CommandListener* listener)
-    {
-        commandListeners.insert(make_pair(command, listener));
-    }
-
-    void Console::removeCommandListener(string command, CommandListener* listener)
-    {
-        pair<commandListenerIterator, commandListenerIterator> range = commandListeners.equal_range(command);
-        for(commandListenerIterator iter = range.first; iter != range.second; ++iter)
-        {
-            if( iter->second == listener )
-            {
-                commandListeners.erase(iter);
-            }
-        }
-    }
-
-    void Console::onCommand(string command) // alleen op eerste woord zoeken
-    {
-        pair<commandListenerIterator, commandListenerIterator> range = commandListeners.equal_range(splitLineCommand(command));
-        if(range.first == range.second)
-        {
-            LOG_WARNING("Command " << command << " received but no command registered");
-        }
-        else
-        {
-            for(commandListenerIterator iter = range.first; iter != range.second; ++iter)
-            {
-                iter->second->handleCommand(command);
-            }
-        }
-    }
-
-    bool Console::changeConsoleColor(float r, float g, float b)
-    {
-        bool flag = true;
-        if( r >= 0.0f && r <= 1.0f && g >= 0.0f && g <= 1.0f && b >= 0.0f && g <= 1.0f ) rects[0]->fillColor = vec4(r,g,b,0.4f);
-        else flag = false;
-        return flag;
-    }
-
-    string Console::splitLineCommand(string command)
-    {
-        int spaceFinder = 0;
-        spaceFinder = command.find(" ", 0);
-        if((unsigned)spaceFinder == std::string::npos)
-        {
-            return command;
-        }
-        int spaceCount = command.find_first_of(" ", 0);
-        return command.substr(0, spaceCount);
-    }
-
-    string Console::splitLineParameters(string command)
-    {
-        int spaceFinder = 0;
-        spaceFinder = command.find(" ", 0);
-        if((unsigned)spaceFinder == std::string::npos)
-        {
-            return "";
-        }
-        int spaceCount = command.find_first_of(" ", 0);
-        return command.substr(spaceCount + 1, currentLine.length() - spaceCount - 1);
-    }
 }
