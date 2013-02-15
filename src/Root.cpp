@@ -101,8 +101,7 @@ namespace Arya
         Config* config = new Config;
         if(!config->init())
         {
-            LOG_INFO("Could not configure settings");
-            return false;
+            LOG_INFO("Could not find configuration file");
         }
 
         LOG_INFO("Root initialized");

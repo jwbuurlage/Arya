@@ -33,6 +33,7 @@ namespace Arya
     {
         configFile = FileSystem::shared().getFile(configFileName);
         if(configFile == 0) return false;
+        LOG_INFO("The size of Config.txt is " << configFile->getSize());
         std::stringstream fileStream(configFile->getData());
         string regel;
         while(true)
