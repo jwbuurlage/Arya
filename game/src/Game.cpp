@@ -43,21 +43,41 @@ void Game::run()
         if(network) delete network;
         network = new Network;
 
-        network->connectToSessionServer("balubu.com", 13337);
         //network->startServer();
-        //network->connectToSessionServer("localhost", 13337);
+
+		//network->connectToLobbyServer("balubu.com", 13337);
+		network->connectToLobbyServer("balubu.com", 13337);
 
         if(eventManager) delete eventManager;
         eventManager = new EventManager(network);
 
         network->setPacketHandler(eventManager);
 
-        Event& joinEvent = eventManager->createEvent(EVENT_JOIN_GAME);
-        joinEvent << 0; // accountId
-        joinEvent << 0; // roomId
-        joinEvent.send();
+		//!!!!!
+		//TEMPORARY:
+		//we assume the client has told the lobby server to start the game (EVENT_SESSION_START)
+		//that means the lobby server has to tell the game server to create the actual game
+		//and then the lobby server should return the gameserver-ip to this client
+		//currently we act like THIS CLIENT is the lobby server
+		//telling the game server to create a new session
+		//and we act like we already received the EVENT_SESSION_INFO from the lobby server
+        Event& lobbyToGameEvent = eventManager->createEvent(EVENT_NEW_SESSION);
+		lobbyToGameEvent << 50505; //session hash
+        lobbyToGameEvent << 4; //player count
+		lobbyToGameEvent << 10101; //secret hashes for each player
+		lobbyToGameEvent << 10102;
+		lobbyToGameEvent << 10103;
+		lobbyToGameEvent << 10104;
+        lobbyToGameEvent.send();
+		//in a normal scenario the following is done below in the eventhandler at EVENT_SESSION_INFO
+		network->connectToSessionServer("balubu.com", 13337);
+		Event& joinEvent = eventManager->createEvent(EVENT_JOIN_GAME);
+		joinEvent << 50505; //session hash
+		joinEvent << 10101; //my secret hash
+		joinEvent.send();
+		//END TEMPORARY
 
-        eventManager->addEventHandler(EVENT_GAME_READY, this);
+		eventManager->addEventHandler(EVENT_SESSION_INFO, this);
         eventManager->addEventHandler(EVENT_CLIENT_ID, this);
 
         root->addFrameListener(this);
@@ -137,19 +157,19 @@ void Game::handleEvent(Packet& packet)
     {
         case EVENT_CLIENT_ID:
             packet >> clientId;
+			//After receiving our client ID we start the session. The server will soon send us the full game state
+			if(session) delete session;
+			session = new GameSession;
+
+			if(!session->init()) {
+				GAME_LOG_ERROR("Could not start a new session");
+				Root::shared().stopRendering();
+			}
             break;
 
-        case EVENT_GAME_READY:
-            if(session) delete session;
-            session = new GameSession;
-
-            if(!session->init()) {
-                GAME_LOG_ERROR("Could not start a new session");
-                Root::shared().stopRendering();
-            }
-
-            GAME_LOG_INFO("Game is ready");
-            break;
+		case EVENT_SESSION_INFO:
+			GAME_LOG_WARNING("EVENT_SESSION_INFO is not supported yet. please upgrade your arya's and try again");
+			break;
 
         default:
             GAME_LOG_INFO("Game: unknown event received! (" << id << ")");

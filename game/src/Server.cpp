@@ -28,7 +28,7 @@ Server::Server()
     acceptor = 0;
     port = 13337;
     clientIdFactory = 100;
-    sessionIdFactory = 100;
+    sessionIdFactory = 10000;
 }
 
 Server::~Server()
@@ -158,32 +158,96 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
     ServerClient* client = iter->second;
 
     switch(packet.getId()){
-        case EVENT_JOIN_GAME:
-            {
-                client->setClientId(clientIdFactory++);
+		case EVENT_NEW_SESSION:
+			//TODO: authenticate to see if this is an actual lobby server
+			{
+				int sessionHash;
+				int clientCount;
+				packet >> sessionHash;
+				packet >> clientCount;
+				if(clientCount > 4)
+				{
+					GAME_LOG_WARNING("Lobby server tried to create session with " << clientCount << " players. This server can not handle this.");
+					clientCount = 4;
+				}
 
-                Packet* pak = createPacket(EVENT_CLIENT_ID);
-                *pak << client->getClientId();
-                clienthandler->sendPacket(pak);
-
-                //TODO: Check which session the client wants to join
-                //For now: create a session if it doesnt exist
-                //and else join the existing session
-                ServerGameSession* session;
-                if(sessionList.empty())
-                {
+                ServerGameSession* session = 0;
+				sessionIterator iter = sessionList.find(sessionHash);
+				if(iter == sessionList.end())
+				{
                     session = new ServerGameSession(this);
-                    sessionList.insert(make_pair(sessionIdFactory++, session));
-                }
-                else
-                {
-                    session = sessionList.begin()->second;
-                }
+                    sessionList.insert(make_pair(sessionHash, session));
 
-                pak = createPacket(EVENT_GAME_READY);
-                clienthandler->sendPacket(pak);
+					session->getGameInfo().playerCount = clientCount;
+					for(int i = 0; i < clientCount; ++i)
+					{
+						int hash;
+						packet >> hash;
+						session->getGameInfo().players[i].accountId = 0;
+						session->getGameInfo().players[i].sessionHash = hash;
+						session->getGameInfo().players[i].slot = i;
+						session->getGameInfo().players[i].color = i;
+						session->getGameInfo().players[i].team = 0;
+					}
+					session->initialize();
+ 				}
+				else
+				{
+					GAME_LOG_WARNING("Lobby server tried to create sesison that already existed.");
+				}
+			}
+			break;
+        case EVENT_JOIN_GAME:
+			if(client->getClientId() != -1)
+			{
+				GAME_LOG_WARNING("Client " << client->getClientId() << " requests to join when already joined.");
+			}
+			else
+			{
+				int sessionHash;
+				int clientHash;
+				packet >> sessionHash >> clientHash;
 
-                session->addClient(client);
+                ServerGameSession* session = 0;
+				sessionIterator iter = sessionList.find(sessionHash);
+				if(iter == sessionList.end())
+				{
+					GAME_LOG_INFO("Client requested to join non-existing session.");
+				}
+				else
+				{
+					if( iter->second->isGameStarted() )
+						//TODO: send packet to client telling him to gtfo with his hacks or wooden pc
+						GAME_LOG_WARNING("Client tried to join game that was already started. Refusing client.");
+					else
+						session = iter->second;
+				}
+				
+				if(session)
+				{
+					//check if this client is allowed to join this session
+					bool found = false;
+					for(int i = 0; i < session->getGameInfo().playerCount; ++i)
+					{
+					    if(clientHash == session->getGameInfo().players[i].sessionHash)
+						{
+							//Accept the client: give him an id
+							client->setClientId(clientIdFactory++);
+							Packet* pak = createPacket(EVENT_CLIENT_ID);
+							*pak << client->getClientId();
+							clienthandler->sendPacket(pak);
+
+							session->addClient(client, i);
+
+							found = true;
+							break;
+						}
+					}
+					if(!found)
+					{
+						GAME_LOG_WARNING("Client tried to join game but had no valid client hash");
+					}
+				}
             }
             break;
         default:
@@ -196,7 +260,7 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
                 if(client->getSession())
                     client->getSession()->handlePacket(client, packet);
                 else
-                    GAME_LOG_WARNING("Unkown packet (id = " << packet.getId() << ") received from client with no session");
+                    GAME_LOG_WARNING("Unkown packet (id = " << packet.getId() << ") received from client " << client->getClientId() << " with no session");
             }
             break;
     }

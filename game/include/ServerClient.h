@@ -30,12 +30,9 @@ class ServerClient
         ServerGameSession* getSession() const { return gameSession; }
         void setSession(ServerGameSession* session){ gameSession = session; }
 
-        //clientId is assumed to be set already
-        void createFaction();
-
         Faction* getFaction() const { return faction; }
+		void setFaction(Faction* fac){ faction = fac; }
 
-        void createStartUnits();
 
     private:
         int clientId; //-1 indicates not joined yet

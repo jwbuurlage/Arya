@@ -16,7 +16,7 @@ class FactionFactory
 {
     public:
         FactionFactory(){}
-        virtual ~FactionFactory(){}
+        virtual ~FactionFactory();
 
         //destory factions by calling delete on them
         Faction* createFaction(int id);

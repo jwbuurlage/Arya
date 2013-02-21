@@ -8,44 +8,85 @@
 #include "../include/Map.h"
 #include "Arya.h"
 
-void ServerGameSession::addClient(ServerClient* client)
+ServerGameSession::ServerGameSession(Server* serv) : server(serv)
 {
+	gameStarted = false;
+	idFactory = 1;
+
+	gameInfo.playerCount = 0;
+	for(int i = 0; i < MAX_PLAYER_COUNT; ++i)
+	{
+		gameInfo.players[i].accountId = 0;
+		gameInfo.players[i].sessionHash = 0;
+		gameInfo.players[i].slot = 0;
+		gameInfo.players[i].color = 0;
+		gameInfo.players[i].team = 0;
+	}
+
+	map = 0;
+	initMap();
+}
+
+ServerGameSession::~ServerGameSession()
+{
+	for(factionIterator it = clientFactionList.begin(); it != clientFactionList.end(); ++it)
+		delete *it;
+	clientFactionList.clear();
+}
+
+void ServerGameSession::initialize()
+{
+	if(!clientFactionList.empty())
+	{
+		GAME_LOG_WARNING("ServerGameSession initialize called but factionlist was already populated. Removing old factions.");
+		for(factionIterator it = clientFactionList.begin(); it != clientFactionList.end(); ++it)
+			delete *it;
+		clientFactionList.clear();
+	}
+
+	//create factions and start units
+	for(int i = 0; i < gameInfo.playerCount; ++i)
+	{
+		//createFaction will register it to the list
+		Faction* faction = createFaction();
+		faction->setColor(gameInfo.players[i].color);
+
+		for(int i = 0; i < 20; ++i)
+		{
+			Unit* unit = createUnit(0);
+			unit->setPosition(vec3(-(faction->getId()%5) * 100.0f + 20.0f * (i / 10), 0.0f, -50.0f + 20.0f * (i % 10)));
+			faction->addUnit(unit);
+
+			unit = createUnit(1);
+			unit->setPosition(vec3(-(faction->getId()%5) * 100.0f - 50.0f + 20.0f * (i / 10), 0.0f, -50.0f + 20.0f * (i % 10)));
+			faction->addUnit(unit);
+		}
+
+		clientFactionList.push_back(faction);
+	}
+}
+
+void ServerGameSession::addClient(ServerClient* client, int index)
+{
+	if(index < 0 || index >= gameInfo.playerCount)
+	{
+		GAME_LOG_WARNING("ServerGameSession addClient called with invalid index!");
+		return;
+	}
     if(client->getSession())
     {
         GAME_LOG_WARNING("ServerClient was already in a session and then added to another gamesession");
     }
+	if(clientFactionList.empty())
+	{
+		GAME_LOG_ERROR("ServerGameSession addClient called before session was initialized!");
+		return;
+	}
     client->setSession(this);
-
-    client->createFaction();
-    client->createStartUnits();
-
-    if(!clientList.empty())
-    {
-        //send the connect to all OTHER clients
-        Packet* pak = server->createPacket(EVENT_CLIENT_CONNECTED);
-
-        *pak << client->getClientId();
-
-        Faction* faction = client->getFaction();
-        *pak << faction->getId();
-        faction->serialize(*pak);
-
-        int unitCount = (int)faction->getUnits().size();
-
-        *pak << unitCount;
-        for(std::list<Unit*>::iterator uiter = faction->getUnits().begin(); uiter != faction->getUnits().end(); ++uiter)
-        {
-            *pak << (*uiter)->getId();
-            (*uiter)->serialize(*pak);
-        }
-
-        sendToAllClients(pak);
-    }
-
-    //Then ADD this new client
+	client->setFaction(clientFactionList[index]);
+	clientFactionList[index]->setClientId(client->getClientId());
     clientList.push_back(client);
-
-    //Send the full game state only to the new client
+    //Send the full game state (only to the new client)
 	client->handler->sendPacket(createFullStatePacket());
 }
 
@@ -54,8 +95,8 @@ void ServerGameSession::removeClient(ServerClient* client)
     //TODO:
     //Lots of stuff like sending a message
     //to everyone about the client being disconnected
-    //Distribute their resources accross allies
-    //and so on
+	//
+	//Let the faction remain intact in case the player reconnects
     int id = client->getClientId();
     for(clientIterator iter = clientList.begin(); iter != clientList.end(); ++iter)
     {
@@ -63,6 +104,7 @@ void ServerGameSession::removeClient(ServerClient* client)
         {
             clientList.erase(iter);
 
+			//if there are remaining clients, let them know
             if(!clientList.empty())
             {
                 Packet* pak = server->createPacket(EVENT_CLIENT_DISCONNECTED);
@@ -79,19 +121,18 @@ Packet* ServerGameSession::createFullStatePacket()
 {
 	Packet* pak = server->createPacket(EVENT_GAME_FULLSTATE);
 
-	*pak << getClientCount(); //player count
+	*pak << (int)clientFactionList.size();
 
-	//for each player:
-	for(clientIterator iter = clientList.begin(); iter != clientList.end(); ++iter)
+	for(factionIterator iter = clientFactionList.begin(); iter != clientFactionList.end(); ++iter)
 	{
-		*pak << (*iter)->getClientId();
+		Faction* faction = *iter;
 
-		Faction* faction = (*iter)->getFaction();
+		*pak << faction->getClientId();
 		*pak << faction->getId();
+
 		faction->serialize(*pak);
 
 		int unitCount = (int)faction->getUnits().size();
-
 		*pak << unitCount;
 		for(std::list<Unit*>::iterator uiter = faction->getUnits().begin(); uiter != faction->getUnits().end(); ++uiter)
 		{
@@ -118,33 +159,6 @@ void ServerGameSession::sendToAllClients(Packet* pak)
     {
         (*iter)->handler->sendPacket(pak);
     }
-}
-
-bool ServerGameSession::gameReadyToLoad() const
-{
-    //TODO: Check if all players joined that needed to join
-    return gameState == STATE_CREATED && clientList.size() >= 2;
-}
-
-bool ServerGameSession::gameReadyToStart() const
-{
-    return gameState == STATE_LOADING;
-}
-
-void ServerGameSession::startLoading()
-{
-    if(gameState != STATE_CREATED)
-    {
-        GAME_LOG_WARNING("startLoading() called when already loaded");
-        return;
-    }
-    gameState = STATE_LOADING;
-
-    Packet* pak = server->createPacket(EVENT_GAME_READY);
-    sendToAllClients(pak);
-
-	pak = createFullStatePacket();
-	sendToAllClients(pak);
 }
 
 void ServerGameSession::startGame()
