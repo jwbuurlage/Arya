@@ -1,6 +1,7 @@
 #include "Sounds.h"
 #include "common/Logger.h"
 #include <vector>
+#include <SFML/System.hpp>
 #include <SFML/Audio.hpp>
 using std::vector;
 
@@ -10,9 +11,7 @@ namespace Arya
 
     SoundManager::SoundManager()
     {
-        sf::SoundBuffer buffer;
-        sf::Sound sound;
-        sf::Music music;
+
     };
 
     SoundManager::~SoundManager()
@@ -20,29 +19,42 @@ namespace Arya
         cleanup();
     }
 
+    void SoundManager::init()
+    {
+        getBufferFile("testSound.wav");
+    }
     void SoundManager::cleanup()
     {
     }
 
-    void SoundManager::play(string audioFileName)
+    void SoundManager::cleanMemory()
     {
-        File* audioFile = FileSystem::shared().getFile(audioFileName);
-        if(audioFile->getSize() > 2)
+
+    }
+    float SoundManager::play(string audioFileName)
+    {
+        bool flag = false;
+        int count = -1;
+        if(bufferCollection.find(audioFileName) == bufferCollection.end())
         {
-            getMusicFile(audioFile);
-            music.Play();
+            getMusicFile(audioFileName);
+            musicCollection[audioFileName]->play();
+            return -999.;
         }
         else
         {
-            getSoundFile(audioFile);
-            sound.SetBuffer(buffer);
-            sound.Play();
+            count = bindSoundFile(audioFileName);
+            soundCollection[count]->play();
+            return soundCollection[count]->getBuffer()->getDuration().asSeconds();
         }
     }
 
-    void SoundManager::stop(string audioFile)
+    void SoundManager::stopMusic(string audioFile)
     {
-
+        if(musicCollection.find(audioFile) != musicCollection.end())
+        {
+            musicCollection[audioFile]->stop();
+        }
     }
 
     void SoundManager::loop(string audioFile, int loopLength)
@@ -65,18 +77,46 @@ namespace Arya
         return 0;
     }
 
-    void SoundManager::getSoundFile(File* bufferFile)
+    void SoundManager::getBufferFile(string audioFileName)
     {
-        if(!buffer.LoadFromMemory(bufferFile->getData(),bufferFile->getSize()))
+        if(bufferCollection.find(audioFileName) != bufferCollection.end())
         {
-            LOG_WARNING("The audiofile cannot be loaded into sound buffer!");
+            LOG_WARNING("Bufferfile" << audioFileName << " already defined!");
         }
+        File* audioFile = FileSystem::shared().getFile(audioFileName);
+        sf::SoundBuffer *bufferPushBack = new sf::SoundBuffer;
+        bufferPushBack->loadFromMemory(audioFile->getData(),audioFile->getSize());
+        bufferCollection.insert(BufferContainer::value_type(audioFileName,bufferPushBack));
     }
-    void SoundManager::getMusicFile(File* musicFile)
+    int SoundManager::bindSoundFile(string audioFileName)
     {
-        if(!music.OpenFromMemory(musicFile->getData(),musicFile->getSize()))
+        if(bufferCollection.find(audioFileName) == bufferCollection.end())
         {
-            LOG_WARNING("The audiofile cannot be loaded into music buffer!");
+            LOG_WARNING("Buffer not found:" << audioFileName);
+            return -999;
         }
+        for(unsigned int i = 0; i < soundCollection.size();i++)
+        {
+            if(soundCollection[i]->getStatus() == sf::SoundSource::Stopped)
+            {
+                return i;
+            }
+        }
+        sf::Sound *soundPushBack = new sf::Sound;
+        soundPushBack->setBuffer(*bufferCollection[audioFileName]);
+        soundCollection.push_back(soundPushBack);
+        return soundCollection.size() - 1;
+    }
+    void SoundManager::getMusicFile(string musicFileName)
+    {
+        if(musicCollection.find(musicFileName)!=musicCollection.end() && musicCollection[musicFileName]->getStatus() == sf::SoundSource::Stopped)
+        {
+            return;
+        }
+        File* musicFile = FileSystem::shared().getFile(musicFileName);
+        sf::Music *musicPushBack = new sf::Music;
+        musicPushBack->openFromMemory(musicFile->getData(),musicFile->getSize());
+        musicCollection.insert(MusicContainer::value_type(musicFileName,musicPushBack));
+        return;
     }
 }

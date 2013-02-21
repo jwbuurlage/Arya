@@ -3,10 +3,9 @@
 #include "Overlay.h"
 #include "Fonts.h"
 #include "Config.h"
+#include "Sounds.h"
 #include "common/Logger.h"
 #include <sstream>
-#include "Sounds.h"
-
 using std::stringstream;
 
 namespace Arya
@@ -82,6 +81,10 @@ namespace Arya
         }
         addCommandListener("consoleColor", this);
         addCommandListener("hide", this);
+        addCommandListener("PLAYSOUND", this);
+        addCommandListener("PLAYMUSIC", this);
+        addCommandListener("STOPSOUND", this);
+        addCommandListener("STOPMUSIC", this);
         return true;
     }
 
@@ -102,6 +105,18 @@ namespace Arya
         if(splitLineCommand(command) == "hide")
         {
             if(splitLineParameters(command) == "console") toggleVisibilityConsole();
+        }
+        if(splitLineCommand(command) == "PLAYSOUND")
+        {
+            SoundManager::shared().play("testSound.wav");
+        }
+        if(splitLineCommand(command) == "PLAYMUSIC")
+        {
+            SoundManager::shared().play("testMusic.wav");
+        }
+        if(splitLineCommand(command) == "STOPMUSIC")
+        {
+            SoundManager::shared().stopMusic("testMusic.wav");
         }
         else flag = false;
         return flag;

@@ -1,29 +1,39 @@
 #pragma once
 #include "common/Singleton.h"
 #include "Files.h"
+#include <vector>
 #include <string>
+#include <map>
+#include <SFML/System.hpp>
 #include <SFML/Audio.hpp>
 using std::string;
+using std::vector;
+using std::map;
 namespace Arya
 {
-    class SoundManager: public Singleton<SoundManager>
+   class SoundManager: public Singleton<SoundManager>
 
     {
         public:
             SoundManager();
             ~SoundManager();
+            void init();
             void cleanup();
-            void play(string audioFileName);
-            void stop(string audioFile);
+            void cleanMemory();
+            float play(string audioFileName);
+            void stopMusic(string audioFile);
             void loop(string audioFile, int loopLength);
             void setPitch(string audioFile, float pitchLevel);
             void setVolume(string audioFile, float soundLevel);
             int getOffset(string audioFile);
         private:
-            sf::SoundBuffer buffer;
-            sf::Sound sound;
-            sf::Music music;
-            void getSoundFile(File* bufferFile);
-            void getMusicFile(File* musicFile);
+            typedef map<string,sf::SoundBuffer*> BufferContainer;
+            BufferContainer bufferCollection;
+            vector<sf::Sound*> soundCollection;
+            typedef map<string,sf::Music*> MusicContainer;
+            MusicContainer musicCollection;
+            void getBufferFile(string audioFileName);
+            int bindSoundFile(string audioFileName);
+            void getMusicFile(string musicFileName);
     };
 }

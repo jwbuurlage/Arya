@@ -14,6 +14,7 @@
 #include "Files.h"
 #include "Overlay.h"
 #include "Camera.h"
+#include "Sounds.h"
 #include "common/Logger.h"
 #include "Interface.h"
 
@@ -37,6 +38,7 @@ namespace Arya
         TextureManager::create();
         MaterialManager::create();
         ModelManager::create();
+        SoundManager::create();
         FontManager::create();
     }
 
@@ -77,7 +79,7 @@ namespace Arya
         TextureManager::shared().initialize();
 		//MaterialManager::shared().initialize();
         ModelManager::shared().initialize();
-
+        SoundManager::shared().init();
         overlay = new Overlay();
         if(!overlay->init()) return false;
 
