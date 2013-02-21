@@ -335,9 +335,9 @@ void GameSession::handleEvent(Packet& packet)
                 {
                     if( (*iter)->getClientId() == id )
                     {
-                        GAME_LOG_INFO("Client " << id << " removed from game session. Removing faction...");
-                        delete *iter;
-                        iter = factions.erase(iter);
+                        GAME_LOG_INFO("Client " << id << " removed from game session. NOT removing faction!");
+                        //delete *iter;
+                        //iter = factions.erase(iter);
                         break;
                     }
                 }

@@ -4,6 +4,12 @@
 #include "../include/Packet.h"
 #include "../include/FactionColors.h"
 
+FactionFactory::~FactionFactory()
+{
+	while(!factionMap.empty())
+		delete factionMap.begin()->second; //the faction deconstructor will unregister itself
+}
+
 Faction* FactionFactory::createFaction(int id)
 {
     Faction* faction = getFactionById(id);
@@ -39,6 +45,7 @@ Faction* FactionFactory::getFactionById(int id)
 
 Faction::Faction(int _id, FactionFactory* _factory) : factory(_factory), id(_id)
 {
+	clientId = -1;
     color = 0;
 }
 
