@@ -113,7 +113,7 @@ namespace Arya
         {
             return;
         }
-        File* musicFile = FileSystem::shared().getFile(musicFileName);
+        File* musicFile = FileSystem::shared().getFile(string("sounds/")+musicFileName);
         sf::Music *musicPushBack = new sf::Music;
         musicPushBack->openFromMemory(musicFile->getData(),musicFile->getSize());
         musicCollection.insert(MusicContainer::value_type(musicFileName,musicPushBack));
