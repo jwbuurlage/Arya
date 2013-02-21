@@ -21,7 +21,7 @@ namespace Arya
 
     void SoundManager::init()
     {
-        getBufferFile("testSound.wav");
+        getBufferFile("sounds/testSound.wav");
     }
     void SoundManager::cleanup()
     {
