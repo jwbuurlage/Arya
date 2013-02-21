@@ -79,7 +79,11 @@ namespace Arya
         TextureManager::shared().initialize();
 		//MaterialManager::shared().initialize();
         ModelManager::shared().initialize();
-        SoundManager::shared().init();
+        if(!SoundManager::shared().init())
+        {
+            LOG_WARNING("Could not initialize SoundManager");
+            return false;
+        }
         overlay = new Overlay();
         if(!overlay->init()) return false;
 

@@ -17,7 +17,7 @@ namespace Arya
         public:
             SoundManager();
             ~SoundManager();
-            void init();
+            bool init();
             void cleanup();
             void cleanMemory();
             float play(string audioFileName);
@@ -32,8 +32,8 @@ namespace Arya
             vector<sf::Sound*> soundCollection;
             typedef map<string,sf::Music*> MusicContainer;
             MusicContainer musicCollection;
-            void getBufferFile(string audioFileName);
+            bool getBufferFile(string audioFileName);
             int bindSoundFile(string audioFileName);
-            void getMusicFile(string musicFileName);
+            bool getMusicFile(string musicFileName);
     };
 }

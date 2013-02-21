@@ -108,11 +108,11 @@ namespace Arya
         }
         if(splitLineCommand(command) == "PLAYSOUND")
         {
-            SoundManager::shared().play("testSound.wav");
+            if(SoundManager::shared().play("testSound.wav") == -1000) LOG_WARNING("SoundFile testSound.wav not found!");
         }
         if(splitLineCommand(command) == "PLAYMUSIC")
         {
-            SoundManager::shared().play("testMusic.wav");
+            if(SoundManager::shared().play("testMusic.wav") == -1000) LOG_WARNING("MusicFile testMusic.wav not found!");
         }
         if(splitLineCommand(command) == "STOPMUSIC")
         {

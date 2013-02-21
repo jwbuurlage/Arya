@@ -19,9 +19,10 @@ namespace Arya
         cleanup();
     }
 
-    void SoundManager::init()
+    bool SoundManager::init()
     {
-        getBufferFile("sounds/testSound.wav");
+        if(!getBufferFile("sounds/testSound.wav")) return false;
+        return true;
     }
     void SoundManager::cleanup()
     {
@@ -33,11 +34,14 @@ namespace Arya
     }
     float SoundManager::play(string audioFileName)
     {
-        bool flag = false;
         int count = -1;
         if(bufferCollection.find(audioFileName) == bufferCollection.end())
         {
-            getMusicFile(audioFileName);
+            if(!getMusicFile(audioFileName))
+            {
+                LOG_WARNING("File not in any collection! Can't play this sound!");
+                return -1000;
+            }
             musicCollection[audioFileName]->play();
             return -999.;
         }
@@ -55,6 +59,7 @@ namespace Arya
         {
             musicCollection[audioFile]->stop();
         }
+        else LOG_WARNING("No such music file found to stop!");
     }
 
     void SoundManager::loop(string audioFile, int loopLength)
@@ -77,16 +82,19 @@ namespace Arya
         return 0;
     }
 
-    void SoundManager::getBufferFile(string audioFileName)
+    bool SoundManager::getBufferFile(string audioFileName)
     {
         if(bufferCollection.find(audioFileName) != bufferCollection.end())
         {
             LOG_WARNING("Bufferfile" << audioFileName << " already defined!");
+            return true;
         }
         File* audioFile = FileSystem::shared().getFile(audioFileName);
+        if(audioFile == 0) return false;
         sf::SoundBuffer *bufferPushBack = new sf::SoundBuffer;
         bufferPushBack->loadFromMemory(audioFile->getData(),audioFile->getSize());
         bufferCollection.insert(BufferContainer::value_type(audioFileName,bufferPushBack));
+        return true;
     }
     int SoundManager::bindSoundFile(string audioFileName)
     {
@@ -107,16 +115,17 @@ namespace Arya
         soundCollection.push_back(soundPushBack);
         return soundCollection.size() - 1;
     }
-    void SoundManager::getMusicFile(string musicFileName)
+    bool SoundManager::getMusicFile(string musicFileName)
     {
         if(musicCollection.find(musicFileName)!=musicCollection.end() && musicCollection[musicFileName]->getStatus() == sf::SoundSource::Stopped)
         {
-            return;
+            return true;
         }
         File* musicFile = FileSystem::shared().getFile(string("sounds/")+musicFileName);
+        if(musicFile == 0) return false;
         sf::Music *musicPushBack = new sf::Music;
         musicPushBack->openFromMemory(musicFile->getData(),musicFile->getSize());
         musicCollection.insert(MusicContainer::value_type(musicFileName,musicPushBack));
-        return;
+        return true;
     }
 }
