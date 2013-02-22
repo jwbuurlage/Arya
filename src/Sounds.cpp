@@ -21,7 +21,7 @@ namespace Arya
 
     bool SoundManager::init()
     {
-        if(!getBufferFile("sounds/testSound.wav")) return false;
+        if(!getBufferFile("testSound.wav")) return false;
         return true;
     }
     void SoundManager::cleanup()
@@ -40,17 +40,42 @@ namespace Arya
             if(!getMusicFile(audioFileName))
             {
                 LOG_WARNING("File not in any collection! Can't play this sound!");
-                return -1000;
+                return -1000.;
             }
             musicCollection[audioFileName]->play();
             return -999.;
         }
         else
         {
+            provideSoundID(audioFileName);
             count = bindSoundFile(audioFileName);
-            soundCollection[count]->play();
-            return soundCollection[count]->getBuffer()->getDuration().asSeconds();
+            if(count == -999) 
+            {
+                soundIdentity.pop_back();
+                return -1000.;
+            }
+            else
+            {
+                soundIdentity[soundIdentity.size()-1].placeInSoundCollection = count;
+                soundIdentity[soundIdentity.size()-1].length = soundCollection[count]->getBuffer()->getDuration().asSeconds();
+                soundCollection[count]->play();
+                return soundIdentity[soundIdentity.size()-1].soundID;
+            }
         }
+    }
+    void SoundManager::provideSoundID(string audioFileName)
+    {
+        int count = 0;
+        for(unsigned int i = 0; i < soundIdentity.size(); i++)
+        {
+            if(soundIdentity[i].nameOfFile == audioFileName) count += 1;
+        }
+        SoundIdentity idPushBack;
+        idPushBack.nameOfFile = audioFileName;
+        idPushBack.soundID = count;
+        idPushBack.placeInSoundCollection = -1;
+        idPushBack.length = -1.;
+        soundIdentity.push_back(idPushBack);
     }
 
     void SoundManager::stopMusic(string audioFile)
@@ -61,10 +86,34 @@ namespace Arya
         }
         else LOG_WARNING("No such music file found to stop!");
     }
-
-    void SoundManager::loop(string audioFile, int loopLength)
+    void SoundManager::stopSound(string audioFileName, int id, float elapsedTime)
     {
+        for(unsigned int i = 0; i < soundIdentity.size(); i++)
+        {
+            if(soundIdentity[i].nameOfFile == audioFileName && soundIdentity[i].soundID == id)
+            {
+                if(elapsedTime < soundIdentity[i].length)
+                {
+                    soundCollection[soundIdentity[i].placeInSoundCollection]->stop();
+                    return;
+                }
+                else
+                {
+                    LOG_INFO("Sound " << audioFileName << ", " << id << "already stopped!");
+                    return;
+                }
+            }
+        }
 
+    }
+
+    void SoundManager::loopMusic(string audioFile, bool isLoop)
+    {
+        if(musicCollection.find(audioFile) != musicCollection.end())
+        {
+            musicCollection[audioFile]->setLoop(isLoop);
+        }
+        else LOG_WARNING("No music file " << audioFile << " found to loop");
     }
 
     void SoundManager::setPitch(string audioFile, float pitchLevel)
@@ -89,7 +138,7 @@ namespace Arya
             LOG_WARNING("Bufferfile" << audioFileName << " already defined!");
             return true;
         }
-        File* audioFile = FileSystem::shared().getFile(audioFileName);
+        File* audioFile = FileSystem::shared().getFile(string("sounds/")+audioFileName);
         if(audioFile == 0) return false;
         sf::SoundBuffer *bufferPushBack = new sf::SoundBuffer;
         bufferPushBack->loadFromMemory(audioFile->getData(),audioFile->getSize());

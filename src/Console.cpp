@@ -106,9 +106,11 @@ namespace Arya
         {
             if(splitLineParameters(command) == "console") toggleVisibilityConsole();
         }
+        int count = 0;
         if(splitLineCommand(command) == "PLAYSOUND")
         {
-            if(SoundManager::shared().play("testSound.wav") == -1000) LOG_WARNING("SoundFile testSound.wav not found!");
+            count = SoundManager::shared().play("testSound.wav");
+            if(count == -1000) LOG_WARNING("SoundFile testSound.wav not found!");
         }
         if(splitLineCommand(command) == "PLAYMUSIC")
         {
@@ -117,6 +119,10 @@ namespace Arya
         if(splitLineCommand(command) == "STOPMUSIC")
         {
             SoundManager::shared().stopMusic("testMusic.wav");
+        }
+        if(splitLineCommand(command) == "STOPSOUND")
+        {
+            SoundManager::shared().stopSound("testSound.wav", count, 0.5);
         }
         else flag = false;
         return flag;
