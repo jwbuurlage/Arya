@@ -47,6 +47,7 @@ namespace Arya
             int pixelsInBetween; // pixels in between lines
             bool lShift; // used for key input
             bool rShift; // used for key input
+            bool rAlt; // used for key input
             bool cLock; // used for key input
             vector<string> history;
             vector<string> searchHistory;

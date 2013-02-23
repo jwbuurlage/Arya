@@ -29,7 +29,8 @@ namespace Arya
             void cleanMemory();
             float play(string audioFileName);
             void stopMusic(string audioFile);
-            void stopSound(string audioFileName, int id, float elapsedTime); //if soundfile is looping, you have to turn loop off before you can stop it
+            void stopSound(string audioFileName, int id, float elapsedTime); //if soundfile is looping, you have to turn looping
+            //off before you can stop it. If this is the case, elapsedTime is to be measured from the time you turned looping off.
             void pauseMusic(string audioFile);
             void setLoopMusic(string audioFile, bool isLoop);
             void setLoopSound(string audioFile, int id, float elapsedTime, bool isLoop);

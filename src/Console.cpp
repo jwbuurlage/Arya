@@ -26,6 +26,7 @@ namespace Arya
         time = 0.0;
         lShift = false;
         rShift = false;
+        rAlt = false;
         cLock = false;
         upCount = 0;
     };
@@ -110,6 +111,7 @@ namespace Arya
         if(splitLineCommand(command) == "PLAYSOUND")
         {
             count = SoundManager::shared().play("testSound.wav");
+            SoundManager::shared().setLoopSound("testSound.wav", count, 0.01, true);
             if(count == -1000) LOG_WARNING("SoundFile testSound.wav not found!");
         }
         if(splitLineCommand(command) == "PLAYMUSIC")
@@ -122,7 +124,8 @@ namespace Arya
         }
         if(splitLineCommand(command) == "STOPSOUND")
         {
-            SoundManager::shared().stopSound("testSound.wav", count, 0.5);
+            SoundManager::shared().setLoopSound("testSound.wav", count, 0.5, false);
+            SoundManager::shared().stopSound("testSound.wav", count, 0.001);
         }
         else flag = false;
         return flag;
@@ -165,6 +168,20 @@ namespace Arya
             else if (keyDown && key == GLFW_KEY_KP_DIVIDE && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
             else if (keyDown && key == GLFW_KEY_KP_EQUAL && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
             else if (keyDown && key == GLFW_KEY_KP_DECIMAL && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == '.' && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == ',' && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == ':' && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == '=' && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == '/' && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == ';' && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == '?' && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == '!' && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == '$' && !rAlt && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == '^' && !rAlt && currentLine.length() < (unsigned)nrCharOnLine) LOG_INFO(key);
+            else if (keyDown && (key == '(' || key == ')') && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && ((key == ']') || (key == '$' && rAlt )) && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(']');
+            else if (keyDown && ((key == '[') || (key == '^' && rAlt )) && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back('[');
+            else if (keyDown && (key == '{' || key == '}') && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
             else
             {
                 switch(key)
@@ -180,6 +197,7 @@ namespace Arya
                     case GLFW_KEY_SPACE: if(keyDown) currentLine.push_back(key); break;
                     case GLFW_KEY_RSHIFT: if(!rShift) rShift = true; else rShift = false; break;
                     case GLFW_KEY_LSHIFT: if(!lShift) lShift = true; else lShift = false; break;
+                    case GLFW_KEY_RALT: if(!rAlt) rAlt = true; else rAlt = false; break;
                     case GLFW_KEY_CAPS_LOCK: if(keyDown)
                                              {
                                                  if(cLock) cLock = false;
