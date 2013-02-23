@@ -82,6 +82,8 @@ namespace Arya
         }
         addCommandListener("consoleColor", this);
         addCommandListener("hide", this);
+        addCommandListener("getVarValue", this);
+        addCommandListener("setVarValue", this);
         addCommandListener("PLAYSOUND", this);
         addCommandListener("PLAYMUSIC", this);
         addCommandListener("STOPSOUND", this);
@@ -106,6 +108,29 @@ namespace Arya
         if(splitLineCommand(command) == "hide")
         {
             if(splitLineParameters(command) == "console") toggleVisibilityConsole();
+        }
+        if(splitLineCommand(command) == "getVarValue")
+        {
+            string variableName;
+            stringstream parser;
+            parser << splitLineParameters(command);
+            parser >> variableName;
+            string output = Config::shared().getVarValue(variableName);
+            LOG_INFO("The value of " << variableName << " is: " << output);
+        }
+        if(splitLineCommand(command) == "setVarValue")
+        {
+            string variableName;
+            string value;
+            stringstream parser;
+            parser << splitLineParameters(command);
+            parser >> variableName >> value;
+
+            string output = Config::shared().getVarValue(variableName);
+            LOG_INFO("The value of " << variableName << " is: " << output);
+            Config::shared().setVarValue(variableName, value);
+            string output1 = Config::shared().getVarValue(variableName);
+            LOG_INFO("The value of " << variableName << " is: " << output1);
         }
         int count = 0;
         if(splitLineCommand(command) == "PLAYSOUND")
