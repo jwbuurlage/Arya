@@ -22,6 +22,7 @@ namespace Arya
     bool SoundManager::init()
     {
         if(!getBufferFile("testSound.wav")) return false;
+        if(!getBufferFile("marching.wav")) return false;
         return true;
     }
     void SoundManager::cleanup()
@@ -92,7 +93,7 @@ namespace Arya
         {
             if(soundIdentity[i].nameOfFile == audioFileName && soundIdentity[i].soundID == id)
             {
-                if(elapsedTime < soundIdentity[i].length)
+                if(elapsedTime + 0.01 < soundIdentity[i].length || soundCollection[soundIdentity[i].placeInSoundCollection]->getLoop())
                 {
                     soundCollection[soundIdentity[i].placeInSoundCollection]->stop();
                     return;
@@ -106,8 +107,16 @@ namespace Arya
         }
 
     }
+    void SoundManager::pauseMusic(string audioFile)
+    {
+        if(musicCollection.find(audioFile) != musicCollection.end())
+        {
+            musicCollection[audioFile]->pause();
+        }
+        else LOG_WARNING("No such music file found to pause!");
+    }
 
-    void SoundManager::loopMusic(string audioFile, bool isLoop)
+    void SoundManager::setLoopMusic(string audioFile, bool isLoop)
     {
         if(musicCollection.find(audioFile) != musicCollection.end())
         {
@@ -116,21 +125,173 @@ namespace Arya
         else LOG_WARNING("No music file " << audioFile << " found to loop");
     }
 
-    void SoundManager::setPitch(string audioFile, float pitchLevel)
+    void SoundManager::setLoopSound(string audioFile, int id, float elapsedTime, bool isLoop)
     {
-
+        for(unsigned int i = 0; i < soundIdentity.size(); i++)
+        {
+            if(soundIdentity[i].nameOfFile == audioFile && soundIdentity[i].soundID == id)
+            {
+                if(isLoop)
+                {
+                    if(elapsedTime + 0.01 < soundIdentity[i].length)
+                    {
+                        soundIdentity[i].length = soundCollection[soundIdentity[i].placeInSoundCollection]->getBuffer()->getDuration().asSeconds();
+                        soundCollection[soundIdentity[i].placeInSoundCollection]->setLoop(isLoop);
+                        return;
+                    }
+                    else
+                    {
+                        LOG_INFO("Sound " << audioFile << ", " << id << "already stopped!");
+                        return;
+                    }
+                }
+                else
+                {
+                    float Offset = soundCollection[soundIdentity[i].placeInSoundCollection]->getPlayingOffset().asSeconds();
+                    soundIdentity[i].length -= Offset;
+                    soundCollection[soundIdentity[i].placeInSoundCollection]->setLoop(isLoop);
+                    return;
+                }
+            }
+        }
+    }
+    void SoundManager::setPitchMusic(string audioFile, float pitchLevel)
+    {
+        if(musicCollection.find(audioFile) != musicCollection.end())
+        {
+            musicCollection[audioFile]->setPitch(pitchLevel);
+        }
+        else LOG_WARNING("No music file " << audioFile << " found to set pitch");
+    }
+    void SoundManager::setPitchSound(string audioFile, int id, float elapsedTime, float pitchLevel)
+    {
+        for(unsigned int i = 0; i < soundIdentity.size(); i++)
+        {
+            if(soundIdentity[i].nameOfFile == audioFile && soundIdentity[i].soundID == id)
+            {
+                if(elapsedTime + 0.01 < soundIdentity[i].length)
+                {
+                    soundCollection[soundIdentity[i].placeInSoundCollection]->setPitch(pitchLevel);
+                    return;
+                }
+                else
+                {
+                    LOG_INFO("Sound " << audioFile << ", " << id << "already stopped!");
+                    return;
+                }
+            }
+        }
     }
 
-    void SoundManager::setVolume(string audioFile, float soundLevel)
+    void SoundManager::setVolumeMusic(string audioFile, float soundLevel)
     {
-
+        if(musicCollection.find(audioFile) != musicCollection.end())
+        {
+            musicCollection[audioFile]->setVolume(soundLevel);
+        }
+        else LOG_WARNING("No music file " << audioFile << " found to set volume");
     }
 
-    int SoundManager::getOffset(string audioFile)
+    void SoundManager::setVolumeSound(string audioFile, int id, float elapsedTime, float soundLevel)
     {
-        return 0;
+        for(unsigned int i = 0; i < soundIdentity.size(); i++)
+        {
+            if(soundIdentity[i].nameOfFile == audioFile && soundIdentity[i].soundID == id)
+            {
+                if(elapsedTime + 0.01 < soundIdentity[i].length)
+                {
+                    soundCollection[soundIdentity[i].placeInSoundCollection]->setVolume(soundLevel);
+                    return;
+                }
+                else
+                {
+                    LOG_INFO("Sound " << audioFile << ", " << id << "already stopped!");
+                    return;
+                }
+            }
+        }
     }
-
+    void SoundManager::setMinimumDistanceMusic(string audioFile, float distance)
+    {
+        if(musicCollection.find(audioFile) != musicCollection.end())
+        {
+            musicCollection[audioFile]->setMinDistance(distance);
+        }
+        else LOG_WARNING("No music file " << audioFile << " found to set min distance");
+    }
+    void SoundManager::setMinimumDistanceSound(string audioFile, int id, float elapsedTime, float distance)
+    {
+        for(unsigned int i = 0; i < soundIdentity.size(); i++)
+        {
+            if(soundIdentity[i].nameOfFile == audioFile && soundIdentity[i].soundID == id)
+            {
+                if(elapsedTime + 0.01 < soundIdentity[i].length)
+                {
+                    soundCollection[soundIdentity[i].placeInSoundCollection]->setMinDistance(distance);
+                    return;
+                }
+                else
+                {
+                    LOG_INFO("Sound " << audioFile << ", " << id << "already stopped!");
+                    return;
+                }
+            }
+        }
+    }
+    void SoundManager::set3DPositionMusic(string audioFile, float positionX, float positionY, float positionZ)
+    {
+        if(musicCollection.find(audioFile) != musicCollection.end())
+        {
+            musicCollection[audioFile]->setPosition(positionX, positionY, positionZ);
+        }
+        else LOG_WARNING("No music file " << audioFile << " found to set position");
+    }
+    void SoundManager::set3DPositionSound(string audioFile, int id, float elapsedTime, float positionX, float positionY, float positionZ)
+    {
+        for(unsigned int i = 0; i < soundIdentity.size(); i++)
+        {
+            if(soundIdentity[i].nameOfFile == audioFile && soundIdentity[i].soundID == id)
+            {
+                if(elapsedTime + 0.01 < soundIdentity[i].length)
+                {
+                    soundCollection[soundIdentity[i].placeInSoundCollection]->setPosition(positionX, positionY, positionZ);
+                    return;
+                }
+                else
+                {
+                    LOG_INFO("Sound " << audioFile << ", " << id << "already stopped!");
+                    return;
+                }
+            }
+        }
+    }
+    void SoundManager::setRelativeMusic(string audioFile, bool isRelative)
+    {
+        if(musicCollection.find(audioFile) != musicCollection.end())
+        {
+            musicCollection[audioFile]->setRelativeToListener(isRelative);
+        }
+        else LOG_WARNING("No music file " << audioFile << " found to set relative to listener");
+    }
+    void SoundManager::setRelativeSound(string audioFile, int id, float elapsedTime, bool isRelative)
+    {
+        for(unsigned int i = 0; i < soundIdentity.size(); i++)
+        {
+            if(soundIdentity[i].nameOfFile == audioFile && soundIdentity[i].soundID == id)
+            {
+                if(elapsedTime + 0.01 < soundIdentity[i].length)
+                {
+                    soundCollection[soundIdentity[i].placeInSoundCollection]->setRelativeToListener(isRelative);
+                    return;
+                }
+                else
+                {
+                    LOG_INFO("Sound " << audioFile << ", " << id << "already stopped!");
+                    return;
+                }
+            }
+        }
+    }
     bool SoundManager::getBufferFile(string audioFileName)
     {
         if(bufferCollection.find(audioFileName) != bufferCollection.end())
