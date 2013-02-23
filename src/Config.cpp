@@ -84,28 +84,25 @@ namespace Arya
         }
         if(flag == false) outputFile << edit << std::endl;
         outputFile.close();
-    }
-    string Config::getVarValue(string variableName)
-    {
         if(!init())
         {
             LOG_WARNING("Error loading Config File!");
-            return "";
+            return;
         }
-        else
+    }
+    string Config::getVarValue(string variableName)
+    {
+        std::stringstream fileStream(configFile->getData());
+        string regel;
+        while(true)
         {
-            std::stringstream fileStream(configFile->getData());
-            string regel;
-            while(true)
+            getline(fileStream,regel);
+            if(!fileStream.good()) break;
+            if(regel.substr(0,3) == "var" && regel.substr(4,variableName.size()) == variableName)
             {
-                getline(fileStream,regel);
-                if(!fileStream.good()) break;
-                if(regel.substr(0,3) == "var" && regel.substr(4,variableName.size()) == variableName)
-                {
-                    return regel.substr(5 + variableName.size(), regel.size() - 5 - variableName.size());
-                }
-                else continue;
+                return regel.substr(5 + variableName.size(), regel.size() - 5 - variableName.size());
             }
+            else continue;
         }
     }
     void Config::setVarValue(string variableName, string value)
@@ -145,6 +142,10 @@ namespace Arya
         }
         if(flag == false) outputFile << "var " << variableName << " " << value << std::endl;
         outputFile.close();
-
+        if(!init())
+        {
+            LOG_WARNING("Error loading Config File!");
+            return;
+        }
     }
 }
