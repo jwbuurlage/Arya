@@ -180,7 +180,7 @@ void GameSession::onRender()
     decalProgram->use();
     glBindVertexArray(decalVao);
 
-    decalProgram->setUniform1f("yOffset", 0.5);
+    decalProgram->setUniform1f("yOffset", 2.0);
     decalProgram->setUniformMatrix4fv("vpMatrix", Root::shared().getScene()->getCamera()->getVPMatrix());
     decalProgram->setUniformMatrix4fv("scaleMatrix", Root::shared().getScene()->getTerrain()->getScaleMatrix());
 
