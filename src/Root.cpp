@@ -14,6 +14,7 @@
 #include "Files.h"
 #include "Overlay.h"
 #include "Camera.h"
+#include "Sounds.h"
 #include "common/Logger.h"
 #include "Interface.h"
 
@@ -37,6 +38,7 @@ namespace Arya
         TextureManager::create();
         MaterialManager::create();
         ModelManager::create();
+        SoundManager::create();
         FontManager::create();
     }
 
@@ -78,7 +80,11 @@ namespace Arya
         TextureManager::shared().initialize();
 		//MaterialManager::shared().initialize();
         ModelManager::shared().initialize();
-
+        if(!SoundManager::shared().init())
+        {
+            LOG_WARNING("Could not initialize SoundManager");
+            return false;
+        }
         overlay = new Overlay();
         if(!overlay->init()) return false;
 
@@ -102,8 +108,7 @@ namespace Arya
         Config* config = new Config;
         if(!config->init())
         {
-            LOG_INFO("Could not configure settings");
-            return false;
+            LOG_INFO("Could not find configuration file");
         }
 
         LOG_INFO("Root initialized");

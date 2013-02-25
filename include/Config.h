@@ -13,7 +13,8 @@ namespace Arya
             bool init();
             void cleanup();
             void editConfigFile(string edit);
-
+            string getVarValue(string variableName);
+            void setVarValue(string variableName, string value);
         private:
             bool loadConfigFile(string configFileName);
             File* configFile;

@@ -16,7 +16,7 @@ using namespace Poco::Net;
 class Connection
 {
     public:
-        Connection() : socket(new StreamSocket), bufferSizeTotal(4096)
+        Connection() : socket(new StreamSocket), bufferSizeTotal(8192)
         {
             connected = false;
             connecting = false;
