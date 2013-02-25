@@ -11,8 +11,10 @@ Map::Map()
 
 Map::~Map()
 {
+#ifndef SERVERONLY
     if(terrainInitialized) //unset terrain
         scene->setTerrain(0, 0, 0, vector<Arya::Material*>(), 0, 0);
+#endif
     terrainInitialized = false;
 
     if(hFile) Arya::FileSystem::shared().releaseFile(hFile);
@@ -38,6 +40,7 @@ bool Map::initHeightData()
 
 bool Map::initGraphics(Scene* sc)
 {
+#ifndef SERVERONLY
     if(terrainInitialized) return true;
     if(!hFile) return false;
     if(!sc) return false;
@@ -56,6 +59,7 @@ bool Map::initGraphics(Scene* sc)
     scene->getTerrain()->setScaleMatrix(scaleMatrix);
 
     terrainInitialized = true;
+#endif
     return true;
 }
 

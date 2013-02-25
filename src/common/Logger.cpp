@@ -35,10 +35,12 @@ namespace Arya
 			//Note: When doing file output, also prepend timestamp
             filestream << streambuff.str() << std::endl;
 		}
+#ifndef SERVERONLY
         if(gameConsoleLogLevel & currentLogLevel)
         {
             if(&Console::shared()) Console::shared().addOutputText(streambuff.str());
         }
+#endif
         streambuff.str(std::string());
         streambuff.seekp(0);
         streambuff.clear();
