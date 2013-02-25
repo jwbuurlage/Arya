@@ -330,6 +330,7 @@ void Unit::setUnitState(UnitState state)
 
     unitState = state;
 
+#ifndef SERVERONLY
     if(!object) return; //server
 
     switch(unitState)
@@ -354,6 +355,7 @@ void Unit::setUnitState(UnitState state)
             object->setAnimation("death_fallback");
             break;
    }
+#endif
 }
 
 void Unit::setTargetUnit(Unit* target)

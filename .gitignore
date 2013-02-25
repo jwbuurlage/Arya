@@ -1,5 +1,6 @@
 build/*
 game/build/*
+game/buildserver/*
 tools/build/*
 obj/
 bin/*
@@ -10,4 +11,5 @@ shaders/version_convert.rb
 
 !/build/CMakeLists.txt
 !/game/build/CMakeLists.txt
+!/game/buildserver/CMakeLists.txt
 !/tools/build/CMakeLists.txt
