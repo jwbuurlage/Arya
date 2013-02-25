@@ -71,7 +71,7 @@ void Game::run()
 		network->connectToSessionServer("balubu.com", 13337);
 		Event& joinEvent = eventManager->createEvent(EVENT_JOIN_GAME);
 		joinEvent << 50505; //session hash
-		joinEvent << 10102; //my secret hash
+		joinEvent << 10104; //my secret hash
 		joinEvent.send();
 		//END TEMPORARY
 

@@ -51,17 +51,18 @@ void ServerGameSession::initialize()
 		Faction* faction = createFaction();
 		faction->setColor(gameInfo.players[i].color);
 
+        int num = faction->getId() % 4;
+        vec3 basePos( -250.0f + 500.0f * (num%2), 0.0f, -250.0f + 500.0f * (num/2) ); //one of the 4 corners of map
 		for(int i = 0; i < 20; ++i)
 		{
 			Unit* unit = createUnit(0);
-			unit->setPosition(vec3(-(faction->getId()%5) * 100.0f + 20.0f * (i / 10), 0.0f, -50.0f + 20.0f * (i % 10)));
+            unit->setPosition(basePos + vec3(20.0f*(i/10), 0.0f, 20.0f*(i%10)));
 			faction->addUnit(unit);
 
 			unit = createUnit(1);
-			unit->setPosition(vec3(-(faction->getId()%5) * 100.0f - 50.0f + 20.0f * (i / 10), 0.0f, -50.0f + 20.0f * (i % 10)));
+            unit->setPosition(basePos + vec3(20.0f*(i/10) - 70.0f, 0.0f, 20.0f*(i%10) - 70.0f));
 			faction->addUnit(unit);
 		}
-
 		clientFactionList.push_back(faction);
 	}
 }
