@@ -46,10 +46,26 @@ namespace Arya
         }
         return true;
     }
+    bool Config::loadConfigFileAfterRootInit(string configFileName)
+    {
+        configFile = FileSystem::shared().getFile(configFileName);
+        if(configFile == 0) return false;
+        std::stringstream fileStream(configFile->getData());
+        string regel;
+        while(true)
+        {
+            getline(fileStream,regel);
+            if(!fileStream.good()) break;
+            if(regel.empty()) continue;
+            if(regel.substr(0,3) == "var") continue;
+            if(regel[0] == '#') continue;
+        }
+        return true;
+    }
     void Config::updateConfigFile()
     {
         if(configFile != 0) FileSystem::shared().releaseFile(configFile);
-        loadConfigFile("config.txt");
+        loadConfigFileAfterRootInit("config.txt");
         return;
     }
 

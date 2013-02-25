@@ -17,6 +17,7 @@ namespace Arya
             void setVarValue(string variableName, string value);
         private:
             bool loadConfigFile(string configFileName);
+            bool loadConfigFileAfterRootInit(string configFileName);
             void updateConfigFile();
             File* configFile;
     };
