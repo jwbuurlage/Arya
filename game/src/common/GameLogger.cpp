@@ -48,10 +48,12 @@ void GameLogger::flush()
         //Note: When doing file output, also prepend timestamp
         filestream << getStream().str() << std::endl;
     }
+#ifndef SERVERONLY
     if(gameConsoleLogLevel & currentLogLevel)
     {
         if(&Arya::Console::shared()) Arya::Console::shared().addOutputText(getStream().str());
     }
+#endif
     getStream().str(std::string());
     getStream().seekp(0);
     getStream().clear();

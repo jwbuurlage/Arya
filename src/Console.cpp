@@ -263,6 +263,8 @@ namespace Arya
                         stbtt_GetBakedQuad(font->baked, 512, 512, history[i].at(j),&xpos ,&ypos,&q,true);
                         rects[i*nrCharOnLine + j + 1]->texOffset = vec2(q.s0, 1 - q.t0 - (q.t1 - q.t0));
                         rects[i*nrCharOnLine + j + 1]->texSize = vec2(q.s1 - q.s0, (q.t1 - q.t0));
+                        rects[i*nrCharOnLine + j + 1]->offsetInPixels.y = Root::shared().getWindowHeight() - (i+1) * (textHeightInPixels + pixelsInBetween) - q.y1;
+                        rects[i*nrCharOnLine + j + 1]->sizeInPixels = vec2(q.x1 - q.x0, (q.y1 - q.y0));
                     }
                 }
                 for(int i = 0; (i < nrLines && (unsigned)i < history.size()); i++) // clears the fonttextures of the rectangles that do not need to be filled
@@ -278,7 +280,8 @@ namespace Arya
                 rects[nrLines * nrCharOnLine + j + 1]->textureHandle = font->textureHandle;
                 rects[nrLines * nrCharOnLine + j + 1]->isVisible = visibility; // + 1 because of the console rect
                 stbtt_GetBakedQuad(font->baked, 512, 512, currentLine.at(j),&xpos ,&ypos,&q,true);
-                rects[nrLines * nrCharOnLine + j + 1]->offsetInPixels.y = Root::shared().getWindowHeight() - (history.size() + 1) * (textHeightInPixels + pixelsInBetween);
+                rects[nrLines * nrCharOnLine + j + 1]->offsetInPixels.y = Root::shared().getWindowHeight() - (history.size() + 1) * (textHeightInPixels + pixelsInBetween) - q.y1;
+                rects[nrLines * nrCharOnLine + j + 1]->sizeInPixels = vec2(q.x1 - q.x0, (q.y1 - q.y0));
                 rects[nrLines * nrCharOnLine + j + 1]->texOffset = vec2(q.s0, 1 - q.t0 - (q.t1 - q.t0));
                 rects[nrLines * nrCharOnLine + j + 1]->texSize = vec2(q.s1 - q.s0, (q.t1 - q.t0));
             }
@@ -305,8 +308,7 @@ namespace Arya
 
     void Console::toggleVisibilityConsole() //toggle visibility of the console
     {
-        if(visibility) visibility = false;
-        else visibility = true;
+        visibility = !visibility;
     }
 
     void Console::addTextLine(string textToBeAdded) //add line of text to the history (as well as to the search history). If nr of lines > maxnr then the first one will be deleted

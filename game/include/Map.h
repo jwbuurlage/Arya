@@ -21,6 +21,8 @@ class Map
         bool initGraphics(Scene* scene);
 
         float heightAtGroundPosition(float x, float z);
+        float getSize() const { return scaleVector.x; }
+
     private:
         Scene* scene;
         Arya::File* hFile;

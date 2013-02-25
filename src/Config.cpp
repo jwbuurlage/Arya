@@ -17,10 +17,10 @@ namespace Arya
     {
         cleanup();
     }
+
     bool Config::init()
     {
-        if(loadConfigFile("config.txt")){return true;}
-        else return false;
+        return loadConfigFile("config.txt");
     }
 
     void Config::cleanup()
