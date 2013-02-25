@@ -46,6 +46,12 @@ namespace Arya
         }
         return true;
     }
+    void Config::updateConfigFile()
+    {
+        if(configFile != 0) FileSystem::shared().releaseFile(configFile);
+        loadConfigFile("config.txt");
+        return;
+    }
 
     void Config::editConfigFile(string edit)
     {
@@ -84,11 +90,7 @@ namespace Arya
         }
         if(flag == false) outputFile << edit << std::endl;
         outputFile.close();
-        if(!init())
-        {
-            LOG_WARNING("Error loading Config File!");
-            return;
-        }
+        updateConfigFile();
     }
     string Config::getVarValue(string variableName)
     {
@@ -142,10 +144,6 @@ namespace Arya
         }
         if(flag == false) outputFile << "var " << variableName << " " << value << std::endl;
         outputFile.close();
-        if(!init())
-        {
-            LOG_WARNING("Error loading Config File!");
-            return;
-        }
+        updateConfigFile();
     }
 }

@@ -47,7 +47,7 @@ namespace Arya
             vec3 getDepthResult(){ return clickScreenLocation; }
 
             float getAspectRatio() const { return windowWidth/(float)windowHeight; }
-
+            bool consoleInit;
         private:
             bool initGLFW();
             bool initGLEW();
