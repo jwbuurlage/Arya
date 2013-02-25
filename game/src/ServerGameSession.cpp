@@ -52,7 +52,7 @@ void ServerGameSession::initialize()
 		faction->setColor(gameInfo.players[i].color);
 
         int num = faction->getId() % 4;
-        vec3 basePos( -1000.0f + 2000.0f * (num%2), 0.0f, -1000.0f + 2000.0f * (num/2) ); //one of the 4 corners of map
+        vec3 basePos( -250.0f + 500.0f * (num%2), 0.0f, -250.0f + 500.0f * (num/2) ); //one of the 4 corners of map
 		for(int i = 0; i < 20; ++i)
 		{
 			Unit* unit = createUnit(0);
