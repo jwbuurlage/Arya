@@ -33,7 +33,7 @@ void Game::run()
 {
     root = new Root;
 
-    if(!(root->init(false, 800, 600))) {
+    if(!(root->init(true, 800, 600))) {
         GAME_LOG_ERROR("Unable to init root");
     }
     else
@@ -43,9 +43,7 @@ void Game::run()
         if(network) delete network;
         network = new Network;
 
-        //network->connectToSessionServer("balubu.com", 13337);
-        network->startServer();
-        network->connectToSessionServer("localhost", 13337);
+        network->connectToLobbyServer("balubu.com", 13337);
 
         if(eventManager) delete eventManager;
         eventManager = new EventManager(network);

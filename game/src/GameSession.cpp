@@ -135,7 +135,7 @@ bool GameSession::initVertices()
 void GameSession::onFrame(float elapsedTime)
 {
     // clear the quadtree
-    unitTree->clear();
+    //unitTree->clear();
 
     // update units
     mat4 vpMatrix = Root::shared().getScene()->getCamera()->getVPMatrix();
@@ -156,7 +156,7 @@ void GameSession::onFrame(float elapsedTime)
                 (*it)->setScreenPosition(vec2(onScreen.x, onScreen.y));
 
                 if(factions[i] != localFaction)
-                    unitTree->insert((*it)->getId(), vec2((*it)->getPosition().x,(*it)->getPosition().y));
+                    //unitTree->insert((*it)->getId(), vec2((*it)->getPosition().x,(*it)->getPosition().y));
 
                 (*it)->update(elapsedTime, map);
 
