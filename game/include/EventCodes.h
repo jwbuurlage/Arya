@@ -108,5 +108,10 @@ typedef enum
 	//------------------------
 	// - Unit ID
 	//------------------------
-	EVENT_UNIT_DIED
+	EVENT_UNIT_DIED,
+
+	//------------------------
+	// - Faction ID
+	//------------------------
+	EVENT_PLAYER_VICTORY
 } EventCode;
