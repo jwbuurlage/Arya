@@ -400,7 +400,7 @@ void GameSession::handleEvent(Packet& packet)
 		}
 		break;
 
-        case EVENT_PLAYER_VICTORY:
+        case EVENT_PLAYER_DEFEAT:
 		{
             int factionID;
             packet >> factionID;
