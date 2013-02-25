@@ -107,11 +107,11 @@ namespace Arya
         addFrameListener(console);
         addInputListener(console);
 
-        /* Config* config = new Config;
+        Config* config = new Config;
         if(!config->init())
         {
             LOG_INFO("Could not find configuration file");
-        } */
+        }
 
         LOG_INFO("Root initialized");
 
