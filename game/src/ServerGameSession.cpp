@@ -53,7 +53,7 @@ void ServerGameSession::initialize()
 
         int num = gameInfo.players[i].slot;
         vec3 basePos( -250.0f + 500.0f * (num%2), 0.0f, -250.0f + 500.0f * (num/2) ); //one of the 4 corners of map
-		for(int i = 0; i < 10; ++i)
+		for(int i = 0; i < 5; ++i)
 		{
 			Unit* unit = createUnit(0);
             unit->setPosition(basePos + vec3(20.0f*(i/5), 0.0f, 20.0f*(i%5)));
@@ -182,11 +182,18 @@ void ServerGameSession::update(float elapsedTime)
 
         if(faction->getUnits().empty()) continue;
 
+        bool lost = false;
+
         for(list<Unit*>::iterator it = faction->getUnits().begin();
                 it != faction->getUnits().end(); )
         {
             if((*it)->obsolete() && (*it)->readyToDelete())
             {
+                if( (*it)->getType() == 2 )
+                {
+                    lost = true;
+                }
+
                 delete *it;
                 it = faction->getUnits().erase(it);
             }
@@ -199,13 +206,17 @@ void ServerGameSession::update(float elapsedTime)
 
         //all units of a faction have died during this loop
         //player loses
-        if(faction->getUnits().empty())
+        if(lost)
         {
             if(clientList.empty()==false)
             {
                 Packet *pak = server->createPacket(EVENT_PLAYER_DEFEAT);
                 *pak << faction->getId();
                 sendToAllClients(pak);
+            }
+            for(list<Unit*>::iterator it = faction->getUnits().begin(); it != faction->getUnits().end(); ++it)
+            {
+                (*it)->makeObsolete();
             }
         }
     }
