@@ -99,6 +99,8 @@ void ServerGameSession::removeClient(ServerClient* client)
 	//
 	//Let the faction remain intact in case the player reconnects
     int id = client->getClientId();
+    Faction* faction = client->getFaction();
+    if(faction) faction->setClientId(-1);
     for(clientIterator iter = clientList.begin(); iter != clientList.end(); ++iter)
     {
         if(*iter == client)
@@ -169,10 +171,11 @@ void ServerGameSession::startGame()
 
 void ServerGameSession::update(float elapsedTime)
 {
-    for(clientIterator clientIter = clientList.begin(); clientIter != clientList.end(); ++clientIter)
-    {
-        Faction* faction = (*clientIter)->getFaction();
-        if(!faction) continue;
+	for(factionIterator iter = clientFactionList.begin(); iter != clientFactionList.end(); ++iter)
+	{
+		Faction* faction = *iter;
+
+        if(faction->getUnits().empty()) continue;
 
         for(list<Unit*>::iterator it = faction->getUnits().begin();
                 it != faction->getUnits().end(); )
@@ -186,6 +189,18 @@ void ServerGameSession::update(float elapsedTime)
             {
                 (*it)->serverUpdate(elapsedTime, map, this);
                 ++it;
+            }
+        }
+
+        //all units of a faction have died during this loop
+        //player loses
+        if(faction->getUnits().empty())
+        {
+            if(clientList.empty()==false)
+            {
+                Packet *pak = server->createPacket(EVENT_PLAYER_DEFEAT);
+                *pak << faction->getId();
+                sendToAllClients(pak);
             }
         }
     }
