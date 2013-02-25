@@ -47,7 +47,7 @@ namespace Arya
             vec3 getDepthResult(){ return clickScreenLocation; }
 
             float getAspectRatio() const { return windowWidth/(float)windowHeight; }
-            bool consoleInit;
+            bool getConfigIsInit(){return configIsInit;}
         private:
             bool initGLFW();
             bool initGLEW();
@@ -82,5 +82,6 @@ namespace Arya
             friend void GLFWCALL mouseButtonCallback(int button, int action);
             friend void GLFWCALL mousePosCallback(int x, int y);
             friend void GLFWCALL mouseWheelCallback(int pos);
+            bool configIsInit;
     };
 }

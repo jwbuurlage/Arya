@@ -103,7 +103,7 @@ namespace Arya
             parser << splitLineParameters(command);
             parser >> float1 >> float2 >> float3;
             changeConsoleColor(float1, float2, float3);
-            if(Root::shared().consoleInit) Config::shared().editConfigFile(command);
+            if(Root::shared().getConfigIsInit()) Config::shared().editConfigFile(command);
         }
         if(splitLineCommand(command) == "hide")
         {
