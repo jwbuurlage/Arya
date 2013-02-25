@@ -67,6 +67,7 @@ namespace Arya
         if(!initGLFW()) return false;
         if(!initGLEW()) return false;
 
+
         // set GL stuff
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
@@ -210,10 +211,8 @@ namespace Arya
             windowHeight = desktopHeight;
         }
 
-#ifdef __APPLE__
         glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3); // Use OpenGL Core v3.2
-        glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 2);
-#endif
+        glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 1);
 
         if(!glfwOpenWindow(windowWidth, windowHeight, 0, 0, 0, 0, 32, 0, (fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW)))
         {
@@ -232,14 +231,12 @@ namespace Arya
 
     bool Root::initGLEW()
     {
-#ifdef __APPLE__
         glewExperimental = GL_TRUE; 
-#endif
         glewInit();
 
-        if (!GLEW_VERSION_4_0)
+        if (!GLEW_VERSION_3_1)
         {
-            LOG_WARNING("No OpenGL 4.0 support! Continuing");
+            LOG_WARNING("No OpenGL 3.1 support! Continuing");
         }
 
         return true;

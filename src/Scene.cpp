@@ -86,20 +86,26 @@ namespace Arya
 
     bool Scene::initShadowSupport()
     {
+        if(glGetError() != GL_NO_ERROR)
+            LOG_ERROR("GL error before FBO");
+
+        int shadowFBOSize = 1024;
         glGenFramebuffers(1, &shadowFBOHandle);
         glBindFramebuffer(GL_FRAMEBUFFER, shadowFBOHandle);
 
         glGenTextures(1, &shadowDepthTextureHandle);
         glBindTexture(GL_TEXTURE_2D, shadowDepthTextureHandle);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, 2048, 2048, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, shadowFBOSize, shadowFBOSize, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, shadowDepthTextureHandle, 0);
-
         glDrawBuffer(GL_NONE);
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowDepthTextureHandle, 0);
+
+        LOG_GL_ERRORS();
 
         switch(glCheckFramebufferStatus(GL_FRAMEBUFFER)) {
             case GL_FRAMEBUFFER_COMPLETE:
@@ -109,10 +115,20 @@ namespace Arya
             case GL_FRAMEBUFFER_UNSUPPORTED:
                 LOG_ERROR("Framebuffer is unsupported");
                 return false;
+
                 break;
 
-           case GL_FRAMEBUFFER_UNDEFINED:
+            case GL_FRAMEBUFFER_UNDEFINED:
                 LOG_ERROR("Framebuffer is undefined");
+                return false;
+                break;
+
+            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+                LOG_ERROR("Framebuffer has incomplete attachment");
+                return false;
+                break;
+            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+                LOG_ERROR("Framebuffer is missing attachment");
                 return false;
                 break;
 
@@ -131,7 +147,7 @@ namespace Arya
 
         rotateToLightDirMatrix = glm::rotate(mat4(1.0),
                 glm::acos(glm::dot(glm::normalize(lightDirection),
-                               vec3(0.0, 0.0, 1.0))) * (180.0f / 3.141592653589793f),
+                        vec3(0.0, 0.0, 1.0))) * (180.0f / 3.141592653589793f),
                 glm::cross(lightDirection, vec3(0.0, 0.0, 1.0)));
 
         lightOrthoMatrix = orthoShadowCubeMatrix * rotateToLightDirMatrix;
@@ -215,7 +231,7 @@ namespace Arya
 
         rotateToLightDirMatrix = glm::rotate(mat4(1.0),
                 glm::acos(glm::dot(glm::normalize(lightDirection),
-                               vec3(0.0, 0.0, 1.0))) * (180.0f / 3.141592653589793f),
+                        vec3(0.0, 0.0, 1.0))) * (180.0f / 3.141592653589793f),
                 glm::cross(lightDirection, vec3(0.0, 0.0, 1.0)));
 
         mat4 translationMatrix = glm::translate(mat4(1.0), -translationToCenter);
@@ -230,9 +246,10 @@ namespace Arya
         //------------------------------
 
         glBindFramebuffer(GL_FRAMEBUFFER, shadowFBOHandle);
-        glViewport(0, 0, 2048, 2048);
+        glViewport(0, 0, 1024, 1024);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
         basicProgram->use();
 
