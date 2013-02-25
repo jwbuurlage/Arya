@@ -65,7 +65,7 @@ void ServerGameSession::initialize()
 		}
 
         Unit* u = createUnit(2);
-        u->setPosition(vec3(-(faction->getId()%5) * 100.0f - 50.0f + 20.0f * (i / 10), 0.0f, -50.0f + 20.0f * (i % 10)));
+        u->setPosition(basePos);
         faction->addUnit(u);
 
 	clientFactionList.push_back(faction);
