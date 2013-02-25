@@ -43,7 +43,8 @@ void Game::run()
         if(network) delete network;
         network = new Network;
 
-        network->connectToLobbyServer("balubu.com", 13337);
+        network->startServer();
+        network->connectToLobbyServer("localhost", 13337);
 
         if(eventManager) delete eventManager;
         eventManager = new EventManager(network);
@@ -67,7 +68,7 @@ void Game::run()
 		lobbyToGameEvent << 10104;
         lobbyToGameEvent.send();
 		//in a normal scenario the following is done below in the eventhandler at EVENT_SESSION_INFO
-		network->connectToSessionServer("balubu.com", 13337);
+		network->connectToSessionServer("localhost", 13337);
 		Event& joinEvent = eventManager->createEvent(EVENT_JOIN_GAME);
 		joinEvent << 50505; //session hash
 		joinEvent << 10102; //my secret hash

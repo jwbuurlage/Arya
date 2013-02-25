@@ -89,7 +89,7 @@ namespace Arya
         if(glGetError() != GL_NO_ERROR)
             LOG_ERROR("GL error before FBO");
 
-        int shadowFBOSize = 1024;
+        int shadowFBOSize = 2048;
         glGenFramebuffers(1, &shadowFBOHandle);
         glBindFramebuffer(GL_FRAMEBUFFER, shadowFBOHandle);
 
@@ -246,7 +246,7 @@ namespace Arya
         //------------------------------
 
         glBindFramebuffer(GL_FRAMEBUFFER, shadowFBOHandle);
-        glViewport(0, 0, 1024, 1024);
+        glViewport(0, 0, 2048, 2048);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
