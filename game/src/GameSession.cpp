@@ -155,7 +155,7 @@ void GameSession::onFrame(float elapsedTime)
                 onScreen.y /= onScreen.w;
                 (*it)->setScreenPosition(vec2(onScreen.x, onScreen.y));
 
-                if(factions[i] != localFaction)
+                //if(factions[i] != localFaction)
                     //unitTree->insert((*it)->getId(), vec2((*it)->getPosition().x,(*it)->getPosition().y));
 
                 (*it)->update(elapsedTime, map);
