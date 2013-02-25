@@ -33,6 +33,7 @@ namespace Arya
         scene = 0;
         oldTime = 0;
         overlay = 0;
+        consoleInit = false;
 
         FileSystem::create();
         TextureManager::create();
@@ -101,6 +102,7 @@ namespace Arya
           LOG_INFO("Could not initialize console");
           return false;
         }
+        consoleInit = true;
         addFrameListener(console);
         addInputListener(console);
 
