@@ -1,4 +1,5 @@
-#version 400
+#version 140
+#extension GL_ARB_explicit_attrib_location : require
 
 uniform sampler2D splatTexture;
 uniform sampler2D texture1;
@@ -30,9 +31,9 @@ void main()
     vec4 splatSample = vec4(0.0);
     splatSample = texture(splatTexture, texCoo);
 	
-	vec4 color1 = texture(texture1, 10.0*texCoo);
-	vec4 color2 = texture(texture2, 10.0*texCoo);
-	vec4 color3 = texture(texture3, 10.0*texCoo);
+	vec4 color1 = texture(texture1, 30.0*texCoo);
+	vec4 color2 = texture(texture2, 30.0*texCoo);
+	vec4 color3 = texture(texture3, 30.0*texCoo);
 
 	color1 *= max(lightFraction*parameters1.w, parameters1.z);
 	color2 *= max(lightFraction*parameters2.w, parameters2.z);

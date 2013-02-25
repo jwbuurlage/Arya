@@ -1,11 +1,12 @@
-#version 400
+#version 140
+#extension GL_ARB_explicit_attrib_location : require
 
 uniform vec2 screenSize;
 uniform vec2 screenPosition;
 uniform vec2 texOffset;
 uniform vec2 texSize;
 
-layout (location = 0) in vec2 position;
+layout(location=0) in vec2 position;
 
 out vec2 texCoo;
 

@@ -1,10 +1,10 @@
-#version 400
+#version 140
+#extension GL_ARB_explicit_attrib_location : require
 
 uniform sampler2D texture1;
 uniform vec4 uColor;
 in vec2 texCoo;
-layout (location = 0) out vec4 fragColor;
-
+layout(location=0) out vec4 fragColor;
 
 vec4 overlayColor(vec2 tex)
 {
