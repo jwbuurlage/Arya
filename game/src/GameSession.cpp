@@ -53,6 +53,7 @@ bool GameSession::init()
     Game::shared().getEventManager()->addEventHandler(EVENT_MOVE_UNIT, this);
     Game::shared().getEventManager()->addEventHandler(EVENT_ATTACK_MOVE_UNIT, this);
     Game::shared().getEventManager()->addEventHandler(EVENT_UNIT_DIED, this);
+    Game::shared().getEventManager()->addEventHandler(EVENT_PLAYER_DEFEAT, this);
     Game::shared().getEventManager()->addEventHandler(EVENT_PLAYER_VICTORY, this);
 
     input = new GameSessionInput(this);
@@ -403,7 +404,15 @@ void GameSession::handleEvent(Packet& packet)
 		{
             int factionID;
             packet >> factionID;
-            LOG_INFO("Game won by player" << factionID + 1);
+            LOG_INFO("Player lost: " << factionID + 1);
+		}
+		break;
+
+        case EVENT_PLAYER_VICTORY:
+		{
+            int factionID;
+            packet >> factionID;
+            LOG_INFO("Game won by player: " << factionID + 1);
 		}
 		break;
 
