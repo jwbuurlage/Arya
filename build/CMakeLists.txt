@@ -17,6 +17,8 @@ IF(APPLE)
         LIB_LIBRARIES
         "GLEW"
         "glfw"
+        "sfml-system"
+        "sfml-audio"
         ) 
     SET(
         CMAKE_CXX_LINK_FLAGS
@@ -28,6 +30,8 @@ ELSE()
         "GL"
         "GLEW"
         "glfw"
+        "sfml-system"
+        "sfml-audio"
         )
 ENDIF()
 
@@ -53,6 +57,7 @@ SET(
     "../src/common/Logger.cpp"
     "../src/Console.cpp"
     "../src/Config.cpp"
+    "../src/Sounds.cpp"
     )
 
 SET(

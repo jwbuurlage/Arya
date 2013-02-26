@@ -53,6 +53,8 @@ bool GameSession::init()
     Game::shared().getEventManager()->addEventHandler(EVENT_MOVE_UNIT, this);
     Game::shared().getEventManager()->addEventHandler(EVENT_ATTACK_MOVE_UNIT, this);
     Game::shared().getEventManager()->addEventHandler(EVENT_UNIT_DIED, this);
+    Game::shared().getEventManager()->addEventHandler(EVENT_PLAYER_DEFEAT, this);
+    Game::shared().getEventManager()->addEventHandler(EVENT_PLAYER_VICTORY, this);
 
     input = new GameSessionInput(this);
     input->init();
@@ -85,7 +87,7 @@ bool GameSession::init()
     Texture* selectionTex = TextureManager::shared().getTexture("selection.png");
     if(selectionTex) selectionDecalHandle = selectionTex->handle;
 
-    unitTree = new QuadTree(0, 5, vec2(0.0), vec2(1024.0));
+    unitTree = new QuadTree(0, 5, vec2(0.0), vec2(map->getSize()));
 
     return true;
 }
@@ -135,7 +137,7 @@ bool GameSession::initVertices()
 void GameSession::onFrame(float elapsedTime)
 {
     // clear the quadtree
-    unitTree->clear();
+    //unitTree->clear();
 
     // update units
     mat4 vpMatrix = Root::shared().getScene()->getCamera()->getVPMatrix();
@@ -155,17 +157,13 @@ void GameSession::onFrame(float elapsedTime)
                 onScreen.y /= onScreen.w;
                 (*it)->setScreenPosition(vec2(onScreen.x, onScreen.y));
 
-                if(factions[i] != localFaction)
-                {
-                    unitTree->insert((*it)->getId(), vec2((*it)->getPosition().x,(*it)->getPosition().y));
-                }
+                //if(factions[i] != localFaction)
+                    //unitTree->insert((*it)->getId(), vec2((*it)->getPosition().x,(*it)->getPosition().y));
 
                 (*it)->update(elapsedTime, map);
 
                 if(factions[i] == localFaction)
-                {
                     (*it)->checkForEnemies(unitTree);
-                }
 
                 ++it;
             }
@@ -184,7 +182,7 @@ void GameSession::onRender()
     decalProgram->use();
     glBindVertexArray(decalVao);
 
-    decalProgram->setUniform1f("yOffset", 0.5);
+    decalProgram->setUniform1f("yOffset", 2.0);
     decalProgram->setUniformMatrix4fv("vpMatrix", Root::shared().getScene()->getCamera()->getVPMatrix());
     decalProgram->setUniformMatrix4fv("scaleMatrix", Root::shared().getScene()->getTerrain()->getScaleMatrix());
 
@@ -352,9 +350,9 @@ void GameSession::handleEvent(Packet& packet)
                 {
                     if( (*iter)->getClientId() == id )
                     {
-                        GAME_LOG_INFO("Client " << id << " removed from game session. Removing faction...");
-                        delete *iter;
-                        iter = factions.erase(iter);
+                        GAME_LOG_INFO("Client " << id << " removed from game session. NOT removing faction!");
+                        //delete *iter;
+                        //iter = factions.erase(iter);
                         break;
                     }
                 }
@@ -399,6 +397,22 @@ void GameSession::handleEvent(Packet& packet)
 			packet >> id;
 			Unit* unit = getUnitById(id);
 			if(unit) unit->makeDead();
+		}
+		break;
+
+        case EVENT_PLAYER_DEFEAT:
+		{
+            int factionID;
+            packet >> factionID;
+            LOG_INFO("Player lost: " << factionID + 1);
+		}
+		break;
+
+        case EVENT_PLAYER_VICTORY:
+		{
+            int factionID;
+            packet >> factionID;
+            LOG_INFO("Game won by player: " << factionID + 1);
 		}
 		break;
 

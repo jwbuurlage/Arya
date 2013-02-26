@@ -3,9 +3,9 @@
 #include "Overlay.h"
 #include "Fonts.h"
 #include "Config.h"
+#include "Sounds.h"
 #include "common/Logger.h"
 #include <sstream>
-
 using std::stringstream;
 
 namespace Arya
@@ -26,6 +26,7 @@ namespace Arya
         time = 0.0;
         lShift = false;
         rShift = false;
+        rAlt = false;
         cLock = false;
         upCount = 0;
     };
@@ -81,6 +82,12 @@ namespace Arya
         }
         addCommandListener("consoleColor", this);
         addCommandListener("hide", this);
+        addCommandListener("getVarValue", this);
+        addCommandListener("setVarValue", this);
+        addCommandListener("PLAYSOUND", this);
+        addCommandListener("PLAYMUSIC", this);
+        addCommandListener("STOPSOUND", this);
+        addCommandListener("STOPMUSIC", this);
         return true;
     }
 
@@ -96,11 +103,54 @@ namespace Arya
             parser << splitLineParameters(command);
             parser >> float1 >> float2 >> float3;
             changeConsoleColor(float1, float2, float3);
-            Config::shared().editConfigFile(command);
+            if(Root::shared().getConfigIsInit()) Config::shared().editConfigFile(command);
         }
         if(splitLineCommand(command) == "hide")
         {
             if(splitLineParameters(command) == "console") toggleVisibilityConsole();
+        }
+        if(splitLineCommand(command) == "getVarValue")
+        {
+            string variableName;
+            stringstream parser;
+            parser << splitLineParameters(command);
+            parser >> variableName;
+            string output = Config::shared().getVarValue(variableName);
+            LOG_INFO("The value of " << variableName << " is: " << output);
+        }
+        if(splitLineCommand(command) == "setVarValue")
+        {
+            string variableName;
+            string value;
+            stringstream parser;
+            parser << splitLineParameters(command);
+            parser >> variableName >> value;
+
+            string output = Config::shared().getVarValue(variableName);
+            LOG_INFO("The value of " << variableName << " is: " << output);
+            Config::shared().setVarValue(variableName, value);
+            string output1 = Config::shared().getVarValue(variableName);
+            LOG_INFO("The value of " << variableName << " is: " << output1);
+        }
+        int count = 0;
+        if(splitLineCommand(command) == "PLAYSOUND")
+        {
+            count = SoundManager::shared().play("testSound.wav");
+            SoundManager::shared().setLoopSound("testSound.wav", count, 0.01, true);
+            if(count == -1000) LOG_WARNING("SoundFile testSound.wav not found!");
+        }
+        if(splitLineCommand(command) == "PLAYMUSIC")
+        {
+            if(SoundManager::shared().play("testMusic.wav") == -1000) LOG_WARNING("MusicFile testMusic.wav not found!");
+        }
+        if(splitLineCommand(command) == "STOPMUSIC")
+        {
+            SoundManager::shared().stopMusic("testMusic.wav");
+        }
+        if(splitLineCommand(command) == "STOPSOUND")
+        {
+            SoundManager::shared().setLoopSound("testSound.wav", count, 0.5, false);
+            SoundManager::shared().stopSound("testSound.wav", count, 0.001);
         }
         else flag = false;
         return flag;
@@ -143,6 +193,20 @@ namespace Arya
             else if (keyDown && key == GLFW_KEY_KP_DIVIDE && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
             else if (keyDown && key == GLFW_KEY_KP_EQUAL && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
             else if (keyDown && key == GLFW_KEY_KP_DECIMAL && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == '.' && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == ',' && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == ':' && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == '=' && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == '/' && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == ';' && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == '?' && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == '!' && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == '$' && !rAlt && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && key == '^' && !rAlt && currentLine.length() < (unsigned)nrCharOnLine) LOG_INFO(key);
+            else if (keyDown && (key == '(' || key == ')') && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
+            else if (keyDown && ((key == ']') || (key == '$' && rAlt )) && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(']');
+            else if (keyDown && ((key == '[') || (key == '^' && rAlt )) && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back('[');
+            else if (keyDown && (key == '{' || key == '}') && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
             else
             {
                 switch(key)
@@ -158,6 +222,7 @@ namespace Arya
                     case GLFW_KEY_SPACE: if(keyDown) currentLine.push_back(key); break;
                     case GLFW_KEY_RSHIFT: if(!rShift) rShift = true; else rShift = false; break;
                     case GLFW_KEY_LSHIFT: if(!lShift) lShift = true; else lShift = false; break;
+                    case GLFW_KEY_RALT: if(!rAlt) rAlt = true; else rAlt = false; break;
                     case GLFW_KEY_CAPS_LOCK: if(keyDown)
                                              {
                                                  if(cLock) cLock = false;
@@ -198,6 +263,8 @@ namespace Arya
                         stbtt_GetBakedQuad(font->baked, 512, 512, history[i].at(j),&xpos ,&ypos,&q,true);
                         rects[i*nrCharOnLine + j + 1]->texOffset = vec2(q.s0, 1 - q.t0 - (q.t1 - q.t0));
                         rects[i*nrCharOnLine + j + 1]->texSize = vec2(q.s1 - q.s0, (q.t1 - q.t0));
+                        rects[i*nrCharOnLine + j + 1]->offsetInPixels.y = Root::shared().getWindowHeight() - (i+1) * (textHeightInPixels + pixelsInBetween) - q.y1;
+                        rects[i*nrCharOnLine + j + 1]->sizeInPixels = vec2(q.x1 - q.x0, (q.y1 - q.y0));
                     }
                 }
                 for(int i = 0; (i < nrLines && (unsigned)i < history.size()); i++) // clears the fonttextures of the rectangles that do not need to be filled
@@ -213,7 +280,8 @@ namespace Arya
                 rects[nrLines * nrCharOnLine + j + 1]->textureHandle = font->textureHandle;
                 rects[nrLines * nrCharOnLine + j + 1]->isVisible = visibility; // + 1 because of the console rect
                 stbtt_GetBakedQuad(font->baked, 512, 512, currentLine.at(j),&xpos ,&ypos,&q,true);
-                rects[nrLines * nrCharOnLine + j + 1]->offsetInPixels.y = Root::shared().getWindowHeight() - (history.size() + 1) * (textHeightInPixels + pixelsInBetween);
+                rects[nrLines * nrCharOnLine + j + 1]->offsetInPixels.y = Root::shared().getWindowHeight() - (history.size() + 1) * (textHeightInPixels + pixelsInBetween) - q.y1;
+                rects[nrLines * nrCharOnLine + j + 1]->sizeInPixels = vec2(q.x1 - q.x0, (q.y1 - q.y0));
                 rects[nrLines * nrCharOnLine + j + 1]->texOffset = vec2(q.s0, 1 - q.t0 - (q.t1 - q.t0));
                 rects[nrLines * nrCharOnLine + j + 1]->texSize = vec2(q.s1 - q.s0, (q.t1 - q.t0));
             }
@@ -240,8 +308,7 @@ namespace Arya
 
     void Console::toggleVisibilityConsole() //toggle visibility of the console
     {
-        if(visibility) visibility = false;
-        else visibility = true;
+        visibility = !visibility;
     }
 
     void Console::addTextLine(string textToBeAdded) //add line of text to the history (as well as to the search history). If nr of lines > maxnr then the first one will be deleted

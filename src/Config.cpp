@@ -17,10 +17,10 @@ namespace Arya
     {
         cleanup();
     }
+
     bool Config::init()
     {
-        if(loadConfigFile("config.txt")){return true;}
-        else return false;
+        return loadConfigFile("config.txt");
     }
 
     void Config::cleanup()
@@ -40,10 +40,33 @@ namespace Arya
             getline(fileStream,regel);
             if(!fileStream.good()) break;
             if(regel.empty()) continue;
+            if(regel.substr(0,3) == "var") continue;
             if(regel[0] == '#') continue;
             Console::shared().onCommand(regel);
         }
         return true;
+    }
+    bool Config::loadConfigFileAfterRootInit(string configFileName)
+    {
+        configFile = FileSystem::shared().getFile(configFileName);
+        if(configFile == 0) return false;
+        std::stringstream fileStream(configFile->getData());
+        string regel;
+        while(true)
+        {
+            getline(fileStream,regel);
+            if(!fileStream.good()) break;
+            if(regel.empty()) continue;
+            if(regel.substr(0,3) == "var") continue;
+            if(regel[0] == '#') continue;
+        }
+        return true;
+    }
+    void Config::updateConfigFile()
+    {
+        if(configFile != 0) FileSystem::shared().releaseFile(configFile);
+        loadConfigFileAfterRootInit("config.txt");
+        return;
     }
 
     void Config::editConfigFile(string edit)
@@ -83,5 +106,60 @@ namespace Arya
         }
         if(flag == false) outputFile << edit << std::endl;
         outputFile.close();
+        updateConfigFile();
+    }
+    string Config::getVarValue(string variableName)
+    {
+        std::stringstream fileStream(configFile->getData());
+        string regel;
+        while(true)
+        {
+            getline(fileStream,regel);
+            if(!fileStream.good()) break;
+            if(regel.substr(0,3) == "var" && regel.substr(4,variableName.size()) == variableName)
+            {
+                return regel.substr(5 + variableName.size(), regel.size() - 5 - variableName.size());
+            }
+            else continue;
+        }
+    }
+    void Config::setVarValue(string variableName, string value)
+    {
+        bool flag = false;
+        std::ofstream outputFile((FileSystem::shared().getApplicationPath() + "config.txt").c_str());
+        if(!outputFile.is_open()) 
+        {
+            LOG_WARNING("Could not open output config file!");
+            return;
+        }
+        std::stringstream fileStream(configFile->getData());
+        string regel;
+        while(true)
+        {
+            getline(fileStream,regel);
+            if(!fileStream.good()) break;
+            if(regel.empty())
+            {
+                outputFile << regel << std::endl;
+                continue;
+            }
+            else
+            {
+                string regelVarAndValue = regel.substr(4, regel.size()-4);
+                string regelVar = regel.substr(4, regelVarAndValue.find_first_of(" "));
+                if(regelVar == variableName)
+                {
+                    outputFile << "var " << variableName << " " << value << std::endl;
+                    flag = true;
+                }
+                else
+                {
+                    outputFile << regel << std::endl;
+                }
+            }
+        }
+        if(flag == false) outputFile << "var " << variableName << " " << value << std::endl;
+        outputFile.close();
+        updateConfigFile();
     }
 }

@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include "common/Logger.h"
 
 namespace Arya
 {
@@ -38,6 +39,7 @@ namespace Arya
         }
         frameCount = count;
         vaoHandles = new GLuint[frameCount];
+
         glGenVertexArrays(frameCount, vaoHandles);
     }
 }
