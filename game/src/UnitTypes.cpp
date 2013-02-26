@@ -1,7 +1,12 @@
 #include "../include/UnitTypes.h"
 
+// CONSTRUCTOR HEADER FOR REFERENCE
+//UnitInfo(const char* _name, float _radius, float _attackRadius, float _speed, float _yawSpeed,
+            //float _maxHealth, float _damage, float _attackSpeed)
+
 UnitInfo infoForUnitType[] = {
-    UnitInfo("ogros", 10.0f, 5.0f, 30.0f, 720.0f, 100.0f, 20.0f, 1.0f),
-    UnitInfo("hep", 15.0f, 50.0f, 50.0f, 360.0f, 60.0f, 10.0f, 0.7f),
-    UnitInfo("imp", 15.0f, 50.0f, 50.0f, 360.0f, 60.0f, 10.0f, 0.7f)
+            //name      radius  atRad   speed   yawSpeed health   damage  attackSpeed
+    UnitInfo("ogros",   10.0f,  5.0f,   30.0f,  720.0f,  100.0f,  20.0f,  1.0f),
+    UnitInfo("hep",     15.0f,  50.0f,  50.0f,  360.0f,  60.0f,   10.0f,  0.7f),
+    UnitInfo("imp",     30.0f,  15.0f,  10.0f,  180.0f,  300.0f,   50.0f,  0.1f)
 };
