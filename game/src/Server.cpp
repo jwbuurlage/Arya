@@ -106,6 +106,11 @@ Packet* Server::createPacket(int id)
     return new Packet(id);
 }
 
+void Server::deletePacket(Packet* pak)
+{
+    delete pak;
+}
+
 //------------------------------
 // SERVER LOGIC
 //------------------------------

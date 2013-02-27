@@ -240,7 +240,7 @@ void Unit::serverUpdate(float timeElapsed, Map* map, ServerGameSession* serverSe
             return;
         }
 
-		//Unit is alive here
+		//Target unit is alive here
 
         if(glm::distance(getPosition2(), targetUnit->getPosition2())
                 < infoForUnitType[targetUnit->getType()].radius + infoForUnitType[type].attackRadius) {
@@ -259,7 +259,7 @@ void Unit::serverUpdate(float timeElapsed, Map* map, ServerGameSession* serverSe
 					*pak << targetUnit->id;
 					serverSession->sendToAllClients(pak);
 					//Kill the unit
-					targetUnit->makeObsolete();
+                    targetUnit->markForDelete();
                     targetUnit->release();
                     targetUnit = 0;
 

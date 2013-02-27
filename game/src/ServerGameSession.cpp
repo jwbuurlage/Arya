@@ -68,7 +68,7 @@ void ServerGameSession::initialize()
         u->setPosition(basePos);
         faction->addUnit(u);
 
-	clientFactionList.push_back(faction);
+        clientFactionList.push_back(faction);
 	}
 }
 
@@ -160,7 +160,8 @@ void ServerGameSession::sendToAllClients(Packet* pak)
 {
     if(clientList.empty())
     {
-        GAME_LOG_WARNING("calling sendToAllClients but client list is empty. This means the packet is NOT added to any queue and the pointer is probably lost");
+        GAME_LOG_WARNING("calling sendToAllClients but client list is empty. deleting packet.");
+        server->deletePacket(pak);
         return;
     }
     for(clientIterator iter = clientList.begin(); iter != clientList.end(); ++iter)
@@ -176,9 +177,9 @@ void ServerGameSession::startGame()
 
 void ServerGameSession::update(float elapsedTime)
 {
-	for(factionIterator iter = clientFactionList.begin(); iter != clientFactionList.end(); ++iter)
+	for(factionIterator fac = clientFactionList.begin(); fac != clientFactionList.end(); ++fac)
 	{
-		Faction* faction = *iter;
+		Faction* faction = *fac;
 
         if(faction->getUnits().empty()) continue;
 
@@ -187,19 +188,30 @@ void ServerGameSession::update(float elapsedTime)
         for(list<Unit*>::iterator it = faction->getUnits().begin();
                 it != faction->getUnits().end(); )
         {
-            if((*it)->obsolete() && (*it)->readyToDelete())
-            {
-                if( (*it)->getType() == 2 )
-                {
-                    lost = true;
-                }
+            Unit* unit = *it;
 
-                delete *it;
+            if(unit->readyToDelete())
+            {
+                delete unit;
                 it = faction->getUnits().erase(it);
             }
             else
             {
-                (*it)->serverUpdate(elapsedTime, map, this);
+                //during this update, many events can occur like
+                //units dieing, units being created, players losing, etc
+                //TODO: check if this can result in unexpected behaviour
+                // - creating units: get added to the end of list<Unit*>
+                //   the std::list specification states that iterators are
+                //   still valid after a push_back
+                //   note that the new unit will get serverUpdate() in the
+                //   same frame that it was created, so its timing will
+                //   be different?
+                // - removing units: this may never be done within serverUpdate
+                //   the only way to remove units is by calling unit->markForDelete()
+                //   so that this loop will remove it
+                // - big events like a full faction that loses all its units
+                //   ???????? solution needed ??????
+                unit->serverUpdate(elapsedTime, map, this);
                 ++it;
             }
         }
@@ -216,7 +228,7 @@ void ServerGameSession::update(float elapsedTime)
             }
             for(list<Unit*>::iterator it = faction->getUnits().begin(); it != faction->getUnits().end(); ++it)
             {
-                (*it)->makeObsolete();
+                (*it)->markForDelete();
             }
         }
     }

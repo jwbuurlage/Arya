@@ -96,9 +96,11 @@ class Unit
 
         bool isAlive() const { return (health > 0); }
 		void makeDead(){ health = 0; setUnitState(UNIT_DYING); dyingTime = 0.0f; }; //will show death animation and then delete unit
-		void makeObsolete(){ health = 0; dyingTime = 1.0f; } //will delete unit immediately (on next frame when refcount reaches zero)
         bool obsolete() { return !isAlive() && (dyingTime > 0.8f); }
-        bool readyToDelete() { return refCount <= 0; }
+
+        //if this returns true the unit will be deleted by session
+        bool readyToDelete() { return refCount <= 0 && !isAlive() && (dyingTime > 0.8f); }
+        void markForDelete(){ health = 0; dyingTime = 1.0f; }; //unit will be deleted as soon as refcount reaches zero
 
         void retain() { ++refCount; }
         void release() { --refCount; }

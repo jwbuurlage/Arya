@@ -40,6 +40,8 @@ class Server
         //check for zero refcounts
         Packet* createPacket(int id);
 
+        void deletePacket(Packet* pak);
+
     private:
         Poco::Thread thread;
         Poco::Net::ServerSocket* serverSocket;

@@ -295,8 +295,8 @@ void GameSession::handleEvent(Packet& packet)
 					//we make them obsolte so that they are deleted next frame
 					for(vector<int>::iterator iter = allIDs.begin(); iter != allIDs.end(); ++iter)
 					{
-						Unit* unit = getUnitById(*iter); //if unit == 0 then there are some serious issues
-						if(unit) unit->makeObsolete();
+						Unit* unit = getUnitById(*iter); //if unit == 0 then there are some serious issues ;)
+						if(unit) unit->markForDelete();
 					}
                 }
             }
