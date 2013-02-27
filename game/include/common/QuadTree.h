@@ -67,7 +67,9 @@ struct QuadTree
     void insert(int id, vec2 insertPosition)
     {
         if(level == maxLevel)
+        {
             refs.push_back(TreePoint(id, insertPosition));
+        }
         else
         {
             if((insertPosition.x <= position.x) && (insertPosition.y <= position.y))
@@ -78,6 +80,7 @@ struct QuadTree
                 children[2]->insert(id, insertPosition);
             else if((insertPosition.x >= position.x) && (insertPosition.y >= position.y))
                 children[3]->insert(id, insertPosition);
+
         }
     }
 
@@ -90,7 +93,7 @@ struct QuadTree
                 children[i]->clear();
     }
 
-    int closestId(vec2 insertPosition)
+    int closestId(vec2 checkPosition)
     {
         if(level == maxLevel)
         {
@@ -108,14 +111,14 @@ struct QuadTree
         }
         else
         {
-            if((insertPosition.x <= position.x) && (insertPosition.y <= position.y))
-                return children[0]->closestId(position);
-            else if((insertPosition.x <= position.x) && (insertPosition.y >= position.y))
-                return children[1]->closestId(position);
-            else if((insertPosition.x >= position.x) && (insertPosition.y <= position.y))
-                return children[2]->closestId(position);
-            else if((insertPosition.x >= position.x) && (insertPosition.y >= position.y))
-                return children[3]->closestId(position);
+            if((checkPosition.x <= position.x) && (checkPosition.y <= position.y))
+                return children[0]->closestId(checkPosition);
+            else if((checkPosition.x <= position.x) && (checkPosition.y >= position.y))
+                return children[1]->closestId(checkPosition);
+            else if((checkPosition.x >= position.x) && (checkPosition.y <= position.y))
+                return children[2]->closestId(checkPosition);
+            else if((checkPosition.x >= position.x) && (checkPosition.y >= position.y))
+                return children[3]->closestId(checkPosition);
         }
 
     }

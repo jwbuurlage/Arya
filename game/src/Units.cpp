@@ -109,7 +109,7 @@ void Unit::checkForEnemies(QuadTree* qt)
     if(cId > 0)
     {
         Unit* closestUnit = unitFactory->getUnitById(cId);
-        if(glm::distance(getPosition(), closestUnit->getPosition()) < infoForUnitType[type].attackRadius)
+        if(glm::distance(getPosition(), closestUnit->getPosition()) < infoForUnitType[type].attackRadius * 15.0f)
             setTargetUnit(closestUnit);
     }
 }

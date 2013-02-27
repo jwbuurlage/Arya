@@ -87,7 +87,7 @@ bool GameSession::init()
     Texture* selectionTex = TextureManager::shared().getTexture("selection.png");
     if(selectionTex) selectionDecalHandle = selectionTex->handle;
 
-    unitTree = new QuadTree(0, 5, vec2(0.0), vec2(map->getSize()));
+    unitTree = new QuadTree(0, 4, vec2(0.0), vec2(map->getSize()));
 
     return true;
 }
@@ -137,7 +137,7 @@ bool GameSession::initVertices()
 void GameSession::onFrame(float elapsedTime)
 {
     // clear the quadtree
-    //unitTree->clear();
+    unitTree->clear();
 
     // update units
     mat4 vpMatrix = Root::shared().getScene()->getCamera()->getVPMatrix();
@@ -157,17 +157,21 @@ void GameSession::onFrame(float elapsedTime)
                 onScreen.y /= onScreen.w;
                 (*it)->setScreenPosition(vec2(onScreen.x, onScreen.y));
 
-                //if(factions[i] != localFaction)
-                    //unitTree->insert((*it)->getId(), vec2((*it)->getPosition().x,(*it)->getPosition().y));
+                if(factions[i] != localFaction)
+                   unitTree->insert((*it)->getId(), (*it)->getPosition2());
 
                 (*it)->update(elapsedTime, map);
-
-                if(factions[i] == localFaction)
-                    (*it)->checkForEnemies(unitTree);
 
                 ++it;
             }
         }
+    }
+
+    for(list<Unit*>::iterator it = localFaction->getUnits().begin();
+            it != localFaction->getUnits().end(); )
+    {
+        (*it)->checkForEnemies(unitTree);
+        ++it;
     }
 }
 
