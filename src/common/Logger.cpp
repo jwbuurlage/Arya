@@ -38,7 +38,8 @@ namespace Arya
 #ifndef SERVERONLY
         if(gameConsoleLogLevel & currentLogLevel)
         {
-            if(&Console::shared()) Console::shared().addOutputText(streambuff.str());
+            if(&Console::shared() && Console::shared().isInitialized())
+                Console::shared().addOutputText(streambuff.str());
         }
 #endif
         streambuff.str(std::string());

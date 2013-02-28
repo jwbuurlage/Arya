@@ -14,6 +14,7 @@ namespace Arya
 
     Console::Console()
     {
+        initialized = false;
         nrLines = 20;
         searchNrLines = 50;
         heightKernel = 270.0;
@@ -38,12 +39,14 @@ namespace Arya
 
     bool Console::init()
     {
+        if(initialized) return true;
+
         if((!Root::shared().getWindowWidth()) || (!Root::shared().getWindowHeight())) return false;
         nrCharOnLine = (Root::shared().getWindowWidth()-(Root::shared().getWindowWidth() % textWidthInPixels))/textWidthInPixels;
         font = FontManager::shared().getFont("courier.ttf"); //font to be used
         if(!font) return false;
 
-        Rect* rect = new Rect; // here we initialize the frame for the console itself
+        Rect* rect = Root::shared().getOverlay()->createRect(); // here we initialize the frame for the console itself
         rects.push_back(rect);
         rect->offsetInPixels.x = 0.0;
         rect->offsetInPixels.y = Root::shared().getWindowHeight() - heightKernel;
@@ -51,13 +54,12 @@ namespace Arya
         rect->sizeInPixels.y = heightKernel; // height of kernel in pixels
         rect->fillColor = vec4(0.0, 0.0, 0.0, 0.4);
         rect->isVisible = false;
-        Root::shared().getOverlay()->addRect(rect);
 
         for(int i = 0; i < nrLines; i++) // next, we add the rectangles for the history, this will be changed into sentences instead of seperate characters
         {
             for(int j = 0; j < nrCharOnLine; j++)
             {
-                Rect* rect = new Rect;
+                Rect* rect = Root::shared().getOverlay()->createRect();
                 rects.push_back(rect);
                 rect->sizeInPixels.x = textWidthInPixels;
                 rect->sizeInPixels.y = textHeightInPixels;
@@ -65,20 +67,18 @@ namespace Arya
                 rect->offsetInPixels.y = Root::shared().getWindowHeight() - (i+1) * (textHeightInPixels + pixelsInBetween);
                 rect->textureHandle = font->textureHandle;
                 rect->isVisible = false;
-                Root::shared().getOverlay()->addRect(rect);
             }
         }
 
         for(int i = 0; i < nrCharOnLine; i++) // here, we add rectangles for the currentLine. These should be seperate, because we need to be able to delete and add letters
         {
-            Rect* rect = new Rect;
+            Rect* rect = Root::shared().getOverlay()->createRect();
             rects.push_back(rect);
             rect->sizeInPixels.x = textWidthInPixels;
             rect->sizeInPixels.y = textHeightInPixels;
             rect->offsetInPixels.x = i * rect->sizeInPixels.x;
             rect->offsetInPixels.y = Root::shared().getWindowHeight() - (history.size() + 1) * (rect->sizeInPixels.y + pixelsInBetween);
             rect->isVisible = false;
-            Root::shared().getOverlay()->addRect(rect);
         }
         addCommandListener("consoleColor", this);
         addCommandListener("hide", this);
@@ -88,6 +88,7 @@ namespace Arya
         addCommandListener("PLAYMUSIC", this);
         addCommandListener("STOPSOUND", this);
         addCommandListener("STOPMUSIC", this);
+        initialized = true;
         return true;
     }
 
@@ -103,7 +104,7 @@ namespace Arya
             parser << splitLineParameters(command);
             parser >> float1 >> float2 >> float3;
             changeConsoleColor(float1, float2, float3);
-            if(Root::shared().getConfigIsInit()) Config::shared().editConfigFile(command);
+            Config::shared().editConfigFile(command);
         }
         if(splitLineCommand(command) == "hide")
         {
@@ -295,10 +296,11 @@ namespace Arya
 
     void Console::cleanup()
     {
-        for(int i = 0; (unsigned)i < rects.size(); i++)
+        for(unsigned int i = 0; i < rects.size(); i++)
         {
             Root::shared().getOverlay()->removeRect(rects[i]);
         }
+        rects.clear();
     }
 
     void Console::setVisibilityConsole(bool flag) //set the visibility of the console
@@ -343,7 +345,7 @@ namespace Arya
         else
         {
             int count = 0;
-            for(int i = 1; (textToBeAdded.length() > (i * nrCharOnLine)); i++)
+            for(unsigned int i = 1; (textToBeAdded.length() > (i * nrCharOnLine)); i++)
                 count = i;
 
             for(int i = 0; i < count - 2; i++)

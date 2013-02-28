@@ -105,8 +105,6 @@ namespace Arya
 
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowDepthTextureHandle, 0);
 
-        LOG_GL_ERRORS();
-
         switch(glCheckFramebufferStatus(GL_FRAMEBUFFER)) {
             case GL_FRAMEBUFFER_COMPLETE:
                 LOG_INFO("Framebuffer is complete");

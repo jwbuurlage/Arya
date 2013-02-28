@@ -51,7 +51,8 @@ void GameLogger::flush()
 #ifndef SERVERONLY
     if(gameConsoleLogLevel & currentLogLevel)
     {
-        if(&Arya::Console::shared()) Arya::Console::shared().addOutputText(getStream().str());
+        if(&Arya::Console::shared() && Arya::Console::shared().isInitialized())
+            Arya::Console::shared().addOutputText(getStream().str());
     }
 #endif
     getStream().str(std::string());

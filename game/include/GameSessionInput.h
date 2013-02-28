@@ -40,7 +40,7 @@ class GameSessionInput : public Arya::InputListener, public Arya::FrameListener
 
         vec2 originalMousePos;
 
-        Rect selectionRect;
+        Rect* selectionRect;
         bool doUnitMovementNextFrame;
         bool doUnitSelectionNextFrame;
         void selectUnit();

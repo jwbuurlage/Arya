@@ -33,14 +33,26 @@ namespace Arya
         scene = 0;
         oldTime = 0;
         overlay = 0;
-        configIsInit = false;
+        interface = 0;
 
         FileSystem::create();
+        Config::create();
         TextureManager::create();
         MaterialManager::create();
         ModelManager::create();
-        SoundManager::create();
         FontManager::create();
+        Console::create();
+        SoundManager::create();
+
+        //Some classes should be initialized
+        //before the graphics, like Config
+        //other graphic related classes are
+        //initialized in Root::initialize
+        //when the graphics are initialized
+        if(!Config::shared().init())
+        {
+            LOG_WARNING("Unable to init config");
+        }
     }
 
     Root::~Root()
@@ -49,13 +61,20 @@ namespace Arya
         //Only clean them up if needed
         glfwTerminate();
 
+        //Console deconstructor uses overlay
+        //so it must be deleted first
+        Console::destroy();
+
         if(scene) delete scene;
         if(overlay) delete overlay;
+        if(interface) delete interface;
 
+        SoundManager::destroy();
         FontManager::destroy();
         ModelManager::destroy();
         MaterialManager::destroy();
         TextureManager::destroy();
+        Config::destroy();
         FileSystem::destroy();
     }
 
@@ -69,7 +88,6 @@ namespace Arya
 
         if(!initGLFW()) return false;
         if(!initGLEW()) return false;
-
 
         // set GL stuff
         glEnable(GL_DEPTH_TEST);
@@ -86,32 +104,28 @@ namespace Arya
             LOG_WARNING("Could not initialize SoundManager");
             return false;
         }
-        overlay = new Overlay();
-        if(!overlay->init()) return false;
+        if(!overlay) overlay = new Overlay;
+        if(!overlay->init())
+        {
+            LOG_INFO("Could not initialize overlay");
+            return false;
+        }
 
-        Interface* interf = new Interface;
-        if(!interf->init())
+        if(!interface) interface = new Interface;
+        if(!interface->init())
         {
           LOG_INFO("Could not initialize interface");
           return false;
         }
-        addFrameListener(interf);
+        addFrameListener(interface);
 
-        Console* console = new Console;
-        if(!console->init()) 
+        if(!Console::shared().init()) 
         {
           LOG_INFO("Could not initialize console");
           return false;
         }
-        addFrameListener(console);
-        addInputListener(console);
-
-        Config* config = new Config;
-        if(!config->init())
-        {
-            LOG_INFO("Could not find configuration file");
-        }
-        configIsInit = true;
+        addFrameListener(&Console::shared());
+        addInputListener(&Console::shared());
 
         LOG_INFO("Root initialized");
 

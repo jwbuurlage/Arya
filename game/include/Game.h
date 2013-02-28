@@ -10,6 +10,9 @@ using Arya::ModelManager;
 using Arya::Camera;
 using Arya::Texture;
 using Arya::TextureManager;
+using Arya::SoundManager;
+using Arya::Config;
+using Arya::cvar;
 
 class Network;
 class EventManager;

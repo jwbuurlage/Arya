@@ -17,8 +17,9 @@ namespace Arya
     {
         public:
             Console();
-            ~Console();
+            virtual ~Console();
 
+            bool isInitialized() const { return initialized; }
             void cleanup();
             void onFrame(float elapsedTime);
             bool keyDown(int key, bool keyDown);
@@ -37,6 +38,8 @@ namespace Arya
 
             void onCommand(string command);
         private:
+            bool initialized;
+
             void consoleInfo();
             int nrLines; //visible number of lines of console
             int searchNrLines; //number of lines in which you can search, if more the first one will be kicked

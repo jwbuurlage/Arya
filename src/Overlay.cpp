@@ -71,9 +71,11 @@ namespace Arya
         return true;
     }
 
-    void Overlay::addRect(Rect* rect)
+    Rect* Overlay::createRect()
     {
-        rects.push_back(rect);
+        Rect* newRect = new Rect;
+        rects.push_back(newRect);
+        return newRect;
     }
 
     void Overlay::removeRect(Rect* rect)
@@ -83,6 +85,7 @@ namespace Arya
             if( *it == rect ) it = rects.erase(it);
             else ++it;
         }
+        delete rect;
     }
 
     void Overlay::render()

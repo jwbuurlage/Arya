@@ -12,6 +12,7 @@ namespace Arya
 {
     class Scene;
     class Overlay;
+    class Interface;
 
     class Root : public Singleton<Root>, public CommandListener
     {
@@ -47,12 +48,12 @@ namespace Arya
             vec3 getDepthResult(){ return clickScreenLocation; }
 
             float getAspectRatio() const { return windowWidth/(float)windowHeight; }
-            bool getConfigIsInit(){return configIsInit;}
         private:
             bool initGLFW();
             bool initGLEW();
             Scene* scene;
             Overlay* overlay;
+            Interface* interface;
 
             int windowWidth, windowHeight;
             int desktopWidth, desktopHeight;
@@ -82,6 +83,5 @@ namespace Arya
             friend void GLFWCALL mouseButtonCallback(int button, int action);
             friend void GLFWCALL mousePosCallback(int x, int y);
             friend void GLFWCALL mouseWheelCallback(int pos);
-            bool configIsInit;
     };
 }

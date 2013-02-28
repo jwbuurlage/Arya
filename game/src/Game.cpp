@@ -33,8 +33,8 @@ Game::~Game()
 void Game::run()
 {
     root = new Root;
-
-    if(!(root->init(true, 800, 600))) {
+    if(!(root->init(Config::shared().getCvarBool("fullscreen"), 800, 600)))
+    {
         GAME_LOG_ERROR("Unable to init root");
     }
     else
@@ -45,7 +45,8 @@ void Game::run()
         network = new Network;
 
         network->startServer();
-        const char* serveraddr = "localhost";
+        cvar* var = Config::shared().getCvar("serveraddress");
+        const char* serveraddr = (var ? var->value.c_str() : "localhost");
         network->connectToLobbyServer(serveraddr, 13337);
 
         if(eventManager) delete eventManager;

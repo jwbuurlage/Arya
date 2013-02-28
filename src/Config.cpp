@@ -11,6 +11,7 @@ namespace Arya
     Config::Config()
     {
         configFile = 0;
+        loadingConfigFlag = false;
     };
 
     Config::~Config()
@@ -20,7 +21,9 @@ namespace Arya
 
     bool Config::init()
     {
-        setCvarWithoutSave("fullScreen", "true", TYPE_BOOL);
+        LOG_INFO("Initializing config.");
+        setCvarWithoutSave("fullscreen", "false", TYPE_BOOL);
+        setCvarWithoutSave("serveraddress", "localhost", TYPE_STRING);
         return loadConfigFile("config.txt");
     }
 
@@ -32,20 +35,28 @@ namespace Arya
 
     bool Config::loadConfigFile(string configFileName)
     {
+        if(loadingConfigFlag) return true;
+        loadingConfigFlag = true;
+
+        bool ret = false;
         configFile = FileSystem::shared().getFile(configFileName);
-        if(configFile == 0) return false;
-        std::stringstream fileStream(configFile->getData());
-        string regel;
-        while(true)
+        if(configFile != 0)
         {
-            getline(fileStream,regel);
-            if(!fileStream.good()) break;
-            if(regel.empty()) continue;
-            if(regel.substr(0,3) == "set") continue;
-            if(regel[0] == '#') continue;
-            Console::shared().onCommand(regel);
+            ret = true;
+            std::stringstream fileStream(configFile->getData());
+            string regel;
+            while(true)
+            {
+                getline(fileStream,regel);
+                if(!fileStream.good()) break;
+                if(regel.empty()) continue;
+                if(regel.substr(0,3) == "set") continue;
+                if(regel[0] == '#') continue;
+                Console::shared().onCommand(regel);
+            }
         }
-        return true;
+        loadingConfigFlag = false;
+        return ret;
     }
     bool Config::loadConfigFileAfterRootInit(string configFileName)
     {
@@ -113,7 +124,6 @@ namespace Arya
     cvar * Config::getCvar(string name)
     {
         cvarContainer::iterator iter = cvarList.find(name);
-        LOG_INFO("I do not get stuck here!");
         if(iter == cvarList.end()) return 0;
         else return &(iter->second);
     }
@@ -139,11 +149,16 @@ namespace Arya
     }
     bool Config::getCvarBool(string name)
     {
-        cvar* var= getCvar(name);
-        if(var) return var->getBool();
+        cvar* var = getCvar(name);
+        if(var)
+        {
+            if(var->type != TYPE_BOOL)
+                LOG_WARNING("Config var " << name << " is not a bool");
+            return var->getBool();
+        }
         else
         {
-            LOG_WARNING("Var " << name << " is not of this type!");
+            LOG_WARNING("Config var " << name << " not found");
             return false;
         }
     }
@@ -159,11 +174,6 @@ namespace Arya
         else
         {
             cvarList.insert(cvarContainer::value_type(name, cvar(type, value)));
-            var = getCvar(name);
-        }
-        if(var == 0)
-        {
-            LOG_ERROR("Could not add new cvar '" << name << "' to list");
         }
     }
     void Config::setCvar(string name, string value, ValueType type)

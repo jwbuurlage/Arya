@@ -7,7 +7,7 @@ namespace Arya
     {
         public:
             Interface(){ offsetFPS = 0.0; time = 0.0; count = 0; }
-            ~Interface(){}
+            virtual ~Interface(){}
 
             void onFrame(float elapsedTime);
             bool init();

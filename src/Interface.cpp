@@ -22,11 +22,10 @@ namespace Arya
         if(!font) return false;
         for(int i = 0; i < 9; i++)
         {
-            Rect* rect = new Rect;
+            Rect* rect = Root::shared().getOverlay()->createRect();
             rects.push_back(rect);
             rects[i]->textureHandle = font->textureHandle;
             rects[i]->offsetInPixels.y = OFFSET_Y;
-            Root::shared().getOverlay()->addRect(rect);
         }
 
         float xpos = 0.0f, ypos = 0.0f;

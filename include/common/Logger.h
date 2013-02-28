@@ -6,7 +6,7 @@
 
 #pragma once
 #include "common/Singleton.h"
-#include <GL/glew.h>
+//#include <GL/glew.h>
 #include <sstream>
 #include <fstream>
 
@@ -16,7 +16,7 @@
 #define LOG_CRITICALERROR(MSG)	AryaLogger << Arya::Logger::L_CRITICALERROR	<< MSG << Arya::endLog
 #define LOG_INFO(MSG)			AryaLogger << Arya::Logger::L_INFO		<< MSG << Arya::endLog
 #define LOG_DEBUG(MSG)			AryaLogger << Arya::Logger::L_DEBUG		<< MSG << Arya::endLog
-#define LOG_GL_ERRORS()			AryaLogger.checkGLError();
+//#define LOG_GL_ERRORS()			AryaLogger.checkGLError();
 
 namespace Arya
 {
@@ -49,25 +49,25 @@ namespace Arya
             //Flushes the text to console and file
             void flush();
 
-            //check for gl errors
-            void checkGLError()
-            {
-                //TODO: actually output errors
-                GLuint err = glGetError();
-                switch(err)
-                {
-                    case GL_INVALID_ENUM:
-                        break;
-                    case GL_INVALID_VALUE:
-                        break;
-                    case GL_INVALID_OPERATION:
-                        break;
-                    case GL_NO_ERROR:
-                        break;
-                    default:
-                        break;
-                }
-            }
+//            //check for gl errors
+//            void checkGLError()
+//            {
+//                //TODO: actually output errors
+//                GLuint err = glGetError();
+//                switch(err)
+//                {
+//                    case GL_INVALID_ENUM:
+//                        break;
+//                    case GL_INVALID_VALUE:
+//                        break;
+//                    case GL_INVALID_OPERATION:
+//                        break;
+//                    case GL_NO_ERROR:
+//                        break;
+//                    default:
+//                        break;
+//                }
+//            }
 
             //Do NOT use this directly!
             //I wasnt able to make the templated << operator a friend of this class so

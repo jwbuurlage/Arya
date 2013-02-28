@@ -23,17 +23,18 @@ GameSessionInput::GameSessionInput(GameSession* ses)
 
     doUnitMovementNextFrame = false;
     doUnitSelectionNextFrame = false;
+
+    selectionRect = Root::shared().getOverlay()->createRect();
 }
 
 GameSessionInput::~GameSessionInput()
 {
-    Root::shared().getOverlay()->removeRect(&selectionRect); 
+    Root::shared().getOverlay()->removeRect(selectionRect);
 }
 
 void GameSessionInput::init()
 {
-    selectionRect.fillColor = vec4(1.0, 1.0, 1.0, 0.2);
-    Root::shared().getOverlay()->addRect(&selectionRect);
+    selectionRect->fillColor = vec4(1.0, 1.0, 1.0, 0.2);
 }
 
 void GameSessionInput::onFrame(float elapsedTime)
@@ -126,13 +127,13 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
             }
             else
             {
-                selectUnits(-1.0 + 2.0 * selectionRect.offsetInPixels.x / Root::shared().getWindowWidth(), 
-                        -1.0 + 2.0 * (selectionRect.offsetInPixels.x + selectionRect.sizeInPixels.x) / Root::shared().getWindowWidth(),
-                        -1.0 + 2.0 * selectionRect.offsetInPixels.y / Root::shared().getWindowHeight(), 
-                        -1.0 + 2.0 * (selectionRect.offsetInPixels.y + selectionRect.sizeInPixels.y) / Root::shared().getWindowHeight());
+                selectUnits(-1.0 + 2.0 * selectionRect->offsetInPixels.x / Root::shared().getWindowWidth(), 
+                        -1.0 + 2.0 * (selectionRect->offsetInPixels.x + selectionRect->sizeInPixels.x) / Root::shared().getWindowWidth(),
+                        -1.0 + 2.0 * selectionRect->offsetInPixels.y / Root::shared().getWindowHeight(), 
+                        -1.0 + 2.0 * (selectionRect->offsetInPixels.y + selectionRect->sizeInPixels.y) / Root::shared().getWindowHeight());
 
-                selectionRect.offsetInPixels = vec2(0.0);
-                selectionRect.sizeInPixels = vec2(0.0);
+                selectionRect->offsetInPixels = vec2(0.0);
+                selectionRect->sizeInPixels = vec2(0.0);
             }
         }
     }
@@ -200,28 +201,28 @@ bool GameSessionInput::mouseMoved(int x, int y, int dx, int dy)
         int deltaY = y - originalMousePos.y;
 
         if(deltaX < 0 && deltaY > 0) {
-            selectionRect.offsetInPixels.x = x;
-            selectionRect.offsetInPixels.y = originalMousePos.y;
-            selectionRect.sizeInPixels.x = originalMousePos.x - x;
-            selectionRect.sizeInPixels.y = y - originalMousePos.y;
+            selectionRect->offsetInPixels.x = x;
+            selectionRect->offsetInPixels.y = originalMousePos.y;
+            selectionRect->sizeInPixels.x = originalMousePos.x - x;
+            selectionRect->sizeInPixels.y = y - originalMousePos.y;
         }
         else if(deltaX > 0 && deltaY < 0) {
-            selectionRect.offsetInPixels.x = originalMousePos.x;
-            selectionRect.offsetInPixels.y = y;
-            selectionRect.sizeInPixels.x = x - originalMousePos.x;
-            selectionRect.sizeInPixels.y = originalMousePos.y - y;
+            selectionRect->offsetInPixels.x = originalMousePos.x;
+            selectionRect->offsetInPixels.y = y;
+            selectionRect->sizeInPixels.x = x - originalMousePos.x;
+            selectionRect->sizeInPixels.y = originalMousePos.y - y;
         }
         else if(deltaX > 0 && deltaY > 0) {
-            selectionRect.offsetInPixels.x = originalMousePos.x;
-            selectionRect.offsetInPixels.y = originalMousePos.y;
-            selectionRect.sizeInPixels.x = x - originalMousePos.x;
-            selectionRect.sizeInPixels.y = y - originalMousePos.y;
+            selectionRect->offsetInPixels.x = originalMousePos.x;
+            selectionRect->offsetInPixels.y = originalMousePos.y;
+            selectionRect->sizeInPixels.x = x - originalMousePos.x;
+            selectionRect->sizeInPixels.y = y - originalMousePos.y;
         }
         else if(deltaX < 0 && deltaY < 0) {
-            selectionRect.offsetInPixels.x = x;
-            selectionRect.offsetInPixels.y = y;
-            selectionRect.sizeInPixels.x = originalMousePos.x - x;
-            selectionRect.sizeInPixels.y = originalMousePos.y - y;
+            selectionRect->offsetInPixels.x = x;
+            selectionRect->offsetInPixels.y = y;
+            selectionRect->sizeInPixels.x = originalMousePos.x - x;
+            selectionRect->sizeInPixels.y = originalMousePos.y - y;
         }
     }
 
