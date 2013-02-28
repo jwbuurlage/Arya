@@ -12,6 +12,8 @@
 #include "Scene.h"
 #include "Shaders.h"
 #include "Console.h"
+#include "Sounds.h"
+#include "Config.h"
 #include "common/Singleton.h"
 
 #include <glm/glm.hpp>

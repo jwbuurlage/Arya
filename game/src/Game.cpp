@@ -3,6 +3,7 @@
 #include "../include/GameSession.h"
 #include "../include/Network.h"
 #include "../include/Events.h"
+#include "Arya.h"
 
 Game* Game::singleton = 0;
 

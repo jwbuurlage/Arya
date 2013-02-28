@@ -20,6 +20,7 @@ namespace Arya
 
     bool Config::init()
     {
+        setCvarWithoutSave("fullScreen", "true", TYPE_BOOL);
         return loadConfigFile("config.txt");
     }
 
@@ -40,7 +41,7 @@ namespace Arya
             getline(fileStream,regel);
             if(!fileStream.good()) break;
             if(regel.empty()) continue;
-            if(regel.substr(0,3) == "var") continue;
+            if(regel.substr(0,3) == "set") continue;
             if(regel[0] == '#') continue;
             Console::shared().onCommand(regel);
         }
@@ -57,7 +58,7 @@ namespace Arya
             getline(fileStream,regel);
             if(!fileStream.good()) break;
             if(regel.empty()) continue;
-            if(regel.substr(0,3) == "var") continue;
+            if(regel.substr(0,3) == "set") continue;
             if(regel[0] == '#') continue;
         }
         return true;
@@ -108,23 +109,81 @@ namespace Arya
         outputFile.close();
         updateConfigFile();
     }
-    string Config::getVarValue(string variableName)
+
+    cvar * Config::getCvar(string name)
     {
-        std::stringstream fileStream(configFile->getData());
-        string regel;
-        while(true)
+        cvarContainer::iterator iter = cvarList.find(name);
+        LOG_INFO("I do not get stuck here!");
+        if(iter == cvarList.end()) return 0;
+        else return &(iter->second);
+    }
+    int Config::getCvarInt(string name)
+    {
+        cvar* var = getCvar(name);
+        if(var) return var->getInt();
+        else
         {
-            getline(fileStream,regel);
-            if(!fileStream.good()) break;
-            if(regel.substr(0,3) == "var" && regel.substr(4,variableName.size()) == variableName)
-            {
-                return regel.substr(5 + variableName.size(), regel.size() - 5 - variableName.size());
-            }
-            else continue;
+            LOG_WARNING("Var " << name << " is not of this type!");
+            return 0;
         }
     }
-    void Config::setVarValue(string variableName, string value)
+    float Config::getCvarFloat(string name)
     {
+       cvar* var = getCvar(name);
+       if(var) return var->getFloat();
+       else
+       {
+           LOG_WARNING("Var " << name << " is not of this type!");
+           return 0.0f;
+       }
+    }
+    bool Config::getCvarBool(string name)
+    {
+        cvar* var= getCvar(name);
+        if(var) return var->getBool();
+        else
+        {
+            LOG_WARNING("Var " << name << " is not of this type!");
+            return false;
+        }
+    }
+    void Config::setCvarWithoutSave(string name, string value, ValueType type)
+    {
+        if(name.empty()) return;
+        cvar* var = getCvar(name);
+        if(var)
+        {
+            var->value = value;
+            var->type = type;
+        }
+        else
+        {
+            cvarList.insert(cvarContainer::value_type(name, cvar(type, value)));
+            var = getCvar(name);
+        }
+        if(var == 0)
+        {
+            LOG_ERROR("Could not add new cvar '" << name << "' to list");
+        }
+    }
+    void Config::setCvar(string name, string value, ValueType type)
+    {
+        if(name.empty()) return;
+        cvar* var = getCvar(name);
+        if(var)
+        {
+            var->value = value;
+            var->type = type;
+        }
+        else
+        {
+            cvarList.insert(cvarContainer::value_type(name, cvar(type, value)));
+            var = getCvar(name);
+        }
+        if(var == 0)
+        {
+            LOG_ERROR("Could not add new cvar '" << name << "' to list");
+        }
         bool flag = false;
         std::ofstream outputFile((FileSystem::shared().getApplicationPath() + "config.txt").c_str());
         if(!outputFile.is_open()) 
@@ -147,9 +206,9 @@ namespace Arya
             {
                 string regelVarAndValue = regel.substr(4, regel.size()-4);
                 string regelVar = regel.substr(4, regelVarAndValue.find_first_of(" "));
-                if(regelVar == variableName)
+                if(regelVar == name)
                 {
-                    outputFile << "var " << variableName << " " << value << std::endl;
+                    outputFile << "set " << name << " " << value << std::endl;
                     flag = true;
                 }
                 else
@@ -158,8 +217,26 @@ namespace Arya
                 }
             }
         }
-        if(flag == false) outputFile << "var " << variableName << " " << value << std::endl;
+        if(flag == false) outputFile << "set " << name << " " << value << std::endl;
         outputFile.close();
         updateConfigFile();
+    }
+    void Config::setCvarInt(string name, int value)
+    {
+        std::ostringstream stream;
+        stream << value;
+        setCvar(name, stream.str());
+    }
+    void Config::setCvarFloat(string name, float value)
+    {
+        std::ostringstream stream;
+        stream << value;
+        setCvar(name, stream.str());
+    }
+    void Config::setCvarBool(string name, bool value)
+    {
+        std::ostringstream stream;
+        stream << value;
+        setCvar(name, stream.str());
     }
 }

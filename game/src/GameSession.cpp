@@ -409,6 +409,7 @@ void GameSession::handleEvent(Packet& packet)
             int factionID;
             packet >> factionID;
             LOG_INFO("Player lost: " << factionID + 1);
+            Arya::SoundManager::shared().play("defeat.wav");
 		}
 		break;
 
@@ -417,6 +418,7 @@ void GameSession::handleEvent(Packet& packet)
             int factionID;
             packet >> factionID;
             LOG_INFO("Game won by player: " << factionID + 1);
+            Arya::SoundManager::shared().play("victory.wav");
 		}
 		break;
 
