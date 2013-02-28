@@ -20,6 +20,7 @@ namespace Arya
 
     bool Config::init()
     {
+        setCvarWithoutSave("fullScreen", "true", TYPE_BOOL);
         return loadConfigFile("config.txt");
     }
 
@@ -112,6 +113,7 @@ namespace Arya
     cvar * Config::getCvar(string name)
     {
         cvarContainer::iterator iter = cvarList.find(name);
+        LOG_INFO("I do not get stuck here!");
         if(iter == cvarList.end()) return 0;
         else return &(iter->second);
     }
@@ -119,13 +121,31 @@ namespace Arya
     {
         cvar* var = getCvar(name);
         if(var) return var->getInt();
-        else return 0;
+        else
+        {
+            LOG_WARNING("Var " << name << " is not of this type!");
+            return 0;
+        }
     }
     float Config::getCvarFloat(string name)
     {
        cvar* var = getCvar(name);
        if(var) return var->getFloat();
-       else return 0.0f;
+       else
+       {
+           LOG_WARNING("Var " << name << " is not of this type!");
+           return 0.0f;
+       }
+    }
+    bool Config::getCvarBool(string name)
+    {
+        cvar* var= getCvar(name);
+        if(var) return var->getBool();
+        else
+        {
+            LOG_WARNING("Var " << name << " is not of this type!");
+            return false;
+        }
     }
     void Config::setCvarWithoutSave(string name, string value, ValueType type)
     {
@@ -208,6 +228,12 @@ namespace Arya
         setCvar(name, stream.str());
     }
     void Config::setCvarFloat(string name, float value)
+    {
+        std::ostringstream stream;
+        stream << value;
+        setCvar(name, stream.str());
+    }
+    void Config::setCvarBool(string name, bool value)
     {
         std::ostringstream stream;
         stream << value;

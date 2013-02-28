@@ -1,3 +1,4 @@
+#pragma once
 #include "common/Singleton.h"
 #include "Files.h"
 #include <string>
@@ -24,6 +25,12 @@ namespace Arya
         ~cvar(){};
         int getInt(){int ret; std::istringstream(value) >> ret; return ret;}
         float getFloat(){float ret; std::istringstream(value) >> ret; return ret;}
+        bool getBool()
+        {
+            if(value == "true" || value == "True" || value == "TRUE" || value == "1") return true;
+            if(value == "false" || value == "False" || value == "FALSE" || value == "0") return false;
+            else return false;
+        }
     };
     class Config : public Singleton<Config>
     {
@@ -36,10 +43,12 @@ namespace Arya
             cvar* getCvar(string name);
             int getCvarInt(string name);
             float getCvarFloat(string name);
+            bool getCvarBool(string name);
             void setCvarWithoutSave(string name, string value, ValueType type = TYPE_STRING);
             void setCvar(string name, string value, ValueType type = TYPE_STRING);
             void setCvarInt(string name, int value);
             void setCvarFloat(string name, float value);
+            void setCvarBool(string name, bool value);
         private:
             typedef map<string,cvar> cvarContainer;
             cvarContainer cvarList;
