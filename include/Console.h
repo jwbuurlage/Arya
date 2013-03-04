@@ -69,5 +69,7 @@ namespace Arya
 
             multimap<string, CommandListener*> commandListeners;
             typedef multimap<string,CommandListener*>::iterator commandListenerIterator;
+            bool loadConfigFile(string configFileName);
+            File* configFile;
     };
 }

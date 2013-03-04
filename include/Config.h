@@ -43,16 +43,17 @@ namespace Arya
             cvar* getCvar(string name);
             int getCvarInt(string name);
             float getCvarFloat(string name);
+            string getCvarString(string name);
             bool getCvarBool(string name);
             void setCvarWithoutSave(string name, string value, ValueType type = TYPE_STRING);
             void setCvar(string name, string value, ValueType type = TYPE_STRING);
             void setCvarInt(string name, int value);
             void setCvarFloat(string name, float value);
             void setCvarBool(string name, bool value);
+            void setConfigFile(File* file);
         private:
             typedef map<string,cvar> cvarContainer;
             cvarContainer cvarList;
-            bool loadConfigFile(string configFileName);
             bool loadConfigFileAfterRootInit(string configFileName);
             void updateConfigFile();
             File* configFile;

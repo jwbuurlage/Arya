@@ -82,13 +82,17 @@ namespace Arya
         }
         addCommandListener("consoleColor", this);
         addCommandListener("hide", this);
+        addCommandListener("set", this);
+        addCommandListener("get", this);
         addCommandListener("getVarValue", this);
         addCommandListener("setVarValue", this);
         addCommandListener("PLAYSOUND", this);
         addCommandListener("PLAYMUSIC", this);
         addCommandListener("STOPSOUND", this);
         addCommandListener("STOPMUSIC", this);
+
         initialized = true;
+        if(!loadConfigFile("config.txt")) return false;
         return true;
     }
 
@@ -113,25 +117,60 @@ namespace Arya
         if(splitLineCommand(command) == "get")
         {
             string variableName;
+            string type;
             stringstream parser;
             parser << splitLineParameters(command);
-            parser >> variableName;
-            //string output = Config::shared().getVarValue(variableName);
-            //LOG_INFO("The value of " << variableName << " is: " << output);
+            parser >> variableName >> type;
+            if(type == "int" || type == "Int" || type == "integer" || type == "Integer" || type == "INT")
+            {
+                int output = Config::shared().getCvarInt(variableName);
+                LOG_INFO("The value of " << variableName << " is: " << output);
+            }
+            else if(type == "float" || type == "FLOAT" || type == "Float")
+            {
+                float output = Config::shared().getCvarFloat(variableName);
+                LOG_INFO("The value of " << variableName << " is: " << output);
+            }
+            else if(type == "bool" || type == "BOOL" || type == "Bool")
+            {
+                bool output = Config::shared().getCvarBool(variableName);
+                LOG_INFO("The value of " << variableName << " is: " << output);
+            }
+            else if(type == "string" || type == "STRING" || type == "String")
+            {
+                string output = Config::shared().getCvarString(variableName);
+                LOG_INFO("The value of " << variableName << " is: " << output);
+            }
+            else
+            {
+                LOG_WARNING("Type of " << variableName << " not recognised!");
+            }
         }
         if(splitLineCommand(command) == "set")
         {
             string variableName;
             string value;
+            string type;
             stringstream parser;
             parser << splitLineParameters(command);
-            parser >> variableName >> value;
-
-           // string output = Config::shared().getVarValue(variableName);
-           // LOG_INFO("The value of " << variableName << " is: " << output);
-           // Config::shared().setVarValue(variableName, value);
-           // string output1 = Config::shared().getVarValue(variableName);
-           // LOG_INFO("The value of " << variableName << " is: " << output1);
+            parser >> variableName >> value >> type;
+            if(type == "int" || type == "Int" || type == "integer" || type == "Integer" || type == "INT")
+            {
+                Config::shared().setCvar(variableName, value, TYPE_INTEGER);
+            }
+            else if(type == "float" || type == "FLOAT" || type == "Float")
+            {
+                Config::shared().setCvar(variableName, value, TYPE_FLOAT);
+            }
+            else if(type == "bool" || type == "BOOL" || type == "Bool")
+            {
+                Config::shared().setCvar(variableName, value, TYPE_BOOL);
+            }
+            else if(type == "string" || type == "STRING" || type == "String")
+            {
+                Config::shared().setCvar(variableName, value, TYPE_STRING);
+            }
+            else LOG_WARNING("Type of " << variableName << " not recognised!");
         }
         int count = 0;
         if(splitLineCommand(command) == "PLAYSOUND")
@@ -421,5 +460,26 @@ namespace Arya
         }
         int spaceCount = command.find_first_of(" ", 0);
         return command.substr(spaceCount + 1, currentLine.length() - spaceCount - 1);
+    }
+    bool Console::loadConfigFile(string configFileName)
+    {
+        bool ret = false;
+        configFile = FileSystem::shared().getFile(configFileName);
+        if(configFile != 0)
+        {
+            ret = true;
+            std::stringstream fileStream(configFile->getData());
+            string regel;
+            while(true)
+            {
+                getline(fileStream,regel);
+                if(!fileStream.good()) break;
+                if(regel.empty()) continue;
+                if(regel[0] == '#') continue;
+                onCommand(regel);
+            }
+        }
+        Config::shared().setConfigFile(configFile);
+        return ret;
     }
 }
