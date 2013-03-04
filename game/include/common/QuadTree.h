@@ -99,7 +99,7 @@ struct QuadTree
         {
             int currentClosestId = -1;
             float currentClosestDistance = 100000.0f;
-            for(int i = 0; i < refs.size(); ++i)
+            for(unsigned int i = 0; i < refs.size(); ++i)
             {
                 if(glm::distance(position, refs[i].pos) < currentClosestDistance)
                 {

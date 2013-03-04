@@ -2,8 +2,10 @@
 #include "../include/Units.h"
 #include "../include/Packet.h"
 #include "../include/Map.h"
+#include "../include/Game.h"
 #include "../include/EventCodes.h"
 #include "../include/ServerGameSession.h"
+#include "../include/common/Cells.h"
 #include <math.h>
 
 #ifdef _WIN32
@@ -61,6 +63,7 @@ Unit::Unit(int _type, int _id, UnitFactory* factory) : id(_id)
 
     health = infoForUnitType[type].maxHealth;
     timeSinceLastAttack = infoForUnitType[type].attackSpeed + 1.0f;
+
     dyingTime = 0.0f;
 
     refCount = 0;
@@ -99,22 +102,76 @@ void Unit::setObject(Object* obj)
     object = obj;
 }
 
-void Unit::checkForEnemies(QuadTree* qt)
+void Unit::insertIntoList(CellList* cl, Map* map)
+{
+    int ix, iy;
+    cl->cellForPositionGivenSize(getPosition2(), map->getSize(), ix, iy);
+    cl->cellForIndex(ix, iy)->add(id);
+}
+
+void Unit::checkForEnemies(CellList* cl, Map* map)
 {
     if(unitState != UNIT_IDLE)
         return;
 
-    // shoot the damn guy
-    int cId = qt->closestId(getPosition2());
-    if(cId > 0)
+    int ix, iy;
+    cl->cellForPositionGivenSize(getPosition2(), map->getSize(), ix, iy);
+
+    Cell* c;
+    float closestDistance = infoForUnitType[type].attackRadius * 4.0;
+    int closestId = -1;
+
+    float d;
+    // loop through neighbours
+    for(int dx = -1; dx <= 1; ++dx)
+        for(int dy = -1; dy <= 1; ++dy)
+        {
+            if(ix + dx >= cl->gridSize || ix + dx < 0) continue;
+            if(iy + dy >= cl->gridSize || iy + dy < 0) continue;
+            c = cl->cellForIndex(ix + dx, iy + dy);
+            // loop through
+            for(unsigned i = 0; i < c->cellPoints.size(); ++i)
+            {
+                d = glm::distance(position, unitFactory->getUnitById(c->cellPoints[i])->getPosition());
+
+                if(d < infoForUnitType[type].attackRadius * 2.0 && d < closestDistance)
+                {
+                    closestDistance = d;
+                    closestId = c->cellPoints[i];
+                }
+            }
+        }
+
+    if(closestId > 0)
     {
-        Unit* closestUnit = unitFactory->getUnitById(cId);
-        if(glm::distance(getPosition(), closestUnit->getPosition()) < infoForUnitType[type].attackRadius * 15.0f)
-            setTargetUnit(closestUnit);
+        Event& ev = Game::shared().getEventManager()->createEvent(EVENT_ATTACK_MOVE_UNIT_REQUEST);
+
+        ev << 1;
+        ev << id << closestId;
+
+        ev.send();
     }
 }
 
-void Unit::update(float timeElapsed, Map* map)
+void Unit::setPositionAndUpdateLists(const vec3& pos, CellList* cl, Map* map)
+{
+    position = pos;
+    if(object) 
+        object->setPosition(pos);
+
+    int ixp, iyp;
+    cl->cellForPositionGivenSize(vec2(position.x, position.z), map->getSize(), ixp, iyp);
+    int ix, iy;
+    cl->cellForPositionGivenSize(vec2(pos.x, pos.z), map->getSize(), ix, iy);
+
+    if(ix != ixp || iy != iyp)
+    {
+        cl->cellForIndex(ixp, iyp)->remove(id);
+        cl->cellForIndex(ix, iy)->add(id);
+    }
+}
+
+void Unit::update(float timeElapsed, Map* map, CellList* cl, bool local)
 {
     //healthBar->relative = screenPosition;
 
@@ -170,7 +227,7 @@ void Unit::update(float timeElapsed, Map* map)
             if(unitState != UNIT_ATTACKING_OUT_OF_RANGE)
                 setUnitState(UNIT_ATTACKING_OUT_OF_RANGE);
             targetPosition = vec2(targetUnit->getPosition().x,
-                            targetUnit->getPosition().z);
+                    targetUnit->getPosition().z);
         }
     }
 
@@ -183,7 +240,10 @@ void Unit::update(float timeElapsed, Map* map)
 
     if(glm::length(diff) < 2.0) // arbitrary closeness...
     {
-        setPosition(target);
+        if(!local)
+            setPositionAndUpdateLists(target, cl, map);
+        else
+            setPosition(target);
         targetPosition = vec2(0.0);
         setUnitState(UNIT_IDLE);
         return;
@@ -207,7 +267,10 @@ void Unit::update(float timeElapsed, Map* map)
         diff = glm::normalize(diff);
         vec3 newPosition = getPosition() + timeElapsed * (infoForUnitType[type].speed * diff);
         newPosition.y = map->heightAtGroundPosition(newPosition.x, newPosition.z);
-        setPosition(newPosition);
+        if(!local)
+            setPositionAndUpdateLists(newPosition, cl, map);
+        else
+            setPosition(newPosition);
     }
     else
     {
@@ -240,7 +303,7 @@ void Unit::serverUpdate(float timeElapsed, Map* map, ServerGameSession* serverSe
             return;
         }
 
-		//Unit is alive here
+        //Unit is alive here
 
         if(glm::distance(getPosition2(), targetUnit->getPosition2())
                 < infoForUnitType[targetUnit->getType()].radius + infoForUnitType[type].attackRadius) {
@@ -253,13 +316,13 @@ void Unit::serverUpdate(float timeElapsed, Map* map, ServerGameSession* serverSe
                 targetUnit->receiveDamage(infoForUnitType[type].damage, this);
                 if(!(targetUnit->isAlive()))
                 {
-					//Note that the unit was alive before this damage so this must have killed it
-					//Therefore we can send the death packet here
-					Packet* pak = serverSession->createPacket(EVENT_UNIT_DIED);
-					*pak << targetUnit->id;
-					serverSession->sendToAllClients(pak);
-					//Kill the unit
-					targetUnit->makeObsolete();
+                    //Note that the unit was alive before this damage so this must have killed it
+                    //Therefore we can send the death packet here
+                    Packet* pak = serverSession->createPacket(EVENT_UNIT_DIED);
+                    *pak << targetUnit->id;
+                    serverSession->sendToAllClients(pak);
+                    //Kill the unit
+                    targetUnit->makeObsolete();
                     targetUnit->release();
                     targetUnit = 0;
 
@@ -276,7 +339,7 @@ void Unit::serverUpdate(float timeElapsed, Map* map, ServerGameSession* serverSe
             if(unitState != UNIT_ATTACKING_OUT_OF_RANGE)
                 setUnitState(UNIT_ATTACKING_OUT_OF_RANGE);
             targetPosition = vec2(targetUnit->getPosition().x,
-                            targetUnit->getPosition().z);
+                    targetUnit->getPosition().z);
         }
     }
 
@@ -351,10 +414,10 @@ void Unit::setUnitState(UnitState state)
             object->setAnimation("attack");
             break;
 
-         case UNIT_DYING:
+        case UNIT_DYING:
             object->setAnimation("death_fallback");
             break;
-   }
+    }
 #endif
 }
 
@@ -409,9 +472,9 @@ void Unit::serialize(Packet& pk)
     pk << type;
     pk << factionId;
     pk << position;
-	pk << (int)unitState;
-	pk << targetPosition;
-	pk << (targetUnit ? targetUnit->getId() : 0);
+    pk << (int)unitState;
+    pk << targetPosition;
+    pk << (targetUnit ? targetUnit->getId() : 0);
 }
 
 void Unit::deserialize(Packet& pk)
@@ -419,9 +482,9 @@ void Unit::deserialize(Packet& pk)
     pk >> type;
     pk >> factionId;
     pk >> position;
-	pk >> (int&)unitState;
-	pk >> targetPosition;
-	int targetUnitId;
-	pk >> targetUnitId;
-	if(targetUnitId) targetUnit = unitFactory->getUnitById(targetUnitId);
+    pk >> (int&)unitState;
+    pk >> targetPosition;
+    int targetUnitId;
+    pk >> targetUnitId;
+    if(targetUnitId) targetUnit = unitFactory->getUnitById(targetUnitId);
 }

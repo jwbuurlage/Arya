@@ -4,7 +4,6 @@
 #include "Events.h"
 #include "Units.h"
 #include "Faction.h"
-#include "common/QuadTree.h"
 
 #include <vector>
 using std::vector;
@@ -23,6 +22,8 @@ using Arya::ShaderProgram;
 class GameSessionInput;
 class Map;
 
+struct CellList;
+
 class GameSession :
     public Arya::FrameListener,
     public EventHandler,
@@ -37,6 +38,8 @@ class GameSession :
         bool initShaders();
         bool initVertices();
 
+        void rebuildCellList();
+
         Faction* getLocalFaction() const { return localFaction; } ;
         const vector<Faction*>& getFactions() const { return factions; }
 
@@ -45,7 +48,7 @@ class GameSession :
         void onRender();
 
         void handleEvent(Packet& packet);
-        QuadTree* unitTree;
+        CellList* unitCells;
 
      private:
         GameSessionInput* input;

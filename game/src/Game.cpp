@@ -43,7 +43,7 @@ void Game::run()
         if(network) delete network;
         network = new Network;
 
-        network->startServer();
+        //network->startServer();
         network->connectToLobbyServer("localhost", 13337);
 
         if(eventManager) delete eventManager;

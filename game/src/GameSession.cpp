@@ -7,6 +7,7 @@
 #include "../include/Faction.h"
 #include "../include/Units.h"
 #include "../include/common/QuadTree.h"
+#include "../include/common/Cells.h"
 
 GameSession::GameSession()
 {
@@ -87,7 +88,7 @@ bool GameSession::init()
     Texture* selectionTex = TextureManager::shared().getTexture("selection.png");
     if(selectionTex) selectionDecalHandle = selectionTex->handle;
 
-    unitTree = new QuadTree(0, 4, vec2(0.0), vec2(map->getSize()));
+    unitCells = new CellList(64);
 
     return true;
 }
@@ -134,15 +135,33 @@ bool GameSession::initVertices()
     return true;
 }
 
-void GameSession::onFrame(float elapsedTime)
+void GameSession::rebuildCellList()
 {
-    // clear the quadtree
-    unitTree->clear();
-
-    // update units
-    mat4 vpMatrix = Root::shared().getScene()->getCamera()->getVPMatrix();
+    unitCells->clear();
+    // loop through units and insert them into cell list
     for(unsigned int i = 0; i < factions.size(); ++i)
     {
+        if(factions[i] == localFaction) continue;
+         for(list<Unit*>::iterator it = factions[i]->getUnits().begin();
+                it != factions[i]->getUnits().end(); )
+        {
+            if((*it)->obsolete()) continue;
+
+            (*it)->insertIntoList(unitCells, map);
+
+            ++it;
+        }
+    }
+}
+
+void GameSession::onFrame(float elapsedTime)
+{
+    // update units
+    mat4 vpMatrix = Root::shared().getScene()->getCamera()->getVPMatrix();
+    bool isLocal;
+    for(unsigned int i = 0; i < factions.size(); ++i)
+    {
+        isLocal == (factions[i] == localFaction);
         for(list<Unit*>::iterator it = factions[i]->getUnits().begin();
                 it != factions[i]->getUnits().end(); )
         {
@@ -157,10 +176,7 @@ void GameSession::onFrame(float elapsedTime)
                 onScreen.y /= onScreen.w;
                 (*it)->setScreenPosition(vec2(onScreen.x, onScreen.y));
 
-                if(factions[i] != localFaction)
-                   unitTree->insert((*it)->getId(), (*it)->getPosition2());
-
-                (*it)->update(elapsedTime, map);
+               (*it)->update(elapsedTime, map, unitCells, isLocal);
 
                 ++it;
             }
@@ -170,7 +186,7 @@ void GameSession::onFrame(float elapsedTime)
     for(list<Unit*>::iterator it = localFaction->getUnits().begin();
             it != localFaction->getUnits().end(); )
     {
-        (*it)->checkForEnemies(unitTree);
+        (*it)->checkForEnemies(unitCells, map);
         ++it;
     }
 }
@@ -298,6 +314,8 @@ void GameSession::handleEvent(Packet& packet)
 						Unit* unit = getUnitById(*iter); //if unit == 0 then there are some serious issues
 						if(unit) unit->makeObsolete();
 					}
+
+                    rebuildCellList();
                 }
             }
             break;
