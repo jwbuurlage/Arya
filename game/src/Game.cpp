@@ -44,7 +44,7 @@ void Game::run()
         if(network) delete network;
         network = new Network;
 
-        network->startServer();
+        //network->startServer();
         cvar* var = Config::shared().getCvar("serveraddress");
         const char* serveraddr = (var ? var->value.c_str() : "localhost");
         network->connectToLobbyServer(serveraddr, 13337);
