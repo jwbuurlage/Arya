@@ -57,6 +57,11 @@ class Faction
         const int id;
         int clientId;
 
+        //!! It is important that a linked list is used here
+        //because during the iteration over this container,
+        //new units will be created and existing ones deleted
+        //and iterators should not be invalidated after
+        //such operations
         list<Unit*> units;
         int color;
 };

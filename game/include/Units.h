@@ -2,7 +2,6 @@
 
 #include "Arya.h"
 #include "UnitTypes.h"
-#include "common/QuadTree.h"
 
 #include <map>
 using std::map;
@@ -35,6 +34,8 @@ class Unit;
 class Map;
 class ServerGameSession;
 
+struct CellList;
+
 //Factory design pattern
 class UnitFactory
 {
@@ -63,6 +64,7 @@ class Unit
     public:
         ~Unit(); //unregisters itself at unit factory
 
+        void setPositionAndUpdateLists(const vec3& pos, CellList* cl, Map* map);
         void setPosition(const vec3& pos) { position = pos; if(object) object->setPosition(pos); }
         vec3 getPosition() const { return position; }
 		vec2 getPosition2() const { return vec2(position.x, position.z); }
@@ -79,8 +81,10 @@ class Unit
         void setSelected(bool sel) { selected = sel; }
         bool isSelected() { return selected; }
 
-        void update(float elapsedTime, Map* map);
-        void checkForEnemies(QuadTree* qt);
+        void update(float timeElapsed, Map* map, CellList* cl, bool local);
+        void removeFromList(CellList* cl, Map* map);
+        void insertIntoList(CellList* cl, Map* map);
+        void checkForEnemies(CellList* cl, Map* map);
         void serverUpdate(float elapsedTime, Map* map, ServerGameSession* serverSession);
 
         vec2 getTargetPosition() const { return targetPosition; }
