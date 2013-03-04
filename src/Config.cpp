@@ -11,7 +11,6 @@ namespace Arya
     Config::Config()
     {
         configFile = 0;
-        loadingConfigFlag = false;
     };
 
     Config::~Config()
@@ -21,10 +20,10 @@ namespace Arya
 
     bool Config::init()
     {
-        LOG_INFO("Initializing config.");
         setCvarWithoutSave("fullscreen", "false", TYPE_BOOL);
         setCvarWithoutSave("serveraddress", "localhost", TYPE_STRING);
-        return loadConfigFile("config.txt");
+        setCvarWithoutSave("gGravity", "10", TYPE_INTEGER);
+        return true;
     }
 
     void Config::cleanup()
@@ -33,31 +32,6 @@ namespace Arya
         configFile = 0;
     }
 
-    bool Config::loadConfigFile(string configFileName)
-    {
-        if(loadingConfigFlag) return true;
-        loadingConfigFlag = true;
-
-        bool ret = false;
-        configFile = FileSystem::shared().getFile(configFileName);
-        if(configFile != 0)
-        {
-            ret = true;
-            std::stringstream fileStream(configFile->getData());
-            string regel;
-            while(true)
-            {
-                getline(fileStream,regel);
-                if(!fileStream.good()) break;
-                if(regel.empty()) continue;
-                if(regel.substr(0,3) == "set") continue;
-                if(regel[0] == '#') continue;
-                Console::shared().onCommand(regel);
-            }
-        }
-        loadingConfigFlag = false;
-        return ret;
-    }
     bool Config::loadConfigFileAfterRootInit(string configFileName)
     {
         configFile = FileSystem::shared().getFile(configFileName);
@@ -147,6 +121,16 @@ namespace Arya
            return 0.0f;
        }
     }
+    string Config::getCvarString(string name)
+    {
+        cvar* var = getCvar(name);
+        if(var) return var->value;
+        else
+        {
+            LOG_WARNING("Var " << name << " is not of this type!");
+            return "";
+        }
+    }
     bool Config::getCvarBool(string name)
     {
         cvar* var = getCvar(name);
@@ -201,6 +185,11 @@ namespace Arya
             LOG_WARNING("Could not open output config file!");
             return;
         }
+        if(!configFile)
+        {
+            LOG_WARNING("configFile pointer is 0!");
+            return;
+        }
         std::stringstream fileStream(configFile->getData());
         string regel;
         while(true)
@@ -218,7 +207,22 @@ namespace Arya
                 string regelVar = regel.substr(4, regelVarAndValue.find_first_of(" "));
                 if(regelVar == name)
                 {
-                    outputFile << "set " << name << " " << value << std::endl;
+                    if(type == TYPE_STRING)
+                    {
+                        outputFile << "set " << name << " " << value << " " << "string" << std::endl;
+                    }
+                    else if(type == TYPE_BOOL)
+                    {
+                        outputFile << "set " << name << " " << value << " " << "bool" << std::endl;
+                    }
+                    else if(type == TYPE_FLOAT)
+                    {
+                        outputFile << "set " << name << " " << value << " " << "float" << std::endl;
+                    }
+                    else if(type == TYPE_INTEGER)
+                    {
+                        outputFile << "set " << name << " " << value << " " << "integer" << std::endl;
+                    }
                     flag = true;
                 }
                 else
@@ -227,7 +231,25 @@ namespace Arya
                 }
             }
         }
-        if(flag == false) outputFile << "set " << name << " " << value << std::endl;
+        if(flag == false)
+        {
+            if(type == TYPE_STRING)
+            {
+                outputFile << "set " << name << " " << value << " " << "string" << std::endl;
+            }
+            else if(type == TYPE_BOOL)
+            {
+                outputFile << "set " << name << " " << value << " " << "bool" << std::endl;
+            }
+            else if(type == TYPE_FLOAT)
+            {
+                outputFile << "set " << name << " " << value << " " << "float" << std::endl;
+            }
+            else if(type == TYPE_INTEGER)
+            {
+                outputFile << "set " << name << " " << value << " " << "integer" << std::endl;
+            }
+        }
         outputFile.close();
         updateConfigFile();
     }
@@ -248,5 +270,9 @@ namespace Arya
         std::ostringstream stream;
         stream << value;
         setCvar(name, stream.str());
+    }
+    void Config::setConfigFile(File* file)
+    {
+        configFile = file;
     }
 }
