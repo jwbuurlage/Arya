@@ -109,6 +109,13 @@ void Unit::insertIntoList(CellList* cl, Map* map)
     cl->cellForIndex(ix, iy)->add(id);
 }
 
+void Unit::removeFromList(CellList* cl, Map* map)
+{
+    int ix, iy;
+    cl->cellForPositionGivenSize(getPosition2(), map->getSize(), ix, iy);
+    cl->cellForIndex(ix, iy)->remove(id);
+}
+
 void Unit::checkForEnemies(CellList* cl, Map* map)
 {
     if(unitState != UNIT_IDLE)
@@ -145,10 +152,8 @@ void Unit::checkForEnemies(CellList* cl, Map* map)
     if(closestId > 0)
     {
         Event& ev = Game::shared().getEventManager()->createEvent(EVENT_ATTACK_MOVE_UNIT_REQUEST);
-
         ev << 1;
         ev << id << closestId;
-
         ev.send();
     }
 }
@@ -457,7 +462,9 @@ void Unit::receiveDamage(float dmg, Unit* attacker)
     //healthBar->sizeInPixels = vec2(25.0*getHealthRatio(), 3.0);
 
     if(!isAlive())
+    {
         setUnitState(UNIT_DYING);
+    }
 }
 
 void Unit::setTintColor(vec3 tC)

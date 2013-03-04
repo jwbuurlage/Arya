@@ -82,6 +82,7 @@ class Unit
         bool isSelected() { return selected; }
 
         void update(float timeElapsed, Map* map, CellList* cl, bool local);
+        void removeFromList(CellList* cl, Map* map);
         void insertIntoList(CellList* cl, Map* map);
         void checkForEnemies(CellList* cl, Map* map);
         void serverUpdate(float elapsedTime, Map* map, ServerGameSession* serverSession);

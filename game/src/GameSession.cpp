@@ -166,6 +166,7 @@ void GameSession::onFrame(float elapsedTime)
                 it != factions[i]->getUnits().end(); )
         {
             if((*it)->obsolete() && (*it)->readyToDelete()) {
+                (*it)->removeFromList(unitCells, map);
                 delete *it;
                 it = factions[i]->getUnits().erase(it);
             }
