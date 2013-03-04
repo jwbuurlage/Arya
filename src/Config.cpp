@@ -20,7 +20,7 @@ namespace Arya
 
     bool Config::init()
     {
-        setCvarWithoutSave("fullscreen", "false", TYPE_BOOL);
+        setCvarWithoutSave("fullscreen", "true", TYPE_BOOL);
         setCvarWithoutSave("serveraddress", "localhost", TYPE_STRING);
         setCvarWithoutSave("gGravity", "10", TYPE_INTEGER);
         return true;

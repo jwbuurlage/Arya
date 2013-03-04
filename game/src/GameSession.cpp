@@ -158,7 +158,7 @@ void GameSession::onFrame(float elapsedTime)
 {
     // update units
     mat4 vpMatrix = Root::shared().getScene()->getCamera()->getVPMatrix();
-    bool isLocal;
+    bool isLocal = false;
     for(unsigned int i = 0; i < factions.size(); ++i)
     {
         isLocal == (factions[i] == localFaction);
