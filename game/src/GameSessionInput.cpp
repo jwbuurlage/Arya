@@ -232,6 +232,7 @@ bool GameSessionInput::mouseMoved(int x, int y, int dx, int dy)
 void GameSessionInput::unselectAll()
 {
     Faction* lf = session->getLocalFaction();
+    if(!lf) return;
     for(list<Unit*>::iterator it = lf->getUnits().begin();
             it != lf->getUnits().end(); ++it)
         (*it)->setSelected(false);
@@ -240,6 +241,7 @@ void GameSessionInput::unselectAll()
 void GameSessionInput::selectAll()
 {
     Faction* lf = session->getLocalFaction();
+    if(!lf) return;
     for(list<Unit*>::iterator it = lf->getUnits().begin();
             it != lf->getUnits().end(); ++it)
         (*it)->setSelected(true);
@@ -252,6 +254,7 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
 
     Faction* lf = session->getLocalFaction();
 
+    if(!lf) return;
     for(list<Unit*>::iterator it = lf->getUnits().begin();
             it != lf->getUnits().end(); ++it)
     {

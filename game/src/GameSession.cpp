@@ -89,7 +89,6 @@ bool GameSession::init()
     if(selectionTex) selectionDecalHandle = selectionTex->handle;
 
     unitCells = new CellList(64);
-
     return true;
 }
 
@@ -156,6 +155,7 @@ void GameSession::rebuildCellList()
 
 void GameSession::onFrame(float elapsedTime)
 {
+    if(!localFaction) return;
     // update units
     mat4 vpMatrix = Root::shared().getScene()->getCamera()->getVPMatrix();
     bool isLocal = false;
