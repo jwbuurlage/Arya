@@ -20,6 +20,8 @@
 
 namespace Arya
 {
+    typedef void (*LogCallbackFunc)(const std::string &logmsg);
+
     class Logger
     {
         public:
@@ -39,7 +41,9 @@ namespace Arya
             //combine the flags like DEBUG | ERROR | CRITICALERROR
             int consoleLogLevel;
             int fileLogLevel;
-            int gameConsoleLogLevel;
+            int callbackLogLevel;
+
+            void setLoggerCallback(LogCallbackFunc func){ callbackFunc = func; return; }
 
             //This can be used instead of the << operators
             //It will append a newline
@@ -49,25 +53,7 @@ namespace Arya
             //Flushes the text to console and file
             void flush();
 
-//            //check for gl errors
-//            void checkGLError()
-//            {
-//                //TODO: actually output errors
-//                GLuint err = glGetError();
-//                switch(err)
-//                {
-//                    case GL_INVALID_ENUM:
-//                        break;
-//                    case GL_INVALID_VALUE:
-//                        break;
-//                    case GL_INVALID_OPERATION:
-//                        break;
-//                    case GL_NO_ERROR:
-//                        break;
-//                    default:
-//                        break;
-//                }
-//            }
+            static Logger& shared();
 
             //Do NOT use this directly!
             //I wasnt able to make the templated << operator a friend of this class so
@@ -77,6 +63,7 @@ namespace Arya
             std::stringstream streambuff;
             std::ofstream filestream;
             LOGLEVEL currentLogLevel; //The log type that is currently in the streambuff
+            LogCallbackFunc callbackFunc;
 
             friend Logger& operator<<(Logger& logger, Logger::LOGLEVEL lvl);
     };

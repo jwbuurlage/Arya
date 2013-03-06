@@ -12,6 +12,12 @@ namespace Arya
 {
     template<> Console* Singleton<Console>::singleton = 0;
 
+    void LogCallback(const std::string &logmsg)
+    {
+        if( &Console::shared() && Console::shared().isInitialized() )
+            Console::shared().addOutputText(logmsg);
+    }
+
     Console::Console()
     {
         initialized = false;
@@ -90,6 +96,8 @@ namespace Arya
         addCommandListener("PLAYMUSIC", this);
         addCommandListener("STOPSOUND", this);
         addCommandListener("STOPMUSIC", this);
+
+        Logger::shared().setLoggerCallback(LogCallback);
 
         initialized = true;
         if(!loadConfigFile("config.txt")) return false;
@@ -335,6 +343,8 @@ namespace Arya
 
     void Console::cleanup()
     {
+        Logger::shared().setLoggerCallback(0);
+
         for(unsigned int i = 0; i < rects.size(); i++)
         {
             Root::shared().getOverlay()->removeRect(rects[i]);
