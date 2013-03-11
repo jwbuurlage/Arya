@@ -36,16 +36,17 @@ struct Cell
 
 struct CellList
 {
-    CellList(int _size)
+    CellList(int _size, float _mapSize)
     {
         gridSize = _size;
+        mapSize = _mapSize;
         cells = new Cell[gridSize * gridSize];
     }
 
-    void cellForPositionGivenSize(vec2 p, float s, int& i, int& j)
+    void cellForPositionGivenSize(vec2 p, int& i, int& j)
     {
-        i = (int)((p.x + s/2)/s * gridSize);
-        j = (int)((p.y + s/2)/s * gridSize);
+        i = (int)((p.x + mapSize/2)/mapSize * gridSize);
+        j = (int)((p.y + mapSize/2)/mapSize * gridSize);
     }
 
     Cell* cellForIndex(int i, int j)
@@ -61,5 +62,6 @@ struct CellList
     }
 
     int gridSize;
+    float mapSize;
     Cell* cells;
 };

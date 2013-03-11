@@ -91,8 +91,10 @@ void Server::prepareServer()
     //It will register to the reactor
     acceptor = new ConnectionAcceptor(*serverSocket, *reactor, this);
 
-    timer.update();
-    timerDiff = 0;
+    timer.restart();
+    timerDiff = sf::Time::Zero;
+    fpsTime = sf::Time::Zero;
+    frameCounter = 0;
 
     //TODO: better solution
     //Arya::FileSystem should be made threadsafe?
@@ -117,23 +119,27 @@ void Server::deletePacket(Packet* pak)
 
 void Server::update()
 {
-    //diff is an 64 bit signed integer
-    //with the elapsed time in microseconds
-    Timestamp oldTime(timer);
-    timer.update();
-    timerDiff += timer - oldTime;
-
-    while(timerDiff >= 100000) //100 ms
+    frameCounter++;
+    fpsTime += timer.getElapsedTime();
+    if(fpsTime.asMilliseconds() >= 10000)
     {
-        timerDiff -= 100000;
+        GAME_LOG_INFO("SFML fps: " << ((float)frameCounter) / fpsTime.asSeconds() );
+        fpsTime -= sf::milliseconds(10000);
+        frameCounter = 0;
+    }
+
+    timerDiff += timer.restart();
+    while(timerDiff.asMilliseconds() > 100)
+    {
+        timerDiff -= sf::milliseconds(100);
         for(sessionIterator iter = sessionList.begin(); iter != sessionList.end(); ++iter)
         {
             iter->second->update((float)(100.0f/1000.0f));
         }
     }
-
     //save some cpu time
-    Poco::Thread::yield();
+    //Poco::Thread::yield();
+    Poco::Thread::sleep(1);
 }
 
 void Server::newClient(ServerClientHandler* clientHandler)
