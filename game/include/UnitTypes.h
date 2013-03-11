@@ -3,7 +3,7 @@
 struct UnitInfo
 {
     UnitInfo(const char* _name, float _radius, float _attackRadius, float _speed, float _yawSpeed,
-            float _maxHealth, float _damage, float _attackSpeed)
+            float _maxHealth, float _damage, float _attackSpeed, bool _canMoveWhileAttacking)
     {
         name = _name;
         radius = _radius;
@@ -13,6 +13,7 @@ struct UnitInfo
         maxHealth = _maxHealth;
         damage = _damage;
         attackSpeed = _attackSpeed;
+        canMoveWhileAttacking = _canMoveWhileAttacking;
     }
 
     const char* name;
@@ -25,6 +26,7 @@ struct UnitInfo
     float maxHealth;
     float damage;
     float attackSpeed; //the time one attack takes
+    bool canMoveWhileAttacking;
 };
 
 extern UnitInfo infoForUnitType[];
