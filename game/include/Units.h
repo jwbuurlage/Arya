@@ -81,11 +81,10 @@ class Unit
         void setSelected(bool sel) { selected = sel; }
         bool isSelected() { return selected; }
 
-        void update(float timeElapsed, Map* map, CellList* cl, bool local);
+        void update(float timeElapsed, Map* map, CellList* cl, bool local, ServerGameSession* serverSession = 0);
         void removeFromList(CellList* cl, Map* map);
         void insertIntoList(CellList* cl, Map* map);
         void checkForEnemies(CellList* cl, Map* map);
-        void serverUpdate(float elapsedTime, Map* map, ServerGameSession* serverSession);
 
         vec2 getTargetPosition() const { return targetPosition; }
         void setTargetPosition(vec2 target);
