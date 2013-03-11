@@ -102,27 +102,27 @@ void Unit::setObject(Object* obj)
     object = obj;
 }
 
-void Unit::insertIntoList(CellList* cl, Map* map)
+void Unit::insertIntoList(CellList* cl)
 {
     int ix, iy;
-    cl->cellForPositionGivenSize(getPosition2(), map->getSize(), ix, iy);
+    cl->cellForPositionGivenSize(getPosition2(), ix, iy);
     cl->cellForIndex(ix, iy)->add(id);
 }
 
-void Unit::removeFromList(CellList* cl, Map* map)
+void Unit::removeFromList(CellList* cl)
 {
     int ix, iy;
-    cl->cellForPositionGivenSize(getPosition2(), map->getSize(), ix, iy);
+    cl->cellForPositionGivenSize(getPosition2(), ix, iy);
     cl->cellForIndex(ix, iy)->remove(id);
 }
 
-void Unit::checkForEnemies(CellList* cl, Map* map)
+void Unit::checkForEnemies(CellList* cl)
 {
     if(unitState != UNIT_IDLE)
         return;
 
     int ix, iy;
-    cl->cellForPositionGivenSize(getPosition2(), map->getSize(), ix, iy);
+    cl->cellForPositionGivenSize(getPosition2(), ix, iy);
 
     Cell* c;
     float closestDistance = infoForUnitType[type].attackRadius * 4.0;
@@ -158,23 +158,24 @@ void Unit::checkForEnemies(CellList* cl, Map* map)
     }
 }
 
-void Unit::setPositionAndUpdateLists(const vec3& pos, CellList* cl, Map* map)
+void Unit::setPositionAndUpdateLists(const vec3& pos, CellList* cl)
 {
-    position = pos;
-    if(object) 
-        object->setPosition(pos);
-
     int ixp, iyp;
-    cl->cellForPositionGivenSize(vec2(position.x, position.z), map->getSize(), ixp, iyp);
+    cl->cellForPositionGivenSize(vec2(position.x, position.z), ixp, iyp);
     int ix, iy;
-    cl->cellForPositionGivenSize(vec2(pos.x, pos.z), map->getSize(), ix, iy);
+    cl->cellForPositionGivenSize(vec2(pos.x, pos.z), ix, iy);
 
     if(ix != ixp || iy != iyp)
     {
         cl->cellForIndex(ixp, iyp)->remove(id);
         cl->cellForIndex(ix, iy)->add(id);
     }
+
+    position = pos;
+    if(object)
+        object->setPosition(pos);
 }
+
 
 void Unit::update(float timeElapsed, Map* map, CellList* cl, bool local, ServerGameSession* serverSession)
 {
@@ -310,7 +311,7 @@ void Unit::update(float timeElapsed, Map* map, CellList* cl, bool local, ServerG
             if(local || serverSession)
                 setPosition(newPosition3);
             else
-                setPositionAndUpdateLists(newPosition3, cl, map);
+                setPositionAndUpdateLists(newPosition3, cl);
         }
     }
     else

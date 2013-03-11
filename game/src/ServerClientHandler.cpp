@@ -12,7 +12,7 @@ ServerClientHandler::ServerClientHandler(StreamSocket& _socket, SocketReactor& _
 {
     //Note that 'server' is not yet set here due to the way Poco works
     //The call to server->newClient is done in the connection acceptor.
-    GAME_LOG_INFO("New connection from " << socket.address().toString().c_str());
+    GAME_LOG_INFO("New connection from " << socket.peerAddress().toString().c_str());
     NObserver<ServerClientHandler, ReadableNotification> readObserver(*this, &ServerClientHandler::onReadable);
     NObserver<ServerClientHandler, WritableNotification> writeObserver(*this, &ServerClientHandler::onWritable);
     NObserver<ServerClientHandler, ShutdownNotification> shutdownObserver(*this, &ServerClientHandler::onShutdown);
@@ -25,7 +25,7 @@ ServerClientHandler::ServerClientHandler(StreamSocket& _socket, SocketReactor& _
 
 ServerClientHandler::~ServerClientHandler()
 {
-    GAME_LOG_INFO("Disconnected: " << socket.address().toString().c_str());
+    GAME_LOG_INFO("Disconnected: " << socket.peerAddress().toString().c_str());
     server->removeClient(this);
     NObserver<ServerClientHandler, ReadableNotification> readObserver(*this, &ServerClientHandler::onReadable);
     NObserver<ServerClientHandler, WritableNotification> writeObserver(*this, &ServerClientHandler::onWritable);
@@ -46,10 +46,12 @@ void ServerClientHandler::onReadable(const AutoPtr<ReadableNotification>& notifi
     catch(TimeoutException& e)
     {
         GAME_LOG_WARNING("Timeout exception when reading socket!");
+        n = 0;
     }
     catch(NetException& e)
     {
         GAME_LOG_WARNING("Net exception when reading socket");
+        n = 0;
     }
 
     if(n <= 0)

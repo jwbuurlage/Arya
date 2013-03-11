@@ -2,8 +2,8 @@
 #include <map>
 #include <vector>
 
+#include "SFML/System.hpp"
 #include "Poco/Thread.h"
-#include "Poco/Timestamp.h"
 #include "Poco/Net/ServerSocket.h"
 
 using std::vector;
@@ -47,10 +47,13 @@ class Server
         Poco::Net::ServerSocket* serverSocket;
         ServerReactor* reactor;
         ConnectionAcceptor* acceptor;
-        Poco::Timestamp timer;
-        Poco::Timestamp::TimeDiff timerDiff;
         int port;
         void prepareServer();
+
+        sf::Clock timer;
+        sf::Time timerDiff;
+        unsigned int frameCounter;
+        sf::Time fpsTime;
 
         //List of all clients, can be in any game session
         //ServerClient contains a pointer to their game session
