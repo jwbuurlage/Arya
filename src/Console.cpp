@@ -1,4 +1,5 @@
 #include "Console.h"
+#include "Commands.h"
 #include "Root.h"
 #include "Overlay.h"
 #include "Fonts.h"
@@ -36,6 +37,7 @@ namespace Arya
         rAlt = false;
         cLock = false;
         upCount = 0;
+        consoleColor= vec4(0,0,0,0);
     };
 
     Console::~Console()
@@ -86,123 +88,12 @@ namespace Arya
             rect->offsetInPixels.y = Root::shared().getWindowHeight() - (history.size() + 1) * (rect->sizeInPixels.y + pixelsInBetween);
             rect->isVisible = false;
         }
-        addCommandListener("consoleColor", this);
-        addCommandListener("hide", this);
-        addCommandListener("set", this);
-        addCommandListener("get", this);
-        addCommandListener("getVarValue", this);
-        addCommandListener("setVarValue", this);
-        addCommandListener("PLAYSOUND", this);
-        addCommandListener("PLAYMUSIC", this);
-        addCommandListener("STOPSOUND", this);
-        addCommandListener("STOPMUSIC", this);
-
         Logger::shared().setLoggerCallback(LogCallback);
 
         initialized = true;
-        if(!loadConfigFile("config.txt")) return false;
         return true;
     }
 
-    bool Console::handleCommand(string command)
-    {
-        bool flag = true;
-        if(splitLineCommand(command) == "consoleColor")
-        {
-            float float1 = 0.0f;
-            float float2 = 0.0f;
-            float float3 = 0.0f;
-            stringstream parser;
-            parser << splitLineParameters(command);
-            parser >> float1 >> float2 >> float3;
-            changeConsoleColor(float1, float2, float3);
-            Config::shared().editConfigFile(command);
-        }
-        if(splitLineCommand(command) == "hide")
-        {
-            if(splitLineParameters(command) == "console") toggleVisibilityConsole();
-        }
-        if(splitLineCommand(command) == "get")
-        {
-            string variableName;
-            string type;
-            stringstream parser;
-            parser << splitLineParameters(command);
-            parser >> variableName >> type;
-            if(type == "int" || type == "Int" || type == "integer" || type == "Integer" || type == "INT")
-            {
-                int output = Config::shared().getCvarInt(variableName);
-                LOG_INFO("The value of " << variableName << " is: " << output);
-            }
-            else if(type == "float" || type == "FLOAT" || type == "Float")
-            {
-                float output = Config::shared().getCvarFloat(variableName);
-                LOG_INFO("The value of " << variableName << " is: " << output);
-            }
-            else if(type == "bool" || type == "BOOL" || type == "Bool")
-            {
-                bool output = Config::shared().getCvarBool(variableName);
-                LOG_INFO("The value of " << variableName << " is: " << output);
-            }
-            else if(type == "string" || type == "STRING" || type == "String")
-            {
-                string output = Config::shared().getCvarString(variableName);
-                LOG_INFO("The value of " << variableName << " is: " << output);
-            }
-            else
-            {
-                LOG_WARNING("Type of " << variableName << " not recognised!");
-            }
-        }
-        if(splitLineCommand(command) == "set")
-        {
-            string variableName;
-            string value;
-            string type;
-            stringstream parser;
-            parser << splitLineParameters(command);
-            parser >> variableName >> value >> type;
-            if(type == "int" || type == "Int" || type == "integer" || type == "Integer" || type == "INT")
-            {
-                Config::shared().setCvar(variableName, value, TYPE_INTEGER);
-            }
-            else if(type == "float" || type == "FLOAT" || type == "Float")
-            {
-                Config::shared().setCvar(variableName, value, TYPE_FLOAT);
-            }
-            else if(type == "bool" || type == "BOOL" || type == "Bool")
-            {
-                Config::shared().setCvar(variableName, value, TYPE_BOOL);
-            }
-            else if(type == "string" || type == "STRING" || type == "String")
-            {
-                Config::shared().setCvar(variableName, value, TYPE_STRING);
-            }
-            else LOG_WARNING("Type of " << variableName << " not recognised!");
-        }
-        int count = 0;
-        if(splitLineCommand(command) == "PLAYSOUND")
-        {
-            count = SoundManager::shared().play("testSound.wav");
-            SoundManager::shared().setLoopSound("testSound.wav", count, 0.01, true);
-            if(count == -1000) LOG_WARNING("SoundFile testSound.wav not found!");
-        }
-        if(splitLineCommand(command) == "PLAYMUSIC")
-        {
-            if(SoundManager::shared().play("testMusic.wav") == -1000) LOG_WARNING("MusicFile testMusic.wav not found!");
-        }
-        if(splitLineCommand(command) == "STOPMUSIC")
-        {
-            SoundManager::shared().stopMusic("testMusic.wav");
-        }
-        if(splitLineCommand(command) == "STOPSOUND")
-        {
-            SoundManager::shared().setLoopSound("testSound.wav", count, 0.5, false);
-            SoundManager::shared().stopSound("testSound.wav", count, 0.001);
-        }
-        else flag = false;
-        return flag;
-    }
     bool Console::keyDown(int key, bool keyDown)
     {
         bool keyHandled = true;
@@ -301,6 +192,7 @@ namespace Arya
             float xpos = 0.0f, ypos = 0.0f;
             stbtt_aligned_quad q;
             rects[0]->isVisible = visibility;
+            rects[0]->fillColor = consoleColor;
             if(history.empty() == false)
             {
                 for(int i = 0; (i < nrLines && (unsigned)i < history.size()); i++) // fills the rectangles that need to be filled
@@ -373,7 +265,7 @@ namespace Arya
     void Console::enterInput() // When you press enter, currentLine needs to be emptied and needs to be added to the history and searchhistory
     {
         addTextLine(currentLine);
-        onCommand(currentLine);
+        CommandHandler::shared().onCommand(currentLine);
         upCount = 0;
         currentLine = "";
     }
@@ -406,90 +298,11 @@ namespace Arya
         if(history.size() == (unsigned)nrLines - 1) history.erase(history.begin());
     }
 
-
-    void Console::addCommandListener(string command, CommandListener* listener)
-    {
-        commandListeners.insert(make_pair(command, listener));
-    }
-
-    void Console::removeCommandListener(string command, CommandListener* listener)
-    {
-        pair<commandListenerIterator, commandListenerIterator> range = commandListeners.equal_range(command);
-        for(commandListenerIterator iter = range.first; iter != range.second; ++iter)
-        {
-            if( iter->second == listener )
-            {
-                commandListeners.erase(iter);
-            }
-        }
-    }
-
-    void Console::onCommand(string command) // alleen op eerste woord zoeken
-    {
-        pair<commandListenerIterator, commandListenerIterator> range = commandListeners.equal_range(splitLineCommand(command));
-        if(range.first == range.second)
-        {
-            LOG_WARNING("Command " << command << " received but no command registered");
-        }
-        else
-        {
-            for(commandListenerIterator iter = range.first; iter != range.second; ++iter)
-            {
-                iter->second->handleCommand(command);
-            }
-        }
-    }
-
     bool Console::changeConsoleColor(float r, float g, float b)
     {
         bool flag = true;
-        if( r >= 0.0f && r <= 1.0f && g >= 0.0f && g <= 1.0f && b >= 0.0f && g <= 1.0f ) rects[0]->fillColor = vec4(r,g,b,0.4f);
+        if( r >= 0.0f && r <= 1.0f && g >= 0.0f && g <= 1.0f && b >= 0.0f && b <= 1.0f ) consoleColor = vec4(r,g,b,0.4f);
         else flag = false;
         return flag;
-    }
-
-    string Console::splitLineCommand(string command)
-    {
-        int spaceFinder = 0;
-        spaceFinder = command.find(" ", 0);
-        if((unsigned)spaceFinder == std::string::npos)
-        {
-            return command;
-        }
-        int spaceCount = command.find_first_of(" ", 0);
-        return command.substr(0, spaceCount);
-    }
-
-    string Console::splitLineParameters(string command)
-    {
-        int spaceFinder = 0;
-        spaceFinder = command.find(" ", 0);
-        if((unsigned)spaceFinder == std::string::npos)
-        {
-            return "";
-        }
-        int spaceCount = command.find_first_of(" ", 0);
-        return command.substr(spaceCount + 1, currentLine.length() - spaceCount - 1);
-    }
-    bool Console::loadConfigFile(string configFileName)
-    {
-        bool ret = false;
-        configFile = FileSystem::shared().getFile(configFileName);
-        if(configFile != 0)
-        {
-            ret = true;
-            std::stringstream fileStream(configFile->getData());
-            string regel;
-            while(true)
-            {
-                getline(fileStream,regel);
-                if(!fileStream.good()) break;
-                if(regel.empty()) continue;
-                if(regel[0] == '#') continue;
-                onCommand(regel);
-            }
-        }
-        Config::shared().setConfigFile(configFile);
-        return ret;
     }
 }

@@ -26,21 +26,15 @@ namespace Arya
             bool init();
             bool visibility; //visibility of the kernel
             string currentLine;
-            string currentLineCommand;
-            string currentLineParam;
 
             void toggleVisibilityConsole();
             void enterInput();
             void addOutputText(string textToBeAdded);
-            void addCommandListener(string command, CommandListener* listener);
-            void removeCommandListener(string command, CommandListener* listener);
-            bool handleCommand(string command);
+            bool changeConsoleColor(float r, float g, float b);
 
-            void onCommand(string command);
         private:
             bool initialized;
 
-            void consoleInfo();
             int nrLines; //visible number of lines of console
             int searchNrLines; //number of lines in which you can search, if more the first one will be kicked
             int textWidthInPixels; //width of character
@@ -58,18 +52,9 @@ namespace Arya
             Font* font;
             float time; // used for cursor flashing
             int upCount; // counts how many times we pressed up before pressing enter
-
-            bool changeConsoleColor(float r, float g, float b);
+            vec4 consoleColor;
             void goBackInHistory();
             void setVisibilityConsole(bool flag);
             void addTextLine(string textToBeAdded);
-            bool inputRecognizer(string command);
-            string splitLineCommand(string command);
-            string splitLineParameters(string command);
-
-            multimap<string, CommandListener*> commandListeners;
-            typedef multimap<string,CommandListener*>::iterator commandListenerIterator;
-            bool loadConfigFile(string configFileName);
-            File* configFile;
     };
 }
