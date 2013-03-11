@@ -58,6 +58,7 @@ SET(
     "../src/Console.cpp"
     "../src/Config.cpp"
     "../src/Sounds.cpp"
+    "../src/Commands.cpp"
     )
 
 SET(
