@@ -1,4 +1,4 @@
-#version 140
+#version 400
 #extension GL_ARB_explicit_attrib_location : require
 
 uniform sampler2D clouds;

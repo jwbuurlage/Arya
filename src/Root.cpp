@@ -89,6 +89,7 @@ namespace Arya
         if(!initGLFW()) return false;
         if(!initGLEW()) return false;
 
+
         // set GL stuff
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
@@ -233,10 +234,11 @@ namespace Arya
         }
 
         glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3); // Use OpenGL Core v3.2
-        glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 1);
+        glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 2);
 
         if(!glfwOpenWindow(windowWidth, windowHeight, 0, 0, 0, 0, 32, 0, (fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW)))
         {
+            LOG_ERROR("Could not open glfw window!");
             return false;
         }
 
