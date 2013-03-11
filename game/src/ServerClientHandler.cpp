@@ -12,21 +12,20 @@ ServerClientHandler::ServerClientHandler(StreamSocket& _socket, SocketReactor& _
 {
     //Note that 'server' is not yet set here due to the way Poco works
     //The call to server->newClient is done in the connection acceptor.
-    GAME_LOG_INFO("ServerClientHandler()");
+    GAME_LOG_INFO("New connection from " << socket.address().toString().c_str());
     NObserver<ServerClientHandler, ReadableNotification> readObserver(*this, &ServerClientHandler::onReadable);
     NObserver<ServerClientHandler, WritableNotification> writeObserver(*this, &ServerClientHandler::onWritable);
     NObserver<ServerClientHandler, ShutdownNotification> shutdownObserver(*this, &ServerClientHandler::onShutdown);
     reactor.addEventHandler(socket, readObserver);
     reactor.addEventHandler(socket, writeObserver);
     reactor.addEventHandler(socket, shutdownObserver);
-
     dataBuffer = new char[bufferSizeTotal+1];
     bytesReceived = 0;
 }
 
 ServerClientHandler::~ServerClientHandler()
 {
-    GAME_LOG_INFO("~ServerClientHandler()");
+    GAME_LOG_INFO("Disconnected: " << socket.address().toString().c_str());
     server->removeClient(this);
     NObserver<ServerClientHandler, ReadableNotification> readObserver(*this, &ServerClientHandler::onReadable);
     NObserver<ServerClientHandler, WritableNotification> writeObserver(*this, &ServerClientHandler::onWritable);
@@ -55,7 +54,7 @@ void ServerClientHandler::onReadable(const AutoPtr<ReadableNotification>& notifi
 
     if(n <= 0)
     {
-        GAME_LOG_INFO("Client closed connection");
+        //GAME_LOG_INFO("Client closed connection");
         delete this;
     }
     else
