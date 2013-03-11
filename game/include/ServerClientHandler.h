@@ -1,6 +1,7 @@
 #pragma once
 #include "Packet.h"
 #include <vector>
+#include <string>
 
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/StreamSocket.h"
@@ -27,6 +28,7 @@ class ServerClientHandler
         StreamSocket socket;
         SocketReactor& reactor;
         Server* server; //is set on creation by ConnectionAcceptor
+        std::string clientAddress;
         friend class ConnectionAcceptor;
 
         const int bufferSizeTotal;

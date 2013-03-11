@@ -1,7 +1,7 @@
 #include <sstream>
 #include "common/Logger.h"
 #include "Config.h"
-#include "Console.h"
+#include "Commands.h"
 using std::stringstream;
 using std::fstream;
 namespace Arya
@@ -20,9 +20,10 @@ namespace Arya
 
     bool Config::init()
     {
-        setCvarWithoutSave("fullscreen", "true", TYPE_BOOL);
+        setCvarWithoutSave("fullscreen", "false", TYPE_BOOL);
         setCvarWithoutSave("serveraddress", "localhost", TYPE_STRING);
         setCvarWithoutSave("gGravity", "10", TYPE_INTEGER);
+        loadConfigFile("config.txt");
         return true;
     }
 
@@ -57,6 +58,7 @@ namespace Arya
 
     void Config::editConfigFile(string edit)
     {
+        if(!configFile) return;
         bool flag = false;
         std::ofstream outputFile((FileSystem::shared().getApplicationPath() + "config.txt").c_str());
         if(!outputFile.is_open()) 
@@ -178,16 +180,16 @@ namespace Arya
         {
             LOG_ERROR("Could not add new cvar '" << name << "' to list");
         }
+        if(!configFile)
+        {
+            LOG_WARNING("configFile pointer is 0!");
+            return;
+        }
         bool flag = false;
         std::ofstream outputFile((FileSystem::shared().getApplicationPath() + "config.txt").c_str());
         if(!outputFile.is_open()) 
         {
             LOG_WARNING("Could not open output config file!");
-            return;
-        }
-        if(!configFile)
-        {
-            LOG_WARNING("configFile pointer is 0!");
             return;
         }
         std::stringstream fileStream(configFile->getData());
@@ -274,5 +276,27 @@ namespace Arya
     void Config::setConfigFile(File* file)
     {
         configFile = file;
+    }
+
+    bool Config::loadConfigFile(string configFileName)
+    {
+        bool ret = false;
+        configFile = FileSystem::shared().getFile(configFileName);
+        if(configFile != 0)
+        {
+            ret = true;
+            std::stringstream fileStream(configFile->getData());
+            string regel;
+            while(true)
+            {
+                getline(fileStream,regel);
+                if(!fileStream.good()) break;
+                if(regel.empty()) continue;
+                if(regel[0] == '#') continue;
+                CommandHandler::shared().onCommand(regel);
+            }
+        }
+        setConfigFile(configFile);
+        return ret;
     }
 }

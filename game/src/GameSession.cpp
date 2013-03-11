@@ -88,8 +88,7 @@ bool GameSession::init()
     Texture* selectionTex = TextureManager::shared().getTexture("selection.png");
     if(selectionTex) selectionDecalHandle = selectionTex->handle;
 
-    unitCells = new CellList(64);
-
+    unitCells = new CellList(64, map->getSize());
     return true;
 }
 
@@ -147,7 +146,7 @@ void GameSession::rebuildCellList()
         {
             if((*it)->obsolete()) continue;
 
-            (*it)->insertIntoList(unitCells, map);
+            (*it)->insertIntoList(unitCells);
 
             ++it;
         }
@@ -156,6 +155,7 @@ void GameSession::rebuildCellList()
 
 void GameSession::onFrame(float elapsedTime)
 {
+    if(!localFaction) return;
     // update units
     mat4 vpMatrix = Root::shared().getScene()->getCamera()->getVPMatrix();
     bool isLocal = false;
@@ -166,7 +166,7 @@ void GameSession::onFrame(float elapsedTime)
                 it != factions[i]->getUnits().end(); )
         {
             if((*it)->obsolete() && (*it)->readyToDelete()) {
-                (*it)->removeFromList(unitCells, map);
+                (*it)->removeFromList(unitCells);
                 delete *it;
                 it = factions[i]->getUnits().erase(it);
             }
@@ -187,7 +187,7 @@ void GameSession::onFrame(float elapsedTime)
     for(list<Unit*>::iterator it = localFaction->getUnits().begin();
             it != localFaction->getUnits().end(); )
     {
-        (*it)->checkForEnemies(unitCells, map);
+        (*it)->checkForEnemies(unitCells);
         ++it;
     }
 }
@@ -239,6 +239,8 @@ void GameSession::handleEvent(Packet& packet)
     {
         case EVENT_GAME_FULLSTATE:
             {
+                GAME_LOG_DEBUG("Full game state received!");
+
                 int count;
                 packet >> count;
                 for(int i = 0; i < count; ++i)

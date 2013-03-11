@@ -102,27 +102,27 @@ void Unit::setObject(Object* obj)
     object = obj;
 }
 
-void Unit::insertIntoList(CellList* cl, Map* map)
+void Unit::insertIntoList(CellList* cl)
 {
     int ix, iy;
-    cl->cellForPositionGivenSize(getPosition2(), map->getSize(), ix, iy);
+    cl->cellForPositionGivenSize(getPosition2(), ix, iy);
     cl->cellForIndex(ix, iy)->add(id);
 }
 
-void Unit::removeFromList(CellList* cl, Map* map)
+void Unit::removeFromList(CellList* cl)
 {
     int ix, iy;
-    cl->cellForPositionGivenSize(getPosition2(), map->getSize(), ix, iy);
+    cl->cellForPositionGivenSize(getPosition2(), ix, iy);
     cl->cellForIndex(ix, iy)->remove(id);
 }
 
-void Unit::checkForEnemies(CellList* cl, Map* map)
+void Unit::checkForEnemies(CellList* cl)
 {
     if(unitState != UNIT_IDLE)
         return;
 
     int ix, iy;
-    cl->cellForPositionGivenSize(getPosition2(), map->getSize(), ix, iy);
+    cl->cellForPositionGivenSize(getPosition2(), ix, iy);
 
     Cell* c;
     float closestDistance = infoForUnitType[type].attackRadius * 4.0;
@@ -158,27 +158,36 @@ void Unit::checkForEnemies(CellList* cl, Map* map)
     }
 }
 
-void Unit::setPositionAndUpdateLists(const vec3& pos, CellList* cl, Map* map)
+void Unit::setPositionAndUpdateLists(const vec3& pos, CellList* cl)
 {
-    position = pos;
-    if(object) 
-        object->setPosition(pos);
-
     int ixp, iyp;
-    cl->cellForPositionGivenSize(vec2(position.x, position.z), map->getSize(), ixp, iyp);
+    cl->cellForPositionGivenSize(vec2(position.x, position.z), ixp, iyp);
     int ix, iy;
-    cl->cellForPositionGivenSize(vec2(pos.x, pos.z), map->getSize(), ix, iy);
+    cl->cellForPositionGivenSize(vec2(pos.x, pos.z), ix, iy);
 
     if(ix != ixp || iy != iyp)
     {
         cl->cellForIndex(ixp, iyp)->remove(id);
         cl->cellForIndex(ix, iy)->add(id);
     }
+
+    position = pos;
+    if(object)
+        object->setPosition(pos);
 }
 
-void Unit::update(float timeElapsed, Map* map, CellList* cl, bool local)
+
+void Unit::update(float timeElapsed, Map* map, CellList* cl, bool local, ServerGameSession* serverSession)
 {
-    //healthBar->relative = screenPosition;
+    //For any units referenced by this unit we must check if they are obsolete
+    //Currently the only referenced unit is targetUnit
+    if(targetUnit && (targetUnit->obsolete() || !targetUnit->isAlive()))
+    {
+        targetUnit->release();
+        targetUnit = 0;
+        if(unitState == UNIT_ATTACKING || unitState == UNIT_ATTACKING_OUT_OF_RANGE)
+            setUnitState(UNIT_IDLE);
+    }
 
     if(unitState == UNIT_IDLE)
         return;
@@ -189,144 +198,72 @@ void Unit::update(float timeElapsed, Map* map, CellList* cl, bool local)
         return;
     }
 
-    if(unitState == UNIT_ATTACKING || 
-            unitState == UNIT_ATTACKING_OUT_OF_RANGE)
+    //If we are attacking the target position is the position of the target unit
+    if(unitState == UNIT_ATTACKING || unitState == UNIT_ATTACKING_OUT_OF_RANGE)
     {
-        if(!targetUnit) {
-            GAME_LOG_WARNING("Attacking, but no target unit");
-            setUnitState(UNIT_IDLE);
-            return;
-        }
-
-        if(!(targetUnit->isAlive()) || targetUnit->obsolete())
+        if(!targetUnit)
         {
-            targetUnit->release();
-            targetUnit = 0;
-            setUnitState(UNIT_IDLE);
-            return;
-        }
-
-        if(glm::distance(getPosition2(), targetUnit->getPosition2())
-                < infoForUnitType[targetUnit->getType()].radius + infoForUnitType[type].attackRadius) {
-            if(unitState != UNIT_ATTACKING)
-                setUnitState(UNIT_ATTACKING);
-
-            if(timeSinceLastAttack > infoForUnitType[type].attackSpeed)
-            {
-                // make one attack
-                targetUnit->receiveDamage(infoForUnitType[type].damage, this);
-                if(!(targetUnit->isAlive()))
-                {
-                    targetUnit->release();
-                    targetUnit = 0;
-                    setUnitState(UNIT_IDLE);
-                    timeSinceLastAttack = infoForUnitType[type].attackSpeed + 1.0f;
-                    return;
-                }
-                timeSinceLastAttack = 0.0f;
-            }
-            else
-                timeSinceLastAttack += timeElapsed;
-        }
-        else {
-            if(unitState != UNIT_ATTACKING_OUT_OF_RANGE)
-                setUnitState(UNIT_ATTACKING_OUT_OF_RANGE);
-            targetPosition = vec2(targetUnit->getPosition().x,
-                    targetUnit->getPosition().z);
-        }
-    }
-
-    if(!map) return;
-
-    float targeth;
-    targeth = map->heightAtGroundPosition(targetPosition.x, targetPosition.y);
-    vec3 target(targetPosition.x, targeth, targetPosition.y);
-    vec3 diff = target - getPosition();
-
-    if(glm::length(diff) < 2.0) // arbitrary closeness...
-    {
-        if(!local)
-            setPositionAndUpdateLists(target, cl, map);
-        else
-            setPosition(target);
-        targetPosition = vec2(0.0);
-        setUnitState(UNIT_IDLE);
-        return;
-    }
-
-    float newYaw = (180.0f/M_PI)*atan2(-diff.x, -diff.z);
-    float oldYaw = getYaw();
-    float yawDiff = newYaw - oldYaw;
-
-    if(yawDiff > 180.0f) yawDiff -= 360.0f;
-    else if(yawDiff < -180.0f) yawDiff += 360.0f;
-
-    float deltaYaw = timeElapsed * infoForUnitType[type].yawSpeed + 1.0f;
-    if((yawDiff >= 0 && yawDiff < deltaYaw) || (yawDiff <= 0 && yawDiff > -deltaYaw))
-    {
-        //angle is small enough (less than 1 degree) so we can start walking now
-        setYaw(newYaw);
-        if(unitState == UNIT_ATTACKING)
-            return;
-
-        diff = glm::normalize(diff);
-        vec3 newPosition = getPosition() + timeElapsed * (infoForUnitType[type].speed * diff);
-        newPosition.y = map->heightAtGroundPosition(newPosition.x, newPosition.z);
-        if(!local)
-            setPositionAndUpdateLists(newPosition, cl, map);
-        else
-            setPosition(newPosition);
-    }
-    else
-    {
-        //Rotate
-        if(yawDiff < 0) deltaYaw = -deltaYaw;
-        setYaw( oldYaw + deltaYaw );
-    }
-
-}
-
-void Unit::serverUpdate(float timeElapsed, Map* map, ServerGameSession* serverSession)
-{
-    if(unitState == UNIT_IDLE)
-        return;
-
-    if(unitState == UNIT_ATTACKING || 
-            unitState == UNIT_ATTACKING_OUT_OF_RANGE)
-    {
-        if(!targetUnit) {
             GAME_LOG_WARNING("Unit (" << id << ") is attacking, but no target unit");
             setUnitState(UNIT_IDLE);
             return;
         }
+        targetPosition = targetUnit->getPosition2();
+    }
 
-        if(!(targetUnit->isAlive()) || targetUnit->obsolete())
+    // Rotation and movement
+    // Even when we are in attacking mode we must still
+    // check if we are faced towards the target
+    // so these calculations are always done first
+
+    vec2 diff = targetPosition - getPosition2();
+    float difflength = glm::length(diff);
+
+    float newYaw = (difflength < 0.1 ? getYaw() : (180.0f/M_PI)*atan2(-diff.x, -diff.y));
+    float yawDiff = newYaw - getYaw();
+    //make sure it is in the [-180,180] range
+    //so that a small rotation is always a small number
+    //instead of 359 degrees
+    if(yawDiff > 180.0f) yawDiff -= 360.0f;
+    else if(yawDiff < -180.0f) yawDiff += 360.0f;
+
+    //At this point we can have a switch or some if statements
+    //to decide what to do for each unit state.
+    //After this the unit will always be rotated to their target
+    //angle (we assume this can be done in any state, even during attacks)
+    //If canMove is left to true it will also move when fully rotated
+    bool canMove = true;
+    if(unitState == UNIT_ATTACKING || unitState == UNIT_ATTACKING_OUT_OF_RANGE)
+    {
+        bool inRange = glm::distance(getPosition2(), targetUnit->getPosition2())
+            < infoForUnitType[targetUnit->getType()].radius + infoForUnitType[type].attackRadius;
+        bool inAngleRange = yawDiff > -20.0f && yawDiff < 20.0f;
+
+        if(inRange && inAngleRange)
         {
-            targetUnit->release();
-            targetUnit = 0;
-            setUnitState(UNIT_IDLE);
-            return;
-        }
+            if(!infoForUnitType[type].canMoveWhileAttacking)
+                canMove = false;
 
-        //This unit and target unit are both alive at this point
-        if(glm::distance(getPosition2(), targetUnit->getPosition2())
-                < infoForUnitType[targetUnit->getType()].radius + infoForUnitType[type].attackRadius) {
             if(unitState != UNIT_ATTACKING)
                 setUnitState(UNIT_ATTACKING);
 
-            if(timeSinceLastAttack > infoForUnitType[type].attackSpeed)
+            timeSinceLastAttack += timeElapsed;
+
+            while(timeSinceLastAttack > infoForUnitType[type].attackSpeed)
             {
-                // make one attack
+                timeSinceLastAttack -= infoForUnitType[type].attackSpeed;
+
                 targetUnit->receiveDamage(infoForUnitType[type].damage, this);
                 if(!(targetUnit->isAlive()))
                 {
-					//Note that the unit was alive before this damage so this must have killed it
-					//Therefore we can send the death packet here
-                    Packet* pak = serverSession->createPacket(EVENT_UNIT_DIED);
-                    *pak << targetUnit->id;
-                    serverSession->sendToAllClients(pak);
-                    //Kill the unit
-                    targetUnit->markForDelete();
+                    if(serverSession)
+                    {
+                        //Note that the unit was alive before this damage so this must have killed it
+                        //Therefore we can send the death packet here
+                        Packet* pak = serverSession->createPacket(EVENT_UNIT_DIED);
+                        *pak << targetUnit->id;
+                        serverSession->sendToAllClients(pak);
+                        targetUnit->markForDelete();
+                    }
                     targetUnit->release();
                     targetUnit = 0;
 
@@ -334,59 +271,54 @@ void Unit::serverUpdate(float timeElapsed, Map* map, ServerGameSession* serverSe
                     timeSinceLastAttack = infoForUnitType[type].attackSpeed + 1.0f;
                     return;
                 }
-                timeSinceLastAttack -= infoForUnitType[type].attackSpeed;
             }
-            else
-                timeSinceLastAttack += timeElapsed;
         }
-        else {
+        else
+        {
             if(unitState != UNIT_ATTACKING_OUT_OF_RANGE)
                 setUnitState(UNIT_ATTACKING_OUT_OF_RANGE);
-            targetPosition = vec2(targetUnit->getPosition().x,
-                    targetUnit->getPosition().z);
         }
     }
 
-    if(!map) return;
-
-    float targeth;
-    targeth = map->heightAtGroundPosition(targetPosition.x, targetPosition.y);
-    vec3 target(targetPosition.x, targeth, targetPosition.y);
-    vec3 diff = target - getPosition();
-
-    if(glm::length(diff) < 2.0) // arbitrary closeness...
+    float deltaYaw = timeElapsed * infoForUnitType[type].yawSpeed;
+    //check if we reached target angle
+    if( abs(yawDiff) < deltaYaw )
     {
-        setPosition(target);
-        targetPosition = vec2(0.0);
-        setUnitState(UNIT_IDLE);
-        return;
-    }
-
-    float newYaw = (180.0f/M_PI)*atan2(-diff.x, -diff.z);
-    float oldYaw = getYaw();
-    float yawDiff = newYaw - oldYaw;
-
-    if(yawDiff > 180.0f) yawDiff -= 360.0f;
-    else if(yawDiff < -180.0f) yawDiff += 360.0f;
-
-    float deltaYaw = timeElapsed * infoForUnitType[type].yawSpeed + 1.0f;
-    if((yawDiff >= 0 && yawDiff < deltaYaw) || (yawDiff <= 0 && yawDiff > -deltaYaw))
-    {
-        //angle is small enough (less than 1 degree) so we can start walking now
+        //Target angle reached
         setYaw(newYaw);
-        if(unitState == UNIT_ATTACKING)
-            return;
 
-        diff = glm::normalize(diff);
-        vec3 newPosition = getPosition() + timeElapsed * (infoForUnitType[type].speed * diff);
-        newPosition.y = map->heightAtGroundPosition(newPosition.x, newPosition.z);
-        setPosition(newPosition);
+        //A part of the current frametime went into rotating
+        //we must now calculate how many frametime is left for moving
+        float remainingTime = (deltaYaw - abs(yawDiff)) / infoForUnitType[type].yawSpeed;
+
+        if(canMove)
+        {
+            //When we are close to the target, we might go past the target because
+            //of high speed or high frametime so we have to check for this
+            float distanceToTravel = remainingTime * infoForUnitType[type].speed;
+
+            vec2 newPosition;
+            if( distanceToTravel >= difflength )
+            {
+                newPosition = targetPosition;
+                setUnitState(UNIT_IDLE);
+            }
+            else
+                newPosition = getPosition2() + distanceToTravel * glm::normalize(diff);
+
+            float height = (map ? map->heightAtGroundPosition(newPosition.x, newPosition.y) : 0.0f);
+            vec3 newPosition3 = vec3(newPosition.x, height, newPosition.y);
+            if(local || serverSession)
+                setPosition(newPosition3);
+            else
+                setPositionAndUpdateLists(newPosition3, cl);
+        }
     }
     else
     {
-        //Rotate
+        //Target angle not reached, rotate
         if(yawDiff < 0) deltaYaw = -deltaYaw;
-        setYaw( oldYaw + deltaYaw );
+        setYaw( getYaw() + deltaYaw );
     }
 }
 

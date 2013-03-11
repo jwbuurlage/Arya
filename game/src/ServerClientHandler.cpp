@@ -12,21 +12,21 @@ ServerClientHandler::ServerClientHandler(StreamSocket& _socket, SocketReactor& _
 {
     //Note that 'server' is not yet set here due to the way Poco works
     //The call to server->newClient is done in the connection acceptor.
-    GAME_LOG_INFO("ServerClientHandler()");
+    clientAddress = socket.peerAddress().toString();
+    GAME_LOG_INFO("New connection from " << clientAddress.c_str());
     NObserver<ServerClientHandler, ReadableNotification> readObserver(*this, &ServerClientHandler::onReadable);
     NObserver<ServerClientHandler, WritableNotification> writeObserver(*this, &ServerClientHandler::onWritable);
     NObserver<ServerClientHandler, ShutdownNotification> shutdownObserver(*this, &ServerClientHandler::onShutdown);
     reactor.addEventHandler(socket, readObserver);
     reactor.addEventHandler(socket, writeObserver);
     reactor.addEventHandler(socket, shutdownObserver);
-
     dataBuffer = new char[bufferSizeTotal+1];
     bytesReceived = 0;
 }
 
 ServerClientHandler::~ServerClientHandler()
 {
-    GAME_LOG_INFO("~ServerClientHandler()");
+    GAME_LOG_INFO("Disconnected: " << clientAddress.c_str());
     server->removeClient(this);
     NObserver<ServerClientHandler, ReadableNotification> readObserver(*this, &ServerClientHandler::onReadable);
     NObserver<ServerClientHandler, WritableNotification> writeObserver(*this, &ServerClientHandler::onWritable);
@@ -35,6 +35,13 @@ ServerClientHandler::~ServerClientHandler()
     reactor.removeEventHandler(socket, writeObserver);
     reactor.removeEventHandler(socket, shutdownObserver);
     delete[] dataBuffer;
+    for(vector< pair<Packet*,int> >::iterator pak = packets.begin(); pak != packets.end(); ++pak)
+    {
+        pak->first->refCount--;
+        if(pak->first->refCount == 0)
+            delete pak->first;
+    }
+    packets.clear();
 }
 
 void ServerClientHandler::onReadable(const AutoPtr<ReadableNotification>& notification)
@@ -47,15 +54,17 @@ void ServerClientHandler::onReadable(const AutoPtr<ReadableNotification>& notifi
     catch(TimeoutException& e)
     {
         GAME_LOG_WARNING("Timeout exception when reading socket!");
+        terminate();
     }
     catch(NetException& e)
     {
         GAME_LOG_WARNING("Net exception when reading socket");
+        terminate();
     }
 
     if(n <= 0)
     {
-        GAME_LOG_INFO("Client closed connection");
+        //GAME_LOG_INFO("Client closed connection");
         delete this;
     }
     else

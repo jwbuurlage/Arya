@@ -10,7 +10,7 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
 #-- Display warnings
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g")
 
 IF(APPLE)
     SET(
@@ -58,6 +58,7 @@ SET(
     "../src/Console.cpp"
     "../src/Config.cpp"
     "../src/Sounds.cpp"
+    "../src/Commands.cpp"
     )
 
 SET(

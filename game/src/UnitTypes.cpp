@@ -5,8 +5,8 @@
             //float _maxHealth, float _damage, float _attackSpeed)
 
 UnitInfo infoForUnitType[] = {
-            //name      radius  atRad   speed   yawSpeed health   damage  attackSpeed
-    UnitInfo("ogros",   10.0f,  5.0f,   30.0f,  720.0f,  100.0f,  20.0f,  1.0f),
-    UnitInfo("hep",     15.0f,  50.0f,  50.0f,  360.0f,  60.0f,   10.0f,  0.7f),
-    UnitInfo("imp",     30.0f,  15.0f,  10.0f,  180.0f,  300.0f,   50.0f,  0.1f)
+            //name      radius  atRad   speed   yawSpeed health   damage  attackSpeed   moveWhileAttacking
+    UnitInfo("ogros",   10.0f,  5.0f,   30.0f,  720.0f,  100.0f,  20.0f,  1.0f,         true),
+    UnitInfo("hep",     15.0f,  50.0f,  50.0f,  360.0f,  60.0f,   10.0f,  0.7f,         false),
+    UnitInfo("imp",     30.0f,  15.0f,  10.0f,  180.0f,  300.0f,   50.0f,  0.1f,        false)
 };

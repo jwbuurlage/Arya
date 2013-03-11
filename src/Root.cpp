@@ -11,6 +11,7 @@
 #include "Scene.h"
 #include "Console.h"
 #include "Config.h"
+#include "Commands.h"
 #include "Files.h"
 #include "Overlay.h"
 #include "Camera.h"
@@ -36,23 +37,22 @@ namespace Arya
         interface = 0;
 
         FileSystem::create();
+        CommandHandler::create();
         Config::create();
         TextureManager::create();
         MaterialManager::create();
         ModelManager::create();
         FontManager::create();
-        Console::create();
         SoundManager::create();
+        Console::create();
 
         //Some classes should be initialized
         //before the graphics, like Config
         //other graphic related classes are
         //initialized in Root::initialize
         //when the graphics are initialized
-        if(!Config::shared().init())
-        {
-            LOG_WARNING("Unable to init config");
-        }
+        if(!CommandHandler::shared().init()) LOG_WARNING("Unable to init CommandHandler");
+        if(!Config::shared().init()) LOG_WARNING("Unable to init config");
     }
 
     Root::~Root()
@@ -75,6 +75,7 @@ namespace Arya
         MaterialManager::destroy();
         TextureManager::destroy();
         Config::destroy();
+        CommandHandler::destroy();
         FileSystem::destroy();
     }
 

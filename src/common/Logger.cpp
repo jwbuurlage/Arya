@@ -1,5 +1,4 @@
 #include "common/Logger.h"
-#include "Console.h"
 #include <sstream>
 #include <iostream>
 
@@ -11,8 +10,9 @@ namespace Arya
 	{
 		consoleLogLevel = L_INFO | L_WARNING | L_ERROR | L_CRITICALERROR | L_DEBUG;
 		fileLogLevel = L_WARNING | L_ERROR | L_CRITICALERROR;
-        gameConsoleLogLevel = L_INFO | L_WARNING | L_ERROR | L_CRITICALERROR | L_DEBUG;
+        callbackLogLevel = L_INFO | L_WARNING | L_ERROR | L_CRITICALERROR | L_DEBUG;
 		currentLogLevel = L_NONE;
+        callbackFunc = 0;
         filestream.open("logarya.txt");
 	}
 
@@ -35,15 +35,17 @@ namespace Arya
 			//Note: When doing file output, also prepend timestamp
             filestream << streambuff.str() << std::endl;
 		}
-#ifndef SERVERONLY
-        if(gameConsoleLogLevel & currentLogLevel)
-        {
-            if(&Console::shared() && Console::shared().isInitialized())
-                Console::shared().addOutputText(streambuff.str());
-        }
-#endif
+        if(callbackFunc)
+            if(callbackLogLevel & currentLogLevel)
+                callbackFunc(streambuff.str());
+
         streambuff.str(std::string());
         streambuff.seekp(0);
         streambuff.clear();
 	}
+
+    Logger& Logger::shared()
+    {
+        return AryaLogger;
+    }
 }

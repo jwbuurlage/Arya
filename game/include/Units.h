@@ -64,7 +64,7 @@ class Unit
     public:
         ~Unit(); //unregisters itself at unit factory
 
-        void setPositionAndUpdateLists(const vec3& pos, CellList* cl, Map* map);
+        void setPositionAndUpdateLists(const vec3& pos, CellList* cl);
         void setPosition(const vec3& pos) { position = pos; if(object) object->setPosition(pos); }
         vec3 getPosition() const { return position; }
 		vec2 getPosition2() const { return vec2(position.x, position.z); }
@@ -81,11 +81,11 @@ class Unit
         void setSelected(bool sel) { selected = sel; }
         bool isSelected() { return selected; }
 
-        void update(float timeElapsed, Map* map, CellList* cl, bool local);
-        void removeFromList(CellList* cl, Map* map);
-        void insertIntoList(CellList* cl, Map* map);
-        void checkForEnemies(CellList* cl, Map* map);
-        void serverUpdate(float elapsedTime, Map* map, ServerGameSession* serverSession);
+        void update(float timeElapsed, Map* map, CellList* cl, bool local, ServerGameSession* serverSession = 0);
+        //void graphicalUpdate(Map* map
+        void removeFromList(CellList* cl);
+        void insertIntoList(CellList* cl);
+        void checkForEnemies(CellList* cl);
 
         vec2 getTargetPosition() const { return targetPosition; }
         void setTargetPosition(vec2 target);
