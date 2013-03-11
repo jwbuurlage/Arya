@@ -254,6 +254,7 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
 
     Faction* lf = session->getLocalFaction();
 
+    bool soundPlayed = false;
     if(!lf) return;
     for(list<Unit*>::iterator it = lf->getUnits().begin();
             it != lf->getUnits().end(); ++it)
@@ -262,6 +263,8 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
 
         if((onScreen.x > x_min && onScreen.x < x_max) && (onScreen.y > y_min && onScreen.y < y_max)) {
             (*it)->setSelected(true);
+            if(!soundPlayed) SoundManager::shared().play(infoForUnitType[(*it)->getType()].selectionSound);
+            soundPlayed = true;
         }
     }
 }
@@ -356,5 +359,8 @@ void GameSessionInput::selectUnit()
     }
 
     if(best_unit)
+    {
+        SoundManager::shared().play(infoForUnitType[best_unit->getType()].selectionSound);
         best_unit->setSelected(true);
+    }
 }

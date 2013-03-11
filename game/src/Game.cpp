@@ -74,7 +74,7 @@ void Game::run()
 		network->connectToSessionServer(serveraddr, 13337);
 		Event& joinEvent = eventManager->createEvent(EVENT_JOIN_GAME);
 		joinEvent << 50505; //session hash
-		joinEvent << 10103; //my secret hash
+		joinEvent << Config::shared().getCvarInt("sessionhash"); //my secret hash
 		joinEvent.send();
 		//END TEMPORARY
 
