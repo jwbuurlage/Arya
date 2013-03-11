@@ -39,8 +39,8 @@ namespace Arya
                 isVisible = true; 
             };
             ~Rect() {}
-        public:
 
+        public:
             vec2 relative; // in screen coordinates [-1, 1]
             vec2 offsetInPixels; // in pixels
             vec2 sizeInPixels; // in pixels

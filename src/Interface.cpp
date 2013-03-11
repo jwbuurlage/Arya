@@ -7,6 +7,7 @@
 #include "common/Logger.h"
 #include <sstream>
 #include <vector>
+
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "../ext/stb_truetype.h"
 using std::vector;
