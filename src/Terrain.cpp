@@ -374,7 +374,6 @@ namespace Arya
             glDrawElements(GL_TRIANGLE_STRIP, indexCount[p.lod], GL_UNSIGNED_INT, (void*)0);
         }
 
-
 		glEnable(GL_ALPHA_TEST);
         glEnable(GL_BLEND);
 
