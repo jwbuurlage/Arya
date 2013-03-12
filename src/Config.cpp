@@ -38,14 +38,14 @@ namespace Arya
         configFile = FileSystem::shared().getFile(configFileName);
         if(configFile == 0) return false;
         std::stringstream fileStream(configFile->getData());
-        string regel;
+        string line;
         while(true)
         {
-            getline(fileStream,regel);
+            getline(fileStream,line);
             if(!fileStream.good()) break;
-            if(regel.empty()) continue;
-            if(regel.substr(0,3) == "set") continue;
-            if(regel[0] == '#') continue;
+            if(line.empty()) continue;
+            if(line.substr(0,3) == "set") continue;
+            if(line[0] == '#') continue;
         }
         return true;
     }
@@ -68,27 +68,27 @@ namespace Arya
         }
         string editCommand = edit.substr(0, edit.find_first_of(" "));
         std::stringstream fileStream(configFile->getData());
-        string regel;
+        string line;
         while(true)
         {
-            getline(fileStream,regel);
+            getline(fileStream,line);
             if(!fileStream.good()) break;
-            if(regel.empty())
+            if(line.empty())
             {
-                outputFile << regel << std::endl;
+                outputFile << line << std::endl;
                 continue;
             }
             else
             {
-                string regelCommand = regel.substr(0, edit.find_first_of(" "));
-                if(regelCommand == editCommand)
+                string lineCommand = line.substr(0, edit.find_first_of(" "));
+                if(lineCommand == editCommand)
                 {
                     outputFile << edit << std::endl;
                     flag = true;
                 }
                 else
                 {
-                    outputFile << regel << std::endl;
+                    outputFile << line << std::endl;
                 }
             }
         }
@@ -193,21 +193,21 @@ namespace Arya
             return;
         }
         std::stringstream fileStream(configFile->getData());
-        string regel;
+        string line;
         while(true)
         {
-            getline(fileStream,regel);
+            getline(fileStream,line);
             if(!fileStream.good()) break;
-            if(regel.empty())
+            if(line.empty())
             {
-                outputFile << regel << std::endl;
+                outputFile << line << std::endl;
                 continue;
             }
             else
             {
-                string regelVarAndValue = regel.substr(4, regel.size()-4);
-                string regelVar = regel.substr(4, regelVarAndValue.find_first_of(" "));
-                if(regelVar == name)
+                string lineVarAndValue = line.substr(4, line.size()-4);
+                string lineVar = line.substr(4, lineVarAndValue.find_first_of(" "));
+                if(lineVar == name)
                 {
                     if(type == TYPE_STRING)
                     {
@@ -229,7 +229,7 @@ namespace Arya
                 }
                 else
                 {
-                    outputFile << regel << std::endl;
+                    outputFile << line << std::endl;
                 }
             }
         }
@@ -286,14 +286,14 @@ namespace Arya
         {
             ret = true;
             std::stringstream fileStream(configFile->getData());
-            string regel;
+            string line;
             while(true)
             {
-                getline(fileStream,regel);
+                getline(fileStream,line);
                 if(!fileStream.good()) break;
-                if(regel.empty()) continue;
-                if(regel[0] == '#') continue;
-                CommandHandler::shared().onCommand(regel);
+                if(line.empty()) continue;
+                if(line[0] == '#') continue;
+                CommandHandler::shared().onCommand(line);
             }
         }
         setConfigFile(configFile);
