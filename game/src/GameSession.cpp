@@ -161,7 +161,7 @@ void GameSession::onFrame(float elapsedTime)
     bool isLocal = false;
     for(unsigned int i = 0; i < factions.size(); ++i)
     {
-        isLocal == (factions[i] == localFaction);
+        isLocal = (factions[i] == localFaction);
         for(list<Unit*>::iterator it = factions[i]->getUnits().begin();
                 it != factions[i]->getUnits().end(); )
         {
