@@ -63,6 +63,7 @@ Faction::~Faction()
 void Faction::addUnit(Unit* unit)
 {
     unit->setTintColor(factionColors[color]);
+    unit->setFactionId(id);
     units.push_back(unit);
 }
 

@@ -156,7 +156,6 @@ void Unit::checkForEnemies()
         ev << 1;
         ev << id << closestId;
         ev.send();
-        GAME_LOG_INFO("Unit " << id << " autoattacking " << closestId);
     }
 }
 

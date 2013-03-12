@@ -116,6 +116,8 @@ class Unit
         void setTintColor(vec3 tC);
 
         int getId() const { return id; }
+        int getFactionId() const { return factionId; }
+        void setFactionId(int id) { factionId = id; }
 
         float getRadius() const { return infoForUnitType[type].radius; }
 
