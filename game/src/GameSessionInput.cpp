@@ -18,7 +18,7 @@ GameSessionInput::GameSessionInput(GameSession* ses)
     leftShiftPressed = false;
     forceDirection = vec3(0.0f);
     specMovement = vec3(0.0f);
-    specPos = vec3(0.0f, 150.0f, 0.0f);
+	specPos = vec3(0.0f,150.0f,0.0f);
     originalMousePos = vec2(0.0);
 
     doUnitMovementNextFrame = false;
@@ -36,6 +36,12 @@ void GameSessionInput::init()
 {
     selectionRect->fillColor = vec4(1.0, 1.0, 1.0, 0.2);
 }
+
+void GameSessionInput::setSpecPos(vec3 pos)
+{
+	specPos = pos; 
+}
+
 
 void GameSessionInput::onFrame(float elapsedTime)
 {
