@@ -4,6 +4,9 @@
 #include <vector>
 using std::vector;
 
+#include <stack>
+using std::stack;
+
 #include <glm/glm.hpp>
 using glm::vec2;
 
@@ -24,19 +27,22 @@ namespace Arya
             vec2 size;
    };
 
-    class View : public InterfaceElement
+    class Window : public InterfaceElement
     {
         public:
-            View();
-            ~View();
+            Window();
+            ~Window();
 
             void draw();
 
             void addChild(InterfaceElement* ele);
             void removeChild(InterfaceElement* ele);
 
+			void setActiveState(bool active);
+
         private:
-            vector<InterfaceElement*> elements;
+            vector<InterfaceElement*> childElements;
+			bool isActive;
     };
 
     class Label : public InterfaceElement
@@ -51,6 +57,10 @@ namespace Arya
             DrawableText* dt;
     };
 
+/////////////////////////
+// Interface
+/////////////////////////
+
     class Interface : public FrameListener
     {
         public:
@@ -60,11 +70,15 @@ namespace Arya
             void onFrame(float elapsedTime);
             bool init();
 
+			void makeActive(Window* w);
+			void makeInactive(Window* w);
+			
         private:
             float time; 
             int count;
             float offsetFPS;
 
             vector<Rect*> rects;
+			stack<Window*> windowStack;
     };
 }
