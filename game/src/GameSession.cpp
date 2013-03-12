@@ -140,15 +140,10 @@ void GameSession::rebuildCellList()
     // loop through units and insert them into cell list
     for(unsigned int i = 0; i < factions.size(); ++i)
     {
-        if(factions[i] == localFaction) continue;
-         for(list<Unit*>::iterator it = factions[i]->getUnits().begin();
-                it != factions[i]->getUnits().end(); )
+        for(list<Unit*>::iterator it = factions[i]->getUnits().begin();
+                it != factions[i]->getUnits().end(); ++it)
         {
-            if((*it)->obsolete()) continue;
-
-            (*it)->insertIntoList(unitCells);
-
-            ++it;
+            (*it)->setCellFromList(unitCells);
         }
     }
 }
@@ -158,15 +153,13 @@ void GameSession::onFrame(float elapsedTime)
     if(!localFaction) return;
     // update units
     mat4 vpMatrix = Root::shared().getScene()->getCamera()->getVPMatrix();
-    bool isLocal = false;
     for(unsigned int i = 0; i < factions.size(); ++i)
     {
-        isLocal = (factions[i] == localFaction);
         for(list<Unit*>::iterator it = factions[i]->getUnits().begin();
                 it != factions[i]->getUnits().end(); )
         {
             if((*it)->obsolete() && (*it)->readyToDelete()) {
-                (*it)->removeFromList(unitCells);
+                (*it)->setCell(0);
                 delete *it;
                 it = factions[i]->getUnits().erase(it);
             }
@@ -177,7 +170,7 @@ void GameSession::onFrame(float elapsedTime)
                 onScreen.y /= onScreen.w;
                 (*it)->setScreenPosition(vec2(onScreen.x, onScreen.y));
 
-               (*it)->update(elapsedTime, map, unitCells, isLocal);
+                (*it)->update(elapsedTime, map);
 
                 ++it;
             }
@@ -185,10 +178,9 @@ void GameSession::onFrame(float elapsedTime)
     }
 
     for(list<Unit*>::iterator it = localFaction->getUnits().begin();
-            it != localFaction->getUnits().end(); )
+            it != localFaction->getUnits().end(); ++it)
     {
-        (*it)->checkForEnemies(unitCells);
-        ++it;
+        (*it)->checkForEnemies();
     }
 }
 
@@ -264,13 +256,13 @@ void GameSession::handleEvent(Packet& packet)
                     if(clientId == Game::shared().getClientId())
                         localFaction = faction;
 
-					//If any of the units that we have was NOT sent in this list they must be deleted
-					//So we keep a list of IDs that we have and check which ones are in the packet
-					//This method might be a bit slow but this process only happens in rare situations
-					//so we do not bother adding extra member variables to the unit class to accomplish this
-					vector<int> allIDs;
-					for(list<Unit*>::iterator it = factions[i]->getUnits().begin(); it != factions[i]->getUnits().end(); ++it)
-						allIDs.push_back((*it)->getId());
+                    //If any of the units that we have was NOT sent in this list they must be deleted
+                    //So we keep a list of IDs that we have and check which ones are in the packet
+                    //This method might be a bit slow but this process only happens in rare situations
+                    //so we do not bother adding extra member variables to the unit class to accomplish this
+                    vector<int> allIDs;
+                    for(list<Unit*>::iterator it = factions[i]->getUnits().begin(); it != factions[i]->getUnits().end(); ++it)
+                        allIDs.push_back((*it)->getId());
 
                     int unitCount;
                     packet >> unitCount;
@@ -279,26 +271,26 @@ void GameSession::handleEvent(Packet& packet)
                         int id;
                         packet >> id;
 
-						for(vector<int>::iterator iter = allIDs.begin(); iter != allIDs.end(); ++iter)
-							if( *iter == id ){ allIDs.erase(iter); break; }
+                        for(vector<int>::iterator iter = allIDs.begin(); iter != allIDs.end(); ++iter)
+                            if( *iter == id ){ allIDs.erase(iter); break; }
 
-						Unit* unit = getUnitById(id);
-						bool newUnit = false;
-						if(!unit)
-						{
-							newUnit = true;
-							unit = createUnit(id, 0);
-						}
+                        Unit* unit = getUnitById(id);
+                        bool newUnit = false;
+                        if(!unit)
+                        {
+                            newUnit = true;
+                            unit = createUnit(id, 0);
+                        }
                         unit->deserialize(packet);
 
-						Object* obj = unit->getObject();
-						if(!obj) obj = Root::shared().getScene()->createObject();
+                        Object* obj = unit->getObject();
+                        if(!obj) obj = Root::shared().getScene()->createObject();
 
-						string s(infoForUnitType[unit->getType()].name);
-						obj->setModel(ModelManager::shared().getModel(s + ".aryamodel"));
-						obj->setAnimation("stand");
+                        string s(infoForUnitType[unit->getType()].name);
+                        obj->setModel(ModelManager::shared().getModel(s + ".aryamodel"));
+                        obj->setAnimation("stand");
 
-						unit->setObject(obj);
+                        unit->setObject(obj);
 
                         float heightModel = map->heightAtGroundPosition(unit->getPosition().x, unit->getPosition().z);
 
@@ -309,17 +301,17 @@ void GameSession::handleEvent(Packet& packet)
                         if(newUnit) faction->addUnit(unit);
                     }
 
-					//now allIDs contains a list of units that were not in the packet so they must be deleted
-					//note that we can not just delete them because of reference counts and so on.
-					//we make them obsolte so that they are deleted next frame
-					for(vector<int>::iterator iter = allIDs.begin(); iter != allIDs.end(); ++iter)
-					{
-						Unit* unit = getUnitById(*iter); //if unit == 0 then there are some serious issues ;)
-						if(unit) unit->markForDelete();
-					}
+                    //now allIDs contains a list of units that were not in the packet so they must be deleted
+                    //note that we can not just delete them because of reference counts and so on.
+                    //we make them obsolte so that they are deleted next frame
+                    for(vector<int>::iterator iter = allIDs.begin(); iter != allIDs.end(); ++iter)
+                    {
+                        Unit* unit = getUnitById(*iter); //if unit == 0 then there are some serious issues ;)
+                        if(unit) unit->markForDelete();
+                    }
 
-                    rebuildCellList();
                 }
+                rebuildCellList();
             }
             break;
 
@@ -385,67 +377,67 @@ void GameSession::handleEvent(Packet& packet)
             break;
 
         case EVENT_MOVE_UNIT: {
-            int numUnits;
-            packet >> numUnits;
+                                  int numUnits;
+                                  packet >> numUnits;
 
-            int unitId;
-            vec2 unitTargetPosition;
-            for(int i = 0; i < numUnits; ++i) {
-                packet >> unitId;
-                packet >> unitTargetPosition;
-                Unit* unit = getUnitById(unitId);
-                if(unit) unit->setTargetPosition(unitTargetPosition);
-            }
+                                  int unitId;
+                                  vec2 unitTargetPosition;
+                                  for(int i = 0; i < numUnits; ++i) {
+                                      packet >> unitId;
+                                      packet >> unitTargetPosition;
+                                      Unit* unit = getUnitById(unitId);
+                                      if(unit) unit->setTargetPosition(unitTargetPosition);
+                                  }
 
-            break;
-        }
+                                  break;
+                              }
 
         case EVENT_ATTACK_MOVE_UNIT:
-		{
-			int numUnits;
-			packet >> numUnits;
+                              {
+                                  int numUnits;
+                                  packet >> numUnits;
 
-			int unitId, targetUnitId;
-			for(int i = 0; i < numUnits; ++i) {
-				packet >> unitId >> targetUnitId;
-				Unit* unit = getUnitById(unitId);
-				Unit* targetUnit = getUnitById(targetUnitId);
-				if(unit && targetUnit) unit->setTargetUnit(targetUnit);
-			}
+                                  int unitId, targetUnitId;
+                                  for(int i = 0; i < numUnits; ++i) {
+                                      packet >> unitId >> targetUnitId;
+                                      Unit* unit = getUnitById(unitId);
+                                      Unit* targetUnit = getUnitById(targetUnitId);
+                                      if(unit && targetUnit) unit->setTargetUnit(targetUnit);
+                                  }
 
-			break;
-		}
+                                  break;
+                              }
 
-		case EVENT_UNIT_DIED:
-		{
-			int id;
-			packet >> id;
-			Unit* unit = getUnitById(id);
-			if(unit) unit->makeDead();
-		}
-		break;
+        case EVENT_UNIT_DIED:
+                              {
+                                  int id;
+                                  packet >> id;
+                                  Unit* unit = getUnitById(id);
+                                  if(unit) unit->makeDead();
+                              }
+                              break;
 
         case EVENT_PLAYER_DEFEAT:
-		{
-            int factionID;
-            packet >> factionID;
-            LOG_INFO("Player lost: " << factionID + 1);
-            Arya::SoundManager::shared().play("defeat.wav");
-		}
-		break;
+                              {
+                                  int factionID;
+                                  packet >> factionID;
+                                  LOG_INFO("Player lost: " << factionID + 1);
+                                  Arya::SoundManager::shared().play("defeat.wav");
+                              }
+                              break;
 
         case EVENT_PLAYER_VICTORY:
-		{
-            int factionID;
-            packet >> factionID;
-            LOG_INFO("Game won by player: " << factionID + 1);
-            Arya::SoundManager::shared().play("victory.wav");
-		}
-		break;
+                              {
+                                  int factionID;
+                                  packet >> factionID;
+                                  LOG_INFO("Game won by player: " << factionID + 1);
+                                  Arya::SoundManager::shared().play("victory.wav");
+                              }
+                              break;
 
         default:
-            GAME_LOG_INFO("GameSession: unknown event received! (" << id << ")");
-            break;
+                              GAME_LOG_INFO("GameSession: unknown event received! (" << id << ")");
+                              break;
     }
 }
 

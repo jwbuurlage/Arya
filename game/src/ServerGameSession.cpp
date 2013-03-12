@@ -211,7 +211,7 @@ void ServerGameSession::update(float elapsedTime)
                 //   so that this loop will remove it
                 // - big events like a full faction that loses all its units
                 //   ???????? solution needed ??????
-                unit->update(elapsedTime, map, 0, true, this);
+                unit->update(elapsedTime, map, this);
                 ++it;
             }
         }
