@@ -9,6 +9,20 @@
 #include <sstream>
 using std::stringstream;
 
+//consoleWindow = new Window();
+//interface->addWindow(consoleWindow);
+//// initialize Window
+//
+//consoleWindow->setSize(..);
+//consoleWindow->setPosition(..);
+//
+//for(i in history....)
+//{
+//	consoleWindow->addChild(Label("courier", history[i], position, size));
+//}
+//
+//interface->makeActive(consoleWindow);
+
 namespace Arya
 {
     template<> Console* Singleton<Console>::singleton = 0;
