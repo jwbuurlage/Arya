@@ -106,6 +106,7 @@ void Unit::setObject(Object* obj)
 
 void Unit::checkForEnemies()
 {
+#ifndef SERVERONLY
     if(unitState != UNIT_IDLE)
         return;
 
@@ -157,6 +158,7 @@ void Unit::checkForEnemies()
         ev << id << closestId;
         ev.send();
     }
+#endif
 }
 
 void Unit::setPosition(const vec3& pos)

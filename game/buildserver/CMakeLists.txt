@@ -36,6 +36,7 @@ SET(
     "PocoNet"
     "PocoFoundation"
     "pthread"
+    "sfml-system"
 )
 
 ADD_DEFINITIONS(-DPOCO_NO_AUTOMATIC_LIBS)
