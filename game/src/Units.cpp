@@ -63,6 +63,7 @@ Unit::Unit(int _type, int _id, UnitFactory* factory) : id(_id)
 
     health = infoForUnitType[type].maxHealth;
     timeSinceLastAttack = infoForUnitType[type].attackSpeed + 1.0f;
+    timeSinceLastAttackRequest = 2.0f;
 
     dyingTime = 0.0f;
 
@@ -120,6 +121,9 @@ void Unit::checkForEnemies(CellList* cl)
 {
     if(unitState != UNIT_IDLE)
         return;
+
+    if(timeSinceLastAttackRequest < 1.0f) return;
+    timeSinceLastAttackRequest = 0;
 
     int ix, iy;
     cl->cellForPositionGivenSize(getPosition2(), ix, iy);
@@ -188,6 +192,8 @@ void Unit::update(float timeElapsed, Map* map, CellList* cl, bool local, ServerG
         if(unitState == UNIT_ATTACKING || unitState == UNIT_ATTACKING_OUT_OF_RANGE)
             setUnitState(UNIT_IDLE);
     }
+
+    timeSinceLastAttackRequest += timeElapsed;
 
     if(unitState == UNIT_IDLE)
         return;
