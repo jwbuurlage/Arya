@@ -60,6 +60,7 @@ Unit::Unit(int _type, int _id, UnitFactory* factory) : id(_id)
     targetPosition = vec2(0.0f);
     unitState = UNIT_IDLE;
     targetUnit = 0;
+    currentCell = 0;
 
     health = infoForUnitType[type].maxHealth;
     timeSinceLastAttack = infoForUnitType[type].attackSpeed + 1.0f;
@@ -103,33 +104,23 @@ void Unit::setObject(Object* obj)
     object = obj;
 }
 
-void Unit::insertIntoList(CellList* cl)
-{
-    int ix, iy;
-    cl->cellForPositionGivenSize(getPosition2(), ix, iy);
-    cl->cellForIndex(ix, iy)->add(id);
-}
-
-void Unit::removeFromList(CellList* cl)
-{
-    int ix, iy;
-    cl->cellForPositionGivenSize(getPosition2(), ix, iy);
-    cl->cellForIndex(ix, iy)->remove(id);
-}
-
-void Unit::checkForEnemies(CellList* cl)
+void Unit::checkForEnemies()
 {
     if(unitState != UNIT_IDLE)
         return;
 
     if(timeSinceLastAttackRequest < 1.0f) return;
-    timeSinceLastAttackRequest = 0;
 
-    int ix, iy;
-    cl->cellForPositionGivenSize(getPosition2(), ix, iy);
+    if(!currentCell) return;
+
+    CellList* list = currentCell->cellList;
+    if(!list) return;
+
+    int curx = currentCell->cellx;
+    int cury = currentCell->celly;
 
     Cell* c;
-    float closestDistance = infoForUnitType[type].attackRadius * 4.0;
+    float closestDistance = infoForUnitType[type].attackRadius * 2.0;
     int closestId = -1;
 
     float d;
@@ -137,15 +128,18 @@ void Unit::checkForEnemies(CellList* cl)
     for(int dx = -1; dx <= 1; ++dx)
         for(int dy = -1; dy <= 1; ++dy)
         {
-            if(ix + dx >= cl->gridSize || ix + dx < 0) continue;
-            if(iy + dy >= cl->gridSize || iy + dy < 0) continue;
-            c = cl->cellForIndex(ix + dx, iy + dy);
+            if(curx + dx >= list->gridSize || curx + dx < 0) continue;
+            if(cury + dy >= list->gridSize || cury + dy < 0) continue;
+            c = list->cellForIndex(curx + dx, cury + dy);
             // loop through
             for(unsigned i = 0; i < c->cellPoints.size(); ++i)
             {
-                d = glm::distance(position, unitFactory->getUnitById(c->cellPoints[i])->getPosition());
+                Unit* unit = unitFactory->getUnitById(c->cellPoints[i]);
+                if(!unit) continue;
+                if(unit->factionId == factionId) continue;
+                d = glm::distance(position, unit->getPosition());
 
-                if(d < infoForUnitType[type].attackRadius * 2.0 && d < closestDistance)
+                if(d < closestDistance)
                 {
                     closestDistance = d;
                     closestId = c->cellPoints[i];
@@ -153,8 +147,11 @@ void Unit::checkForEnemies(CellList* cl)
             }
         }
 
-    if(closestId > 0)
+    if(closestId >= 0)
     {
+        timeSinceLastAttackRequest = 0;
+        //TODO: Instead of a single event for each unit we can combine
+        //all attacks into a single event (currently there is a '1' as count)
         Event& ev = Game::shared().getEventManager()->createEvent(EVENT_ATTACK_MOVE_UNIT_REQUEST);
         ev << 1;
         ev << id << closestId;
@@ -162,26 +159,39 @@ void Unit::checkForEnemies(CellList* cl)
     }
 }
 
-void Unit::setPositionAndUpdateLists(const vec3& pos, CellList* cl)
+void Unit::setPosition(const vec3& pos)
 {
-    int ixp, iyp;
-    cl->cellForPositionGivenSize(vec2(position.x, position.z), ixp, iyp);
-    int ix, iy;
-    cl->cellForPositionGivenSize(vec2(pos.x, pos.z), ix, iy);
-
-    if(ix != ixp || iy != iyp)
-    {
-        cl->cellForIndex(ixp, iyp)->remove(id);
-        cl->cellForIndex(ix, iy)->add(id);
-    }
-
     position = pos;
-    if(object)
-        object->setPosition(pos);
+    if(object) object->setPosition(pos);
+
+    if(currentCell)
+    {
+        Cell* newCell = currentCell->cellList->cellForPosition(getPosition2());
+        if(currentCell != newCell)
+        {
+            currentCell->remove(id);
+            currentCell = newCell;
+            currentCell->add(id);
+        }
+    }
 }
 
+void Unit::setCell(Cell* newCell)
+{
+    if(currentCell != newCell)
+    {
+        if(currentCell) currentCell->remove(id);
+        currentCell = newCell;
+        if(currentCell) currentCell->add(id);
+    }
+}
 
-void Unit::update(float timeElapsed, Map* map, CellList* cl, bool local, ServerGameSession* serverSession)
+void Unit::setCellFromList(CellList* cl)
+{
+    setCell(cl->cellForPosition(getPosition2()));
+}
+
+void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
 {
     //For any units referenced by this unit we must check if they are obsolete
     //Currently the only referenced unit is targetUnit
@@ -313,11 +323,7 @@ void Unit::update(float timeElapsed, Map* map, CellList* cl, bool local, ServerG
                 newPosition = getPosition2() + distanceToTravel * glm::normalize(diff);
 
             float height = (map ? map->heightAtGroundPosition(newPosition.x, newPosition.y) : 0.0f);
-            vec3 newPosition3 = vec3(newPosition.x, height, newPosition.y);
-            if(local || serverSession)
-                setPosition(newPosition3);
-            else
-                setPositionAndUpdateLists(newPosition3, cl);
+            setPosition(vec3(newPosition.x, height, newPosition.y));
         }
     }
     else
