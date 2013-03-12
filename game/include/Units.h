@@ -138,6 +138,7 @@ class Unit
         vec2 screenPosition;
 
         float health;
+        float timeSinceLastAttackRequest; //to prevent spamming the server
         float timeSinceLastAttack;
         float dyingTime;
 
