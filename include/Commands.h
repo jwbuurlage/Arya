@@ -17,7 +17,6 @@ namespace Arya
             CommandHandler();
             virtual ~CommandHandler();
 
-            bool isInitialized() const { return initialized; }
             bool init();
 
             void addCommandListener(string command, CommandListener* listener);
@@ -27,7 +26,6 @@ namespace Arya
             void onCommand(string command);
 
         private:
-            bool initialized;
 
             string splitLineCommand(string command);
             string splitLineParameters(string command);

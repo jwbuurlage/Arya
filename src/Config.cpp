@@ -22,7 +22,7 @@ namespace Arya
     {
         setCvarWithoutSave("fullscreen", "false", TYPE_BOOL);
         setCvarWithoutSave("serveraddress", "localhost", TYPE_STRING);
-        setCvarWithoutSave("gGravity", "10", TYPE_INTEGER);
+
         loadConfigFile("config.txt");
         return true;
     }

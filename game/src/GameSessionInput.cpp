@@ -18,7 +18,7 @@ GameSessionInput::GameSessionInput(GameSession* ses)
     leftShiftPressed = false;
     forceDirection = vec3(0.0f);
     specMovement = vec3(0.0f);
-    specPos = vec3(0.0f, 150.0f, 0.0f);
+	specPos = vec3(0.0f,150.0f,0.0f);
     originalMousePos = vec2(0.0);
 
     doUnitMovementNextFrame = false;
@@ -36,6 +36,12 @@ void GameSessionInput::init()
 {
     selectionRect->fillColor = vec4(1.0, 1.0, 1.0, 0.2);
 }
+
+void GameSessionInput::setSpecPos(vec3 pos)
+{
+	specPos = pos; 
+}
+
 
 void GameSessionInput::onFrame(float elapsedTime)
 {
@@ -254,6 +260,7 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
 
     Faction* lf = session->getLocalFaction();
 
+    bool soundPlayed = false;
     if(!lf) return;
     for(list<Unit*>::iterator it = lf->getUnits().begin();
             it != lf->getUnits().end(); ++it)
@@ -262,6 +269,8 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
 
         if((onScreen.x > x_min && onScreen.x < x_max) && (onScreen.y > y_min && onScreen.y < y_max)) {
             (*it)->setSelected(true);
+            if(!soundPlayed) SoundManager::shared().play(infoForUnitType[(*it)->getType()].selectionSound);
+            soundPlayed = true;
         }
     }
 }
@@ -356,5 +365,8 @@ void GameSessionInput::selectUnit()
     }
 
     if(best_unit)
+    {
+        SoundManager::shared().play(infoForUnitType[best_unit->getType()].selectionSound);
         best_unit->setSelected(true);
+    }
 }
