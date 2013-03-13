@@ -33,7 +33,6 @@ namespace Arya
     {
         scene = 0;
         oldTime = 0;
-        overlay = 0;
         interface = 0;
 
         FileSystem::create();
@@ -66,7 +65,6 @@ namespace Arya
         Console::destroy();
 
         if(scene) delete scene;
-        if(overlay) delete overlay;
         if(interface) delete interface;
 
         SoundManager::destroy();
@@ -104,12 +102,6 @@ namespace Arya
         if(!SoundManager::shared().init())
         {
             LOG_WARNING("Could not initialize SoundManager, files not found!");
-        }
-        if(!overlay) overlay = new Overlay;
-        if(!overlay->init())
-        {
-            LOG_INFO("Could not initialize overlay");
-            return false;
         }
 
         if(!interface) interface = new Interface;
@@ -291,11 +283,16 @@ namespace Arya
             clickScreenLocation.z = screenPos.z;
        }
 
-        if(overlay)
-            overlay->render();
+        if(interface)
+            interface->render();
 
         glfwSwapBuffers();
     }
+
+	Overlay* Root::getOverlay() const
+	{
+		return interface->getOverlay();
+	}
 
     void Root::addInputListener(InputListener* listener)
     {

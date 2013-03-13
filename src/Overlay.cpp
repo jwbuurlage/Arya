@@ -7,10 +7,15 @@
 
 namespace Arya
 {
-    Overlay::Overlay() 
+    Overlay::Overlay(ShaderProgram* _overlayProgram, GLuint _rectVAO) 
     {
-        rectVAO = 0;
-        overlayProgram = 0;
+		LOG_INFO("hello");
+
+        rectVAO = _rectVAO;
+        overlayProgram = _overlayProgram;
+
+		ww = 0;
+		wh = 0;
     }
 
     Overlay::~Overlay()
@@ -23,50 +28,8 @@ namespace Arya
 
     bool Overlay::init()
     {
-        if(!initShaders()) return false;
-
         ww = Root::shared().getWindowWidth();
         wh = Root::shared().getWindowHeight();
-
-        // make 1 by 1 px vertex buffer
-        // inititialize shader
-        GLfloat vertices[] = {
-            0.0,        0.0,
-            1.0,        0.0,
-            0.0,        1.0,
-            1.0,        1.0
-        };
-
-        GLuint vbo;
-        glGenBuffers(1, &vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), vertices, GL_STATIC_DRAW); 
-
-        glGenVertexArrays(1, &rectVAO);
-        glBindVertexArray(rectVAO);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
-
-        glBindVertexArray(0);
-
-        return true;
-    }
-
-    bool Overlay::initShaders()
-    {
-
-        Shader* overlayVertex = new Shader(VERTEX);
-        if(!(overlayVertex->addSourceFile("../shaders/overlay.vert"))) return false;
-        if(!(overlayVertex->compile())) return false;
-
-        Shader* overlayFragment = new Shader(FRAGMENT);
-        if(!(overlayFragment->addSourceFile("../shaders/overlay.frag"))) return false;
-        if(!(overlayFragment->compile())) return false;
-
-        overlayProgram = new ShaderProgram("overlay");
-        overlayProgram->attach(overlayVertex);
-        overlayProgram->attach(overlayFragment);
-        if(!(overlayProgram->link())) return false;
 
         return true;
     }

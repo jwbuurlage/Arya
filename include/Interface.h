@@ -1,5 +1,6 @@
 #include "common/Listeners.h"
 #include "Overlay.h"
+#include <GL/glew.h>
 
 #include <vector>
 using std::vector;
@@ -9,6 +10,7 @@ using std::stack;
 
 #include <glm/glm.hpp>
 using glm::vec2;
+using glm::vec4;
 
 namespace Arya
 {
@@ -17,10 +19,10 @@ namespace Arya
     class InterfaceElement
     {
         public:
-            InterfaceElement();
-            virtual ~InterfaceElement();
+            InterfaceElement(vec2 _position, vec2 _size);
+            virtual ~InterfaceElement() { }
 
-            virtual void draw();
+            virtual void draw() { }
 
         private:
             vec2 position;
@@ -30,8 +32,8 @@ namespace Arya
     class Window : public InterfaceElement
     {
         public:
-            Window();
-            ~Window();
+            Window(vec2 _position, vec2 _size, vec4 _backgroundColor);
+            ~Window() { }
 
             void draw();
 
@@ -43,15 +45,16 @@ namespace Arya
         private:
             vector<InterfaceElement*> childElements;
 			bool isActive;
+			vec4 backgroundColor;
     };
 
     class Label : public InterfaceElement
     {
         public:
-            Label() { }
+            Label(vec2 _position, vec2 _size);
             ~Label() { }
 
-            void draw();
+            void draw() { }
 
         private:
             DrawableText* dt;
@@ -64,19 +67,29 @@ namespace Arya
     class Interface : public FrameListener
     {
         public:
-            Interface() { offsetFPS = 0.0; time = 0.0; count = 0; }
+            Interface();
             virtual ~Interface() {}
 
             void onFrame(float elapsedTime);
+			void render();
             bool init();
+            bool initShaders();
 
 			void makeActive(Window* w);
 			void makeInactive(Window* w);
+
+			GLuint getonepxRectVAO() const { return onepxRectVAO; };
+			Overlay* getOverlay() const { return overlay; }
+			ShaderProgram* getTexturedRectProgram() const { return texturedRectProgram; }
 			
         private:
             float time; 
             int count;
             float offsetFPS;
+
+			Overlay* overlay;
+			ShaderProgram* texturedRectProgram;
+			GLuint onepxRectVAO;
 
             vector<Rect*> rects;
 			stack<Window*> windowStack;

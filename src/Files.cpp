@@ -68,7 +68,6 @@ namespace Arya
 
 	File* FileSystem::getFile(string filename)
 	{
-        LOG_INFO("Loading file: " << filename);
 		string formattedFilename(filename);
 		//Note: only works for ascii strings:
 		//Unix filenames are case-sensitive
