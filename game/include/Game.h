@@ -17,7 +17,7 @@ using Arya::cvar;
 class Network;
 class EventManager;
 
-class Game : public Arya::InputListener , public Arya::FrameListener, public EventHandler
+class Game : public Arya::InputListener , public Arya::FrameListener, public EventHandler, public Arya::CommandListener
 {
     public:
         Game();

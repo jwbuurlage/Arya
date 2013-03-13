@@ -35,6 +35,7 @@ namespace Arya
             //For smooth zoom you should just set the camZoomSpeed variable
             //and the zoom will be set accordingly in the update function
             void setZoom(float zoom){ camDist = zoom; updateMatrix = updateInverse = true; }
+			float getZoom() const {return camDist;}
 
             //Smooth camera movement, should be called by Scene every frame
             //(not by the application)

@@ -18,6 +18,7 @@ Game::Game()
     clientId = 0;
 
     timeSinceNetworkPoll = 1.0f;
+	
 
     singleton = this;
 }
@@ -40,6 +41,8 @@ void Game::run()
     else
     {
         root->addInputListener(this);
+
+		Arya::CommandHandler::shared().addCommandListener("restartsession" ,this);
 
         if(network) delete network;
         network = new Network;

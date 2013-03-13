@@ -61,8 +61,9 @@ void GameSessionInput::onFrame(float elapsedTime)
         vec3 force = forceDirection;
         force = glm::rotateY(force, cam->getYaw());
         float speedFactor = 4000.0f;
-        if(slowMode) speedFactor = 500.0f;
-        specMovement += force * speedFactor * elapsedTime;
+        if(slowMode) speedFactor *= 0.125f;
+		float zoomSpeedFactor = cam->getZoom()/300.0f;
+        specMovement += force * speedFactor * zoomSpeedFactor * elapsedTime;
     }
 
     specPos += specMovement * elapsedTime;
