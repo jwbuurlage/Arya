@@ -301,6 +301,10 @@ void GameSession::handleEvent(Packet& packet)
                                     unit->getPosition().z));
 
                         if(newUnit) faction->addUnit(unit);
+                        if(unit->getType() == 2 && faction == localFaction)
+                        {
+							input->setSpecPos(unit->getPosition());
+                        }
                     }
 
                     //now allIDs contains a list of units that were not in the packet so they must be deleted

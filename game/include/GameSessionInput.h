@@ -22,7 +22,7 @@ class GameSessionInput : public Arya::InputListener, public Arya::FrameListener
         void selectUnits(float x_min, float x_max, float y_min, float y_max);
 
         void moveSelectedUnits();
-
+		void setSpecPos(vec3 pos);
     private: 
         GameSession* session;
 

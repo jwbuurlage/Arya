@@ -18,7 +18,7 @@ GameSessionInput::GameSessionInput(GameSession* ses)
     leftShiftPressed = false;
     forceDirection = vec3(0.0f);
     specMovement = vec3(0.0f);
-    specPos = vec3(0.0f, 150.0f, 0.0f);
+	specPos = vec3(0.0f,150.0f,0.0f);
     originalMousePos = vec2(0.0);
 
     doUnitMovementNextFrame = false;
@@ -36,6 +36,12 @@ void GameSessionInput::init()
 {
     selectionRect->fillColor = vec4(1.0, 1.0, 1.0, 0.2);
 }
+
+void GameSessionInput::setSpecPos(vec3 pos)
+{
+	specPos = pos; 
+}
+
 
 void GameSessionInput::onFrame(float elapsedTime)
 {
@@ -82,19 +88,47 @@ bool GameSessionInput::keyDown(int key, bool keyDown)
 
     bool DirectionChanged = false;
 
-    switch(key) {
-        case GLFW_KEY_LSHIFT: leftShiftPressed = keyDown; break;
-        case GLFW_KEY_RSHIFT: slowMode = keyDown; break;
-        case 'W': goingForward = keyDown;	DirectionChanged = true; break;
-        case 'S': goingBackward = keyDown;	DirectionChanged = true; break;
-        case 'Q': rotatingLeft = keyDown;	break;
-        case 'E': rotatingRight = keyDown;	break;
-        case 'A': goingLeft = keyDown;		DirectionChanged = true; break;
-        case 'D': goingRight = keyDown;		DirectionChanged = true; break;
-        case 'Z': goingDown = keyDown;		DirectionChanged = true; break;
-        case 'X': goingUp = keyDown;		DirectionChanged = true; break;
-        default: keyHandled = false; break;
-    }
+        if(key == GLFW_KEY_LSHIFT) leftShiftPressed = keyDown;
+        else if(key == GLFW_KEY_RSHIFT) slowMode = keyDown;
+		else if(key == Config::shared().getCvarString("goingforwardgame")[0])
+		{
+			goingForward = keyDown;
+			DirectionChanged = true;
+		}
+        else if(key == Config::shared().getCvarString("goingbackwardgame")[0])
+		{
+			goingBackward = keyDown;
+			DirectionChanged = true;
+		}
+		else if(key == Config::shared().getCvarString("rotatingleftgame")[0])
+		{
+        	 rotatingLeft = keyDown;
+		}
+		else if(key == Config::shared().getCvarString("rotatingrightgame")[0])
+		{
+			rotatingRight = keyDown;
+		}
+		else if(key == Config::shared().getCvarString("goingleftgame")[0])
+		{
+			goingLeft = keyDown;
+			DirectionChanged = true;
+		}
+		else if(key == Config::shared().getCvarString("goingrightgame")[0])
+		{
+			goingRight = keyDown;
+			DirectionChanged = true;
+		}
+		else if(key == Config::shared().getCvarString("goingdowngame")[0])
+		{
+			goingDown = keyDown;
+			DirectionChanged = true;
+		}
+		else if(key == Config::shared().getCvarString("goingupgame")[0])
+		{
+			goingUp = keyDown;
+			DirectionChanged = true;
+		}
+        else keyHandled = false;
 
     if( DirectionChanged ){
         forceDirection = vec3(0.0f);
@@ -254,6 +288,7 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
 
     Faction* lf = session->getLocalFaction();
 
+    bool soundPlayed = false;
     if(!lf) return;
     for(list<Unit*>::iterator it = lf->getUnits().begin();
             it != lf->getUnits().end(); ++it)
@@ -262,6 +297,8 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
 
         if((onScreen.x > x_min && onScreen.x < x_max) && (onScreen.y > y_min && onScreen.y < y_max)) {
             (*it)->setSelected(true);
+            if(!soundPlayed) SoundManager::shared().play(infoForUnitType[(*it)->getType()].selectionSound);
+            soundPlayed = true;
         }
     }
 }
@@ -356,5 +393,8 @@ void GameSessionInput::selectUnit()
     }
 
     if(best_unit)
+    {
+        SoundManager::shared().play(infoForUnitType[best_unit->getType()].selectionSound);
         best_unit->setSelected(true);
+    }
 }

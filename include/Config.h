@@ -57,7 +57,6 @@ namespace Arya
             bool loadConfigFileAfterRootInit(string configFileName);
             void updateConfigFile();
             File* configFile;
-            bool loadingConfigFlag;
             bool loadConfigFile(string configFileName);
     };
 }

@@ -10,7 +10,6 @@ namespace Arya
 
     CommandHandler::CommandHandler()
     {
-        initialized = false;
     };
 
     CommandHandler::~CommandHandler()
@@ -19,8 +18,6 @@ namespace Arya
 
     bool CommandHandler::init()
     {
-        if(initialized) return true;
-
         addCommandListener("consoleColor", this);
         addCommandListener("hide", this);
         addCommandListener("set", this);
@@ -32,7 +29,6 @@ namespace Arya
         addCommandListener("STOPSOUND", this);
         addCommandListener("STOPMUSIC", this);
 
-        initialized = true;
         return true;
     }
 
