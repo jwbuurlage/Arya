@@ -37,7 +37,9 @@ class Faction
 
         Faction(int id, FactionFactory* factory);
     public:
-        ~Faction(); //unregisters itself at factory
+        //~Faction deletes all units it has
+        //and unregisters itself at factory
+        ~Faction();
 
         void addUnit(Unit* unit);
 

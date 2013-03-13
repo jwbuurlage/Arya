@@ -14,6 +14,14 @@
 
 using Arya::Root;
 
+UnitFactory::~UnitFactory()
+{
+    if(!unitMap.empty())
+    {
+        GAME_LOG_ERROR("List of units is not empty at deconstruction of unit factory (gamesession). Possible memory leak");
+    }
+}
+
 Unit* UnitFactory::createUnit(int id, int type)
 {
     Unit* unit = getUnitById(id);
@@ -49,8 +57,12 @@ Unit* UnitFactory::getUnitById(int id)
 
 Unit::Unit(int _type, int _id, UnitFactory* factory) : id(_id)
 {
-    type = _type;
     unitFactory = factory;
+    type = _type;
+    factionId = -1;
+    local = false;
+    obsolete = false;
+    refCount = 0;
 
     object = 0;
     position = vec3(0.0f);
@@ -68,8 +80,6 @@ Unit::Unit(int _type, int _id, UnitFactory* factory) : id(_id)
 
     dyingTime = 0.0f;
 
-    refCount = 0;
-
     screenPosition = vec2(0.0);
     tintColor = vec3(0.5);
 
@@ -81,8 +91,6 @@ Unit::Unit(int _type, int _id, UnitFactory* factory) : id(_id)
     //healthBar->offsetInPixels = vec2(-12.5, 25.0);
     //Root::shared().getOverlay()->addRect(healthBar);
 
-    factionId = -1;
-
     //Register at Game session unit id map
 }
 
@@ -93,6 +101,8 @@ Unit::~Unit()
     if(object) object->setObsolete();
 
     unitFactory->destroyUnit(id);
+
+    setCell(0);
 
     //NOT IN SERVER:
     //Root::shared().getOverlay()->removeRect(healthBar);
@@ -197,7 +207,7 @@ void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
 {
     //For any units referenced by this unit we must check if they are obsolete
     //Currently the only referenced unit is targetUnit
-    if(targetUnit && (targetUnit->obsolete() || !targetUnit->isAlive()))
+    if(targetUnit && !targetUnit->isAlive())
     {
         targetUnit->release();
         targetUnit = 0;
@@ -206,6 +216,7 @@ void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
     }
 
     timeSinceLastAttackRequest += timeElapsed;
+    timeSinceLastAttack += timeElapsed;
 
     if(unitState == UNIT_IDLE)
         return;
@@ -213,10 +224,12 @@ void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
     if(unitState == UNIT_DYING)
     {
         dyingTime += timeElapsed;
+        //TODO: Use death animation time here
+        if(dyingTime > 0.8f) markForDelete();
         return;
     }
 
-    //If we are attacking the target position is the position of the target unit
+    //If we are attacking, the target position is the position of the target unit
     if(unitState == UNIT_ATTACKING || unitState == UNIT_ATTACKING_OUT_OF_RANGE)
     {
         if(!targetUnit)
@@ -264,16 +277,17 @@ void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
             if(unitState != UNIT_ATTACKING)
                 setUnitState(UNIT_ATTACKING);
 
-            timeSinceLastAttack += timeElapsed;
-
             while(timeSinceLastAttack > infoForUnitType[type].attackSpeed)
             {
                 timeSinceLastAttack -= infoForUnitType[type].attackSpeed;
 
                 targetUnit->receiveDamage(infoForUnitType[type].damage, this);
-                if(!(targetUnit->isAlive()))
+
+                //When the unit dies the server sends a packet
+                //The client leaves the unit alive untill it receives the packet
+                if(serverSession)
                 {
-                    if(serverSession)
+                    if(!targetUnit->isAlive())
                     {
                         //Note that the unit was alive before this damage so this must have killed it
                         //Therefore we can send the death packet here
@@ -281,13 +295,11 @@ void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
                         *pak << targetUnit->id;
                         serverSession->sendToAllClients(pak);
                         targetUnit->markForDelete();
+                        targetUnit->release();
+                        targetUnit = 0;
+                        setUnitState(UNIT_IDLE);
+                        return;
                     }
-                    targetUnit->release();
-                    targetUnit = 0;
-
-                    setUnitState(UNIT_IDLE);
-                    timeSinceLastAttack = infoForUnitType[type].attackSpeed + 1.0f;
-                    return;
                 }
             }
         }
@@ -394,11 +406,19 @@ void Unit::setTargetPosition(vec2 target)
 
 void Unit::receiveDamage(float dmg, Unit* attacker)
 {
-    if(unitState == UNIT_IDLE) 
+    if(local)
     {
-        setUnitState(UNIT_ATTACKING_OUT_OF_RANGE);
-        targetUnit = attacker;
-        attacker->retain();
+        if(timeSinceLastAttackRequest > 1.0f)
+        {
+            if(unitState == UNIT_IDLE) //and if not in passive mode
+            {
+                timeSinceLastAttackRequest = 0;
+                Event& ev = Game::shared().getEventManager()->createEvent(EVENT_ATTACK_MOVE_UNIT_REQUEST);
+                ev << 1;
+                ev << id << attacker->getId();
+                ev.send();
+            }
+        }
     }
 
     health -= dmg;
@@ -406,6 +426,7 @@ void Unit::receiveDamage(float dmg, Unit* attacker)
 
     //healthBar->sizeInPixels = vec2(25.0*getHealthRatio(), 3.0);
 
+    //This is done when the death packet is received
     if(!isAlive())
     {
         setUnitState(UNIT_DYING);

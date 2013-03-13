@@ -307,7 +307,7 @@ void GameSessionInput::moveSelectedUnits()
         Event& ev = Game::shared().getEventManager()->createEvent(EVENT_ATTACK_MOVE_UNIT_REQUEST);
 
         ev << numSelected;
-        for(int i = 0; i < unitIds.size(); ++i)
+        for(unsigned int i = 0; i < unitIds.size(); ++i)
             ev << unitIds[i] << best_unit->getId();
 
         ev.send();
@@ -316,14 +316,14 @@ void GameSessionInput::moveSelectedUnits()
     }
 
     int perRow = (int)(glm::sqrt((float)numSelected));
-    int currentIndex = 0;
+    //int currentIndex = 0;
     float spread = 10.0f;
 
     Event& ev = Game::shared().getEventManager()->createEvent(EVENT_MOVE_UNIT_REQUEST);
     ev << numSelected;
-    for(int i = 0; i < unitIds.size(); ++i)
-        ev << unitIds[i] << vec2(clickPos.x + spread*((i % perRow) - perRow / 2),
-                        clickPos.z + spread*(i / perRow - perRow / 2));
+    for(unsigned int i = 0; i < unitIds.size(); ++i)
+        ev << unitIds[i] << vec2(clickPos.x + spread*((signed)(i % perRow) - perRow / 2),
+                        clickPos.z + spread*((signed)i / perRow - perRow / 2));
 
     ev.send();
 }

@@ -41,8 +41,8 @@ struct Cell;
 class UnitFactory
 {
     public:
-        UnitFactory(){}
-        virtual ~UnitFactory(){}
+        UnitFactory(){};
+        virtual ~UnitFactory();
 
         //destory units by calling delete on them
         Unit* createUnit(int id, int type);
@@ -100,13 +100,12 @@ class Unit
         void receiveDamage(float dmg, Unit* attacker);
         float getHealthRatio() const { return health / infoForUnitType[type].maxHealth; }
 
-        bool isAlive() const { return (health > 0); }
+        bool isAlive() const { return (!obsolete && health > 0); }
 		void makeDead(){ health = 0; setUnitState(UNIT_DYING); dyingTime = 0.0f; }; //will show death animation and then delete unit
-        bool obsolete() { return !isAlive() && (dyingTime > 0.8f); }
 
         //if this returns true the unit will be deleted by session
-        bool readyToDelete() { return refCount <= 0 && !isAlive() && (dyingTime > 0.8f); }
-        void markForDelete(){ health = 0; dyingTime = 1.0f; }; //unit will be deleted as soon as refcount reaches zero
+        bool readyToDelete() const { return obsolete && refCount <= 0; }
+        void markForDelete(){ obsolete = true; } //unit will be deleted as soon as refcount reaches zero
 
         void retain() { ++refCount; }
         void release() { --refCount; }
@@ -118,6 +117,8 @@ class Unit
         int getId() const { return id; }
         int getFactionId() const { return factionId; }
         void setFactionId(int id) { factionId = id; }
+        void setLocal(bool value = true){ local = value; }
+        bool isLocal() const { return local; }
 
         float getRadius() const { return infoForUnitType[type].radius; }
 
@@ -132,6 +133,9 @@ class Unit
         int type;
         const int id;
         int factionId;
+        bool local; //This must be false on the server. When true the update functions will do auto-attack requests
+        bool obsolete;
+        int refCount;
 
         // movement and attack
         vec2 targetPosition;
@@ -140,16 +144,12 @@ class Unit
         Cell* currentCell;
         bool selected;
 
-        vec2 screenPosition;
-
         float health;
         float timeSinceLastAttackRequest; //to prevent spamming the server
         float timeSinceLastAttack;
         float dyingTime;
 
-        int refCount;
         Rect* healthBar;
-
+        vec2 screenPosition;
         vec3 tintColor;
-
 };

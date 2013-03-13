@@ -29,6 +29,7 @@ ServerGameSession::ServerGameSession(Server* serv) : server(serv)
 
 ServerGameSession::~ServerGameSession()
 {
+    //Deleting the factions will cause all units to be deleted
 	for(factionIterator it = clientFactionList.begin(); it != clientFactionList.end(); ++it)
 		delete *it;
 	clientFactionList.clear();

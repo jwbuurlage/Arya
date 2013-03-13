@@ -158,12 +158,14 @@ void GameSession::onFrame(float elapsedTime)
         for(list<Unit*>::iterator it = factions[i]->getUnits().begin();
                 it != factions[i]->getUnits().end(); )
         {
-            if((*it)->obsolete() && (*it)->readyToDelete()) {
+            if((*it)->readyToDelete())
+            {
                 (*it)->setCell(0);
                 delete *it;
                 it = factions[i]->getUnits().erase(it);
             }
-            else {
+            else
+            {
                 vec4 onScreen((*it)->getObject()->getPosition(), 1.0);
                 onScreen = vpMatrix * onScreen;
                 onScreen.x /= onScreen.w;
