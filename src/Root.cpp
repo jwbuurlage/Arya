@@ -103,8 +103,7 @@ namespace Arya
         ModelManager::shared().initialize();
         if(!SoundManager::shared().init())
         {
-            LOG_WARNING("Could not initialize SoundManager");
-            return false;
+            LOG_WARNING("Could not initialize SoundManager, files not found!");
         }
         if(!overlay) overlay = new Overlay;
         if(!overlay->init())
