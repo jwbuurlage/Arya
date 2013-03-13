@@ -22,6 +22,15 @@ namespace Arya
     {
         setCvarWithoutSave("fullscreen", "false", TYPE_BOOL);
         setCvarWithoutSave("serveraddress", "localhost", TYPE_STRING);
+		
+		setCvarWithoutSave("goingforwardgame","W", TYPE_STRING);
+		setCvarWithoutSave("goingbackwardgame","S", TYPE_STRING);
+		setCvarWithoutSave("rotatingleftgame","Q", TYPE_STRING);
+		setCvarWithoutSave("rotatingrightgame","E", TYPE_STRING);
+		setCvarWithoutSave("goingleftgame","A", TYPE_STRING);
+		setCvarWithoutSave("goingrightgame","D", TYPE_STRING);
+		setCvarWithoutSave("goingdowngame","Z", TYPE_STRING);
+		setCvarWithoutSave("goingupgame","X", TYPE_STRING);
 
         loadConfigFile("config.txt");
         return true;
