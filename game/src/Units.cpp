@@ -275,9 +275,17 @@ void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
                 canMove = false;
 
             if(unitState != UNIT_ATTACKING)
+            {
+                //If the time since last attack is LESS we do not want to reset
+                //it because then the unit could attack much faster by going
+                //in-out-in-out of range. When the time is MORE then we want to
+                //cap it because otherwise it could build up attacks
+                if(timeSinceLastAttack > infoForUnitType[type].attackSpeed)
+                    timeSinceLastAttack = infoForUnitType[type].attackSpeed;
                 setUnitState(UNIT_ATTACKING);
+            }
 
-            while(timeSinceLastAttack > infoForUnitType[type].attackSpeed)
+            while(timeSinceLastAttack >= infoForUnitType[type].attackSpeed)
             {
                 timeSinceLastAttack -= infoForUnitType[type].attackSpeed;
 
