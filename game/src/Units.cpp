@@ -131,7 +131,7 @@ void Unit::checkForEnemies()
     int cury = currentCell->celly;
 
     Cell* c;
-    float closestDistance = infoForUnitType[type].attackRadius * 2.0;
+    float closestDistance = infoForUnitType[type].viewRadius;
     int closestId = -1;
 
     float d;

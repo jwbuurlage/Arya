@@ -2,13 +2,16 @@
 
 struct UnitInfo
 {
-    UnitInfo(const char* _name, float _radius, float _attackRadius, float _speed, float _yawSpeed,
+    UnitInfo(const char* _name,
+            float _radius, float _attackRadius, float _viewRadius,
+            float _speed, float _yawSpeed,
             float _maxHealth, float _damage, float _attackSpeed, bool _canMoveWhileAttacking,
             const char* _selectionSound, const char* _attackSound)
     {
         name = _name;
         radius = _radius;
         attackRadius = _attackRadius;
+        viewRadius = _viewRadius;
         speed = _speed;
         yawSpeed = _yawSpeed;
         maxHealth = _maxHealth;
@@ -23,6 +26,7 @@ struct UnitInfo
 
     float radius;
     float attackRadius;
+    float viewRadius;
     float speed;
     float yawSpeed; //in degrees
 
