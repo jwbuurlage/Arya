@@ -285,6 +285,8 @@ void GameSession::handleEvent(Packet& packet)
                         }
                         unit->deserialize(packet);
 
+                        if(faction == localFaction) unit->setLocal(true);
+
                         Object* obj = unit->getObject();
                         if(!obj) obj = Root::shared().getScene()->createObject();
 
@@ -345,6 +347,8 @@ void GameSession::handleEvent(Packet& packet)
                     packet >> id;
                     Unit* unit = createUnit(id, 0);
                     unit->deserialize(packet);
+
+                    if(faction == localFaction) unit->setLocal(true);
 
                     Object* obj = Root::shared().getScene()->createObject();
                     string s(infoForUnitType[unit->getType()].name);
