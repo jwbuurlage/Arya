@@ -76,11 +76,12 @@ namespace Arya
             void render();
 
         private:
+            int ww; //window width
+            int wh; //window height
+
             vector<Rect*> rects;
             ShaderProgram* overlayProgram;
             GLuint rectVAO;
 
-            int ww; //window width
-            int wh; //window height
     };
 }

@@ -9,8 +9,13 @@ namespace Arya
 {
     Overlay::Overlay(ShaderProgram* _overlayProgram, GLuint _rectVAO) 
     {
+		LOG_INFO("hello");
+
         rectVAO = _rectVAO;
         overlayProgram = _overlayProgram;
+
+		ww = 0;
+		wh = 0;
     }
 
     Overlay::~Overlay()

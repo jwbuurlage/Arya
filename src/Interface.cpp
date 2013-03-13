@@ -78,10 +78,20 @@ namespace Arya
 	// Interface
 	///////////////////////////////
 
+	Interface::Interface()
+	{
+		offsetFPS = 0.0;
+		time = 0.0;
+		count = 0;
+		overlay = 0; 
+	}
+
     bool Interface::init()
     {
         // inititialize shader
         if(!initShaders()) return false;
+
+		LOG_INFO("Initialized overlay shaders");
 
 		// make 1 by 1 px vertex buffer
         // inititialize shader
@@ -97,7 +107,7 @@ namespace Arya
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), vertices, GL_STATIC_DRAW); 
 
-        glGenVertexArrays(1, &onepxRectVAO);
+		glGenVertexArrays(1, &onepxRectVAO);
         glBindVertexArray(onepxRectVAO);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
@@ -108,7 +118,7 @@ namespace Arya
 		if(!overlay) overlay = new Overlay(texturedRectProgram, onepxRectVAO);
         if(!overlay->init())
         {
-            LOG_INFO("Could not initialize overlay");
+            LOG_ERROR("Could not initialize overlay");
             return false;
         }
 
