@@ -61,11 +61,10 @@ namespace Arya
     class Overlay
     {
         public:
-            Overlay();
+            Overlay(ShaderProgram* _overlayProgram, GLuint _rectVAO);
             ~Overlay();
 
             bool init();
-            bool initShaders();
 
             //Will create a rect and add it
             //to the list. The rect will

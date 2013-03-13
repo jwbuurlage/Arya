@@ -4,6 +4,8 @@
 #include "Interface.h"
 #include "Fonts.h"
 #include "Textures.h"
+#include "Overlay.h"
+#include "Shaders.h"
 #include "common/Logger.h"
 #include <sstream>
 #include <vector>
@@ -17,8 +19,100 @@ using std::vector;
 
 namespace Arya
 {
+	////////////////////////////////
+	// InterfaceElement
+	///////////////////////////////
+	
+	InterfaceElement::InterfaceElement(vec2 _position, vec2 _size)
+	{
+		position = _position;
+		size = _size;
+	}
+
+	////////////////////////////////
+	// Window
+	///////////////////////////////
+	
+	Window::Window(vec2 _position, vec2 _size, vec4 _backgroundColor)
+		: InterfaceElement(_size, _position)
+	{
+		backgroundColor = _backgroundColor;
+		isActive = false;
+	}
+	
+	void Window::addChild(InterfaceElement* ele)
+	{
+		childElements.push_back(ele);
+	}
+
+	void Window::removeChild(InterfaceElement* ele)
+	{
+		for(int i = 0; i < childElements.size(); ++i)
+		{
+			if(childElements[i] == ele)
+				childElements.erase(childElements.begin() + i);
+		}
+	}
+
+	void Window::draw()
+	{
+		// draw background
+		// bind shader overlay
+
+		// draw childs
+		for(int i = 0; i << childElements.size(); ++i)
+			childElements[i]->draw();
+	}
+
+	////////////////////////////////
+	// Label
+	///////////////////////////////
+	
+	Label::Label(vec2 _position, vec2 _size)
+		: InterfaceElement(_size, _position)
+	{
+
+	}
+	
+	////////////////////////////////
+	// Interface
+	///////////////////////////////
+
     bool Interface::init()
     {
+        // inititialize shader
+        if(!initShaders()) return false;
+
+		// make 1 by 1 px vertex buffer
+        // inititialize shader
+        GLfloat vertices[] = {
+            0.0,        0.0,
+            1.0,        0.0,
+            0.0,        1.0,
+            1.0,        1.0
+        };
+
+        GLuint vbo;
+        glGenBuffers(1, &vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), vertices, GL_STATIC_DRAW); 
+
+        glGenVertexArrays(1, &onepxRectVAO);
+        glBindVertexArray(onepxRectVAO);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
+
+        glBindVertexArray(0);
+
+		// OVERLAY
+		if(!overlay) overlay = new Overlay(texturedRectProgram, onepxRectVAO);
+        if(!overlay->init())
+        {
+            LOG_INFO("Could not initialize overlay");
+            return false;
+        }
+
+		// fonts
         Font* font = FontManager::shared().getFont("courier.ttf");
         if(!font) return false;
         for(int i = 0; i < 9; i++)
@@ -52,6 +146,24 @@ namespace Arya
         return true;
     }
 
+	bool Interface::initShaders()
+	{
+        Shader* overlayVertex = new Shader(VERTEX);
+        if(!(overlayVertex->addSourceFile("../shaders/overlay.vert"))) return false;
+        if(!(overlayVertex->compile())) return false;
+
+        Shader* overlayFragment = new Shader(FRAGMENT);
+        if(!(overlayFragment->addSourceFile("../shaders/overlay.frag"))) return false;
+        if(!(overlayFragment->compile())) return false;
+
+        texturedRectProgram = new ShaderProgram("overlay");
+        texturedRectProgram->attach(overlayVertex);
+        texturedRectProgram->attach(overlayFragment);
+        if(!(texturedRectProgram->link())) return false;
+
+        return true;
+	}
+
     void Interface::onFrame(float elapsedTime)
     {	
         Font* font = FontManager::shared().getFont("courier.ttf");
@@ -82,4 +194,9 @@ namespace Arya
             time = 0.0;
         }
     }
+
+	void Interface::render()
+	{
+		overlay->render();
+	}
 }

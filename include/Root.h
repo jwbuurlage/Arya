@@ -43,7 +43,7 @@ namespace Arya
             int getWindowWidth() const { return windowWidth; }
             int getWindowHeight() const { return windowHeight; }
 
-            Overlay* getOverlay() const { return overlay; }
+            Overlay* getOverlay() const;
 
             vec3 getDepthResult(){ return clickScreenLocation; }
 
@@ -52,7 +52,6 @@ namespace Arya
             bool initGLFW();
             bool initGLEW();
             Scene* scene;
-            Overlay* overlay;
             Interface* interface;
 
             int windowWidth, windowHeight;
