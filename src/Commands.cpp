@@ -1,7 +1,4 @@
 #include "Commands.h"
-#include "Config.h"
-#include "Console.h"
-#include "Sounds.h"
 #include "common/Logger.h"
 #include "Files.h"
 namespace Arya
