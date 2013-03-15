@@ -25,9 +25,10 @@ Game::Game()
 
 Game::~Game()
 {
+    //Delete session before eventmanager, or else it will crash
+    if(session) delete session;
     if(eventManager) delete eventManager;
     if(network) delete network;
-    if(session) delete session;
     if(root) delete &Root::shared();
 }
 
