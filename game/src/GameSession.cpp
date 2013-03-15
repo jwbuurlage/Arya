@@ -43,6 +43,8 @@ GameSession::~GameSession()
 
     Root::shared().removeScene();
 
+    Game::shared().getEventManager()->removeEventHandler(this);
+
     GAME_LOG_INFO("Ended session");
 }
 

@@ -230,9 +230,12 @@ void Game::joinSession(int sessionHash)
 {
     if(session) delete session;
     session = 0;
+
+    //Reconnect
     cvar* var = Config::shared().getCvar("serveraddress");
     const char* serveraddr = (var ? var->value.c_str() : "localhost");
     network->connectToSessionServer(serveraddr, 13337);
+
     Event& joinEvent = eventManager->createEvent(EVENT_JOIN_GAME);
     joinEvent << sessionHash; //session hash
     joinEvent << Config::shared().getCvarInt("sessionhash"); //my secret hash

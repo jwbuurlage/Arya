@@ -24,12 +24,23 @@ void EventManager::addEventHandler(int eventId, EventHandler* handler)
 void EventManager::removeEventHandler(int eventId, EventHandler* handler)
 {
     pair<handlerIterator, handlerIterator> range = eventHandlers.equal_range(eventId);
-    for(handlerIterator iter = range.first; iter != range.second; ++iter)
+    for(handlerIterator iter = range.first; iter != range.second; )
     {
-        if( iter->second == handler )
-        {
-            eventHandlers.erase(iter);
-        }
+        //the erase function invalidates this iterator
+        //so we must increase it first and then erase
+        handlerIterator erase_iter = iter++;
+        if( erase_iter->second == handler )
+            eventHandlers.erase(erase_iter);
+    }
+}
+
+void EventManager::removeEventHandler(EventHandler* handler)
+{
+    for(handlerIterator iter = eventHandlers.begin(); iter != eventHandlers.end(); )
+    {
+        handlerIterator erase_iter = iter++;
+        if( erase_iter->second == handler )
+            eventHandlers.erase(erase_iter);
     }
 }
 
