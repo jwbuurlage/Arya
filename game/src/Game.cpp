@@ -210,26 +210,31 @@ bool Game::handleCommand(string command)
 
 void Game::createSessionDebug(int sessionHash)
 {
-		//TEMPORARY:
-		//we assume the client has told the lobby server to start the game (EVENT_SESSION_START)
-		//that means the lobby server has to tell the game server to create the actual game
-		//and then the lobby server should return the gameserver-ip to this client
-		//currently we act like THIS CLIENT is the lobby server
-		//telling the game server to create a new session
-		//and we act like we already received the EVENT_SESSION_INFO from the lobby server
-        Event& lobbyToGameEvent = eventManager->createEvent(EVENT_NEW_SESSION);
-		lobbyToGameEvent << sessionHash; //session hash
-        lobbyToGameEvent << 4; //player count
-		lobbyToGameEvent << 10101; //secret hashes for each player
-		lobbyToGameEvent << 10102;
-		lobbyToGameEvent << 10103;
-		lobbyToGameEvent << 10104;
-        lobbyToGameEvent.send();
+    //TEMPORARY:
+    //we assume the client has told the lobby server to start the game (EVENT_SESSION_START)
+    //that means the lobby server has to tell the game server to create the actual game
+    //and then the lobby server should return the gameserver-ip to this client
+    //currently we act like THIS CLIENT is the lobby server
+    //telling the game server to create a new session
+    //and we act like we already received the EVENT_SESSION_INFO from the lobby server
+    Event& lobbyToGameEvent = eventManager->createEvent(EVENT_NEW_SESSION);
+    lobbyToGameEvent << sessionHash; //session hash
+    lobbyToGameEvent << 4; //player count
+    lobbyToGameEvent << 10101; //secret hashes for each player
+    lobbyToGameEvent << 10102;
+    lobbyToGameEvent << 10103;
+    lobbyToGameEvent << 10104;
+    lobbyToGameEvent.send();
 }
 void Game::joinSession(int sessionHash)
 {
-		Event& joinEvent = eventManager->createEvent(EVENT_JOIN_GAME);
-		joinEvent << sessionHash; //session hash
-		joinEvent << Config::shared().getCvarInt("sessionhash"); //my secret hash
-		joinEvent.send();
+    if(session) delete session;
+    session = 0;
+    cvar* var = Config::shared().getCvar("serveraddress");
+    const char* serveraddr = (var ? var->value.c_str() : "localhost");
+    network->connectToSessionServer(serveraddr, 13337);
+    Event& joinEvent = eventManager->createEvent(EVENT_JOIN_GAME);
+    joinEvent << sessionHash; //session hash
+    joinEvent << Config::shared().getCvarInt("sessionhash"); //my secret hash
+    joinEvent.send();
 }
