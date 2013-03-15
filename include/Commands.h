@@ -1,6 +1,6 @@
 #pragma once
-#include "common/Listeners.h"
 #include "common/Singleton.h"
+#include "common/Listeners.h"
 #include <vector>
 #include <string>
 #include <map>
@@ -17,11 +17,8 @@ namespace Arya
             CommandHandler();
             virtual ~CommandHandler();
 
-            bool init();
-
             void addCommandListener(string command, CommandListener* listener);
             void removeCommandListener(string command, CommandListener* listener);
-            bool handleCommand(string command);
 
             void onCommand(string command);
 

@@ -1,4 +1,5 @@
 #include <sstream>
+#include "common/Listeners.h"
 #include "common/Logger.h"
 #include "Config.h"
 #include "Commands.h"
@@ -20,6 +21,11 @@ namespace Arya
 
     bool Config::init()
     {
+		CommandHandler::shared().addCommandListener("set", this);
+		CommandHandler::shared().addCommandListener("get", this);
+		CommandHandler::shared().addCommandListener("getVarValue", this);
+		CommandHandler::shared().addCommandListener("setVarValue", this);
+
         setCvarWithoutSave("fullscreen", "false", TYPE_BOOL);
         setCvarWithoutSave("serveraddress", "localhost", TYPE_STRING);
 		
@@ -308,4 +314,68 @@ namespace Arya
         setConfigFile(configFile);
         return ret;
     }
+	bool Config::handleCommand(string command)
+	{
+		bool flag = true;
+		if(CommandHandler::shared().splitLineCommand(command) == "get")
+		{
+			string variableName;
+			string type;
+			std::stringstream parser;
+			parser << CommandHandler::shared().splitLineParameters(command);
+			parser >> variableName >> type;
+			if(type == "int" || type == "Int" || type == "integer" || type == "Integer" || type == "INT")
+			{
+				int output = getCvarInt(variableName);
+				LOG_INFO("The value of " << variableName << " is: " << output);
+			}
+			else if(type == "float" || type == "FLOAT" || type == "Float")
+			{
+				float output = getCvarFloat(variableName);
+				LOG_INFO("The value of " << variableName << " is: " << output);
+			}
+			else if(type == "bool" || type == "BOOL" || type == "Bool")
+			{
+				bool output = getCvarBool(variableName);
+				LOG_INFO("The value of " << variableName << " is: " << output);
+			}
+			else if(type == "string" || type == "STRING" || type == "String")
+			{
+				string output = getCvarString(variableName);
+				LOG_INFO("The value of " << variableName << " is: " << output);
+			}
+			else
+			{
+				LOG_WARNING("Type of " << variableName << " not recognised!");
+			}
+		}
+		if(CommandHandler::shared().splitLineCommand(command) == "set")
+		{
+			string variableName;
+			string value;
+			string type;
+			std::stringstream parser;
+			parser << CommandHandler::shared().splitLineParameters(command);
+			parser >> variableName >> value >> type;
+			if(type == "int" || type == "Int" || type == "integer" || type == "Integer" || type == "INT")
+			{
+				setCvar(variableName, value, TYPE_INTEGER);
+			}
+			else if(type == "float" || type == "FLOAT" || type == "Float")
+			{
+				setCvar(variableName, value, TYPE_FLOAT);
+			}
+			else if(type == "bool" || type == "BOOL" || type == "Bool")
+			{
+				setCvar(variableName, value, TYPE_BOOL);
+			}
+			else if(type == "string" || type == "STRING" || type == "String")
+			{
+				setCvar(variableName, value, TYPE_STRING);
+			}
+			else LOG_WARNING("Type of " << variableName << " not recognised!");
+		}
+		else flag = false;
+		return flag;
+	}
 }

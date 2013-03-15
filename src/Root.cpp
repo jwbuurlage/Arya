@@ -50,7 +50,6 @@ namespace Arya
         //other graphic related classes are
         //initialized in Root::initialize
         //when the graphics are initialized
-        if(!CommandHandler::shared().init()) LOG_WARNING("Unable to init CommandHandler");
         if(!Config::shared().init()) LOG_WARNING("Unable to init config");
     }
 

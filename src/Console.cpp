@@ -68,6 +68,9 @@ namespace Arya
         font = FontManager::shared().getFont("courier.ttf"); //font to be used
         if(!font) return false;
 
+		CommandHandler::shared().addCommandListener("consoleColor", this);
+		CommandHandler::shared().addCommandListener("hide", this);
+
         Rect* rect = Root::shared().getOverlay()->createRect(); // here we initialize the frame for the console itself
         rects.push_back(rect);
         rect->offsetInPixels.x = 0.0;
@@ -319,4 +322,25 @@ namespace Arya
         else flag = false;
         return flag;
     }
+	bool Console::handleCommand(string command)
+	{
+		bool flag = true;
+        if(CommandHandler::shared().splitLineCommand(command) == "consoleColor")
+        {
+            float float1 = 0.0f;
+            float float2 = 0.0f;
+            float float3 = 0.0f;
+            std::stringstream parser;
+            parser << CommandHandler::shared().splitLineParameters(command);
+            parser >> float1 >> float2 >> float3;
+            changeConsoleColor(float1, float2, float3);
+            Config::shared().editConfigFile(command);
+        }
+        if(CommandHandler::shared().splitLineCommand(command) == "hide")
+        {
+			if(CommandHandler::shared().splitLineParameters(command) == "console") toggleVisibilityConsole();
+        }
+        else flag = false;
+        return flag;
+	}
 }

@@ -56,5 +56,6 @@ namespace Arya
             void goBackInHistory();
             void setVisibilityConsole(bool flag);
             void addTextLine(string textToBeAdded);
+			bool handleCommand(string command);
     };
 }
