@@ -25,10 +25,9 @@ namespace Arya
 
             void onCommand(string command);
 
+			string splitLineCommand(string command);
+			string splitLineParameters(string command);
         private:
-
-            string splitLineCommand(string command);
-            string splitLineParameters(string command);
 
             multimap<string, CommandListener*> commandListeners;
             typedef multimap<string,CommandListener*>::iterator commandListenerIterator;

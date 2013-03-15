@@ -450,4 +450,3 @@ void GameSession::handleEvent(Packet& packet)
                               break;
     }
 }
-

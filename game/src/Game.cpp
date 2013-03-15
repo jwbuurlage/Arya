@@ -42,7 +42,8 @@ void Game::run()
     {
         root->addInputListener(this);
 
-		Arya::CommandHandler::shared().addCommandListener("restartsession" ,this);
+		Arya::CommandHandler::shared().addCommandListener("createsession" ,this);
+		Arya::CommandHandler::shared().addCommandListener("joinsession" ,this);
 
         if(network) delete network;
         network = new Network;
@@ -179,4 +180,56 @@ void Game::handleEvent(Packet& packet)
             GAME_LOG_INFO("Game: unknown event received! (" << id << ")");
             break;
     }
+}
+bool Game::handleCommand(string command)
+{
+	bool flag = true;
+	if(Arya::CommandHandler::shared().splitLineCommand(command) == "createsession") 
+	{
+ 		int int1 = 0;
+		std::stringstream parser;
+		parser << Arya::CommandHandler::shared().splitLineParameters(command);
+		parser >> int1;
+		GAME_LOG_INFO("Creating session " << "...");
+		createSessionDebug(int1);
+		GAME_LOG_INFO("Session " << int1 <<  " created!");
+	}
+	else if(Arya::CommandHandler::shared().splitLineCommand(command) == "joinsession")
+	{
+		int int1 = 0;
+		std::stringstream parser;
+		parser << Arya::CommandHandler::shared().splitLineParameters(command);
+		parser >> int1;
+		GAME_LOG_INFO("Joing session " << int1 << "...");
+		joinSession(int1);
+		GAME_LOG_INFO("Session " << int1 << " joined!");
+	}
+	else flag = false;
+	return flag;
+}
+
+void Game::createSessionDebug(int sessionHash)
+{
+		//TEMPORARY:
+		//we assume the client has told the lobby server to start the game (EVENT_SESSION_START)
+		//that means the lobby server has to tell the game server to create the actual game
+		//and then the lobby server should return the gameserver-ip to this client
+		//currently we act like THIS CLIENT is the lobby server
+		//telling the game server to create a new session
+		//and we act like we already received the EVENT_SESSION_INFO from the lobby server
+        Event& lobbyToGameEvent = eventManager->createEvent(EVENT_NEW_SESSION);
+		lobbyToGameEvent << sessionHash; //session hash
+        lobbyToGameEvent << 4; //player count
+		lobbyToGameEvent << 10101; //secret hashes for each player
+		lobbyToGameEvent << 10102;
+		lobbyToGameEvent << 10103;
+		lobbyToGameEvent << 10104;
+        lobbyToGameEvent.send();
+}
+void Game::joinSession(int sessionHash)
+{
+		Event& joinEvent = eventManager->createEvent(EVENT_JOIN_GAME);
+		joinEvent << sessionHash; //session hash
+		joinEvent << Config::shared().getCvarInt("sessionhash"); //my secret hash
+		joinEvent.send();
 }

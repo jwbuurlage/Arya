@@ -45,6 +45,9 @@ class Game : public Arya::InputListener , public Arya::FrameListener, public Eve
         Network* network;
         EventManager* eventManager;
         GameSession* session;
+		bool handleCommand(string command);
+		void createSessionDebug(int sessionHash);
+		void joinSession(int sessionHash);
 
         int clientId;
 
