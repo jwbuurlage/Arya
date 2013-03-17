@@ -80,13 +80,14 @@ namespace Arya
     {
         LOG_INFO("loading root");
 
+        checkForErrors("start of root init");
+
         windowWidth = w;
         windowHeight = h;
         fullscreen = fullscr;
 
         if(!initGLFW()) return false;
         if(!initGLEW()) return false;
-
 
         // set GL stuff
         glEnable(GL_DEPTH_TEST);
@@ -118,6 +119,8 @@ namespace Arya
         }
         addFrameListener(&Console::shared());
         addInputListener(&Console::shared());
+
+        checkForErrors("end of root init");
 
         LOG_INFO("Root initialized");
 
@@ -253,6 +256,8 @@ namespace Arya
             LOG_WARNING("No OpenGL 3.1 support! Continuing");
         }
 
+        checkForErrors("glew initalization");
+
         return true;
     }
 
@@ -262,12 +267,18 @@ namespace Arya
         glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_DEPTH_BUFFER_BIT);
 
+        checkForErrors("root render start");
+
         if(scene)
         {
             scene->render();
 
-            for(std::list<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();++it)
-                (*it)->onRender();
+            for(std::list<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();)
+            {
+                //This construction allows the callback to erase itself from the frameListeners list
+                std::list<FrameListener*>::iterator iter = it++;
+                (*iter)->onRender();
+            }
 
             GLfloat depth;
             glReadPixels(mouseX, mouseY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
@@ -292,6 +303,45 @@ namespace Arya
 	{
 		return interface->getOverlay();
 	}
+
+    bool Root::checkForErrors(const char* stateInfo)
+    {
+        GLenum err = glGetError();
+        if(err != GL_NO_ERROR)
+        {
+            if(!stateInfo || stateInfo[0] == 0)
+                AryaLogger << Logger::L_ERROR << "OpenGL error: ";
+            else
+                AryaLogger << Logger::L_ERROR << "OpenGL error at " << stateInfo << ". Error: ";
+            switch(err)
+            {
+                case GL_INVALID_ENUM:
+                    AryaLogger << "Invalid enum";
+                    break;
+                case GL_INVALID_VALUE:
+                    AryaLogger << "Invalid numerical value";
+                    break;
+                case GL_INVALID_OPERATION:
+                    AryaLogger << "Invalid operation in current state";
+                    break;
+                case GL_STACK_OVERFLOW:
+                    AryaLogger << "Stack overflow";
+                    break;
+                case GL_STACK_UNDERFLOW:
+                    AryaLogger << "Stack underflow";
+                    break;
+                case GL_OUT_OF_MEMORY:
+                    AryaLogger << "Out of memory";
+                    break;
+                default:
+                    AryaLogger << "Unkown error. Code: " << err;
+                    break;
+            }
+            AryaLogger << endLog;
+            return true;
+        }
+        return false;
+    }
 
     void Root::addInputListener(InputListener* listener)
     {
