@@ -16,6 +16,7 @@ namespace Arya
 
     Config::~Config()
     {
+		CommandHandler::shared().removeCommandListener(this);
         cleanup();
     }
 

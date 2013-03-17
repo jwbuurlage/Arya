@@ -25,6 +25,7 @@ Game::Game()
 
 Game::~Game()
 {
+	Arya::CommandHandler::shared().removeCommandListener(this);
     //Delete session before eventmanager, or else it will crash
     if(session) delete session;
     if(eventManager) delete eventManager;
