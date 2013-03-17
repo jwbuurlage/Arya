@@ -9,8 +9,6 @@ namespace Arya
 {
     Overlay::Overlay(ShaderProgram* _overlayProgram, GLuint _rectVAO) 
     {
-		LOG_INFO("hello");
-
         rectVAO = _rectVAO;
         overlayProgram = _overlayProgram;
 
@@ -53,10 +51,6 @@ namespace Arya
 
     void Overlay::render()
     {
-        glDisable(GL_DEPTH_TEST);
-        glEnable(GL_ALPHA_TEST);
-        glEnable(GL_BLEND);
-
         // bind shader
         overlayProgram->use();
         glBindVertexArray(rectVAO);
@@ -86,9 +80,5 @@ namespace Arya
             overlayProgram->setUniform2fv("texSize", vec2(rects[i]->texSize.x, -rects[i]->texSize.y));
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
-
-        glDisable(GL_ALPHA_TEST);
-        glDisable(GL_BLEND);
-        glEnable(GL_DEPTH_TEST);
     }
 }

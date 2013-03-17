@@ -5,6 +5,7 @@
 #include "Fonts.h"
 #include "Config.h"
 #include "Sounds.h"
+#include "Interface.h"
 #include "common/Logger.h"
 #include <sstream>
 using std::stringstream;

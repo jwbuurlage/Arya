@@ -1,12 +1,10 @@
 #include "common/Listeners.h"
+#include "common/Singleton.h"
 #include "Overlay.h"
 #include <GL/glew.h>
 
 #include <vector>
 using std::vector;
-
-#include <stack>
-using std::stack;
 
 #include <glm/glm.hpp>
 using glm::vec2;
@@ -24,7 +22,7 @@ namespace Arya
 
             virtual void draw() { }
 
-        private:
+        protected:
             vec2 position;
             vec2 size;
    };
@@ -64,7 +62,7 @@ namespace Arya
 // Interface
 /////////////////////////
 
-    class Interface : public FrameListener
+    class Interface : public FrameListener, public Singleton<Interface>
     {
         public:
             Interface();
@@ -78,7 +76,7 @@ namespace Arya
 			void makeActive(Window* w);
 			void makeInactive(Window* w);
 
-			GLuint getonepxRectVAO() const { return onepxRectVAO; };
+			GLuint getOnePxRectVAO() const { return onePxRectVAO; };
 			Overlay* getOverlay() const { return overlay; }
 			ShaderProgram* getTexturedRectProgram() const { return texturedRectProgram; }
 			
@@ -89,9 +87,9 @@ namespace Arya
 
 			Overlay* overlay;
 			ShaderProgram* texturedRectProgram;
-			GLuint onepxRectVAO;
+			GLuint onePxRectVAO;
 
             vector<Rect*> rects;
-			stack<Window*> windowStack;
+			vector<Window*> windowStack;
     };
 }
