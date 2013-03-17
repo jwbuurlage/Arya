@@ -15,7 +15,7 @@ namespace Arya
             Singleton(){
                 if(!singleton) singleton = static_cast<T*>(this);
             }
-            ~Singleton(){
+            virtual ~Singleton(){
                 if(this == singleton) singleton = 0;
             }
 

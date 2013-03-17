@@ -52,6 +52,9 @@ namespace Arya
         cLock = false;
         upCount = 0;
         consoleColor= vec4(0,0,0,0);
+
+		CommandHandler::shared().addCommandListener("consoleColor", this);
+		CommandHandler::shared().addCommandListener("hide", this);
     };
 
     Console::~Console()
@@ -68,8 +71,6 @@ namespace Arya
         font = FontManager::shared().getFont("courier.ttf"); //font to be used
         if(!font) return false;
 
-		CommandHandler::shared().addCommandListener("consoleColor", this);
-		CommandHandler::shared().addCommandListener("hide", this);
 
         Rect* rect = Root::shared().getOverlay()->createRect(); // here we initialize the frame for the console itself
         rects.push_back(rect);

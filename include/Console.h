@@ -16,6 +16,7 @@ namespace Arya
     class Console : public Singleton<Console>, public FrameListener, public InputListener, public CommandListener
     {
         public:
+            //!! CommandHandler must be created before Console
             Console();
             virtual ~Console();
 
