@@ -14,6 +14,9 @@ struct Cell
     // and keep it sorted
     vector<int> cellPoints;
 
+    CellList* cellList; //pointer to parent list
+    int cellx, celly; //x,y of this cell
+
     void add(int i)
     {
         cellPoints.push_back(i);
@@ -41,6 +44,13 @@ struct CellList
         gridSize = _size;
         mapSize = _mapSize;
         cells = new Cell[gridSize * gridSize];
+        for(int i = 0; i < gridSize; ++i)
+            for(int j = 0; j < gridSize; ++j)
+            {
+                cellForIndex(i,j)->cellList = this;
+                cellForIndex(i,j)->cellx = i;
+                cellForIndex(i,j)->celly = j;
+            }
     }
 
     void cellForPositionGivenSize(vec2 p, int& i, int& j)
@@ -49,16 +59,23 @@ struct CellList
         j = (int)((p.y + mapSize/2)/mapSize * gridSize);
     }
 
-    Cell* cellForIndex(int i, int j)
+    Cell* cellForPosition(const vec2& p)
+    {
+        int i = (int)((p.x + mapSize/2)/mapSize * gridSize);
+        int j = (int)((p.y + mapSize/2)/mapSize * gridSize);
+        return cellForIndex(i, j);
+    }
+
+    inline Cell* cellForIndex(int i, int j)
     {
         return &cells[j*gridSize + i];
     }
 
     void clear()
     {
-        if(cells)
-            delete[] cells;
-        cells = new Cell[gridSize * gridSize];
+        for(int i = 0; i < gridSize; ++i)
+            for(int j = 0; j < gridSize; ++j)
+                cellForIndex(i,j)->cellPoints.clear();
     }
 
     int gridSize;

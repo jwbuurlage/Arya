@@ -24,6 +24,7 @@ namespace Arya
     template<> Root* Singleton<Root>::singleton = 0;
 
     //glfw callback functions
+    void GLFWCALL windowSizeCallback(int width, int height);
     void GLFWCALL keyCallback(int key, int action);
     void GLFWCALL mouseButtonCallback(int button, int action);
     void GLFWCALL mousePosCallback(int x, int y);
@@ -50,7 +51,6 @@ namespace Arya
         //other graphic related classes are
         //initialized in Root::initialize
         //when the graphics are initialized
-        if(!CommandHandler::shared().init()) LOG_WARNING("Unable to init CommandHandler");
         if(!Config::shared().init()) LOG_WARNING("Unable to init config");
     }
 
@@ -81,13 +81,14 @@ namespace Arya
     {
         LOG_INFO("loading root");
 
+        checkForErrors("start of root init");
+
         windowWidth = w;
         windowHeight = h;
         fullscreen = fullscr;
 
         if(!initGLFW()) return false;
         if(!initGLEW()) return false;
-
 
         // set GL stuff
         glEnable(GL_DEPTH_TEST);
@@ -101,8 +102,7 @@ namespace Arya
         ModelManager::shared().initialize();
         if(!SoundManager::shared().init())
         {
-            LOG_WARNING("Could not initialize SoundManager");
-            return false;
+            LOG_WARNING("Could not initialize SoundManager, files not found!");
         }
 
         if(!interface) interface = new Interface;
@@ -120,6 +120,8 @@ namespace Arya
         }
         addFrameListener(&Console::shared());
         addInputListener(&Console::shared());
+
+        checkForErrors("end of root init");
 
         LOG_INFO("Root initialized");
 
@@ -202,6 +204,7 @@ namespace Arya
 
         glfwSetWindowTitle("Arya");
         glfwEnable(GLFW_MOUSE_CURSOR);
+        glfwSetWindowSizeCallback(windowSizeCallback);
         glfwSetKeyCallback(keyCallback);
         glfwSetMouseButtonCallback(mouseButtonCallback);
         glfwSetMousePosCallback(mousePosCallback);
@@ -237,6 +240,7 @@ namespace Arya
 
         glfwSetWindowTitle("Arya");
         glfwEnable(GLFW_MOUSE_CURSOR);
+        glfwSetWindowSizeCallback(windowSizeCallback);
         glfwSetKeyCallback(keyCallback);
         glfwSetMouseButtonCallback(mouseButtonCallback);
         glfwSetMousePosCallback(mousePosCallback);
@@ -255,6 +259,8 @@ namespace Arya
             LOG_WARNING("No OpenGL 3.1 support! Continuing");
         }
 
+        checkForErrors("glew initalization");
+
         return true;
     }
 
@@ -264,12 +270,22 @@ namespace Arya
         glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_DEPTH_BUFFER_BIT);
 
+        checkForErrors("root render start");
+
         if(scene)
         {
             scene->render();
 
-            for(std::list<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();++it)
-                (*it)->onRender();
+            checkForErrors("scene render");
+
+            for(std::list<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();)
+            {
+                //This construction allows the callback to erase itself from the frameListeners list
+                std::list<FrameListener*>::iterator iter = it++;
+                (*iter)->onRender();
+            }
+
+            checkForErrors("callback onRender");
 
             GLfloat depth;
             glReadPixels(mouseX, mouseY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
@@ -282,10 +298,12 @@ namespace Arya
             clickScreenLocation.x = screenPos.x;
             clickScreenLocation.y = screenPos.y;
             clickScreenLocation.z = screenPos.z;
-       }
+        }
 
         if(interface)
             interface->render();
+
+        checkForErrors("root render end");
 
         glfwSwapBuffers();
     }
@@ -294,6 +312,71 @@ namespace Arya
 	{
 		return interface->getOverlay();
 	}
+
+    bool Root::checkForErrors(const char* stateInfo)
+    {
+        GLenum err = glGetError();
+        if(err != GL_NO_ERROR)
+        {
+            if(!stateInfo || stateInfo[0] == 0)
+                AryaLogger << Logger::L_ERROR << "OpenGL error: ";
+            else
+                AryaLogger << Logger::L_ERROR << "OpenGL error at " << stateInfo << ". Error: ";
+            switch(err)
+            {
+                case GL_INVALID_ENUM:
+                    AryaLogger << "Invalid enum";
+                    break;
+                case GL_INVALID_VALUE:
+                    AryaLogger << "Invalid numerical value";
+                    break;
+                case GL_INVALID_OPERATION:
+                    AryaLogger << "Invalid operation in current state";
+                    break;
+                case GL_STACK_OVERFLOW:
+                    AryaLogger << "Stack overflow";
+                    break;
+                case GL_STACK_UNDERFLOW:
+                    AryaLogger << "Stack underflow";
+                    break;
+                case GL_OUT_OF_MEMORY:
+                    AryaLogger << "Out of memory";
+                    break;
+                case GL_INVALID_FRAMEBUFFER_OPERATION:
+                    AryaLogger << "Invalid framebuffer operation. Additional information: ";
+                    {
+                        GLenum fberr = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+                        switch(fberr){
+                            case GL_FRAMEBUFFER_COMPLETE:
+                                AryaLogger << "framebuffer is complete";
+                                break;
+                            case GL_FRAMEBUFFER_UNSUPPORTED:
+                                AryaLogger << "framebuffer is unsupported";
+                                break;
+                            case GL_FRAMEBUFFER_UNDEFINED:
+                                AryaLogger << "framebuffer undefined";
+                                break;
+                            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+                                AryaLogger << "framebuffer has incomplete attachment";
+                                break;
+                            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+                                AryaLogger << "framebuffer is missing attachment";
+                                break;
+                            default:
+                                AryaLogger << "unkown fbo error code: " << fberr;
+                                break;
+                        }
+                    }
+                    break;
+                default:
+                    AryaLogger << "Unkown error. Code: " << err;
+                    break;
+            }
+            AryaLogger << endLog;
+            return true;
+        }
+        return false;
+    }
 
     void Root::addInputListener(InputListener* listener)
     {
@@ -318,6 +401,18 @@ namespace Arya
         for( std::list<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end(); ){
             if( *it == listener ) it = frameListeners.erase(it);
             else ++it;
+        }
+    }
+
+    void Root::windowSizeChanged(int width, int height)
+    {
+        windowWidth = width;
+        windowHeight = height;
+        if(scene)
+        {
+            Camera* cam = scene->getCamera();
+            if(cam)
+                cam->setProjectionMatrix(45.0f, getAspectRatio(), 0.1f, 2000.0f);
         }
     }
 
@@ -350,6 +445,11 @@ namespace Arya
 
         for( std::list<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
             if( (*it)->mouseMoved(x, y, dx, dy) == true ) break;
+    }
+
+    void GLFWCALL windowSizeCallback(int width, int height)
+    {
+        Root::shared().windowSizeChanged(width, height);
     }
 
     void GLFWCALL keyCallback(int key, int action)

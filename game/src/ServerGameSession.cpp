@@ -29,6 +29,7 @@ ServerGameSession::ServerGameSession(Server* serv) : server(serv)
 
 ServerGameSession::~ServerGameSession()
 {
+    //Deleting the factions will cause all units to be deleted
 	for(factionIterator it = clientFactionList.begin(); it != clientFactionList.end(); ++it)
 		delete *it;
 	clientFactionList.clear();
@@ -211,7 +212,7 @@ void ServerGameSession::update(float elapsedTime)
                 //   so that this loop will remove it
                 // - big events like a full faction that loses all its units
                 //   ???????? solution needed ??????
-                unit->update(elapsedTime, map, 0, true, this);
+                unit->update(elapsedTime, map, this);
                 ++it;
             }
         }

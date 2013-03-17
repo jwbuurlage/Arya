@@ -35,13 +35,14 @@ class Map;
 class ServerGameSession;
 
 struct CellList;
+struct Cell;
 
 //Factory design pattern
 class UnitFactory
 {
     public:
-        UnitFactory(){}
-        virtual ~UnitFactory(){}
+        UnitFactory(){};
+        virtual ~UnitFactory();
 
         //destory units by calling delete on them
         Unit* createUnit(int id, int type);
@@ -64,10 +65,15 @@ class Unit
     public:
         ~Unit(); //unregisters itself at unit factory
 
-        void setPositionAndUpdateLists(const vec3& pos, CellList* cl);
-        void setPosition(const vec3& pos) { position = pos; if(object) object->setPosition(pos); }
+        void setPosition(const vec3& pos);
         vec3 getPosition() const { return position; }
 		vec2 getPosition2() const { return vec2(position.x, position.z); }
+
+        //call setCell with zero to stop using cells
+        void setCell(Cell* newCell);
+        void setCellFromList(CellList* cl);
+        Cell* getCell() const { return currentCell; }
+        void checkForEnemies();
 
         void setYaw(float y){ yaw = y; if(object) object->setYaw(y); }
         float getYaw() const { return yaw; }
@@ -81,11 +87,7 @@ class Unit
         void setSelected(bool sel) { selected = sel; }
         bool isSelected() { return selected; }
 
-        void update(float timeElapsed, Map* map, CellList* cl, bool local, ServerGameSession* serverSession = 0);
-        //void graphicalUpdate(Map* map
-        void removeFromList(CellList* cl);
-        void insertIntoList(CellList* cl);
-        void checkForEnemies(CellList* cl);
+        void update(float timeElapsed, Map* map, ServerGameSession* serverSession = 0);
 
         vec2 getTargetPosition() const { return targetPosition; }
         void setTargetPosition(vec2 target);
@@ -98,13 +100,12 @@ class Unit
         void receiveDamage(float dmg, Unit* attacker);
         float getHealthRatio() const { return health / infoForUnitType[type].maxHealth; }
 
-        bool isAlive() const { return (health > 0); }
+        bool isAlive() const { return (!obsolete && health > 0); }
 		void makeDead(){ health = 0; setUnitState(UNIT_DYING); dyingTime = 0.0f; }; //will show death animation and then delete unit
-        bool obsolete() { return !isAlive() && (dyingTime > 0.8f); }
 
         //if this returns true the unit will be deleted by session
-        bool readyToDelete() { return refCount <= 0 && !isAlive() && (dyingTime > 0.8f); }
-        void markForDelete(){ health = 0; dyingTime = 1.0f; }; //unit will be deleted as soon as refcount reaches zero
+        bool readyToDelete() const { return obsolete && refCount <= 0; }
+        void markForDelete(){ obsolete = true; } //unit will be deleted as soon as refcount reaches zero
 
         void retain() { ++refCount; }
         void release() { --refCount; }
@@ -114,6 +115,10 @@ class Unit
         void setTintColor(vec3 tC);
 
         int getId() const { return id; }
+        int getFactionId() const { return factionId; }
+        void setFactionId(int id) { factionId = id; }
+        void setLocal(bool value = true){ local = value; }
+        bool isLocal() const { return local; }
 
         float getRadius() const { return infoForUnitType[type].radius; }
 
@@ -128,23 +133,23 @@ class Unit
         int type;
         const int id;
         int factionId;
+        bool local; //This must be false on the server. When true the update functions will do auto-attack requests
+        bool obsolete;
+        int refCount;
 
         // movement and attack
         vec2 targetPosition;
         Unit* targetUnit;
         UnitState unitState;
+        Cell* currentCell;
         bool selected;
-
-        vec2 screenPosition;
 
         float health;
         float timeSinceLastAttackRequest; //to prevent spamming the server
         float timeSinceLastAttack;
         float dyingTime;
 
-        int refCount;
         Rect* healthBar;
-
+        vec2 screenPosition;
         vec3 tintColor;
-
 };

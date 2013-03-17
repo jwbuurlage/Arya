@@ -32,7 +32,7 @@ namespace Arya
             else return false;
         }
     };
-    class Config : public Singleton<Config>
+    class Config : public Singleton<Config>, public CommandListener
     {
         public:
             Config();
@@ -58,5 +58,6 @@ namespace Arya
             void updateConfigFile();
             File* configFile;
             bool loadConfigFile(string configFileName);
+			bool handleCommand(string command);
     };
 }

@@ -12,8 +12,8 @@ namespace Arya
         rectVAO = _rectVAO;
         overlayProgram = _overlayProgram;
 
-		ww = 0;
-		wh = 0;
+		//ww = 0;
+		//wh = 0;
     }
 
     Overlay::~Overlay()
@@ -26,8 +26,8 @@ namespace Arya
 
     bool Overlay::init()
     {
-        ww = Root::shared().getWindowWidth();
-        wh = Root::shared().getWindowHeight();
+        //ww = Root::shared().getWindowWidth();
+        //wh = Root::shared().getWindowHeight();
 
         return true;
     }
@@ -51,6 +51,9 @@ namespace Arya
 
     void Overlay::render()
     {
+        int ww = Root::shared().getWindowWidth();
+        int wh = Root::shared().getWindowHeight();
+
         // bind shader
         overlayProgram->use();
         glBindVertexArray(rectVAO);

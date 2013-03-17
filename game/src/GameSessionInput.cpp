@@ -61,8 +61,9 @@ void GameSessionInput::onFrame(float elapsedTime)
         vec3 force = forceDirection;
         force = glm::rotateY(force, cam->getYaw());
         float speedFactor = 4000.0f;
-        if(slowMode) speedFactor = 500.0f;
-        specMovement += force * speedFactor * elapsedTime;
+        if(slowMode) speedFactor *= 0.125f;
+		float zoomSpeedFactor = cam->getZoom()/300.0f;
+        specMovement += force * speedFactor * zoomSpeedFactor * elapsedTime;
     }
 
     specPos += specMovement * elapsedTime;
@@ -88,19 +89,47 @@ bool GameSessionInput::keyDown(int key, bool keyDown)
 
     bool DirectionChanged = false;
 
-    switch(key) {
-        case GLFW_KEY_LSHIFT: leftShiftPressed = keyDown; break;
-        case GLFW_KEY_RSHIFT: slowMode = keyDown; break;
-        case 'W': goingForward = keyDown;	DirectionChanged = true; break;
-        case 'S': goingBackward = keyDown;	DirectionChanged = true; break;
-        case 'Q': rotatingLeft = keyDown;	break;
-        case 'E': rotatingRight = keyDown;	break;
-        case 'A': goingLeft = keyDown;		DirectionChanged = true; break;
-        case 'D': goingRight = keyDown;		DirectionChanged = true; break;
-        case 'Z': goingDown = keyDown;		DirectionChanged = true; break;
-        case 'X': goingUp = keyDown;		DirectionChanged = true; break;
-        default: keyHandled = false; break;
-    }
+        if(key == GLFW_KEY_LSHIFT) leftShiftPressed = keyDown;
+        else if(key == GLFW_KEY_RSHIFT) slowMode = keyDown;
+		else if(key == Config::shared().getCvarString("goingforwardgame")[0])
+		{
+			goingForward = keyDown;
+			DirectionChanged = true;
+		}
+        else if(key == Config::shared().getCvarString("goingbackwardgame")[0])
+		{
+			goingBackward = keyDown;
+			DirectionChanged = true;
+		}
+		else if(key == Config::shared().getCvarString("rotatingleftgame")[0])
+		{
+        	 rotatingLeft = keyDown;
+		}
+		else if(key == Config::shared().getCvarString("rotatingrightgame")[0])
+		{
+			rotatingRight = keyDown;
+		}
+		else if(key == Config::shared().getCvarString("goingleftgame")[0])
+		{
+			goingLeft = keyDown;
+			DirectionChanged = true;
+		}
+		else if(key == Config::shared().getCvarString("goingrightgame")[0])
+		{
+			goingRight = keyDown;
+			DirectionChanged = true;
+		}
+		else if(key == Config::shared().getCvarString("goingdowngame")[0])
+		{
+			goingDown = keyDown;
+			DirectionChanged = true;
+		}
+		else if(key == Config::shared().getCvarString("goingupgame")[0])
+		{
+			goingUp = keyDown;
+			DirectionChanged = true;
+		}
+        else keyHandled = false;
 
     if( DirectionChanged ){
         forceDirection = vec3(0.0f);
@@ -316,7 +345,7 @@ void GameSessionInput::moveSelectedUnits()
         Event& ev = Game::shared().getEventManager()->createEvent(EVENT_ATTACK_MOVE_UNIT_REQUEST);
 
         ev << numSelected;
-        for(int i = 0; i < unitIds.size(); ++i)
+        for(unsigned int i = 0; i < unitIds.size(); ++i)
             ev << unitIds[i] << best_unit->getId();
 
         ev.send();
@@ -325,14 +354,14 @@ void GameSessionInput::moveSelectedUnits()
     }
 
     int perRow = (int)(glm::sqrt((float)numSelected));
-    int currentIndex = 0;
+    //int currentIndex = 0;
     float spread = 10.0f;
 
     Event& ev = Game::shared().getEventManager()->createEvent(EVENT_MOVE_UNIT_REQUEST);
     ev << numSelected;
-    for(int i = 0; i < unitIds.size(); ++i)
-        ev << unitIds[i] << vec2(clickPos.x + spread*((i % perRow) - perRow / 2),
-                        clickPos.z + spread*(i / perRow - perRow / 2));
+    for(unsigned int i = 0; i < unitIds.size(); ++i)
+        ev << unitIds[i] << vec2(clickPos.x + spread*((signed)(i % perRow) - perRow / 2),
+                        clickPos.z + spread*((signed)i / perRow - perRow / 2));
 
     ev.send();
 }

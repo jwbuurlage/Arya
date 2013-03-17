@@ -1,6 +1,6 @@
 #pragma once
-#include "common/Listeners.h"
 #include "common/Singleton.h"
+#include "common/Listeners.h"
 #include <vector>
 #include <string>
 #include <map>
@@ -17,18 +17,16 @@ namespace Arya
             CommandHandler();
             virtual ~CommandHandler();
 
-            bool init();
-
             void addCommandListener(string command, CommandListener* listener);
             void removeCommandListener(string command, CommandListener* listener);
-            bool handleCommand(string command);
+            //remove a listener for all its registered commands:
+            void removeCommandListener(CommandListener* listener);
 
             void onCommand(string command);
 
+			string splitLineCommand(string command);
+			string splitLineParameters(string command);
         private:
-
-            string splitLineCommand(string command);
-            string splitLineParameters(string command);
 
             multimap<string, CommandListener*> commandListeners;
             typedef multimap<string,CommandListener*>::iterator commandListenerIterator;

@@ -1,4 +1,5 @@
 #include "Sounds.h"
+#include "Commands.h"
 #include "common/Logger.h"
 #include <vector>
 #include <SFML/System.hpp>
@@ -21,6 +22,12 @@ namespace Arya
 
     bool SoundManager::init()
     {
+		CommandHandler::shared().addCommandListener("PLAYSOUND", this);
+		CommandHandler::shared().addCommandListener("PLAYMUSIC", this);
+		CommandHandler::shared().addCommandListener("STOPSOUND", this);
+		CommandHandler::shared().addCommandListener("STOPMUSIC", this);
+
+
         if(!getBufferFile("testSound.wav")) return false;
         if(!getBufferFile("marching.wav")) return false;
         if(!getBufferFile("yes.wav")) return false;
@@ -342,4 +349,31 @@ namespace Arya
         musicCollection.insert(MusicContainer::value_type(musicFileName,musicPushBack));
         return true;
     }
+	bool SoundManager::handleCommand(string command)
+	{
+		bool flag = true;
+        
+        int count = 0;
+        if(CommandHandler::shared().splitLineCommand(command) == "PLAYSOUND")
+        {
+            count = play("testSound.wav");
+            setLoopSound("testSound.wav", count, 0.01, true);
+            if(count == -1000) LOG_WARNING("SoundFile testSound.wav not found!");
+        }
+        if(CommandHandler::shared().splitLineCommand(command) == "PLAYMUSIC")
+        {
+            if(play("testMusic.wav") == -1000) LOG_WARNING("MusicFile testMusic.wav not found!");
+        }
+        if(CommandHandler::shared().splitLineCommand(command) == "STOPMUSIC")
+        {
+            stopMusic("testMusic.wav");
+        }
+        if(CommandHandler::shared().splitLineCommand(command) == "STOPSOUND")
+        {
+            setLoopSound("testSound.wav", count, 0.5, false);
+            stopSound("testSound.wav", count, 0.001);
+        }
+        else flag = false;
+        return flag;
+	}
 }

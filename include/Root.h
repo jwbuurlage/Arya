@@ -26,9 +26,6 @@ namespace Arya
             bool getFullscreen() const { return fullscreen; }
             void setFullscreen(bool fullscreen = true);
 
-            //WARNING: You can NOT remove yourself as listener
-            //within the callback. You CAN remove other listeners
-
             //TODO: Extra arguments like APPEND_LAST or FRONT or CALL_ALWAYS or something??
             void addInputListener(InputListener* listener);
             void removeInputListener(InputListener* listener);
@@ -47,7 +44,10 @@ namespace Arya
 
             vec3 getDepthResult(){ return clickScreenLocation; }
 
-            float getAspectRatio() const { return windowWidth/(float)windowHeight; }
+            float getAspectRatio() const { if(windowHeight == 0) return 0; return windowWidth/(float)windowHeight; }
+
+            //Usage: checkForErrors("root initialization")
+            bool checkForErrors(const char* stateInfo = 0);
         private:
             bool initGLFW();
             bool initGLEW();
@@ -63,13 +63,14 @@ namespace Arya
 
             double oldTime;
 
-            //IMPORTANT: These have to be vectors
-            //instead of lists because we need the
+            //IMPORTANT: These have to be lists
+            //instead of vectors because we need the
             //possibility to add and erase elements
             //while looping over them!
             std::list<FrameListener*> frameListeners;
             std::list<InputListener*> inputListeners;
 
+            void windowSizeChanged(int width, int height);
             void keyDown(int key, int action);
             void mouseDown(int button, int action);
             void mouseWheelMoved(int pos);
@@ -78,6 +79,7 @@ namespace Arya
 
             vec3 clickScreenLocation;
 
+            friend void GLFWCALL windowSizeCallback(int width, int height);
             friend void GLFWCALL keyCallback(int key, int action);
             friend void GLFWCALL mouseButtonCallback(int button, int action);
             friend void GLFWCALL mousePosCallback(int x, int y);

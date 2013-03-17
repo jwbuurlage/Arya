@@ -89,6 +89,8 @@ class ServerGameSession : public UnitFactory, public FactionFactory
         Server* const server;
         int idFactory;
 
+        //List of connected clients. Could also be spectators,
+        //does not have to be an actual faction.
         vector<ServerClient*> clientList;
         typedef vector<ServerClient*>::iterator clientIterator;
 

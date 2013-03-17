@@ -17,7 +17,7 @@ using Arya::cvar;
 class Network;
 class EventManager;
 
-class Game : public Arya::InputListener , public Arya::FrameListener, public EventHandler
+class Game : public Arya::InputListener , public Arya::FrameListener, public EventHandler, public Arya::CommandListener
 {
     public:
         Game();
@@ -45,6 +45,9 @@ class Game : public Arya::InputListener , public Arya::FrameListener, public Eve
         Network* network;
         EventManager* eventManager;
         GameSession* session;
+		bool handleCommand(string command);
+		void createSessionDebug(int sessionHash);
+		void joinSession(int sessionHash);
 
         int clientId;
 

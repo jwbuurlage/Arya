@@ -1,5 +1,6 @@
 #pragma once
 #include "common/Singleton.h"
+#include "common/Listeners.h"
 #include "Files.h"
 #include <vector>
 #include <string>
@@ -18,8 +19,7 @@ namespace Arya
         int placeInSoundCollection;
         float length;
    };
-   class SoundManager: public Singleton<SoundManager>
-
+   class SoundManager : public Singleton<SoundManager>, public CommandListener
     {
         public:
             SoundManager();
@@ -55,5 +55,6 @@ namespace Arya
             int bindSoundFile(string audioFileName);
             bool getMusicFile(string musicFileName);
             void provideSoundID(string audioFileName);
+			bool handleCommand(string command);
     };
 }
