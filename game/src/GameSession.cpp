@@ -193,7 +193,6 @@ void GameSession::onRender()
     if(!localFaction) return;
 
     glDisable(GL_CULL_FACE);
-    glEnable(GL_ALPHA_TEST);
     glEnable(GL_BLEND);
 
     decalProgram->use();
@@ -224,7 +223,6 @@ void GameSession::onRender()
     }
 
     glDisable(GL_BLEND);
-    glDisable(GL_ALPHA_TEST);
     glEnable(GL_CULL_FACE);
 }
 

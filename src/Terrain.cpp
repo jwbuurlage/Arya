@@ -321,6 +321,8 @@ namespace Arya
             0.5f, 0.5f, 0.5f, 1.0f
         );
 
+        Root::shared().checkForErrors("terrain render start");
+
         terrainProgram->use();
         terrainProgram->setUniformMatrix4fv("vpMatrix", cam->getVPMatrix());
 		terrainProgram->setUniformMatrix4fv("viewMatrix", cam->getVMatrix());
@@ -374,7 +376,6 @@ namespace Arya
             glDrawElements(GL_TRIANGLE_STRIP, indexCount[p.lod], GL_UNSIGNED_INT, (void*)0);
         }
 
-		glEnable(GL_ALPHA_TEST);
         glEnable(GL_BLEND);
 
 		waterProgram->use();
@@ -407,7 +408,8 @@ namespace Arya
             glDrawElements(GL_TRIANGLE_STRIP, indexCount[p.lod], GL_UNSIGNED_INT, (void*)0);
         }
 
-		glDisable(GL_ALPHA_TEST);
         glDisable(GL_BLEND);
+
+        Root::shared().checkForErrors("terrain render end");
     }
 }

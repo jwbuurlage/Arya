@@ -239,6 +239,8 @@ namespace Arya
 
     void Scene::render()
     {
+        Root::shared().checkForErrors("scene render start");
+
         //------------------------------
         // SHADOW PASS
         //------------------------------
@@ -290,7 +292,6 @@ namespace Arya
             }
         }
 
-
         //------------------------------
         // NORMAL PASS
         //------------------------------
@@ -339,6 +340,9 @@ namespace Arya
             }
         }
 
+        Root::shared().checkForErrors("scene render end");
+
         currentTerrain->render(camera);
+
     }
 }

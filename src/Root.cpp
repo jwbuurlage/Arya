@@ -24,6 +24,7 @@ namespace Arya
     template<> Root* Singleton<Root>::singleton = 0;
 
     //glfw callback functions
+    void GLFWCALL windowSizeCallback(int width, int height);
     void GLFWCALL keyCallback(int key, int action);
     void GLFWCALL mouseButtonCallback(int button, int action);
     void GLFWCALL mousePosCallback(int x, int y);
@@ -203,6 +204,7 @@ namespace Arya
 
         glfwSetWindowTitle("Arya");
         glfwEnable(GLFW_MOUSE_CURSOR);
+        glfwSetWindowSizeCallback(windowSizeCallback);
         glfwSetKeyCallback(keyCallback);
         glfwSetMouseButtonCallback(mouseButtonCallback);
         glfwSetMousePosCallback(mousePosCallback);
@@ -238,6 +240,7 @@ namespace Arya
 
         glfwSetWindowTitle("Arya");
         glfwEnable(GLFW_MOUSE_CURSOR);
+        glfwSetWindowSizeCallback(windowSizeCallback);
         glfwSetKeyCallback(keyCallback);
         glfwSetMouseButtonCallback(mouseButtonCallback);
         glfwSetMousePosCallback(mousePosCallback);
@@ -273,12 +276,16 @@ namespace Arya
         {
             scene->render();
 
+            checkForErrors("scene render");
+
             for(std::list<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();)
             {
                 //This construction allows the callback to erase itself from the frameListeners list
                 std::list<FrameListener*>::iterator iter = it++;
                 (*iter)->onRender();
             }
+
+            checkForErrors("callback onRender");
 
             GLfloat depth;
             glReadPixels(mouseX, mouseY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
@@ -291,10 +298,12 @@ namespace Arya
             clickScreenLocation.x = screenPos.x;
             clickScreenLocation.y = screenPos.y;
             clickScreenLocation.z = screenPos.z;
-       }
+        }
 
         if(interface)
             interface->render();
+
+        checkForErrors("root render end");
 
         glfwSwapBuffers();
     }
@@ -333,6 +342,32 @@ namespace Arya
                 case GL_OUT_OF_MEMORY:
                     AryaLogger << "Out of memory";
                     break;
+                case GL_INVALID_FRAMEBUFFER_OPERATION:
+                    AryaLogger << "Invalid framebuffer operation. Additional information: ";
+                    {
+                        GLenum fberr = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+                        switch(fberr){
+                            case GL_FRAMEBUFFER_COMPLETE:
+                                AryaLogger << "framebuffer is complete";
+                                break;
+                            case GL_FRAMEBUFFER_UNSUPPORTED:
+                                AryaLogger << "framebuffer is unsupported";
+                                break;
+                            case GL_FRAMEBUFFER_UNDEFINED:
+                                AryaLogger << "framebuffer undefined";
+                                break;
+                            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+                                AryaLogger << "framebuffer has incomplete attachment";
+                                break;
+                            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+                                AryaLogger << "framebuffer is missing attachment";
+                                break;
+                            default:
+                                AryaLogger << "unkown fbo error code: " << fberr;
+                                break;
+                        }
+                    }
+                    break;
                 default:
                     AryaLogger << "Unkown error. Code: " << err;
                     break;
@@ -369,6 +404,18 @@ namespace Arya
         }
     }
 
+    void Root::windowSizeChanged(int width, int height)
+    {
+        windowWidth = width;
+        windowHeight = height;
+        if(scene)
+        {
+            Camera* cam = scene->getCamera();
+            if(cam)
+                cam->setProjectionMatrix(45.0f, getAspectRatio(), 0.1f, 2000.0f);
+        }
+    }
+
     void Root::keyDown(int key, int action)
     {
         for( std::list<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
@@ -398,6 +445,11 @@ namespace Arya
 
         for( std::list<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
             if( (*it)->mouseMoved(x, y, dx, dy) == true ) break;
+    }
+
+    void GLFWCALL windowSizeCallback(int width, int height)
+    {
+        Root::shared().windowSizeChanged(width, height);
     }
 
     void GLFWCALL keyCallback(int key, int action)

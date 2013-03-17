@@ -44,7 +44,7 @@ namespace Arya
 
             vec3 getDepthResult(){ return clickScreenLocation; }
 
-            float getAspectRatio() const { return windowWidth/(float)windowHeight; }
+            float getAspectRatio() const { if(windowHeight == 0) return 0; return windowWidth/(float)windowHeight; }
 
             //Usage: checkForErrors("root initialization")
             bool checkForErrors(const char* stateInfo = 0);
@@ -70,6 +70,7 @@ namespace Arya
             std::list<FrameListener*> frameListeners;
             std::list<InputListener*> inputListeners;
 
+            void windowSizeChanged(int width, int height);
             void keyDown(int key, int action);
             void mouseDown(int button, int action);
             void mouseWheelMoved(int pos);
@@ -78,6 +79,7 @@ namespace Arya
 
             vec3 clickScreenLocation;
 
+            friend void GLFWCALL windowSizeCallback(int width, int height);
             friend void GLFWCALL keyCallback(int key, int action);
             friend void GLFWCALL mouseButtonCallback(int button, int action);
             friend void GLFWCALL mousePosCallback(int x, int y);
