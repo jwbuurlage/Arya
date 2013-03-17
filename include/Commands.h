@@ -19,6 +19,8 @@ namespace Arya
 
             void addCommandListener(string command, CommandListener* listener);
             void removeCommandListener(string command, CommandListener* listener);
+            //remove a listener for all its registered commands:
+            void removeCommandListener(CommandListener* listener);
 
             void onCommand(string command);
 

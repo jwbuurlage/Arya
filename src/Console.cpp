@@ -59,6 +59,7 @@ namespace Arya
 
     Console::~Console()
     {
+        CommandHandler::shared().removeCommandListener(this);
         cleanup();
     }
 

@@ -21,14 +21,25 @@ namespace Arya
 	void CommandHandler::removeCommandListener(string command, CommandListener* listener)
 	{
 		pair<commandListenerIterator, commandListenerIterator> range = commandListeners.equal_range(command);
-		for(commandListenerIterator iter = range.first; iter != range.second; ++iter)
+		for(commandListenerIterator iter = range.first; iter != range.second; )
 		{
-			if( iter->second == listener )
-			{
-				commandListeners.erase(iter);
-			}
+            //the erase function invalidates this iterator
+            //so we must increase it first and then erase
+            commandListenerIterator erase_iter = iter++;
+            if( erase_iter->second == listener )
+                commandListeners.erase(erase_iter);
 		}
 	}
+
+    void CommandHandler::removeCommandListener(CommandListener* listener)
+    {
+		for(commandListenerIterator iter = commandListeners.begin(); iter != commandListeners.end(); )
+		{
+            commandListenerIterator erase_iter = iter++;
+            if( erase_iter->second == listener )
+                commandListeners.erase(erase_iter);
+		}
+    }
 
 	void CommandHandler::onCommand(string command) // alleen op eerste woord zoeken
 	{
