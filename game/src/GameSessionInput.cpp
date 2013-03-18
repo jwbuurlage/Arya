@@ -16,6 +16,7 @@ GameSessionInput::GameSessionInput(GameSession* ses)
     draggingLeftMouse = draggingRightMouse = false;
     slowMode = false;
     leftShiftPressed = false;
+	leftControlPressed = false;
     forceDirection = vec3(0.0f);
     specMovement = vec3(0.0f);
 	specPos = vec3(0.0f,150.0f,0.0f);
@@ -90,6 +91,7 @@ bool GameSessionInput::keyDown(int key, bool keyDown)
     bool DirectionChanged = false;
 
         if(key == GLFW_KEY_LSHIFT) leftShiftPressed = keyDown;
+		else if(key == GLFW_KEY_LCTRL) leftControlPressed = keyDown;
         else if(key == GLFW_KEY_RSHIFT) slowMode = keyDown;
 		else if(key == Config::shared().getCvarString("goingforwardgame")[0])
 		{
@@ -296,10 +298,12 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
     {
         vec2 onScreen = (*it)->getScreenPosition();
 
-        if((onScreen.x > x_min && onScreen.x < x_max) && (onScreen.y > y_min && onScreen.y < y_max)) {
+        if((onScreen.x > x_min && onScreen.x < x_max) && (onScreen.y > y_min && onScreen.y < y_max))
+	   	{
             (*it)->setSelected(true);
             if(!soundPlayed) SoundManager::shared().play(infoForUnitType[(*it)->getType()].selectionSound);
             soundPlayed = true;
+			if(leftControlPressed) (*it)->getDebugText();
         }
     }
 }
@@ -397,5 +401,6 @@ void GameSessionInput::selectUnit()
     {
         SoundManager::shared().play(infoForUnitType[best_unit->getType()].selectionSound);
         best_unit->setSelected(true);
+		if(leftControlPressed) best_unit->getDebugText();
     }
 }
