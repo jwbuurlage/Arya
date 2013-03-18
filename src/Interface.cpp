@@ -239,15 +239,13 @@ namespace Arya
 	void Interface::render()
 	{
 		glDisable(GL_DEPTH_TEST);
-		glEnable(GL_ALPHA_TEST);
 		glEnable(GL_BLEND);
 
-		for(int i = 0; i < windowStack.size(); ++i)
-			windowStack[i]->draw();
+		//for(int i = 0; i < windowStack.size(); ++i)
+		//	windowStack[i]->draw();
 
 		overlay->render();
 
-		glDisable(GL_ALPHA_TEST);
 		glDisable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
 

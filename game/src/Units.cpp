@@ -478,5 +478,6 @@ void Unit::getDebugText()
 	GAME_LOG_DEBUG("Unit health = " << health);
 	GAME_LOG_DEBUG("Unit dyingTime = " << dyingTime);
 	GAME_LOG_DEBUG("targetUnit = " << (targetUnit ? targetUnit->getId() : 0));
+	GAME_LOG_DEBUG("Unit state = " << unitState);
 	GAME_LOG_DEBUG("------------------------------------");
 }
