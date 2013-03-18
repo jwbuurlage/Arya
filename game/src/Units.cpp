@@ -399,6 +399,9 @@ void Unit::setTargetUnit(Unit* target)
     targetUnit = target;
     targetUnit->retain();
 
+    if(unitState == UNIT_DYING)
+        GAME_LOG_DEBUG("Unit " << id << " probable error at setTargetUnit");
+
     setUnitState(UNIT_ATTACKING_OUT_OF_RANGE);
 }
 
@@ -407,6 +410,9 @@ void Unit::setTargetPosition(vec2 target)
     if(targetUnit)
         targetUnit->release();
     targetUnit = 0;
+
+    if(unitState == UNIT_DYING)
+        GAME_LOG_DEBUG("Unit " << id << " probable error at setTargetPosition");
 
     targetPosition = target;
     setUnitState(UNIT_RUNNING);
@@ -435,10 +441,10 @@ void Unit::receiveDamage(float dmg, Unit* attacker)
     //healthBar->sizeInPixels = vec2(25.0*getHealthRatio(), 3.0);
 
     //This is done when the death packet is received
-    if(!isAlive())
-    {
-        setUnitState(UNIT_DYING);
-    }
+    //if(!isAlive())
+    //{
+    //    setUnitState(UNIT_DYING);
+    //}
 }
 
 void Unit::setTintColor(vec3 tC)
