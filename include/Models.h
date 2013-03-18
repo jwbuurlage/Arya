@@ -23,7 +23,7 @@ namespace Arya
 
     //Base class for an animation state, stored in each object
     //Only contains the state, not the full animation data
-    //Subclasses can be bone positions or keyframes
+    //Subclasses (in the cpp file) can be bone positions or keyframes
     //The actual keyframe data (like timings) are in the Model
     class AnimationState
     {

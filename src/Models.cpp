@@ -258,7 +258,7 @@ namespace Arya
             }
             else
             {
-                AryaLogger << Logger::L_INFO << "Model has " << animationCount << " animations: ";
+                AryaLogger << Logger::L_INFO << "Model has " << animationCount << " animations in " << header->frameCount << " frames: ";
 
                 animData = new VertexAnimationData;
                 model->animationData = animData;
@@ -281,10 +281,18 @@ namespace Arya
                         newAnim.frameTimes.push_back( *(float*)pointer );
                         pointer += 4;
                     }
+                    
+                    newAnim.startFrame = 0;
+                    newAnim.endFrame = header->frameCount - 1;
+                    newAnim.frameTimes.clear();
+                    for(int i = 0; i <= (newAnim.endFrame-newAnim.startFrame); ++i)
+                        newAnim.frameTimes.push_back(0.1f);
 
                     //Only add the animation if there are actually enough frames
                     if( newAnim.startFrame < header->frameCount && newAnim.endFrame < header->frameCount )
                         animData->animations.insert(animMapType(nameBuf, newAnim));
+                    else
+                        AryaLogger << "(not enough frames) ";
                 }
 
                 AryaLogger << endLog;
