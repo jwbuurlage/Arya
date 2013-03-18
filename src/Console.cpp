@@ -144,7 +144,7 @@ namespace Arya
                 }
             }
             else if(key >= '0' && key <= '9' && keyDown && (currentLine.length() < (unsigned)nrCharOnLine)) currentLine.push_back(key);
-            else if(key >= GLFW_KEY_KP_0  && key <= GLFW_KEY_KP_9  && keyDown && (currentLine.length() < (unsigned)nrCharOnLine)) currentLine.push_back(key - 2);
+            else if(key >= GLFW_KEY_KP_0  && key <= GLFW_KEY_KP_9  && keyDown && (currentLine.length() < (unsigned)nrCharOnLine)) currentLine.push_back(key+2);
             else if (keyDown && key == GLFW_KEY_KP_ADD && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
             else if (keyDown && key == GLFW_KEY_KP_SUBTRACT && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
             else if (keyDown && key == GLFW_KEY_KP_MULTIPLY && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);

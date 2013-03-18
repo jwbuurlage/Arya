@@ -130,6 +130,11 @@ bool GameSessionInput::keyDown(int key, bool keyDown)
 		{
 			goingUp = keyDown;
 			DirectionChanged = true;
+		}		
+		else if(key == Config::shared().getCvarString("synchronizegame")[0])
+		{
+			Event& ev = Game::shared().getEventManager()->createEvent(EVENT_GAME_FULLSTATE_REQUEST);
+			ev.send();
 		}
         else keyHandled = false;
 
