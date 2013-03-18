@@ -281,12 +281,6 @@ namespace Arya
                         newAnim.frameTimes.push_back( *(float*)pointer );
                         pointer += 4;
                     }
-                    
-                    newAnim.startFrame = 0;
-                    newAnim.endFrame = header->frameCount - 1;
-                    newAnim.frameTimes.clear();
-                    for(int i = 0; i <= (newAnim.endFrame-newAnim.startFrame); ++i)
-                        newAnim.frameTimes.push_back(0.1f);
 
                     //Only add the animation if there are actually enough frames
                     if( newAnim.startFrame < header->frameCount && newAnim.endFrame < header->frameCount )
