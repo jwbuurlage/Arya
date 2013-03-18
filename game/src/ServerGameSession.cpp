@@ -57,11 +57,11 @@ void ServerGameSession::initialize()
 		for(int i = 0; i < 5; ++i)
 		{
 			Unit* unit = createUnit(0);
-            unit->setPosition(basePos + vec3(20.0f*(i/5), 0.0f, 20.0f*(i%5)));
+            unit->setPosition(basePos + vec3(20.0f, 0.0f, -40.0f + 20.0f*(i%5)));
 			faction->addUnit(unit);
 
 			unit = createUnit(1);
-            unit->setPosition(basePos + vec3(20.0f*(i/5) - 70.0f, 0.0f, 20.0f*(i%5) - 70.0f));
+            unit->setPosition(basePos + vec3(-20.0f, 0.0f, -40.0f + 20.0f*(i%5)));
 			faction->addUnit(unit);
 		}
 

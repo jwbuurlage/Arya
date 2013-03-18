@@ -229,6 +229,13 @@ void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
         return;
     }
 
+    if(obsolete)
+    {
+        GAME_LOG_DEBUG("Unit " << id << " is obsolete but has state " << unitState);
+        setUnitState(UNIT_DYING);
+        return;
+    }
+
     //If we are attacking, the target position is the position of the target unit
     if(unitState == UNIT_ATTACKING || unitState == UNIT_ATTACKING_OUT_OF_RANGE)
     {
@@ -358,8 +365,8 @@ void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
 
 void Unit::setUnitState(UnitState state)
 {
-    //if(unitState == UNIT_DYING)
-    //    return;
+    if(unitState == UNIT_DYING)
+        return;
 
     unitState = state;
 
