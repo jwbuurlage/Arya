@@ -33,6 +33,7 @@ class GameSessionInput : public Arya::InputListener, public Arya::FrameListener
 		bool slowMode; //Precise movement
 
         bool leftShiftPressed;
+		bool leftControlPressed;
 
         vec3 forceDirection;
         vec3 specMovement;

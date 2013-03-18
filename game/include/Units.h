@@ -125,6 +125,8 @@ class Unit
         void serialize(Packet& pk);
         void deserialize(Packet& pk);
 
+		void getDebugText();
+
     private:
         Object* object; //object->position and object->yaw are always the same as Unit::position and Unit::yaw
         vec3 position; //since server has no Object, position is stored here

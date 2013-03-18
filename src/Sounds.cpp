@@ -17,6 +17,7 @@ namespace Arya
 
     SoundManager::~SoundManager()
     {
+		CommandHandler::shared().removeCommandListener(this);
         cleanup();
     }
 
@@ -31,8 +32,6 @@ namespace Arya
         if(!getBufferFile("testSound.wav")) return false;
         if(!getBufferFile("marching.wav")) return false;
         if(!getBufferFile("yes.wav")) return false;
-        if(!getBufferFile("no.wav")) return false;
-        if(!getBufferFile("chewbacca.wav")) return false;
         if(!getBufferFile("noMercy.wav")) return false;
         return true;
     }
