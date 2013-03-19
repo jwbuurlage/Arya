@@ -50,14 +50,10 @@ void Game::run()
         if(network) delete network;
         network = new Network;
 
-		GAME_LOG_INFO("HERE");
-
         //network->startServer();
         cvar* var = Config::shared().getCvar("serveraddress");
         const char* serveraddr = (var ? var->value.c_str() : "localhost");
         network->connectToLobbyServer(serveraddr, 13337);
-
-		GAME_LOG_INFO("HERE2");
 
         if(eventManager) delete eventManager;
         eventManager = new EventManager(network);
@@ -88,16 +84,11 @@ void Game::run()
 		joinEvent.send();
 		//END TEMPORARY
 
-		GAME_LOG_INFO("HERE3");
-
 		eventManager->addEventHandler(EVENT_SESSION_INFO, this);
         eventManager->addEventHandler(EVENT_CLIENT_ID, this);
 
         root->addFrameListener(this);
-
-		GAME_LOG_INFO("HERE4");
         root->startRendering();
-		GAME_LOG_INFO("HERE5");
     }
 }
 
