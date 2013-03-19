@@ -81,7 +81,6 @@ namespace Arya
     {
         LOG_INFO("loading root");
 
-        checkForErrors("start of root init");
 
         windowWidth = w;
         windowHeight = h;
@@ -89,6 +88,8 @@ namespace Arya
 
         if(!initGLFW()) return false;
         if(!initGLEW()) return false;
+
+        checkForErrors("start of root init");
 
         // set GL stuff
         glEnable(GL_DEPTH_TEST);
