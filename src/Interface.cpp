@@ -67,7 +67,7 @@ namespace Arya
 
 		ShaderProgram* p = Interface::shared().getTexturedRectProgram();
 		GLuint v = Interface::shared().getOnePxRectVAO();
-		// draw background
+
 		// bind shader overlay
 		p->use();
 		glBindVertexArray(v);
@@ -82,6 +82,7 @@ namespace Arya
 		p->setUniform2fv("texOffset", vec2(0.0f));
 		p->setUniform2fv("texSize", vec2(1.0f));
 
+		// draw background
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 		// draw childs
@@ -179,7 +180,7 @@ namespace Arya
 		offsetFPS = lastX;
 
 		// test window
-		Window* w = new Window(vec2(0.1f), vec2(0.5f, 0.5f), vec4(1.0, 1.0, 1.0, 1.0));
+		Window* w = new Window(vec2(0.1f), vec2(1.0f, 0.5f), vec4(1.0, 0.0, 1.0, 1.0));
 		makeActive(w);
 
 		// pixel --> screen matrix 
