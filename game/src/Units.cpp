@@ -229,6 +229,13 @@ void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
         return;
     }
 
+    if(obsolete)
+    {
+        GAME_LOG_DEBUG("Unit " << id << " is obsolete but has state " << unitState);
+        setUnitState(UNIT_DYING);
+        return;
+    }
+
     //If we are attacking, the target position is the position of the target unit
     if(unitState == UNIT_ATTACKING || unitState == UNIT_ATTACKING_OUT_OF_RANGE)
     {
@@ -358,8 +365,8 @@ void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
 
 void Unit::setUnitState(UnitState state)
 {
-    //if(unitState == UNIT_DYING)
-    //    return;
+    if(unitState == UNIT_DYING)
+        return;
 
     unitState = state;
 
@@ -399,6 +406,9 @@ void Unit::setTargetUnit(Unit* target)
     targetUnit = target;
     targetUnit->retain();
 
+    if(unitState == UNIT_DYING)
+        GAME_LOG_DEBUG("Unit " << id << " probable error at setTargetUnit");
+
     setUnitState(UNIT_ATTACKING_OUT_OF_RANGE);
 }
 
@@ -407,6 +417,9 @@ void Unit::setTargetPosition(vec2 target)
     if(targetUnit)
         targetUnit->release();
     targetUnit = 0;
+
+    if(unitState == UNIT_DYING)
+        GAME_LOG_DEBUG("Unit " << id << " probable error at setTargetPosition");
 
     targetPosition = target;
     setUnitState(UNIT_RUNNING);
@@ -435,10 +448,10 @@ void Unit::receiveDamage(float dmg, Unit* attacker)
     //healthBar->sizeInPixels = vec2(25.0*getHealthRatio(), 3.0);
 
     //This is done when the death packet is received
-    if(!isAlive())
-    {
-        setUnitState(UNIT_DYING);
-    }
+    //if(!isAlive())
+    //{
+    //    setUnitState(UNIT_DYING);
+    //}
 }
 
 void Unit::setTintColor(vec3 tC)
@@ -468,4 +481,16 @@ void Unit::deserialize(Packet& pk)
     int targetUnitId;
     pk >> targetUnitId;
     if(targetUnitId) targetUnit = unitFactory->getUnitById(targetUnitId);
+}
+void Unit::getDebugText()
+{
+	GAME_LOG_DEBUG("Unit id = " << id);
+	GAME_LOG_DEBUG("Unit factionId = " << factionId);
+	GAME_LOG_DEBUG("Unit obsolete = " << obsolete);
+	GAME_LOG_DEBUG("Unit refCount = " << refCount);
+	GAME_LOG_DEBUG("Unit health = " << health);
+	GAME_LOG_DEBUG("Unit dyingTime = " << dyingTime);
+	GAME_LOG_DEBUG("targetUnit = " << (targetUnit ? targetUnit->getId() : 0));
+	GAME_LOG_DEBUG("Unit state = " << unitState);
+	GAME_LOG_DEBUG("------------------------------------");
 }

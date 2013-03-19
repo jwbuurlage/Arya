@@ -317,6 +317,8 @@ int main(int argc, char* argv[])
     {
         frame* inputFrame = (frame*)(inputData + header->oFrames + fr * header->frameSize);
 
+        cout << "DEBUG: frame name: " << inputFrame->name << endl;
+
         for(int tri = 0; tri < header->nTriangles; ++tri)
         {
             for(int m = 0; m < 3; ++m)

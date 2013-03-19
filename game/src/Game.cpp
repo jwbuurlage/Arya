@@ -25,6 +25,7 @@ Game::Game()
 
 Game::~Game()
 {
+	Arya::CommandHandler::shared().removeCommandListener(this);
     //Delete session before eventmanager, or else it will crash
     if(session) delete session;
     if(eventManager) delete eventManager;
@@ -113,15 +114,6 @@ bool Game::keyDown(int key, bool keyDown)
                 session = 0;
             }
             break;
-
-		case '8':
-			if(keyDown)
-			{
-				Event& ev = getEventManager()->createEvent(EVENT_GAME_FULLSTATE_REQUEST);
-				ev.send();
-			}
-			break;
-
         case 'O': glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
         case 'I': glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
         case GLFW_KEY_F11: Root::shared().setFullscreen(!Root::shared().getFullscreen()); break;

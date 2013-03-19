@@ -54,14 +54,14 @@ void ServerGameSession::initialize()
 
         int num = gameInfo.players[i].slot;
         vec3 basePos( -250.0f + 500.0f * (num%2), 0.0f, -250.0f + 500.0f * (num/2) ); //one of the 4 corners of map
-		for(int i = 0; i < 5; ++i)
+		for(int i = 0; i < 10; ++i)
 		{
 			Unit* unit = createUnit(0);
-            unit->setPosition(basePos + vec3(20.0f*(i/5), 0.0f, 20.0f*(i%5)));
+            unit->setPosition(basePos + vec3(20.0f+20.0f*(i/5), 0.0f, -40.0f + 20.0f*(i%5)));
 			faction->addUnit(unit);
 
 			unit = createUnit(1);
-            unit->setPosition(basePos + vec3(20.0f*(i/5) - 70.0f, 0.0f, 20.0f*(i%5) - 70.0f));
+            unit->setPosition(basePos + vec3(-(20.0f+20.0f*(i/5)), 0.0f, -40.0f + 20.0f*(i%5)));
 			faction->addUnit(unit);
 		}
 
