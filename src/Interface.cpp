@@ -180,7 +180,7 @@ namespace Arya
 		offsetFPS = lastX;
 
 		// test window
-		Window* w = new Window(vec2(0.1f), vec2(1.0f, 0.5f), vec4(1.0, 0.0, 1.0, 1.0));
+		Window* w = new Window(vec2(0.0f), vec2(1.0f, 1.0f), vec4(1.0, 1.0, 1.0, 1.0));
 		makeActive(w);
 
 		// pixel --> screen matrix 
@@ -242,8 +242,8 @@ namespace Arya
 		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 
-		//for(int i = 0; i < windowStack.size(); ++i)
-		//	windowStack[i]->draw();
+		for(int i = 0; i < windowStack.size(); ++i)
+			windowStack[i]->draw();
 
 		overlay->render();
 
