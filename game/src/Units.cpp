@@ -451,7 +451,7 @@ void Unit::receiveDamage(float dmg, Unit* attacker)
         }
     }
 
-    unitInfo->onDamage(getId(), attacker->getId(), dmg);
+    unitInfo->onDamage(this, attacker, dmg);
 
     health -= dmg;
     if(health < 0) health = 0;

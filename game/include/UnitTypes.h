@@ -37,7 +37,7 @@ struct UnitInfo
     //They will call the appropriate script
     virtual void onDeath(Unit* unit){};
     virtual void onSpawn(Unit* unit){};
-    virtual void onDamage(int victimId, int attackerId, float damage){};
+    virtual void onDamage(Unit* victim, Unit* attacker, float damage){};
 
     int typeId;
 

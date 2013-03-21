@@ -2,8 +2,11 @@
 #include "../include/UnitTypes.h"
 #include "../include/Units.h"
 #include "../include/common/GameLogger.h"
-#include "../include/Arya.h"
 #include <luabind/luabind.hpp>
+
+//TODO: move Scripting::execute to another cpp file
+//so that we dont need to inclue Arya.h here
+#include "../include/Arya.h"
 
 class LuaUnitType : public UnitInfo
 {
@@ -15,7 +18,7 @@ class LuaUnitType : public UnitInfo
         //These are called by the game when the event occurs
         void onDeath(Unit* unit);
         void onSpawn(Unit* unit);
-        void onDamage(int victimId, int attackerId, float damage);
+        void onDamage(Unit* victim, Unit* attacker, float damage);
 
         //These are called by the scripts to set handlers
         void setOnDeath(const luabind::object& obj);
@@ -43,15 +46,15 @@ LuaUnitType::~LuaUnitType()
 
 void LuaUnitType::onDeath(Unit* unit)
 {
-    if(objOnDeath) luabind::call_function<void>(objOnDeath, unit->getId());
+    if(objOnDeath) luabind::call_function<void>(objOnDeath, unit);
 }
 void LuaUnitType::onSpawn(Unit* unit)
 {
-    if(objOnSpawn) luabind::call_function<void>(objOnSpawn, unit->getId());
+    if(objOnSpawn) luabind::call_function<void>(objOnSpawn, unit);
 }
-void LuaUnitType::onDamage(int victimId, int attackerId, float damage)
+void LuaUnitType::onDamage(Unit* victim, Unit* attacker, float damage)
 {
-    if(objOnDamage) luabind::call_function<void>(objOnDamage, victimId, attackerId, damage);
+    if(objOnDamage) luabind::call_function<void>(objOnDamage, victim, attacker, damage);
 }
 
 void LuaUnitType::setOnDeath(const luabind::object& obj)
@@ -98,6 +101,10 @@ int Scripting::init()
 
     luabind::module(luaState)[
         luabind::def("print", &luaPrint),
+        luabind::class_<Unit>("Unit") //scripts may not create these, so no constructor
+            .property("id", &Unit::getId)
+            .property("type", &Unit::getType)
+            .property("health", &Unit::getHealth),
         luabind::class_<UnitInfo>("UnitInfoBase"), //should not be used in scripts
         luabind::class_<LuaUnitType, UnitInfo>("UnitType")
             .def(luabind::constructor<const std::string&>())

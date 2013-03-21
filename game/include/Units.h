@@ -99,6 +99,7 @@ class Unit
         UnitState getUnitState() const { return unitState; }
 
         void receiveDamage(float dmg, Unit* attacker);
+        float getHealth() const { return health; }
         float getHealthRatio() const { return health / unitInfo->maxHealth; }
 
         bool isAlive() const { return (!obsolete && health > 0); }
