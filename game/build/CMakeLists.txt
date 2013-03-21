@@ -29,6 +29,7 @@ SET(
 	PROJECT_INCLUDES
 	"../../include"
 	"../include"
+    "/usr/include/lua5.1"
 )
 
 SET(
