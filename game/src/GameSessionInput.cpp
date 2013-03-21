@@ -306,7 +306,7 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
         if((onScreen.x > x_min && onScreen.x < x_max) && (onScreen.y > y_min && onScreen.y < y_max))
 	   	{
             (*it)->setSelected(true);
-            if(!soundPlayed) SoundManager::shared().play(infoForUnitType[(*it)->getType()].selectionSound);
+            if(!soundPlayed) SoundManager::shared().play((*it)->getInfo()->selectionSound);
             soundPlayed = true;
 			if(leftControlPressed) (*it)->getDebugText();
         }
@@ -333,7 +333,7 @@ void GameSessionInput::moveSelectedUnits()
                 it != session->getFactions()[j]->getUnits().end(); ++it)
         {
             dist = glm::distance((*it)->getPosition(), clickPos);
-            if(dist < 2.0 * infoForUnitType[(*it)->getType()].radius
+            if(dist < 2.0 * (*it)->getInfo()->radius
                     && dist < best_distance) {
                 best_distance = dist; 
                 best_unit = (*it);
@@ -395,7 +395,7 @@ void GameSessionInput::selectUnit()
             it != lf->getUnits().end(); ++it)
     {
         dist = glm::distance((*it)->getPosition(), clickPos);
-        if(dist < 2.0 * infoForUnitType[(*it)->getType()].radius
+        if(dist < 2.0 * (*it)->getInfo()->radius
                 && dist < best_distance) {
             best_distance = dist; 
             best_unit = (*it);
@@ -404,7 +404,7 @@ void GameSessionInput::selectUnit()
 
     if(best_unit)
     {
-        SoundManager::shared().play(infoForUnitType[best_unit->getType()].selectionSound);
+        SoundManager::shared().play(best_unit->getInfo()->selectionSound);
         best_unit->setSelected(true);
 		if(leftControlPressed) best_unit->getDebugText();
     }

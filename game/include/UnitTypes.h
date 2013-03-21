@@ -1,7 +1,16 @@
 #pragma once
+#include <string>
 
+using std::string;
+
+class Unit;
+
+//This class is subclassed by LuaUnitType
+//The class instances are created in the scripts
 struct UnitInfo
 {
+    UnitInfo(){}
+
     UnitInfo(const char* _name,
             float _radius, float _attackRadius, float _viewRadius,
             float _speed, float _yawSpeed,
@@ -9,6 +18,7 @@ struct UnitInfo
             const char* _selectionSound, const char* _attackSound)
     {
         name = _name;
+        modelname = name;
         radius = _radius;
         attackRadius = _attackRadius;
         viewRadius = _viewRadius;
@@ -21,8 +31,18 @@ struct UnitInfo
         selectionSound = _selectionSound;
         attackSound = _attackSound;
     }
+    virtual ~UnitInfo(){}
 
-    const char* name;
+    //Call these from the game
+    //They will call the appropriate script
+    virtual void onDeath(Unit* unit){};
+    virtual void onSpawn(Unit* unit){};
+    virtual void onDamage(int victimId, int attackerId, float damage){};
+
+    int typeId;
+
+    string name;
+    string modelname;
 
     float radius;
     float attackRadius;
@@ -35,8 +55,12 @@ struct UnitInfo
     float attackSpeed; //the time one attack takes
     bool canMoveWhileAttacking;
 
-    const char* selectionSound;
-    const char* attackSound;
+    string selectionSound;
+    string attackSound;
 };
 
-extern UnitInfo infoForUnitType[];
+UnitInfo* getUnitInfo(const string& name);
+UnitInfo* getUnitInfo(int type);
+
+void registerNewUnitInfo(UnitInfo* info);
+

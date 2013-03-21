@@ -47,8 +47,8 @@ namespace Arya
         Console::create();
 
         //Some classes should be initialized
-        //before the graphics, like Config
-        //other graphic related classes are
+        //before the graphics, like Config.
+        //Other graphic related classes are
         //initialized in Root::initialize
         //when the graphics are initialized
         if(!Config::shared().init()) LOG_WARNING("Unable to init config");
@@ -56,10 +56,6 @@ namespace Arya
 
     Root::~Root()
     {
-        //TODO: Check if GLEW, GLFW, Shaders, Objects were still initated
-        //Only clean them up if needed
-        glfwTerminate();
-
         //Console deconstructor uses overlay
         //so it must be deleted first
         Console::destroy();
@@ -75,6 +71,10 @@ namespace Arya
         Config::destroy();
         CommandHandler::destroy();
         FileSystem::destroy();
+
+        //TODO: Check if GLEW, GLFW, Shaders, Objects were still initated
+        //Only clean them up if needed
+        glfwTerminate();
     }
 
     bool Root::init(bool fullscr, int w, int h)

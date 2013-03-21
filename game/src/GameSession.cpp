@@ -290,7 +290,7 @@ void GameSession::handleEvent(Packet& packet)
                         Object* obj = unit->getObject();
                         if(!obj) obj = Root::shared().getScene()->createObject();
 
-                        string s(infoForUnitType[unit->getType()].name);
+                        string s(unit->getInfo()->name);
                         obj->setModel(ModelManager::shared().getModel(s + ".aryamodel"));
                         obj->setAnimation("stand");
 
@@ -351,7 +351,7 @@ void GameSession::handleEvent(Packet& packet)
                     if(faction == localFaction) unit->setLocal(true);
 
                     Object* obj = Root::shared().getScene()->createObject();
-                    string s(infoForUnitType[unit->getType()].name);
+                    string s(unit->getInfo()->name);
                     obj->setModel(ModelManager::shared().getModel(s + ".aryamodel"));
                     obj->setAnimation("stand");
 
