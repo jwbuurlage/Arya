@@ -7,6 +7,7 @@
 #include "common/Singleton.h"
 
 using glm::vec3;
+using glm::mat4;
 
 namespace Arya
 {
@@ -41,6 +42,7 @@ namespace Arya
             int getWindowHeight() const { return windowHeight; }
 
             Overlay* getOverlay() const;
+			mat4 getPixelToScreenTransform() const;
 
             vec3 getDepthResult(){ return clickScreenLocation; }
 

@@ -9,13 +9,19 @@ namespace Arya
 	class DrawableText
 	{
 		public:
-			DrawableText();
+			DrawableText(Font* _font, string _text);
 			~DrawableText();
+
+			Font* getFont() const { return font; };
+			GLuint getVAO() const { return vao; };
+
+			int getVertexCount() const { return vertexCount; }
 
 		private:
 			Font* font;
 			string text;
 			GLuint vao;
+			int vertexCount;
 
 			void bake();
 	};

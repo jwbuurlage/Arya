@@ -3,6 +3,9 @@
 #include "Overlay.h"
 #include <GL/glew.h>
 
+#include <string>
+using std::string;
+
 #include <vector>
 using std::vector;
 
@@ -13,6 +16,7 @@ using glm::vec4;
 namespace Arya
 {
     class DrawableText;
+    class Font;
 
     class InterfaceElement
     {
@@ -49,10 +53,11 @@ namespace Arya
     class Label : public InterfaceElement
     {
         public:
-            Label(vec2 _position, vec2 _size);
-            ~Label() { }
+			Label(vec2 _position, vec2 _size,
+				Font* _font, string _text);
+           ~Label() { }
 
-            void draw() { }
+            void draw();
 
         private:
             DrawableText* dt;
@@ -79,6 +84,7 @@ namespace Arya
 			GLuint getOnePxRectVAO() const { return onePxRectVAO; };
 			Overlay* getOverlay() const { return overlay; }
 			ShaderProgram* getTexturedRectProgram() const { return texturedRectProgram; }
+			ShaderProgram* getClusterTexturedRectProgram() const { return clusterTexturedRectProgram; }
 			
         private:
             float time; 
@@ -87,6 +93,7 @@ namespace Arya
 
 			Overlay* overlay;
 			ShaderProgram* texturedRectProgram;
+			ShaderProgram* clusterTexturedRectProgram;
 			GLuint onePxRectVAO;
 
             vector<Rect*> rects;

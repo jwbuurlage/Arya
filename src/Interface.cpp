@@ -6,6 +6,7 @@
 #include "Textures.h"
 #include "Overlay.h"
 #include "Shaders.h"
+#include "DrawableText.h"
 #include "common/Logger.h"
 #include <sstream>
 #include <vector>
@@ -36,7 +37,7 @@ namespace Arya
 	///////////////////////////////
 
 	Window::Window(vec2 _position, vec2 _size, vec4 _backgroundColor)
-		: InterfaceElement(_size, _position)
+		: InterfaceElement(_position, _size)
 	{
 		backgroundColor = _backgroundColor;
 		isActive = false;
@@ -86,7 +87,7 @@ namespace Arya
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 		// draw childs
-		for(int i = 0; i << childElements.size(); ++i)
+		for(int i = 0; i < childElements.size(); ++i)
 			childElements[i]->draw();
 	}
 
@@ -94,10 +95,31 @@ namespace Arya
 	// Label
 	///////////////////////////////
 
-	Label::Label(vec2 _position, vec2 _size)
+	Label::Label(vec2 _position, vec2 _size,
+			 Font* _font, string _text)
 		: InterfaceElement(_size, _position)
 	{
+		dt = new DrawableText(_font, _text);
+		LOG_INFO("here3");
+	}
 
+	void Label::draw()
+	{
+		// TODO: use at init
+		ShaderProgram* p = Interface::shared().getClusterTexturedRectProgram();
+		GLuint v = Interface::shared().getOnePxRectVAO();
+		p->use();
+
+		p->setUniformMatrix4fv("pixelToScreenTransform", Root::shared().getPixelToScreenTransform());
+
+		// font texture
+		p->setUniform1i("texture1", 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, dt->getFont()->textureHandle);
+
+		// vao
+		glBindVertexArray(dt->getVAO());
+		glDrawArrays(GL_TRIANGLES, 0, dt->getVertexCount());
 	}
 
 	////////////////////////////////
@@ -179,17 +201,26 @@ namespace Arya
 
 		offsetFPS = lastX;
 
-		// test window
-		Window* w = new Window(vec2(0.0f), vec2(1.0f, 1.0f), vec4(1.0, 1.0, 1.0, 1.0));
-		makeActive(w);
+		// ------------------------
+		// TODO: remove test window
+		Window* w = new Window(vec2(0.0f), vec2(0.5f, 0.5f), vec4(0.0f, 0.0f, 0.0f, 0.6f));
 
-		// pixel --> screen matrix 
+		Font* f = FontManager::shared().getFont("courier.ttf");
+		Label* l = new Label(vec2(0.0f), vec2(0.5f, 0.1f), f, "This is a test string");
+		w->addChild(l);
+
+		makeActive(w);
+		// TODO: remove test window
+		// -----------------------
+		
+		LOG_INFO("DOYA");
 
 		return true;
 	}
 
 	bool Interface::initShaders()
 	{
+		// singular
 		Shader* overlayVertex = new Shader(VERTEX);
 		if(!(overlayVertex->addSourceFile("../shaders/overlay.vert"))) return false;
 		if(!(overlayVertex->compile())) return false;
@@ -202,6 +233,20 @@ namespace Arya
 		texturedRectProgram->attach(overlayVertex);
 		texturedRectProgram->attach(overlayFragment);
 		if(!(texturedRectProgram->link())) return false;
+
+		// cluster
+		Shader* cOverlayVertex = new Shader(VERTEX);
+		if(!(cOverlayVertex->addSourceFile("../shaders/overlay_cluster.vert"))) return false;
+		if(!(cOverlayVertex->compile())) return false;
+
+		Shader* cOverlayFragment = new Shader(FRAGMENT);
+		if(!(cOverlayFragment->addSourceFile("../shaders/overlay_cluster.frag"))) return false;
+		if(!(cOverlayFragment->compile())) return false;
+
+		clusterTexturedRectProgram = new ShaderProgram("overlaycluster");
+		clusterTexturedRectProgram->attach(cOverlayVertex);
+		clusterTexturedRectProgram->attach(cOverlayFragment);
+		if(!(clusterTexturedRectProgram->link())) return false;
 
 		return true;
 	}
