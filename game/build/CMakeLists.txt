@@ -39,6 +39,7 @@ SET(
     "PocoFoundation"
     "pthread"
     "luabind"
+	"lua"
 )
 
 ADD_DEFINITIONS(-DPOCO_NO_AUTOMATIC_LIBS)
