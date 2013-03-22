@@ -8,6 +8,7 @@ log*
 shaders/version_convert.rb
 
 *.DS_Store
+*.swp
 
 !/build/CMakeLists.txt
 !/game/build/CMakeLists.txt
