@@ -26,18 +26,49 @@ namespace Arya
 	// InterfaceElement
 	///////////////////////////////
 
-	InterfaceElement::InterfaceElement(vec2 _position, vec2 _size)
+	InterfaceElement::InterfaceElement(vec2 _relativePosition, vec2 _absolutePosition, vec2 _size)
 	{
-		position = _position;
+		absolutePosition= _absolutePosition;
+		relativePosition= _relativePosition;
 		size = _size;
+		parent = 0;
+
+		recalculateScreenSizeAndPosition();
+	}
+
+	void InterfaceElement::setParent(InterfaceElement* _parent)
+	{
+ 		parent = _parent;
+		recalculateScreenSizeAndPosition();
+	}
+
+	void InterfaceElement::recalculateScreenSizeAndPosition()
+	{
+		if(parent) {
+			vec4 tmpScreenAbsolute = Root::shared().getPixelToScreenTransform() * vec4(absolutePosition, 0.0, 1.0);
+			screenOffset = relativePosition * parent->getScreenSize() + vec2(tmpScreenAbsolute.x, tmpScreenAbsolute.y);
+
+			vec4 tmpScreenSize = Root::shared().getPixelToScreenTransform() * vec4(size, 0.0, 1.0);
+			screenSize = vec2(tmpScreenSize.x, tmpScreenSize.y);
+
+			screenOffset += parent->getScreenOffset();
+		}
+		else
+		{
+			vec4 tmpScreenAbsolute = Root::shared().getPixelToScreenTransform() * vec4(absolutePosition, 0.0, 1.0);
+			screenOffset = relativePosition + vec2(tmpScreenAbsolute.x, tmpScreenAbsolute.y);
+
+			vec4 tmpScreenSize = Root::shared().getPixelToScreenTransform() * vec4(size, 0.0, 1.0);
+			screenSize = vec2(tmpScreenSize.x, tmpScreenSize.y);
+		}
 	}
 
 	////////////////////////////////
 	// Window
 	///////////////////////////////
 
-	Window::Window(vec2 _position, vec2 _size, vec4 _backgroundColor)
-		: InterfaceElement(_position, _size)
+	Window::Window(vec2 _relativePosition, vec2 _absolutePosition, vec2 _size, vec4 _backgroundColor)
+		: InterfaceElement(_relativePosition, _absolutePosition, _size)
 	{
 		backgroundColor = _backgroundColor;
 		isActive = false;
@@ -46,6 +77,7 @@ namespace Arya
 	void Window::addChild(InterfaceElement* ele)
 	{
 		childElements.push_back(ele);
+		ele->setParent(this);
 	}
 
 	void Window::removeChild(InterfaceElement* ele)
@@ -69,6 +101,7 @@ namespace Arya
 		ShaderProgram* p = Interface::shared().getTexturedRectProgram();
 		GLuint v = Interface::shared().getOnePxRectVAO();
 
+		// calculate offset
 		// bind shader overlay
 		p->use();
 		glBindVertexArray(v);
@@ -78,8 +111,8 @@ namespace Arya
 		p->setUniform4fv("uColor", backgroundColor);
 		glBindTexture(GL_TEXTURE_2D, TextureManager::shared().getTexture("white")->handle);
 
-		p->setUniform2fv("screenSize", size);
-		p->setUniform2fv("screenPosition", position);
+		p->setUniform2fv("screenSize", screenSize);
+		p->setUniform2fv("screenPosition", screenOffset);
 		p->setUniform2fv("texOffset", vec2(0.0f));
 		p->setUniform2fv("texSize", vec2(1.0f));
 
@@ -95,12 +128,11 @@ namespace Arya
 	// Label
 	///////////////////////////////
 
-	Label::Label(vec2 _position, vec2 _size,
-			 Font* _font, string _text)
-		: InterfaceElement(_size, _position)
+	Label::Label(vec2 _relativePosition, vec2 _absolutePosition, vec2 _size,
+				Font* _font, string _text)
+		: InterfaceElement(_relativePosition, _absolutePosition, _size)
 	{
 		dt = new DrawableText(_font, _text);
-		LOG_INFO("here3");
 	}
 
 	void Label::draw()
@@ -111,6 +143,7 @@ namespace Arya
 		p->use();
 
 		p->setUniformMatrix4fv("pixelToScreenTransform", Root::shared().getPixelToScreenTransform());
+		p->setUniform2fv("screenOffset", screenOffset);
 
 		// font texture
 		p->setUniform1i("texture1", 0);
@@ -203,18 +236,17 @@ namespace Arya
 
 		// ------------------------
 		// TODO: remove test window
-		Window* w = new Window(vec2(0.0f), vec2(0.5f, 0.5f), vec4(0.0f, 0.0f, 0.0f, 0.6f));
+		vec2 windowSize = vec2(300.0f, 300.0f);
+		Window* w = new Window(vec2(1.0f), -1.0f * windowSize - vec2(20.0f), windowSize, vec4(0.0f, 0.0f, 0.0f, 0.6f));
 
 		Font* f = FontManager::shared().getFont("courier.ttf");
-		Label* l = new Label(vec2(0.0f), vec2(0.5f, 0.1f), f, "This is a test string");
+		Label* l = new Label(vec2(0.0f, 1.0f), vec2(20.0f, -30.0f), vec2(0.5f, 0.1f), f, "This is a test window");
 		w->addChild(l);
 
 		makeActive(w);
 		// TODO: remove test window
 		// -----------------------
 		
-		LOG_INFO("DOYA");
-
 		return true;
 	}
 

@@ -19,8 +19,9 @@
 #include "common/Logger.h"
 #include "Interface.h"
 
-// #include <glm/glm.hpp>
-// #include <glm/gtc/matrix_transform.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 
 namespace Arya
 {
@@ -319,7 +320,7 @@ namespace Arya
 
 	mat4 Root::getPixelToScreenTransform() const
 	{
-		return mat4(0.2);
+		return glm::scale(mat4(1.0), vec3(2.0/windowWidth, 2.0/windowHeight, 1.0));
 	}
 
 	bool Root::checkForErrors(const char* stateInfo)

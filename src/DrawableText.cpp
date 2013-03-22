@@ -11,13 +11,17 @@ namespace Arya
 
 		font = _font;
 		text = _text;
+		vertexCount = 0;
 
 		bake();
 	}
 
 	DrawableText::~DrawableText()
 	{
-		// TODO: throw away VAO!! and shit
+		// TODO: This does NOT delete the vertex buffers we should keep 
+		// a reference to them as well.
+		if(vao)
+			glDeleteVertexArrays(1, &vao);
 	}
 
 	void DrawableText::bake()
@@ -37,6 +41,12 @@ namespace Arya
 		float currentOffset = 0.0f;
 		for(int i = 0; i < text.length(); ++i)
 		{
+			if(text[i] == ' ') 
+			{
+				currentOffset += 6.0f;
+				continue;
+			}
+
 			// b---d
 			// | A |
 			// a---c
@@ -50,37 +60,37 @@ namespace Arya
 			vertexAndTextureData[index++] = currentOffset;  				// x
 			vertexAndTextureData[index++] = -q.y1;		   	 				// y
 			vertexAndTextureData[index++] = q.s0; 		    				// s
-			vertexAndTextureData[index++] = 1 - q.t0; 						// t
-
-			// b
-			vertexAndTextureData[index++] = currentOffset;  				// x
-			vertexAndTextureData[index++] = -q.y1 + (q.y1 - q.y0);			// y
-			vertexAndTextureData[index++] = q.s0; 		    				// s
-			vertexAndTextureData[index++] = 1 - q.t0 + (q.t1 - q.t0); 		// t
+			vertexAndTextureData[index++] = 1 - (1 - q.t0) + (q.t1 - q.t0); 		// t
 
 			// c
 			vertexAndTextureData[index++] = currentOffset + (q.x1 - q.x0);	// x
 			vertexAndTextureData[index++] = -q.y1;							// y
 			vertexAndTextureData[index++] = q.s0 + (q.s1 - q.s0); 			// s
-			vertexAndTextureData[index++] = 1 - q.t0; 						// t
-
-			// c
-			vertexAndTextureData[index++] = currentOffset + (q.x1 - q.x0);	// x
-			vertexAndTextureData[index++] = -q.y1;							// y
-			vertexAndTextureData[index++] = q.s0 + (q.s1 - q.s0); 			// s
-			vertexAndTextureData[index++] = 1 - q.t0; 						// t
+			vertexAndTextureData[index++] = 1 - (1 - q.t0) + (q.t1 - q.t0); 		// t
 
 			// b
 			vertexAndTextureData[index++] = currentOffset;  				// x
 			vertexAndTextureData[index++] = -q.y1 + (q.y1 - q.y0);			// y
 			vertexAndTextureData[index++] = q.s0; 		    				// s
-			vertexAndTextureData[index++] = 1 - q.t0 + (q.t1 - q.t0); 		// t
-	
+			vertexAndTextureData[index++] = 1 - (1 - q.t0); 						// t
+
+			// b
+			vertexAndTextureData[index++] = currentOffset;  				// x
+			vertexAndTextureData[index++] = -q.y1 + (q.y1 - q.y0);			// y
+			vertexAndTextureData[index++] = q.s0; 		    				// s
+			vertexAndTextureData[index++] = 1 - (1 - q.t0); 						// t
+
+			// c
+			vertexAndTextureData[index++] = currentOffset + (q.x1 - q.x0);	// x
+			vertexAndTextureData[index++] = -q.y1;							// y
+			vertexAndTextureData[index++] = q.s0 + (q.s1 - q.s0); 			// s
+			vertexAndTextureData[index++] = 1 - (1 - q.t0) + (q.t1 - q.t0); 		// t
+
 			// d
 			vertexAndTextureData[index++] = currentOffset + (q.x1 - q.x0);	// x
 			vertexAndTextureData[index++] = -q.y1 + (q.y1 - q.y0);			// y
 			vertexAndTextureData[index++] = q.s0 + (q.s1 - q.s0); 			// s
-			vertexAndTextureData[index++] = 1 - q.t0 + (q.t1 - q.t0); 		// t
+			vertexAndTextureData[index++] = 1 - (1 - q.t0); 						// t
 
 			currentOffset += (q.x1 - q.x0);
 		}
