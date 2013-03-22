@@ -49,7 +49,7 @@ void Game::run()
         scripting = new Scripting();
         scripting->init();
 
-        scripting->execute("ogre.lua");
+        scripting->execute("units.lua");
 
 		Arya::CommandHandler::shared().addCommandListener("createsession" ,this);
 		Arya::CommandHandler::shared().addCommandListener("joinsession" ,this);

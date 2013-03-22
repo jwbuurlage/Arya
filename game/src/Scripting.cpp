@@ -3,17 +3,18 @@
 #include "../include/Units.h"
 #include "../include/common/GameLogger.h"
 #include <luabind/luabind.hpp>
+#include <lua.hpp>
 
 //TODO: move Scripting::execute to another cpp file
 //so that we dont need to inclue Arya.h here
-#include "../include/Arya.h"
+#include "../include/Files.h"
 
 class LuaUnitType : public UnitInfo
 {
     public:
         //registers itself as a unit type
-        LuaUnitType(const std::string& _name);
-        ~LuaUnitType();
+        LuaUnitType(int typeId) : UnitInfo(typeId) {};
+        ~LuaUnitType() {};
 
         //These are called by the game when the event occurs
         void onDeath(Unit* unit);
@@ -31,30 +32,17 @@ class LuaUnitType : public UnitInfo
         luabind::object objOnDamage;
 };
 
-
-LuaUnitType::LuaUnitType(const std::string& _name) : UnitInfo()
-{
-    name = _name;
-    registerNewUnitInfo(this);
-    GAME_LOG_DEBUG("LuaUnitType constructor. New unit type bitches: " << name);
-}
-
-LuaUnitType::~LuaUnitType()
-{
-    GAME_LOG_DEBUG("LuaUnitType deconstructor!");
-}
-
 void LuaUnitType::onDeath(Unit* unit)
 {
-    if(objOnDeath) luabind::call_function<void>(objOnDeath, unit);
+    if(objOnDeath) try{ luabind::call_function<void>(objOnDeath, unit); }catch(luabind::error& e){ GAME_LOG_ERROR("Script error: " << e.what()); }
 }
 void LuaUnitType::onSpawn(Unit* unit)
 {
-    if(objOnSpawn) luabind::call_function<void>(objOnSpawn, unit);
+    if(objOnSpawn) try{ luabind::call_function<void>(objOnSpawn, unit); }catch(luabind::error& e){ GAME_LOG_ERROR("Script error: " << e.what()); }
 }
 void LuaUnitType::onDamage(Unit* victim, Unit* attacker, float damage)
 {
-    if(objOnDamage) luabind::call_function<void>(objOnDamage, victim, attacker, damage);
+    if(objOnDamage) try{ luabind::call_function<void>(objOnDamage, victim, attacker, damage); }catch(luabind::error& e){ GAME_LOG_ERROR("Script error: " << e.what()); }
 }
 
 void LuaUnitType::setOnDeath(const luabind::object& obj)
@@ -90,28 +78,45 @@ int Scripting::init()
     if(luaState) cleanup();
 
     luaState = lua_open();
-//    luaopen_base(luaState);
-//    luaopen_string(luaState);
-//    luaopen_table(luaState);
-//    luaopen_math(luaState);
-//    luaopen_io(luaState);
-//    luaopen_debug(luaState);
+    luaL_openlibs(luaState);
 
     luabind::open(luaState);
 
+    luabind::object pak = luabind::globals(luaState)["package"];
+    if(pak)
+    {
+        luabind::object pathobj = pak["path"];
+        if(pathobj)
+        {
+            std::string curpath = luabind::object_cast<std::string>(pak["path"]);
+            curpath.append(";");
+            curpath.append(Arya::FileSystem::shared().getApplicationPath());
+            curpath.append("scripts/?");
+            curpath.append(";");
+            curpath.append(Arya::FileSystem::shared().getApplicationPath());
+            curpath.append("scripts/?.lua");
+            pak["path"] = curpath;
+        }
+        else
+            GAME_LOG_WARNING("Lua object package.path not found");
+    }
+    else
+        GAME_LOG_WARNING("No global called 'package' was found");
+
+    //For properties: when no set function is given it is readonly
     luabind::module(luaState)[
         luabind::def("print", &luaPrint),
         luabind::class_<Unit>("Unit") //scripts may not create these, so no constructor
             .property("id", &Unit::getId)
             .property("type", &Unit::getType)
             .property("health", &Unit::getHealth),
-        luabind::class_<UnitInfo>("UnitInfoBase"), //should not be used in scripts
+        luabind::class_<UnitInfo>("UnitInfoBase"), //should not be used in scripts directly
         luabind::class_<LuaUnitType, UnitInfo>("UnitType")
-            .def(luabind::constructor<const std::string&>())
+            .def(luabind::constructor<int>())
             .def("setOnDeath", &LuaUnitType::setOnDeath)
             .def("setOnSpawn", &LuaUnitType::setOnSpawn)
             .def("setOnDamage", &LuaUnitType::setOnDamage)
-            .def_readonly("name", &LuaUnitType::name)
+            .def_readwrite("displayname", &LuaUnitType::displayname)
             .def_readwrite("modelname", &LuaUnitType::modelname)
             .def_readwrite("radius", &LuaUnitType::radius)
             .def_readwrite("attackRadius", &LuaUnitType::attackRadius)
@@ -145,12 +150,11 @@ int Scripting::execute(const char* filename)
     }
     else
     {
-        GAME_LOG_DEBUG("Executing script: " << filename);
-        int errors = luaL_dostring(luaState, scriptFile->getData());
-        if(errors)
-            GAME_LOG_WARNING("Script " << filename << " not executed successfully");
-        else
-            return 1;
+        int err = luaL_loadbuffer(luaState, scriptFile->getData(), scriptFile->getSize(), filename);
+        if(err == 0) err = lua_pcall(luaState, 0, LUA_MULTRET, 0);
+        if(err == 0) return 1;
+        GAME_LOG_WARNING("Script " << filename << " error: " << lua_tostring(luaState, -1));
+        lua_pop(luaState, 1); //pop the error message from the lua stack
     }
     return 0;
 }

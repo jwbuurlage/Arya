@@ -59,7 +59,6 @@ Unit::Unit(int _type, int _id, UnitFactory* factory) : id(_id)
 {
     unitFactory = factory;
     setType(_type);
-    type = _type;
     factionId = -1;
     local = false;
     obsolete = false;
@@ -119,8 +118,8 @@ void Unit::setType(int _type)
 {
     type = _type;
     unitInfo = getUnitInfo(_type);
-    UnitInfo* betterInfo = getUnitInfo(unitInfo->name);
-    if(betterInfo) unitInfo = betterInfo;
+    if(unitInfo == 0)
+        GAME_LOG_ERROR("UnitInfo for type " << type << " not found! This will crash");
 }
 
 void Unit::checkForEnemies()
