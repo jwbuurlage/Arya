@@ -6,6 +6,7 @@ Building Borea on Linux requires the following libraries:
 - `GLEW`
 - `GLFW` (>= 2.7.7) 
 - `Poco` (>= 1.4.5)
+- `luabind`
 
 Also `CMake` is required for building
 

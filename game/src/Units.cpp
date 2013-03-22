@@ -58,7 +58,7 @@ Unit* UnitFactory::getUnitById(int id)
 Unit::Unit(int _type, int _id, UnitFactory* factory) : id(_id)
 {
     unitFactory = factory;
-    type = _type;
+    setType(_type);
     factionId = -1;
     local = false;
     obsolete = false;
@@ -74,8 +74,8 @@ Unit::Unit(int _type, int _id, UnitFactory* factory) : id(_id)
     targetUnit = 0;
     currentCell = 0;
 
-    health = infoForUnitType[type].maxHealth;
-    timeSinceLastAttack = infoForUnitType[type].attackSpeed + 1.0f;
+    health = unitInfo->maxHealth;
+    timeSinceLastAttack = unitInfo->attackSpeed + 1.0f;
     timeSinceLastAttackRequest = 2.0f;
 
     dyingTime = 0.0f;
@@ -114,6 +114,14 @@ void Unit::setObject(Object* obj)
     object = obj;
 }
 
+void Unit::setType(int _type)
+{
+    type = _type;
+    unitInfo = getUnitInfo(_type);
+    if(unitInfo == 0)
+        GAME_LOG_ERROR("UnitInfo for type " << type << " not found! This will crash");
+}
+
 void Unit::checkForEnemies()
 {
 #ifndef SERVERONLY
@@ -131,7 +139,7 @@ void Unit::checkForEnemies()
     int cury = currentCell->celly;
 
     Cell* c;
-    float closestDistance = infoForUnitType[type].viewRadius;
+    float closestDistance = unitInfo->viewRadius;
     int closestId = -1;
 
     float d;
@@ -273,12 +281,12 @@ void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
     if(unitState == UNIT_ATTACKING || unitState == UNIT_ATTACKING_OUT_OF_RANGE)
     {
         bool inRange = glm::distance(getPosition2(), targetUnit->getPosition2())
-            < infoForUnitType[targetUnit->getType()].radius + infoForUnitType[type].attackRadius;
+            < targetUnit->getInfo()->radius + unitInfo->attackRadius;
         bool inAngleRange = yawDiff > -20.0f && yawDiff < 20.0f;
 
         if(inRange && inAngleRange)
         {
-            if(!infoForUnitType[type].canMoveWhileAttacking)
+            if(!unitInfo->canMoveWhileAttacking)
                 canMove = false;
 
             if(unitState != UNIT_ATTACKING)
@@ -287,16 +295,16 @@ void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
                 //it because then the unit could attack much faster by going
                 //in-out-in-out of range. When the time is MORE then we want to
                 //cap it because otherwise it could build up attacks
-                if(timeSinceLastAttack > infoForUnitType[type].attackSpeed)
-                    timeSinceLastAttack = infoForUnitType[type].attackSpeed;
+                if(timeSinceLastAttack > unitInfo->attackSpeed)
+                    timeSinceLastAttack = unitInfo->attackSpeed;
                 setUnitState(UNIT_ATTACKING);
             }
 
-            while(timeSinceLastAttack >= infoForUnitType[type].attackSpeed)
+            while(timeSinceLastAttack >= unitInfo->attackSpeed)
             {
-                timeSinceLastAttack -= infoForUnitType[type].attackSpeed;
+                timeSinceLastAttack -= unitInfo->attackSpeed;
 
-                targetUnit->receiveDamage(infoForUnitType[type].damage, this);
+                targetUnit->receiveDamage(unitInfo->damage, this);
 
                 //When the unit dies the server sends a packet
                 //The client leaves the unit alive untill it receives the packet
@@ -325,7 +333,7 @@ void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
         }
     }
 
-    float deltaYaw = timeElapsed * infoForUnitType[type].yawSpeed;
+    float deltaYaw = timeElapsed * unitInfo->yawSpeed;
     //check if we reached target angle
     if( abs(yawDiff) < deltaYaw )
     {
@@ -334,13 +342,13 @@ void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
 
         //A part of the current frametime went into rotating
         //we must now calculate how many frametime is left for moving
-        float remainingTime = (deltaYaw - abs(yawDiff)) / infoForUnitType[type].yawSpeed;
+        float remainingTime = (deltaYaw - abs(yawDiff)) / unitInfo->yawSpeed;
 
         if(canMove)
         {
             //When we are close to the target, we might go past the target because
             //of high speed or high frametime so we have to check for this
-            float distanceToTravel = remainingTime * infoForUnitType[type].speed;
+            float distanceToTravel = remainingTime * unitInfo->speed;
 
             vec2 newPosition;
             if( distanceToTravel >= difflength )
@@ -442,6 +450,8 @@ void Unit::receiveDamage(float dmg, Unit* attacker)
         }
     }
 
+    unitInfo->onDamage(this, attacker, dmg);
+
     health -= dmg;
     if(health < 0) health = 0;
 
@@ -473,7 +483,9 @@ void Unit::serialize(Packet& pk)
 
 void Unit::deserialize(Packet& pk)
 {
-    pk >> type;
+    int _type;
+    pk >> _type;
+    setType(_type);
     pk >> factionId;
     pk >> position;
     pk >> (int&)unitState;

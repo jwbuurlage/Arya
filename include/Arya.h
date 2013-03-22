@@ -15,7 +15,7 @@
 #include "Commands.h"
 #include "Sounds.h"
 #include "Config.h"
-#include "common/Singleton.h"
+#include "Scripting.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

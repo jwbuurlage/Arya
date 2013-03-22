@@ -287,11 +287,12 @@ void GameSession::handleEvent(Packet& packet)
 
                         if(faction == localFaction) unit->setLocal(true);
 
+                        unit->getInfo()->onSpawn(unit);
+
                         Object* obj = unit->getObject();
                         if(!obj) obj = Root::shared().getScene()->createObject();
 
-                        string s(infoForUnitType[unit->getType()].name);
-                        obj->setModel(ModelManager::shared().getModel(s + ".aryamodel"));
+                        obj->setModel(ModelManager::shared().getModel(unit->getInfo()->modelname + ".aryamodel"));
                         obj->setAnimation("stand");
 
                         unit->setObject(obj);
@@ -351,8 +352,7 @@ void GameSession::handleEvent(Packet& packet)
                     if(faction == localFaction) unit->setLocal(true);
 
                     Object* obj = Root::shared().getScene()->createObject();
-                    string s(infoForUnitType[unit->getType()].name);
-                    obj->setModel(ModelManager::shared().getModel(s + ".aryamodel"));
+                    obj->setModel(ModelManager::shared().getModel(unit->getInfo()->modelname + ".aryamodel"));
                     obj->setAnimation("stand");
 
                     unit->setObject(obj);
@@ -423,7 +423,11 @@ void GameSession::handleEvent(Packet& packet)
                                   int id;
                                   packet >> id;
                                   Unit* unit = getUnitById(id);
-                                  if(unit) unit->makeDead();
+                                  if(unit)
+                                  {
+                                      unit->makeDead();
+                                      unit->getInfo()->onDeath(unit);
+                                  }
                               }
                               break;
 

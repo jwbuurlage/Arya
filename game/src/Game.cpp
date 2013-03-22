@@ -12,6 +12,7 @@ Game* Game::singleton = 0;
 Game::Game()
 {
     root = 0;
+    scripting = 0;
     session = 0;
     eventManager = 0;
     network = 0;
@@ -30,6 +31,7 @@ Game::~Game()
     if(session) delete session;
     if(eventManager) delete eventManager;
     if(network) delete network;
+    if(scripting) delete scripting;
     if(root) delete &Root::shared();
 }
 
@@ -43,6 +45,11 @@ void Game::run()
     else
     {
         root->addInputListener(this);
+
+        scripting = new Scripting();
+        scripting->init();
+
+        scripting->execute("units.lua");
 
 		Arya::CommandHandler::shared().addCommandListener("createsession" ,this);
 		Arya::CommandHandler::shared().addCommandListener("joinsession" ,this);

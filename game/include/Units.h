@@ -82,7 +82,8 @@ class Unit
         Object* getObject() const { return object; }
 
         int getType() const { return type; }
-        void setType(int _type) { type = _type; }
+        void setType(int _type);
+        UnitInfo* getInfo() const { return unitInfo; }
 
         void setSelected(bool sel) { selected = sel; }
         bool isSelected() { return selected; }
@@ -98,7 +99,8 @@ class Unit
         UnitState getUnitState() const { return unitState; }
 
         void receiveDamage(float dmg, Unit* attacker);
-        float getHealthRatio() const { return health / infoForUnitType[type].maxHealth; }
+        float getHealth() const { return health; }
+        float getHealthRatio() const { return health / unitInfo->maxHealth; }
 
         bool isAlive() const { return (!obsolete && health > 0); }
 		void makeDead(){ health = 0; setUnitState(UNIT_DYING); dyingTime = 0.0f; }; //will show death animation and then delete unit
@@ -120,7 +122,7 @@ class Unit
         void setLocal(bool value = true){ local = value; }
         bool isLocal() const { return local; }
 
-        float getRadius() const { return infoForUnitType[type].radius; }
+        float getRadius() const { return unitInfo->radius; }
 
         void serialize(Packet& pk);
         void deserialize(Packet& pk);
@@ -132,6 +134,7 @@ class Unit
         vec3 position; //since server has no Object, position is stored here
         float yaw;
 
+        UnitInfo* unitInfo;
         int type;
         const int id;
         int factionId;

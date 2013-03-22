@@ -25,84 +25,83 @@
 
 namespace Arya
 {
-	template<> Root* Singleton<Root>::singleton = 0;
+    template<> Root* Singleton<Root>::singleton = 0;
 
-	//glfw callback functions
-	void GLFWCALL windowSizeCallback(int width, int height);
-	void GLFWCALL keyCallback(int key, int action);
-	void GLFWCALL mouseButtonCallback(int button, int action);
-	void GLFWCALL mousePosCallback(int x, int y);
-	void GLFWCALL mouseWheelCallback(int pos);
+    //glfw callback functions
+    void GLFWCALL windowSizeCallback(int width, int height);
+    void GLFWCALL keyCallback(int key, int action);
+    void GLFWCALL mouseButtonCallback(int button, int action);
+    void GLFWCALL mousePosCallback(int x, int y);
+    void GLFWCALL mouseWheelCallback(int pos);
 
-	Root::Root()
-	{
-		scene = 0;
-		oldTime = 0;
-		interface = 0;
+    Root::Root()
+    {
+        scene = 0;
+        oldTime = 0;
+        interface = 0;
 
-		FileSystem::create();
-		CommandHandler::create();
-		Config::create();
-		TextureManager::create();
-		MaterialManager::create();
-		ModelManager::create();
-		FontManager::create();
-		SoundManager::create();
-		Console::create();
+        FileSystem::create();
+        CommandHandler::create();
+        Config::create();
+        TextureManager::create();
+        MaterialManager::create();
+        ModelManager::create();
+        FontManager::create();
+        SoundManager::create();
+        Console::create();
 
-		//Some classes should be initialized
-		//before the graphics, like Config
-		//other graphic related classes are
-		//initialized in Root::initialize
-		//when the graphics are initialized
-		if(!Config::shared().init()) LOG_WARNING("Unable to init config");
-	}
+        //Some classes should be initialized
+        //before the graphics, like Config.
+        //Other graphic related classes are
+        //initialized in Root::initialize
+        //when the graphics are initialized
+        if(!Config::shared().init()) LOG_WARNING("Unable to init config");
+    }
 
-	Root::~Root()
-	{
-		//TODO: Check if GLEW, GLFW, Shaders, Objects were still initated
-		//Only clean them up if needed
-		glfwTerminate();
+    Root::~Root()
+    {
+        //Console deconstructor uses overlay
+        //so it must be deleted first
+        Console::destroy();
 
-		//Console deconstructor uses overlay
-		//so it must be deleted first
-		Console::destroy();
+        if(scene) delete scene;
+        if(interface) delete interface;
 
-		if(scene) delete scene;
-		if(interface) delete interface;
+        SoundManager::destroy();
+        FontManager::destroy();
+        ModelManager::destroy();
+        MaterialManager::destroy();
+        TextureManager::destroy();
+        Config::destroy();
+        CommandHandler::destroy();
+        FileSystem::destroy();
 
-		SoundManager::destroy();
-		FontManager::destroy();
-		ModelManager::destroy();
-		MaterialManager::destroy();
-		TextureManager::destroy();
-		Config::destroy();
-		CommandHandler::destroy();
-		FileSystem::destroy();
-	}
+        //TODO: Check if GLEW, GLFW, Shaders, Objects were still initated
+        //Only clean them up if needed
+        glfwTerminate();
+    }
 
-	bool Root::init(bool fullscr, int w, int h)
-	{
-		LOG_INFO("loading root");
+    bool Root::init(bool fullscr, int w, int h)
+    {
+        LOG_INFO("loading root");
 
+        windowWidth = w;
+        windowHeight = h;
+        fullscreen = fullscr;
 
-		windowWidth = w;
-		windowHeight = h;
-		fullscreen = fullscr;
+        if(!initGLFW()) return false;
+        if(!initGLEW()) return false;
 
-		if(!initGLFW()) return false;
-		if(!initGLEW()) return false;
+        checkForErrors("start of root init");
 
-		checkForErrors("start of root init");
+        // set GL stuff
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
 
-		// set GL stuff
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_CULL_FACE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		//Call these in the right order: Models need Textures
-		TextureManager::shared().initialize();
+        //Call these in the right order: Models need Textures
+        TextureManager::shared().initialize();
 		//MaterialManager::shared().initialize();
 		ModelManager::shared().initialize();
 		if(!SoundManager::shared().init())

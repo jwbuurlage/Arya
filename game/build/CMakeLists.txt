@@ -10,6 +10,7 @@ SET(
     "../src/Game.cpp"
     "../src/GameSession.cpp"
     "../src/GameSessionInput.cpp"
+    "../src/Scripting.cpp"
     "../src/Map.cpp"
     "../src/Faction.cpp"
     "../src/Units.cpp"
@@ -28,6 +29,7 @@ SET(
 	PROJECT_INCLUDES
 	"../../include"
 	"../include"
+    "/usr/include/lua5.1"
 )
 
 SET(
@@ -36,6 +38,7 @@ SET(
     "PocoNet"
     "PocoFoundation"
     "pthread"
+    "luabind"
 )
 
 ADD_DEFINITIONS(-DPOCO_NO_AUTOMATIC_LIBS)

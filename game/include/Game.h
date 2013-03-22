@@ -16,6 +16,7 @@ using Arya::cvar;
 
 class Network;
 class EventManager;
+class Scripting;
 
 class Game : public Arya::InputListener , public Arya::FrameListener, public EventHandler, public Arya::CommandListener
 {
@@ -42,6 +43,7 @@ class Game : public Arya::InputListener , public Arya::FrameListener, public Eve
         static Game* singleton;
 
         Root* root;
+        Scripting* scripting;
         Network* network;
         EventManager* eventManager;
         GameSession* session;
