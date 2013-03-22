@@ -9,8 +9,8 @@ LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/..bin/)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
-#-- Display warnings and compile with debug information
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g")
+#-- Display warnings and compile with debug information and optimize
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g -O3")
 
 IF(APPLE)
     SET(
