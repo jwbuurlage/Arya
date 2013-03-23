@@ -6,6 +6,7 @@
 #include "Config.h"
 #include "Sounds.h"
 #include "Interface.h"
+#include "Textures.h"
 #include "common/Logger.h"
 #include <sstream>
 using std::stringstream;
@@ -109,6 +110,13 @@ namespace Arya
             rect->isVisible = false;
         }
         Logger::shared().setLoggerCallback(LogCallback);
+
+		// Console window
+		vec2 consoleWindowSize = vec2(400.0f, 600.0f);
+		Window* consoleWindow = new Window(vec2(-1.0f, 1.0f), vec2(10.0f, -consoleWindowSize.y - 10.0f), consoleWindowSize,
+				TextureManager::shared().getTexture("white"), WINDOW_DRAGGABLE | WINDOW_RESIZABLE | WINDOW_CLOSABLE, "Console",
+				vec4(0.0f, 0.0f, 0.0f, 0.7f));
+		Interface::shared().makeActive(consoleWindow);
 
         initialized = true;
         return true;

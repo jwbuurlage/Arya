@@ -6,6 +6,7 @@
 #include <map>
 #include "Overlay.h"
 #include "Fonts.h"
+
 using std::vector;
 using std::string;
 using std::multimap;
@@ -13,6 +14,8 @@ using std::pair;
 
 namespace Arya
 {
+	class Window;
+
     class Console : public Singleton<Console>, public FrameListener, public InputListener, public CommandListener
     {
         public:
@@ -58,5 +61,6 @@ namespace Arya
             void setVisibilityConsole(bool flag);
             void addTextLine(string textToBeAdded);
 			bool handleCommand(string command);
+			Window* consoleWindow;
     };
 }

@@ -8,7 +8,6 @@
 // - Window flags are meant to be used as in WINDOW_DRAGGABLE | WINDOW_RESIZABLE
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-
 #pragma once
 
 #include "common/Listeners.h"
@@ -48,14 +47,12 @@ namespace Arya
 			virtual void buttonDragMoved(Button* sender, float dx, float dy) { }; // dx, dy, in pixels
 	};
 
-
-
     class InterfaceElement
     {
         public:
             InterfaceElement(vec2 _relativePosition, vec2 _absolutePosition, vec2 _size,
 					vec4 _colorMask = vec4(1.0f));
-            virtual ~InterfaceElement() { }
+            virtual ~InterfaceElement();
 
             virtual void draw() { }
 
@@ -98,7 +95,7 @@ namespace Arya
             Window(vec2 _relativePosition, vec2 _absolutePosition, vec2 _size,
 				Texture* _backgroundTexture, int flags, string _title,
 				vec4 _backgroundColor = vec4(1.0));
-            ~Window();
+            ~Window() { }
 
             void draw();
 
@@ -124,7 +121,7 @@ namespace Arya
 		public:
 			Image(vec2 _relativePosition, vec2 _absolutePosition, vec2 _size,
 				Texture* _texture, vec4 _colorMask = vec4(1.0));
-			~Image() { };
+			~Image() { }
 
 			void draw();
 
@@ -182,7 +179,7 @@ namespace Arya
     {
         public:
             Interface();
-            virtual ~Interface() {}
+            virtual ~Interface() { }
 
             void onFrame(float elapsedTime);
 			void render();

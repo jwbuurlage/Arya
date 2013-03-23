@@ -15,6 +15,8 @@
 #include "../ext/stb_truetype.h"
 using std::vector;
 
+#define TITLE_BAR_HEIGHT 15.0f
+
 namespace Arya
 {
     template<> Interface* Singleton<Interface>::singleton = 0;
@@ -34,6 +36,12 @@ namespace Arya
 		parent = 0;
 
 		recalculateScreenSizeAndPosition();
+	}
+
+	InterfaceElement::~InterfaceElement()
+	{
+		for(int i = 0; i < childElements.size(); ++i)
+			delete childElements[i];
 	}
 
 	void InterfaceElement::addChild(InterfaceElement* ele)
@@ -99,7 +107,7 @@ namespace Arya
 		if(flags & WINDOW_DRAGGABLE)
 		{
 			// add title button
-			vec2 titleButtonSize = vec2(_size.x - ((flags & WINDOW_CLOSABLE) ? 15.0f : 0.0f), 15.0f);
+			vec2 titleButtonSize = vec2(_size.x - ((flags & WINDOW_CLOSABLE) ? TITLE_BAR_HEIGHT : 0.0f), TITLE_BAR_HEIGHT);
 			titleButton = new Button(vec2(-1.0f, 1.0f), vec2(0.0f, -titleButtonSize.y), titleButtonSize,
 					TextureManager::shared().getTexture("white"), FontManager::shared().getFont("DejaVuSans-Bold.ttf"), _title, "titleButton",
 					this, true, vec4(0.0f, 0.0f, 0.0f, 1.0f));
@@ -109,29 +117,24 @@ namespace Arya
 		if(flags & WINDOW_CLOSABLE)
 		{
 			// add close button
-			vec2 closeButtonSize = vec2(15.0f, 15.0f);
+			vec2 closeButtonSize = vec2(TITLE_BAR_HEIGHT, TITLE_BAR_HEIGHT);
 			Button* closeButton = new Button(vec2(1.0, 1.0), -closeButtonSize, closeButtonSize,
 					TextureManager::shared().getTexture("white"), FontManager::shared().getFont("DejaVuSans-Bold.ttf"), "x", "closeButton",
-					this, false, vec4(0.5f));
+					this, false, vec4(0.2f, 0.2f, 0.2f, 1.0f));
 			addChild(closeButton);
 		}
 
 		if(flags & WINDOW_RESIZABLE)
 		{
 			// add resize button
-			vec2 resizeButtonSize = vec2(15.0f, 15.0f);
+			vec2 resizeButtonSize = vec2(TITLE_BAR_HEIGHT, TITLE_BAR_HEIGHT);
 			Button* resizeButton = new Button(vec2(1.0, -1.0), vec2(-resizeButtonSize.x, 0.0f), resizeButtonSize,
 					TextureManager::shared().getTexture("white"), FontManager::shared().getFont("DejaVuSans-Bold.ttf"), ".", "resizeButton",
-					this, true, vec4(0.2f));
+					this, true, vec4(0.2f, 0.2f, 0.2f, 1.0f));
 			addChild(resizeButton);
 		}
 
 		isActive = false;
-	}
-
-	Window::~Window()
-	{
-		// TODO: delete children
 	}
 
 	void Window::setActiveState(bool active)
@@ -178,7 +181,7 @@ namespace Arya
 		background->setSize(_size);
 
 		if(titleButton)
-			titleButton->setSize(vec2(_size.x - ((flags & WINDOW_CLOSABLE) ? 15.0f : 0.0f), 15.0f));
+			titleButton->setSize(vec2(_size.x - ((flags & WINDOW_CLOSABLE) ? TITLE_BAR_HEIGHT : 0.0f), TITLE_BAR_HEIGHT));
 	}
 
 	////////////////////////////////
@@ -398,8 +401,13 @@ namespace Arya
 				WINDOW_DRAGGABLE | WINDOW_RESIZABLE | WINDOW_CLOSABLE, "Test Window",
 				vec4(0.0f, 0.0f, 0.3f, 0.6f));
 
-		Font* f = FontManager::shared().getFont("courier.ttf");
+		Font* f = FontManager::shared().getFont("DejaVuSans.ttf");
+
 		Label* l = new Label(vec2(-1.0f, 1.0f), vec2(20.0f, -30.0f), f, "This is a test window");
+		w->addChild(l);
+		l = new Label(vec2(-1.0f, 1.0f), vec2(20.0f, -50.0f), f, "It is just for testing");
+		w->addChild(l);
+		l = new Label(vec2(-1.0f, 1.0f), vec2(20.0f, -70.0f), f, "For nothing else");
 		w->addChild(l);
 
 		FPSLabel = new Label(vec2(1.0f, -1.0f), vec2(-80.0f, 10.0f), f, "FPS: ");
