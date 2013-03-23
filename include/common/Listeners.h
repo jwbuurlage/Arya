@@ -13,10 +13,10 @@ namespace Arya
     class InputListener{
         public:
             //When returning false, next listener will be called. When returning true, the chain stops.
-            virtual bool keyDown(int key, bool keyDown){ return false; }
-            virtual bool mouseDown(MOUSEBUTTON button, bool buttonDown, int x, int y){ return false; }
-            virtual bool mouseWheelMoved(int delta){ return false; }
-            virtual bool mouseMoved(int x, int y, int dx, int dy){ return false; }
+            virtual bool keyDown(int key, bool keyDown) { return false; }
+            virtual bool mouseDown(MOUSEBUTTON button, bool buttonDown, int x, int y) { return false; }
+            virtual bool mouseWheelMoved(int delta) { return false; }
+            virtual bool mouseMoved(int x, int y, int dx, int dy) { return false; }
     };
 
     //Subclass to be called every frame

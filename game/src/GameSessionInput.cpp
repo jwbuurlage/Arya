@@ -431,13 +431,15 @@ void GameSessionInput::selectUnit()
 void GameSessionInput::initUnitInfoWindow()
 {
 	vec2 windowSize = vec2(300.0f, 150.0f);
-	unitWindow = new Arya::Window(vec2(-1.0f, 1.0f), vec2(20.0f, -20.0f - windowSize.y), windowSize, vec4(0.0f, 0.0f, 0.0f, 0.6f));
+	unitWindow = new Arya::Window(vec2(1.0f, -1.0f), vec2(-20.0f -windowSize.x, 20.0f), windowSize, 
+			TextureManager::shared().getTexture("white"), Arya::WINDOW_DRAGGABLE, "Unit Info",
+			vec4(0.0f, 0.0f, 0.0f, 0.6f));
 
-	Arya::Font* f = Arya::FontManager::shared().getFont("courier.ttf");
-	healthLabel = new Arya::Label(vec2(0.0f, 1.0f), vec2(20.0f, -30.0f), vec2(0.5f, 0.1f), f, "Health: lalalal");
+	Arya::Font* f = Arya::FontManager::shared().getFont("DejaVuSans-Bold.ttf");
+	healthLabel = new Arya::Label(vec2(-1.0f, 1.0f), vec2(20.0f, -30.0f), f, "Health: lalalal");
 	unitWindow->addChild(healthLabel);
 
-	damageLabel = new Arya::Label(vec2(0.0f, 1.0f), vec2(20.0f, -50.0f), vec2(0.5f, 0.1f), f, "Name: lalalal");
+	damageLabel = new Arya::Label(vec2(-1.0f, 1.0f), vec2(20.0f, -50.0f), f, "Name: lalalal");
 	unitWindow->addChild(damageLabel);
 
 	Arya::Interface::shared().makeActive(unitWindow);

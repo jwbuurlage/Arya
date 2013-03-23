@@ -95,6 +95,9 @@ namespace Arya
 			currentOffset += (q.x1 - q.x0);
 		}
 
+		size.x = currentOffset;
+		size.y = -q.y1 + (q.y1 - q.y0);
+
 		vertexCount = index / 4;
 
 		GLuint vertexBuffer;

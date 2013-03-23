@@ -206,7 +206,6 @@ namespace Arya
 
     void Console::onFrame(float elapsedTime)
     {
-		return;
         time += elapsedTime;
         if(time < 2.0) // build something in for moving cursor, but need to wait with implementation untill I added some more keyboard commands.
         {
