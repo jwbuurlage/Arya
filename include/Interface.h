@@ -67,7 +67,7 @@ namespace Arya
 	class Image : public InterfaceElement
 	{
 
-	}
+	};
 
     class Label : public InterfaceElement
     {
@@ -83,6 +83,7 @@ namespace Arya
             DrawableText* dt;
     };
 
+	class ButtonDelegate;
 	class Button : public InterfaceElement
 	{
 		public:
@@ -99,7 +100,7 @@ namespace Arya
 			Image* background;
 			ButtonDelegate* target;
 			string identifier;
-	}
+	};
 
 	class ButtonDelegate
 	{
@@ -109,7 +110,7 @@ namespace Arya
 
 			virtual void buttonDown(Button* sender);
 			virtual void buttonDragged(Button* sender);
-	}
+	};
 
 /////////////////////////
 // Interface
@@ -137,7 +138,6 @@ namespace Arya
         private:
             float time; 
             int count;
-            float offsetFPS;
 
 			Label* FPSLabel;
 			Overlay* overlay;

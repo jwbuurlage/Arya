@@ -46,7 +46,7 @@ namespace Arya
 	{
 		if(parent) {
 			vec4 tmpScreenAbsolute = Root::shared().getPixelToScreenTransform() * vec4(absolutePosition, 0.0, 1.0);
-			screenOffset = relativePosition * parent->getScreenSize() + vec2(tmpScreenAbsolute.x, tmpScreenAbsolute.y);
+			screenOffset = (relativePosition + vec2(1.0)) * (0.5f * parent->getScreenSize()) + vec2(tmpScreenAbsolute.x, tmpScreenAbsolute.y);
 
 			vec4 tmpScreenSize = Root::shared().getPixelToScreenTransform() * vec4(size, 0.0, 1.0);
 			screenSize = vec2(tmpScreenSize.x, tmpScreenSize.y);
@@ -170,7 +170,6 @@ namespace Arya
 
 	Interface::Interface()
 	{
-		offsetFPS = 0.0;
 		time = 0.0;
 		count = 0;
 		overlay = 0; 
@@ -212,47 +211,16 @@ namespace Arya
 			return false;
 		}
 
-		// fonts
-		Font* font = FontManager::shared().getFont("courier.ttf");
-		if(!font) return false;
-		for(int i = 0; i < 9; i++)
-		{
-			Rect* rect = Root::shared().getOverlay()->createRect();
-			rects.push_back(rect);
-			rects[i]->textureHandle = font->textureHandle;
-			rects[i]->offsetInPixels.y = OFFSET_Y;
-		}
-
-		float xpos = 0.0f, ypos = 0.0f;
-		stbtt_aligned_quad q;
-		string s = "FPS = ";
-
-		float lastX = 0.0f;
-
-		for(unsigned int i = 0; i < s.size(); i++)
-		{
-			stbtt_GetBakedQuad(font->baked, 512, 512, s[i], &xpos ,&ypos,&q,true);
-			rects[i]->texOffset = vec2(q.s0, 1 - q.t0 - (q.t1 - q.t0));
-			rects[i]->texSize = vec2(q.s1 - q.s0, (q.t1 - q.t0));
-			rects[i]->offsetInPixels.x = OFFSET_X + lastX;
-			rects[i]->sizeInPixels = vec2(q.x1 - q.x0, (q.y1 - q.y0));
-			rects[i]->offsetInPixels.y = OFFSET_Y - (rects[i]->sizeInPixels.y/2.0);
-
-			lastX = xpos;
-		}
-
-		offsetFPS = lastX;
-
 		// ------------------------
 		// TODO: remove test window
 		vec2 windowSize = vec2(300.0f, 300.0f);
 		Window* w = new Window(vec2(1.0f), -1.0f * windowSize - vec2(20.0f), windowSize, vec4(0.0f, 0.0f, 0.3f, 0.6f));
 
 		Font* f = FontManager::shared().getFont("courier.ttf");
-		Label* l = new Label(vec2(0.0f, 1.0f), vec2(20.0f, -30.0f), vec2(0.5f, 0.1f), f, "This is a test window");
+		Label* l = new Label(vec2(-1.0f, 1.0f), vec2(20.0f, -30.0f), vec2(0.5f, 0.1f), f, "This is a test window");
 		w->addChild(l);
 
-		FPSLabel = new Label(vec2(1.0f, -1.0f), vec2(-200.0f, 30.0f), vec2(0.0f), f, "FPS: ");
+		FPSLabel = new Label(vec2(1.0f, -1.0f), vec2(-80.0f, 10.0f), vec2(0.0f), f, "FPS: ");
 		w->addChild(FPSLabel);
 
 		makeActive(w);
@@ -297,19 +265,20 @@ namespace Arya
 
 	void Interface::onFrame(float elapsedTime)
 	{	
-		Font* font = FontManager::shared().getFont("courier.ttf");
 		time += elapsedTime;
 		count += 1;
 
 		if (time >= 1.0)
 		{
-			float xpos = 0.0f, ypos = 0.0f;
+
 			std::stringstream myStream;
 			myStream.fill('0');
 			myStream.width(3);
 			if(count >= 1000) count = 999;
+
 			myStream << "FPS: " << count;
 			FPSLabel->setText(myStream.str());
+
 			count = 0;
 			time = 0.0;
 		}
