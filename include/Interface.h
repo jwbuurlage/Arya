@@ -1,3 +1,5 @@
+#pragma once
+
 #include "common/Listeners.h"
 #include "common/Singleton.h"
 #include "Overlay.h"
@@ -69,6 +71,7 @@ namespace Arya
            ~Label() { }
 
             void draw();
+			void setText(string _t);
 
         private:
             DrawableText* dt;

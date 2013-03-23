@@ -1,6 +1,7 @@
 #include "Arya.h"
 
 class GameSession;
+class Unit;
 using Arya::Rect;
 
 class GameSessionInput : public Arya::InputListener, public Arya::FrameListener
@@ -23,12 +24,13 @@ class GameSessionInput : public Arya::InputListener, public Arya::FrameListener
 
         void moveSelectedUnits();
 		void setSpecPos(vec3 pos);
+
     private: 
         GameSession* session;
 
         //For key movement
         bool goingForward, goingBackward, goingLeft, goingRight, goingUp, goingDown, rotatingLeft, rotatingRight;
-        bool mouseLeft, mouseRight, mouseTop, mouseBot; //wether mouse is at edge
+        bool mouseLeft, mouseRight, mouseTop, mouseBot; //whether mouse is at edge
         bool draggingLeftMouse, draggingRightMouse;
 		bool slowMode; //Precise movement
 
@@ -45,4 +47,12 @@ class GameSessionInput : public Arya::InputListener, public Arya::FrameListener
         bool doUnitMovementNextFrame;
         bool doUnitSelectionNextFrame;
         void selectUnit();
+
+		// Unit window
+		Arya::Window* unitWindow;
+		Arya::Label* damageLabel;
+		Arya::Label* healthLabel;
+		
+		void initUnitInfoWindow();
+		void updateUnitInfoWindow(Unit* unit);
 };

@@ -155,6 +155,15 @@ namespace Arya
 		glDrawArrays(GL_TRIANGLES, 0, dt->getVertexCount());
 	}
 
+	void Label::setText(string t)
+	{
+		// TODO: possibly optimize with dynamic_draw
+		if(!dt) return;
+		DrawableText* newDt = new DrawableText(dt->getFont(), t);
+		delete dt;
+		dt = newDt;
+	}
+
 	////////////////////////////////
 	// Interface
 	///////////////////////////////
@@ -237,7 +246,7 @@ namespace Arya
 		// ------------------------
 		// TODO: remove test window
 		vec2 windowSize = vec2(300.0f, 300.0f);
-		Window* w = new Window(vec2(1.0f), -1.0f * windowSize - vec2(20.0f), windowSize, vec4(0.0f, 0.0f, 0.0f, 0.6f));
+		Window* w = new Window(vec2(1.0f), -1.0f * windowSize - vec2(20.0f), windowSize, vec4(0.0f, 0.0f, 0.3f, 0.6f));
 
 		Font* f = FontManager::shared().getFont("courier.ttf");
 		Label* l = new Label(vec2(0.0f, 1.0f), vec2(20.0f, -30.0f), vec2(0.5f, 0.1f), f, "This is a test window");

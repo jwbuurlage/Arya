@@ -4,7 +4,10 @@
 #include "../include/Units.h"
 #include "../include/Game.h"
 #include "../include/Events.h"
-#include "common/Logger.h"
+#include "../include/common/GameLogger.h"
+
+// for sprintf
+#include <stdio.h>
 
 GameSessionInput::GameSessionInput(GameSession* ses)
 {
@@ -25,6 +28,10 @@ GameSessionInput::GameSessionInput(GameSession* ses)
     doUnitMovementNextFrame = false;
     doUnitSelectionNextFrame = false;
 
+	unitWindow = 0;
+	damageLabel = 0;
+	healthLabel = 0;
+
     selectionRect = Root::shared().getOverlay()->createRect();
 }
 
@@ -36,6 +43,8 @@ GameSessionInput::~GameSessionInput()
 void GameSessionInput::init()
 {
     selectionRect->fillColor = vec4(1.0, 1.0, 1.0, 0.2);
+
+	initUnitInfoWindow();
 }
 
 void GameSessionInput::setSpecPos(vec3 pos)
@@ -296,7 +305,7 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
 
     Faction* lf = session->getLocalFaction();
 
-    bool soundPlayed = false;
+    bool firstUnitSelected = false;
     if(!lf) return;
     for(list<Unit*>::iterator it = lf->getUnits().begin();
             it != lf->getUnits().end(); ++it)
@@ -306,8 +315,12 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
         if((onScreen.x > x_min && onScreen.x < x_max) && (onScreen.y > y_min && onScreen.y < y_max))
 	   	{
             (*it)->setSelected(true);
-            if(!soundPlayed) SoundManager::shared().play((*it)->getInfo()->selectionSound);
-            soundPlayed = true;
+            if(!firstUnitSelected) 
+			{
+				SoundManager::shared().play((*it)->getInfo()->selectionSound);
+				updateUnitInfoWindow(*it);
+			}
+            firstUnitSelected = true;
 			if(leftControlPressed) (*it)->getDebugText();
         }
     }
@@ -408,4 +421,39 @@ void GameSessionInput::selectUnit()
         best_unit->setSelected(true);
 		if(leftControlPressed) best_unit->getDebugText();
     }
+}
+
+
+//////////////////////////
+// Unit window
+//////////////////////////
+
+void GameSessionInput::initUnitInfoWindow()
+{
+	vec2 windowSize = vec2(300.0f, 150.0f);
+	unitWindow = new Arya::Window(vec2(-1.0f, 1.0f), vec2(20.0f, -20.0f - windowSize.y), windowSize, vec4(0.0f, 0.0f, 0.0f, 0.6f));
+
+	Arya::Font* f = Arya::FontManager::shared().getFont("courier.ttf");
+	healthLabel = new Arya::Label(vec2(0.0f, 1.0f), vec2(20.0f, -30.0f), vec2(0.5f, 0.1f), f, "Health: lalalal");
+	unitWindow->addChild(healthLabel);
+
+	damageLabel = new Arya::Label(vec2(0.0f, 1.0f), vec2(20.0f, -50.0f), vec2(0.5f, 0.1f), f, "Name: lalalal");
+	unitWindow->addChild(damageLabel);
+
+	Arya::Interface::shared().makeActive(unitWindow);
+}
+
+void GameSessionInput::updateUnitInfoWindow(Unit* unit)
+{
+	if(!damageLabel || !healthLabel)
+	{
+		GAME_LOG_WARNING("Updating uninitialized unit info window");
+		return;
+	}
+
+	char buffer [50];
+    sprintf (buffer, "Max Health: %.2f", unit->getInfo()->maxHealth);
+	healthLabel->setText(string(buffer));
+    sprintf (buffer, "Damage: %.2f", unit->getInfo()->damage);
+	damageLabel->setText(string(buffer));
 }
