@@ -114,6 +114,7 @@ namespace Arya
 			Image* background;
 			string title;
 			bool isActive;
+			int flags;
     };
 
 	// use this for backgrounds

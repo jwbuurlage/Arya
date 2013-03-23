@@ -86,7 +86,7 @@ namespace Arya
 	///////////////////////////////
 
 	Window::Window(vec2 _relativePosition, vec2 _absolutePosition, vec2 _size,
-		   	Texture* _backgroundTexture, int flags, string _title,
+		   	Texture* _backgroundTexture, int _flags, string _title,
 			vec4 _backgroundColor)
 		: InterfaceElement(_relativePosition, _absolutePosition, _size, _backgroundColor)
 	{
@@ -94,11 +94,12 @@ namespace Arya
 				_backgroundTexture, _backgroundColor);
 		addChild(background);
 		title = _title;
+		flags = _flags;
 
 		if(flags & WINDOW_DRAGGABLE)
 		{
 			// add title button
-			vec2 titleButtonSize = vec2(_size.x - 15.0f, 15.0f);
+			vec2 titleButtonSize = vec2(_size.x - ((flags & WINDOW_CLOSABLE) ? 15.0f : 0.0f), 15.0f);
 			titleButton = new Button(vec2(-1.0f, 1.0f), vec2(0.0f, -titleButtonSize.y), titleButtonSize,
 					TextureManager::shared().getTexture("white"), FontManager::shared().getFont("DejaVuSans-Bold.ttf"), _title, "titleButton",
 					this, true, vec4(0.0f, 0.0f, 0.0f, 1.0f));
@@ -177,7 +178,7 @@ namespace Arya
 		background->setSize(_size);
 
 		if(titleButton)
-			titleButton->setSize(vec2(_size.x - 15.0f, 15.0f));
+			titleButton->setSize(vec2(_size.x - ((flags & WINDOW_CLOSABLE) ? 15.0f : 0.0f), 15.0f));
 	}
 
 	////////////////////////////////
