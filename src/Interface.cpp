@@ -252,6 +252,9 @@ namespace Arya
 		Label* l = new Label(vec2(0.0f, 1.0f), vec2(20.0f, -30.0f), vec2(0.5f, 0.1f), f, "This is a test window");
 		w->addChild(l);
 
+		FPSLabel = new Label(vec2(1.0f, -1.0f), vec2(-200.0f, 30.0f), vec2(0.0f), f, "FPS: ");
+		w->addChild(FPSLabel);
+
 		makeActive(w);
 		// TODO: remove test window
 		// -----------------------
@@ -305,19 +308,8 @@ namespace Arya
 			myStream.fill('0');
 			myStream.width(3);
 			if(count >= 1000) count = 999;
-			myStream << count;
-			stbtt_aligned_quad q;
-			float lastX = 0.0f;
-			for(int i = 0; i < 3; i++)
-			{
-				stbtt_GetBakedQuad(font->baked, 512, 512, myStream.str()[i], &xpos ,&ypos,&q,true);
-				rects[i + 6]->texOffset = vec2(q.s0, 1 - q.t0 - (q.t1 - q.t0));
-				rects[i + 6]->texSize = vec2(q.s1 - q.s0, (q.t1 - q.t0));
-				rects[i + 6]->sizeInPixels = vec2(q.x1 - q.x0, (q.y1 - q.y0));
-				rects[i + 6]->offsetInPixels.x = lastX + offsetFPS + OFFSET_X;
-				rects[i + 6]->offsetInPixels.y = OFFSET_Y - (rects[i + 6]->sizeInPixels.y / 2.0);
-				lastX = xpos;
-			}
+			myStream << "FPS: " << count;
+			FPSLabel->setText(myStream.str());
 			count = 0;
 			time = 0.0;
 		}

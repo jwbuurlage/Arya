@@ -63,6 +63,12 @@ namespace Arya
 			vec4 backgroundColor;
     };
 
+	// use this for backgrounds
+	class Image : public InterfaceElement
+	{
+
+	}
+
     class Label : public InterfaceElement
     {
         public:
@@ -76,6 +82,34 @@ namespace Arya
         private:
             DrawableText* dt;
     };
+
+	class Button : public InterfaceElement
+	{
+		public:
+			Button();
+			~Button() { }
+
+			void draw();
+
+			void setText();
+			string getIdentifier() const { return identifier; }
+
+		private:
+			Label* label;
+			Image* background;
+			ButtonDelegate* target;
+			string identifier;
+	}
+
+	class ButtonDelegate
+	{
+		public:
+			ButtonDelegate();
+			virtual ~ButtonDelegate();
+
+			virtual void buttonDown(Button* sender);
+			virtual void buttonDragged(Button* sender);
+	}
 
 /////////////////////////
 // Interface
@@ -105,6 +139,7 @@ namespace Arya
             int count;
             float offsetFPS;
 
+			Label* FPSLabel;
 			Overlay* overlay;
 			ShaderProgram* texturedRectProgram;
 			ShaderProgram* clusterTexturedRectProgram;
