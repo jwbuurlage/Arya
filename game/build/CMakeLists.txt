@@ -32,15 +32,26 @@ SET(
     "/usr/include/lua5.1"
 )
 
-SET(
-	PROJECT_LIBRARIES
-	"Arya"
-    "PocoNet"
-    "PocoFoundation"
-    "pthread"
-    "luabind"
-	"lua"
-)
+IF(APPLE)
+    SET(
+		PROJECT_LIBRARIES
+		"Arya"
+		"PocoNet"
+		"PocoFoundation"
+		"pthread"
+		"luabind"
+		"lua"
+	)
+ELSE()
+	SET(
+		PROJECT_LIBRARIES
+		"Arya"
+		"PocoNet"
+		"PocoFoundation"
+		"pthread"
+		"luabind"
+	)
+ENDIF()
 
 ADD_DEFINITIONS(-DPOCO_NO_AUTOMATIC_LIBS)
 ADD_DEFINITIONS(-DPOCO_STATIC)
