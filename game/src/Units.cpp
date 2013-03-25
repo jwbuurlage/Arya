@@ -446,7 +446,7 @@ void Unit::receiveDamage(float dmg, Unit* attacker)
         {
             if(unitState == UNIT_IDLE) //and if not in passive mode
             {
-                timeSinceLastAttackRequest = 0;
+				timeSinceLastAttackRequest = 0;
                 Event& ev = Game::shared().getEventManager()->createEvent(EVENT_ATTACK_MOVE_UNIT_REQUEST);
                 ev << 1;
                 ev << id << attacker->getId();
@@ -455,10 +455,10 @@ void Unit::receiveDamage(float dmg, Unit* attacker)
         }
     }
 
-    unitInfo->onDamage(this, attacker, dmg);
-
     health -= dmg;
     if(health < 0) health = 0;
+
+    unitInfo->onDamage(this, attacker, dmg);
 
     //healthBar->sizeInPixels = vec2(25.0*getHealthRatio(), 3.0);
 

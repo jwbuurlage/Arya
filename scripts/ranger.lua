@@ -17,7 +17,7 @@ ranger.attackSound = "yes.wav"
 ranger.onSpawn =
 function(unit)
     print("rangerdude " .. unit.id .. " has now spawned and will kick your ass")
-    unit.customData.derp = unit.id
+    unit.customData.attackCount = 0
 end
 
 ranger.onDeath = 
@@ -27,6 +27,7 @@ end
 
 ranger.onDamage = 
 function(victim, attacker, damage)
+    victim.customData.attackCount = victim.customData.attackCount + 1
     print("Ranger " .. victim.id .. " received massive damage (" .. damage .. " teradmg). Only " .. victim.health .. " hp left. Unit " .. attacker.id .. " (" .. attacker.health .. " hp), please be careful in the future")
-    print("Ranger " .. victim.id .. " derp = " .. victim.customData.derp)
+    print("Ranger " .. victim.id .. " has been attacked " .. victim.customData.attackCount .. " times")
 end

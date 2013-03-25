@@ -500,5 +500,6 @@ namespace Arya
 		for(int i = 0; i < windowStack.size(); ++i)
 			if(windowStack[i] == w)
 				windowStack.erase(windowStack.begin() + i);
+		w->setActiveState(false);
 	}
 }
