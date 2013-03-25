@@ -22,6 +22,9 @@ Map::~Map()
 
     if(hFile) Arya::FileSystem::shared().releaseFile(hFile);
     hFile = 0;
+
+	if(info)
+		delete info;
 }
 
 bool Map::initHeightData()
@@ -36,7 +39,7 @@ bool Map::initHeightData()
         GAME_LOG_WARNING("Unable to load heightmap data!");
         return false;
     }
-    scaleVector = vec3(info->width, 300.0f, info->height);
+    scaleVector = vec3(info->width, 150.0f, info->height);
     return true;
 }
 
