@@ -15,6 +15,7 @@ using std::pair;
 namespace Arya
 {
 	class Window;
+	class Label;
 
     class Console : public Singleton<Console>, public FrameListener, public InputListener, public CommandListener
     {
@@ -42,9 +43,7 @@ namespace Arya
             int nrLines; //visible number of lines of console
             int searchNrLines; //number of lines in which you can search, if more the first one will be kicked
             int textWidthInPixels; //width of character
-            float textHeightInPixels;
             int nrCharOnLine;
-            float heightKernel;
             int pixelsInBetween; // pixels in between lines
             bool lShift; // used for key input
             bool rShift; // used for key input
@@ -52,15 +51,14 @@ namespace Arya
             bool cLock; // used for key input
             vector<string> history;
             vector<string> searchHistory;
-            vector<Rect*> rects;
             Font* font;
-            float time; // used for cursor flashing
             int upCount; // counts how many times we pressed up before pressing enter
             vec4 consoleColor;
             void goBackInHistory();
-            void setVisibilityConsole(bool flag);
             void addTextLine(string textToBeAdded);
 			bool handleCommand(string command);
 			Window* consoleWindow;
+			vector<Label*> lines;
+			void addLine(string text);
     };
 }

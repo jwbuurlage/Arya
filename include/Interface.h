@@ -61,6 +61,7 @@ namespace Arya
 			vec2 getScreenOffset() const { return screenOffset; }
 			vec2 getScreenSize() const { return screenSize; }
 			vec2 getSize() const { return size; }
+			void setColorMask(vec4 _colorMask){colorMask = _colorMask;};
 
 			void setAbsolutePosition(vec2 _absolutePosition) { absolutePosition = _absolutePosition; recalculateScreenSizeAndPosition(); }
 			void setSize(vec2 _size) { size = _size; recalculateScreenSizeAndPosition(); }
@@ -100,6 +101,7 @@ namespace Arya
             void draw();
 
 			void setActiveState(bool active);
+			bool getActiveState(){return isActive;}
 			void setSize(vec2 _size);
 
 			// ButtonDelegate
