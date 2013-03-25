@@ -434,9 +434,7 @@ void GameSession::handleEvent(Packet& packet)
                                   if(unit)
                                   {
                                       unit->makeDead();
-									  GAME_LOG_DEBUG("Unit "  << id << " has not died yet" );
                                       unit->getInfo()->onDeath(unit);
-									  GAME_LOG_DEBUG("Unit "  << id << " has died" );
                                   }
                               }
                               break;
