@@ -6,6 +6,7 @@
 #include "../include/ServerGameSession.h"
 #include "../include/ServerClient.h"
 #include "../include/Units.h"
+#include "../include/Scripting.h"
 #include "Arya.h"
 #include <cstring>
 #include <algorithm>
@@ -101,6 +102,12 @@ void Server::prepareServer()
     //By having two instances of FileSystem we would load many files
     //twice which would be stupid
     if(&Arya::FileSystem::shared() == 0) Arya::FileSystem::create();
+    if(&Scripting::shared() == 0)
+    {
+        Scripting* scripting = new Scripting;
+        scripting->init();
+        scripting->execute("units.lua");
+    }
 }
 
 Packet* Server::createPacket(int id)

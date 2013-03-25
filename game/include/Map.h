@@ -8,10 +8,12 @@ using Arya::Scene;
 using Arya::Terrain;
 using Arya::Material;
 
+class MapInfo;
+
 class Map
 {
     public:
-        Map();
+        Map(MapInfo* _info);
         ~Map();
 
         //loads map data: both server and client use this
@@ -26,8 +28,8 @@ class Map
     private:
         Scene* scene;
         Arya::File* hFile;
-        int heightMapSize;
         vec3 scaleVector;
 
         bool terrainInitialized;
+		MapInfo* info;
 };

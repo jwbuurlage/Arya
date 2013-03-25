@@ -2,6 +2,7 @@
 #include "../include/Game.h"
 #include "../include/UnitTypes.h"
 #include "../include/Units.h"
+#include "../include/MapInfo.h"
 #include "../include/common/GameLogger.h"
 #include <luabind/luabind.hpp>
 #include <lua.hpp>
@@ -9,6 +10,10 @@
 //TODO: move Scripting::execute to another cpp file
 //so that we dont need to inclue Arya.h here
 #include "../include/Files.h"
+
+//
+// ------------- Unit Info -------------
+//
 
 class LuaUnitType : public UnitInfo
 {
@@ -62,29 +67,62 @@ luabind::object& getCustomUnitData(const Unit& unit)
     return unit.customData->luaobject;
 }
 
-void setCustomUnitData(Unit& unit, luabind::object& obj)
-{
-    unit.customData->luaobject = obj;
-}
-
 void Unit::createScriptData()
 {
-    customData = new LuaScriptData( luabind::newtable(Game::shared().getScripting()->getState()) );
+    customData = 0;
+
+    Scripting& scripting = Scripting::shared();
+    if(&scripting != 0)
+    {
+        customData = new LuaScriptData(luabind::newtable(scripting.getState()));
+    }
 }
+
+//
+// ------------- Map Info -------------
+//
+
+class LuaMapInfo : public MapInfo
+{
+    public:
+        void onLoad()
+        {
+            if(objOnLoad && luabind::type(objOnLoad) == LUA_TFUNCTION)
+            {
+                try{ luabind::call_function<void>(objOnLoad); }
+                catch(luabind::error& e){ GAME_LOG_ERROR("Script error: " << e.what()); }
+            }
+        }
+
+        luabind::object objOnLoad;
+};
+
+LuaMapInfo* createMap()
+{
+    return new LuaMapInfo;
+}
+
+//
+// ----------------------------------
+//
 
 void luaPrint(const std::string& msg)
 {
     GAME_LOG_DEBUG("Script: " << msg);
 }
 
+Scripting* Scripting::singleton = 0;
+
 Scripting::Scripting()
 {
+    if(singleton == 0) singleton = this;
     luaState = 0;
 }
 
 Scripting::~Scripting()
 {
     cleanup();
+    if(singleton == this) singleton = 0;
 }
 
 int Scripting::init()
@@ -120,11 +158,13 @@ int Scripting::init()
     //For properties: when no set function is given it is readonly
     luabind::module(luaState)[
         luabind::def("print", &luaPrint),
+
         luabind::class_<Unit>("Unit") //scripts may not create these, so no constructor
             .property("id", &Unit::getId)
             .property("type", &Unit::getType)
-            .property("health", &Unit::getHealth),
-            //.property("customData", &getCustomUnitData, &setCustomUnitData),
+            .property("health", &Unit::getHealth)
+            .property("customData", &getCustomUnitData),
+
         luabind::def("createUnitType", &createLuaUnitType),
         luabind::class_<UnitInfo>("UnitInfoBase"), //should not be used in scripts directly
         luabind::class_<LuaUnitType, UnitInfo>("UnitType")
@@ -144,7 +184,20 @@ int Scripting::init()
             .def_readwrite("attackSpeed", &LuaUnitType::attackSpeed)
             .def_readwrite("canMoveWhileAttacking", &LuaUnitType::canMoveWhileAttacking)
             .def_readwrite("selectionSound", &LuaUnitType::selectionSound)
-            .def_readwrite("attackSound", &LuaUnitType::attackSound)
+            .def_readwrite("attackSound", &LuaUnitType::attackSound),
+
+        luabind::def("createMap", &createMap),
+        luabind::class_<MapInfo>("MapInfoBase"), //it will segfault without this line
+        luabind::class_<LuaMapInfo, MapInfo>("MapInfo")
+            .def_readwrite("onLoad", &LuaMapInfo::onLoad)
+            .def_readwrite("maxPlayers", &LuaMapInfo::maxPlayers)
+            .def_readwrite("width", &LuaMapInfo::width)
+            .def_readwrite("height", &LuaMapInfo::height)
+            .def_readwrite("name", &LuaMapInfo::name)
+            .def_readwrite("heightmap", &LuaMapInfo::heightmap)
+            .def_readwrite("heightmapSize", &LuaMapInfo::heightmapSize)
+            .def_readwrite("splatmap", &LuaMapInfo::splatmap)
+            .def_readwrite("tileset", &LuaMapInfo::tileset)
         ];
 
     return 1;

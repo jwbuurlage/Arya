@@ -6,6 +6,7 @@
 #include "../include/EventCodes.h"
 #include "../include/Units.h"
 #include "../include/Map.h"
+#include "../include/MapInfo.h"
 #include "Arya.h"
 
 ServerGameSession::ServerGameSession(Server* serv) : server(serv)
@@ -328,7 +329,15 @@ void ServerGameSession::initMap()
 {
     if(!map)
     {
-        map = new Map;
+        map = new Map( new MapInfo(
+				1024.0f,
+				1024.0f,
+				"Borderlands",
+				"heightmap.raw",
+				1025,
+				"splatmap.raw",
+				"grass.tga,snow.tga,rock.tga,dirt.tga") );
+
         if(!map->initHeightData())
         {
             delete map;
