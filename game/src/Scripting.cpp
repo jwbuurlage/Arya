@@ -14,48 +14,36 @@ class LuaUnitType : public UnitInfo
     public:
         //registers itself as a unit type
         LuaUnitType(int typeId) : UnitInfo(typeId) {};
-        ~LuaUnitType() {};
+        ~LuaUnitType() { GAME_LOG_DEBUG("LuaUnitType " << displayname << " deconstructed!"); }
 
         //These are called by the game when the event occurs
         void onDeath(Unit* unit);
         void onSpawn(Unit* unit);
         void onDamage(Unit* victim, Unit* attacker, float damage);
 
-        //These are called by the scripts to set handlers
-        void setOnDeath(const luabind::object& obj);
-        void setOnSpawn(const luabind::object& obj);
-        void setOnDamage(const luabind::object& obj);
-
-    private:
+        //These are set by the script, they represent functions
         luabind::object objOnDeath;
         luabind::object objOnSpawn;
         luabind::object objOnDamage;
 };
 
+LuaUnitType* createLuaUnitType(int type)
+{
+    //registers itself into unittype list at constructor
+    return new LuaUnitType(type);
+}
+
 void LuaUnitType::onDeath(Unit* unit)
 {
-    if(objOnDeath) try{ luabind::call_function<void>(objOnDeath, unit); }catch(luabind::error& e){ GAME_LOG_ERROR("Script error: " << e.what()); }
+    if(objOnDeath && luabind::type(objOnDeath) == LUA_TFUNCTION) try{ luabind::call_function<void>(objOnDeath, unit); }catch(luabind::error& e){ GAME_LOG_ERROR("Script error: " << e.what()); }
 }
 void LuaUnitType::onSpawn(Unit* unit)
 {
-    if(objOnSpawn) try{ luabind::call_function<void>(objOnSpawn, unit); }catch(luabind::error& e){ GAME_LOG_ERROR("Script error: " << e.what()); }
+    if(objOnSpawn && luabind::type(objOnSpawn) == LUA_TFUNCTION) try{ luabind::call_function<void>(objOnSpawn, unit); }catch(luabind::error& e){ GAME_LOG_ERROR("Script error: " << e.what()); }
 }
 void LuaUnitType::onDamage(Unit* victim, Unit* attacker, float damage)
 {
-    if(objOnDamage) try{ luabind::call_function<void>(objOnDamage, victim, attacker, damage); }catch(luabind::error& e){ GAME_LOG_ERROR("Script error: " << e.what()); }
-}
-
-void LuaUnitType::setOnDeath(const luabind::object& obj)
-{
-    if(luabind::type(obj) == LUA_TFUNCTION) objOnDeath = obj;
-}
-void LuaUnitType::setOnSpawn(const luabind::object& obj)
-{
-    if(luabind::type(obj) == LUA_TFUNCTION) objOnSpawn = obj;
-}
-void LuaUnitType::setOnDamage(const luabind::object& obj)
-{
-    if(luabind::type(obj) == LUA_TFUNCTION) objOnDamage = obj;
+    if(objOnDamage && luabind::type(objOnDamage) == LUA_TFUNCTION) try{ luabind::call_function<void>(objOnDamage, victim, attacker, damage); }catch(luabind::error& e){ GAME_LOG_ERROR("Script error: " << e.what()); }
 }
 
 void luaPrint(const std::string& msg)
@@ -110,12 +98,13 @@ int Scripting::init()
             .property("id", &Unit::getId)
             .property("type", &Unit::getType)
             .property("health", &Unit::getHealth),
+        luabind::def("createUnitType", &createLuaUnitType),
         luabind::class_<UnitInfo>("UnitInfoBase"), //should not be used in scripts directly
         luabind::class_<LuaUnitType, UnitInfo>("UnitType")
-            .def(luabind::constructor<int>())
-            .def("setOnDeath", &LuaUnitType::setOnDeath)
-            .def("setOnSpawn", &LuaUnitType::setOnSpawn)
-            .def("setOnDamage", &LuaUnitType::setOnDamage)
+            //.def(luabind::constructor<int>()) //no constructor because they should be created by createUnitType
+            .def_readwrite("onSpawn", &LuaUnitType::objOnSpawn)
+            .def_readwrite("onDeath", &LuaUnitType::objOnDeath)
+            .def_readwrite("onDamage", &LuaUnitType::objOnDamage)
             .def_readwrite("displayname", &LuaUnitType::displayname)
             .def_readwrite("modelname", &LuaUnitType::modelname)
             .def_readwrite("radius", &LuaUnitType::radius)
