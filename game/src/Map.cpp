@@ -1,12 +1,15 @@
 #include "../include/Map.h"
+#include "../include/MapInfo.h"
 #include "../include/common/GameLogger.h"
 
-Map::Map()
+#include <boost/algorithm/string.hpp>
+
+Map::Map(MapInfo* _info)
 {
     scene = 0;
     hFile = 0;
-    heightMapSize = 1025;
     terrainInitialized = false;
+	info = _info;
 }
 
 Map::~Map()
@@ -25,7 +28,7 @@ bool Map::initHeightData()
 {
     if(hFile) return true;
 
-    string heightMapString("heightmap.raw");
+    string heightMapString(info->heightmap);
     heightMapString.insert(0, "textures/");
     hFile = Arya::FileSystem::shared().getFile(heightMapString);
     if(!hFile)
@@ -33,8 +36,7 @@ bool Map::initHeightData()
         GAME_LOG_WARNING("Unable to load heightmap data!");
         return false;
     }
-    heightMapSize = 1025;
-    scaleVector = vec3(4000.0f, 300.0f, 4000.0f);
+    scaleVector = vec3(info->width, 300.0f, info->height);
     return true;
 }
 
@@ -47,12 +49,16 @@ bool Map::initGraphics(Scene* sc)
     scene = sc;
 
     vector<Arya::Material*> tileSet;
-    tileSet.push_back(Arya::MaterialManager::shared().getMaterial("grass.tga"));
-    tileSet.push_back(Arya::MaterialManager::shared().getMaterial("rock.tga"));
-    tileSet.push_back(Arya::MaterialManager::shared().getMaterial("snow.tga"));
-    tileSet.push_back(Arya::MaterialManager::shared().getMaterial("dirt.tga"));
+	vector<string> strs;
+	boost::split(strs, info->tileset, boost::is_any_of(","));
+	for(int i = 0; i < strs.size(); ++i)
+		tileSet.push_back(Arya::MaterialManager::shared().getMaterial(strs[i]));
 
-    if(!scene->setTerrain(hFile->getData(), heightMapSize, "watermap.raw", tileSet, Arya::TextureManager::shared().getTexture("clouds.jpg"), Arya::TextureManager::shared().getTexture("splatmap.tga")))
+    if(!scene->setTerrain(hFile->getData(), 
+				info->heightmapSize, "watermap.raw", 
+				tileSet, 
+				Arya::TextureManager::shared().getTexture("clouds.jpg"), 
+				Arya::TextureManager::shared().getTexture(info->splatmap)))
         return false;
 
     mat4 scaleMatrix = glm::scale(mat4(1.0), scaleVector);
@@ -79,10 +85,10 @@ float Map::heightAtGroundPosition(float x, float z)
     //first convert to integers before doing the
     //comparisons so that we can not get floating
     //point rounding bugs
-    int index1 = (int)(z*heightMapSize);
-    int index2 = (int)(x*heightMapSize);
+    int index1 = (int)(z*info->heightmapSize);
+    int index2 = (int)(x*info->heightmapSize);
 
-    if( index1 >= heightMapSize || index1 <= 0 || index2 >= heightMapSize || index2 <= 0 )
+    if( index1 >= info->heightmapSize || index1 <= 0 || index2 >= info->heightmapSize || index2 <= 0 )
     {
         GAME_LOG_WARNING("Querying height outside of terrain!");
         return 0.0;
@@ -90,7 +96,7 @@ float Map::heightAtGroundPosition(float x, float z)
 
     unsigned short* heights = (unsigned short*)hFile->getData();
 
-    int index = index1*heightMapSize + index2;
+    int index = index1*info->heightmapSize + index2;
     return scaleVector.y*(heights[index] / 65535.0);
 }
 

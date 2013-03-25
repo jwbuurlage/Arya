@@ -4,6 +4,7 @@
 #include "../include/GameSession.h"
 #include "../include/GameSessionInput.h"
 #include "../include/Map.h"
+#include "../include/MapInfo.h"
 #include "../include/Faction.h"
 #include "../include/Units.h"
 #include "../include/common/QuadTree.h"
@@ -79,7 +80,14 @@ bool GameSession::init()
     cam->setCameraAngle(0.0f, -60.0f);
     cam->setZoom(300.0f);
 
-    if(!map) map = new Map;
+    if(!map) map = new Map( new MapInfo(
+				1024.0f,
+				1024.0f,
+				"Borderlands",
+				"heightmap.raw",
+				1025,
+				"splatmap.tga",
+				"grass.tga,snow.tga,rock.tga,dirt.tga") );
 
     if(!map->initHeightData())
         return false;
