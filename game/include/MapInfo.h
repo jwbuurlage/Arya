@@ -3,6 +3,14 @@
 class MapInfo
 {
 	public:
+        MapInfo()
+        {
+            maxPlayers = 0;
+            width = 0.0f;
+            height = 0.0f;
+            heightmapSize = 0;
+        }
+
 		MapInfo(float _width, 
 				float _height,
 				string _name, 
@@ -19,7 +27,10 @@ class MapInfo
 			splatmap = _splatmap;
 			tileset = _tileset;
 		}
-		~MapInfo() { };
+		virtual ~MapInfo() { };
+
+        //amount of spawn positions in the map
+        int maxPlayers;
 
 		float width;
 		float height;
@@ -30,5 +41,6 @@ class MapInfo
 		string splatmap;
 		string tileset; // comma seperated
 
-		//virtual void onLoad();
+        //This will call the script callback function
+        virtual void onLoad() {};
 };
