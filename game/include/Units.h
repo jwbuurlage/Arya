@@ -147,9 +147,10 @@ class Unit
         bool obsolete;
         int refCount;
 
-        //This function is implemented in Scripting.cpp and just calls 'new LuaScriptData' but it needs luabind headers
-        //It is called in the Unit constructor, and in the deconstructor we call 'delete customData'
+        //These functions are implemented in Scripting.cpp and it just calls 'new LuaScriptData' but it needs luabind headers
+        //It is called in the Unit constructor, and in the deconstructor we call the delete one
         void createScriptData();
+        void deleteScriptData();
 
         // movement and attack
         vec2 targetPosition;

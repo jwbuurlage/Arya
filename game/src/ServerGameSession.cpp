@@ -46,6 +46,9 @@ void ServerGameSession::initialize()
 		clientFactionList.clear();
 	}
 
+    //TODO: change this, see MapInfo.h
+    theMap->onLoad();
+
 	//create factions and start units
 	for(int i = 0; i < gameInfo.playerCount; ++i)
 	{
@@ -60,10 +63,12 @@ void ServerGameSession::initialize()
 			Unit* unit = createUnit(0);
             unit->setPosition(basePos + vec3(20.0f+20.0f*(i/5), 0.0f, -40.0f + 20.0f*(i%5)));
 			faction->addUnit(unit);
+            unit->getInfo()->onSpawn(unit);
 
 			unit = createUnit(1);
             unit->setPosition(basePos + vec3(-(20.0f+20.0f*(i/5)), 0.0f, -40.0f + 20.0f*(i%5)));
 			faction->addUnit(unit);
+            unit->getInfo()->onSpawn(unit);
 		}
 
         Unit* u = createUnit(2);
@@ -327,21 +332,16 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
 
 void ServerGameSession::initMap()
 {
+    //TODO: The map is now reloaded for every game session. Please.
     if(!map)
     {
-        map = new Map( new MapInfo(
-				1024.0f,
-				1024.0f,
-				"Borderlands",
-				"heightmap.raw",
-				1025,
-				"splatmap.raw",
-				"grass.tga,snow.tga,rock.tga,dirt.tga") );
+        map = new Map(theMap);
 
         if(!map->initHeightData())
         {
             delete map;
             map = 0;
+            return;
         }
     }
 }
