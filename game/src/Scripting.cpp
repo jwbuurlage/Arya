@@ -1,4 +1,5 @@
 #include "../include/Scripting.h"
+#include "../include/Game.h"
 #include "../include/UnitTypes.h"
 #include "../include/Units.h"
 #include "../include/common/GameLogger.h"
@@ -44,6 +45,31 @@ void LuaUnitType::onSpawn(Unit* unit)
 void LuaUnitType::onDamage(Unit* victim, Unit* attacker, float damage)
 {
     if(objOnDamage && luabind::type(objOnDamage) == LUA_TFUNCTION) try{ luabind::call_function<void>(objOnDamage, victim, attacker, damage); }catch(luabind::error& e){ GAME_LOG_ERROR("Script error: " << e.what()); }
+}
+
+//This is a member of the Unit class
+class LuaScriptData
+{
+    public:
+        LuaScriptData(const luabind::object& obj) : luaobject(obj) {}
+        ~LuaScriptData() {}
+
+        luabind::object luaobject;
+};
+
+luabind::object& getCustomUnitData(const Unit& unit)
+{
+    return unit.customData->luaobject;
+}
+
+void setCustomUnitData(Unit& unit, luabind::object& obj)
+{
+    unit.customData->luaobject = obj;
+}
+
+void Unit::createScriptData()
+{
+    customData = new LuaScriptData( luabind::newtable(Game::shared().getScripting()->getState()) );
 }
 
 void luaPrint(const std::string& msg)
@@ -98,6 +124,7 @@ int Scripting::init()
             .property("id", &Unit::getId)
             .property("type", &Unit::getType)
             .property("health", &Unit::getHealth),
+            //.property("customData", &getCustomUnitData, &setCustomUnitData),
         luabind::def("createUnitType", &createLuaUnitType),
         luabind::class_<UnitInfo>("UnitInfoBase"), //should not be used in scripts directly
         luabind::class_<LuaUnitType, UnitInfo>("UnitType")

@@ -64,6 +64,8 @@ Unit::Unit(int _type, int _id, UnitFactory* factory) : id(_id)
     obsolete = false;
     refCount = 0;
 
+    createScriptData();
+
     object = 0;
     position = vec3(0.0f);
     yaw = 0.0f;
@@ -99,6 +101,8 @@ Unit::~Unit()
     if(targetUnit)
         targetUnit->release();
     if(object) object->setObsolete();
+
+    delete customData;
 
     unitFactory->destroyUnit(id);
 

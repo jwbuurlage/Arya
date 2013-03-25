@@ -13,6 +13,7 @@ class Scripting
 
         int execute(const char* filename);
 
+        lua_State* getState() const { return luaState; }
     private:
         lua_State* luaState;
 };
