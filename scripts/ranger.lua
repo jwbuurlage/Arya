@@ -17,6 +17,7 @@ ranger.attackSound = "yes.wav"
 ranger.onSpawn =
 function(unit)
     print("rangerdude " .. unit.id .. " has now spawned and will kick your ass")
+    unit.customData.derp = unit.id
 end
 
 ranger.onDeath = 
@@ -27,4 +28,5 @@ end
 ranger.onDamage = 
 function(victim, attacker, damage)
     print("Ranger " .. victim.id .. " received massive damage (" .. damage .. " teradmg). Only " .. victim.health .. " hp left. Unit " .. attacker.id .. " (" .. attacker.health .. " hp), please be careful in the future")
+    print("Ranger " .. victim.id .. " derp = " .. victim.customData.derp)
 end

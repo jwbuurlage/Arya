@@ -64,6 +64,7 @@ Unit::Unit(int _type, int _id, UnitFactory* factory) : id(_id)
     obsolete = false;
     refCount = 0;
 
+    customData = 0;
     createScriptData();
 
     object = 0;
