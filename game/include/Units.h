@@ -55,6 +55,8 @@ class UnitFactory
         void destroyUnit(int id);
 };
 
+class LuaScriptData;
+
 class Unit
 {
     private:
@@ -129,6 +131,9 @@ class Unit
 
 		void getDebugText();
 
+        //Must be public because it must be accessed by some
+        //scripting functions
+        LuaScriptData* customData;
     private:
         Object* object; //object->position and object->yaw are always the same as Unit::position and Unit::yaw
         vec3 position; //since server has no Object, position is stored here
@@ -141,6 +146,10 @@ class Unit
         bool local; //This must be false on the server. When true the update functions will do auto-attack requests
         bool obsolete;
         int refCount;
+
+        //This function is implemented in Scripting.cpp and just calls 'new LuaScriptData' but it needs luabind headers
+        //It is called in the Unit constructor, and in the deconstructor we call 'delete customData'
+        void createScriptData();
 
         // movement and attack
         vec2 targetPosition;

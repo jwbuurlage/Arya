@@ -35,7 +35,8 @@ class Game : public Arya::InputListener , public Arya::FrameListener, public Eve
         void handleEvent(Packet& packet);
 
         static Game& shared() { return (*singleton); }
-        EventManager* getEventManager() { return eventManager; }
+        EventManager* getEventManager() const { return eventManager; }
+        Scripting* getScripting() const { return scripting; }
 
         int getClientId() const { return clientId; }
 
