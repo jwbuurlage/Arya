@@ -62,7 +62,7 @@ luabind::object& getCustomUnitData(const Unit& unit)
     return unit.customData->luaobject;
 }
 
-void setCustomUnitData(Unit& unit, luabind::object& obj)
+void setCustomUnitData(const Unit& unit, luabind::object& obj)
 {
     unit.customData->luaobject = obj;
 }
@@ -123,8 +123,8 @@ int Scripting::init()
         luabind::class_<Unit>("Unit") //scripts may not create these, so no constructor
             .property("id", &Unit::getId)
             .property("type", &Unit::getType)
-            .property("health", &Unit::getHealth),
-            //.property("customData", &getCustomUnitData, &setCustomUnitData),
+            .property("health", &Unit::getHealth)
+            .property("customData", &getCustomUnitData), //&setCustomUnitData),
         luabind::def("createUnitType", &createLuaUnitType),
         luabind::class_<UnitInfo>("UnitInfoBase"), //should not be used in scripts directly
         luabind::class_<LuaUnitType, UnitInfo>("UnitType")
