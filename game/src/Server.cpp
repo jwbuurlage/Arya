@@ -107,6 +107,7 @@ void Server::prepareServer()
         Scripting* scripting = new Scripting;
         scripting->init();
         scripting->execute("units.lua");
+        scripting->execute("maps.lua");
     }
 }
 

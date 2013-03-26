@@ -103,7 +103,7 @@ Unit::~Unit()
         targetUnit->release();
     if(object) object->setObsolete();
 
-    delete customData;
+    deleteScriptData();
 
     unitFactory->destroyUnit(id);
 
@@ -317,6 +317,7 @@ void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
                 {
                     if(!targetUnit->isAlive())
                     {
+                        targetUnit->getInfo()->onDeath(targetUnit);
                         //Note that the unit was alive before this damage so this must have killed it
                         //Therefore we can send the death packet here
                         Packet* pak = serverSession->createPacket(EVENT_UNIT_DIED);

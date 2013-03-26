@@ -78,13 +78,32 @@ void Unit::createScriptData()
     }
 }
 
+void Unit::deleteScriptData()
+{
+    delete customData;
+    customData = 0;
+}
+
 //
 // ------------- Map Info -------------
 //
 
+//This is temporary, see MapInfo.h
+MapInfo* theMap = new MapInfo(0, 4,
+				1024.0f,
+				1024.0f,
+				"Borderlands",
+				"heightmap.raw",
+				1025,
+				"splatmap.tga",
+				"grass.tga,snow.tga,rock.tga,dirt.tga");
+
 class LuaMapInfo : public MapInfo
 {
     public:
+        LuaMapInfo(int id) : MapInfo(id) {}
+        ~LuaMapInfo(){}
+
         void onLoad()
         {
             if(objOnLoad && luabind::type(objOnLoad) == LUA_TFUNCTION)
@@ -97,9 +116,9 @@ class LuaMapInfo : public MapInfo
         luabind::object objOnLoad;
 };
 
-LuaMapInfo* createMap()
+LuaMapInfo* createMap(int typeId)
 {
-    return new LuaMapInfo;
+    return new LuaMapInfo(typeId);
 }
 
 //
@@ -189,7 +208,7 @@ int Scripting::init()
         luabind::def("createMap", &createMap),
         luabind::class_<MapInfo>("MapInfoBase"), //it will segfault without this line
         luabind::class_<LuaMapInfo, MapInfo>("MapInfo")
-            .def_readwrite("onLoad", &LuaMapInfo::onLoad)
+            .def_readwrite("onLoad", &LuaMapInfo::objOnLoad)
             .def_readwrite("maxPlayers", &LuaMapInfo::maxPlayers)
             .def_readwrite("width", &LuaMapInfo::width)
             .def_readwrite("height", &LuaMapInfo::height)
