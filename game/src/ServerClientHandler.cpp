@@ -53,12 +53,12 @@ void ServerClientHandler::onReadable(const AutoPtr<ReadableNotification>& notifi
     }
     catch(TimeoutException& e)
     {
-        GAME_LOG_WARNING("Timeout exception when reading socket!");
+        GAME_LOG_WARNING("Timeout exception when reading socket. Msg: " << e.displayText());
         terminate();
     }
     catch(NetException& e)
     {
-        GAME_LOG_WARNING("Net exception when reading socket");
+        GAME_LOG_WARNING("Net exception when reading socket. Msg: " << e.displayText());
         terminate();
     }
 
