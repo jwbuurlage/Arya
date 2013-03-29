@@ -15,6 +15,15 @@ UnitInfo* getUnitInfo(int type)
         return iter->second;
 }
 
+UnitInfo* getUnitInfo(const string& name)
+{
+    map<int,UnitInfo*>::iterator iter;
+    for(iter = unitInfoList.begin(); iter != unitInfoList.end(); ++iter)
+        if(iter->second->displayname == name || iter->second->modelname == name)
+            return iter->second;
+    return 0;
+}
+
 void registerNewUnitInfo(UnitInfo* info)
 {
     unitInfoList[info->typeId] = info;

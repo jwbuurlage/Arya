@@ -13,3 +13,21 @@ map.onLoad =
 function()
 	print("totally loading up these borders in those lands")
 end
+
+map.onLoadFaction =
+function(factionId, factionSpawnPos)
+    -- This will give one of the 4 corners
+    local baseX = -250 + 500 * (factionSpawnPos%2)
+    local baseZ = -250 + 500 * math.floor(factionSpawnPos/2)
+
+    print("Spawning faction " .. factionId .. " at position " .. factionSpawnPos .. ". Coordinates: " .. baseX .. "," .. baseZ)
+
+    -- Spawn the boss
+    spawnUnit(factionId, "imp", vec2(baseX, baseZ))
+
+    -- Spawn the minions
+    for i=1,10 do
+        spawnUnit(factionId, "ogros", vec2(baseX + 20*math.floor(i/5) + 20, baseZ + 20*(i%5) - 40))
+        spawnUnit(factionId, "hep", vec2(baseX - 20*math.floor(i/5) - 20, baseZ + 20*(i%5) - 40))
+    end
+end
