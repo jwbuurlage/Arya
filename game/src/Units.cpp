@@ -494,7 +494,9 @@ void Unit::deserialize(Packet& pk)
     setType(_type);
     pk >> factionId;
     pk >> position;
-    pk >> (int&)unitState;
+    int _unitState;
+    pk >> _unitState;
+    unitState = (UnitState)_unitState;
     pk >> targetPosition;
     int targetUnitId;
     pk >> targetUnitId;

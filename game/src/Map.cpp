@@ -51,7 +51,7 @@ bool Map::initGraphics(Scene* sc)
     vector<Arya::Material*> tileSet;
 	vector<string> strs;
 	boost::split(strs, info->tileset, boost::is_any_of(","));
-	for(int i = 0; i < strs.size(); ++i)
+	for(unsigned int i = 0; i < strs.size(); ++i)
 		tileSet.push_back(Arya::MaterialManager::shared().getMaterial(strs[i]));
 
     if(!scene->setTerrain(hFile->getData(), 

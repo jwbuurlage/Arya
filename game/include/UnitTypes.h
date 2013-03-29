@@ -7,6 +7,7 @@ class Unit;
 class UnitInfo;
 
 UnitInfo* getUnitInfo(int type);
+UnitInfo* getUnitInfo(const std::string& name);
 
 void registerNewUnitInfo(UnitInfo* info);
 

@@ -61,6 +61,7 @@ class Packet
 
         inline Packet& operator>>(int& val)
         {
+            val = 0;
             if(readPos + sizeof(int) <= data.size())
             {
                 val = *(int*)&data[readPos];
@@ -71,6 +72,7 @@ class Packet
 
         inline Packet& operator>>(float& val)
         {
+            val = 0;
             if(readPos + sizeof(float) <= data.size())
             {
                 val = *(float*)&data[readPos];
@@ -81,6 +83,7 @@ class Packet
 
         inline Packet& operator>>(unsigned int& val)
         {
+            val = 0;
             if(readPos + sizeof(unsigned int) <= data.size())
             {
                 val = *(unsigned int*)&data[readPos];

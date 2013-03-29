@@ -46,37 +46,22 @@ void ServerGameSession::initialize()
 		clientFactionList.clear();
 	}
 
-    //TODO: change this, see MapInfo.h
-    theMap->onLoad();
+    //TODO: change this theMap thing to something else, see MapInfo.h
+    theMap->onLoad(this);
 
-	//create factions and start units
+	//create faction
 	for(int i = 0; i < gameInfo.playerCount; ++i)
 	{
 		//createFaction will register it to the list
 		Faction* faction = createFaction();
 		faction->setColor(gameInfo.players[i].color);
-
-        int num = gameInfo.players[i].slot;
-        vec3 basePos( -250.0f + 500.0f * (num%2), 0.0f, -250.0f + 500.0f * (num/2) ); //one of the 4 corners of map
-		for(int i = 0; i < 10; ++i)
-		{
-			Unit* unit = createUnit(0);
-            unit->setPosition(basePos + vec3(20.0f+20.0f*(i/5), 0.0f, -40.0f + 20.0f*(i%5)));
-			faction->addUnit(unit);
-            unit->getInfo()->onSpawn(unit);
-
-			unit = createUnit(1);
-            unit->setPosition(basePos + vec3(-(20.0f+20.0f*(i/5)), 0.0f, -40.0f + 20.0f*(i%5)));
-			faction->addUnit(unit);
-            unit->getInfo()->onSpawn(unit);
-		}
-
-        Unit* u = createUnit(2);
-        u->setPosition(basePos);
-        faction->addUnit(u);
-
         clientFactionList.push_back(faction);
-	}
+    }
+    //call the scripts faction load function
+    //we use seperate loops to ensure all factions have been created
+    //in case the script needs this
+    for(int i = 0; i < gameInfo.playerCount; ++i)
+        theMap->onLoadFaction(this, clientFactionList[i]->getId(), gameInfo.players[i].slot);
 }
 
 void ServerGameSession::addClient(ServerClient* client, int index)

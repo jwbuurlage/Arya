@@ -1,6 +1,7 @@
 #pragma once
 
 class MapInfo;
+class ServerGameSession;
 
 //In the final scenario we have a list of loaded MapInfo's
 //Currently we only have one. It is defined in Scripting.cpp for now
@@ -63,5 +64,6 @@ class MapInfo
 		string tileset; // comma seperated
 
         //This will call the script callback function
-        virtual void onLoad() {};
+        virtual void onLoad(ServerGameSession* serversession) {};
+        virtual void onLoadFaction(ServerGameSession* serversession, int factionId, int factionSpawnPos) {};
 };
