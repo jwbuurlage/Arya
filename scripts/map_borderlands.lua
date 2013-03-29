@@ -1,5 +1,6 @@
-local map_borderlands = createMap()
+local map = createMap(newMapTypeId)
 
+map.maxPlayers = 4
 map.width = 1024.0
 map.height = 1024.0
 map.name = "Borderlands"
@@ -9,6 +10,6 @@ map.splatmap = "borderlands_splatmap.tga"
 map.tileset = "grass.tga,rock.tga,dirt.tga,snow.tga"
 
 map.onLoad =
-function(herp, derp, herp)
-	print("totally loading up in here")
+function()
+	print("totally loading up these borders in those lands")
 end
