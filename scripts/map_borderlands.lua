@@ -26,7 +26,7 @@ function(factionId, factionSpawnPos)
     spawnUnit(factionId, "imp", vec2(baseX, baseZ))
 
     -- Spawn the minions
-    for i=1,10 do
+    for i=0,9 do
         spawnUnit(factionId, "ogros", vec2(baseX + 20*math.floor(i/5) + 20, baseZ + 20*(i%5) - 40))
         spawnUnit(factionId, "hep", vec2(baseX - 20*math.floor(i/5) - 20, baseZ + 20*(i%5) - 40))
     end
