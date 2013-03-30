@@ -191,6 +191,9 @@ namespace Arya
 			void makeActive(Window* w);
 			void makeInactive(Window* w);
 
+            //Recalculate all windows, when the user resizes the main window
+            void recalculatePositions();
+
 			GLuint getOnePxRectVAO() const { return onePxRectVAO; };
 			Overlay* getOverlay() const { return overlay; }
 			ShaderProgram* getTexturedRectProgram() const { return texturedRectProgram; }

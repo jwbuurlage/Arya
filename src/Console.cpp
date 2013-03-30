@@ -30,7 +30,6 @@ namespace Arya
 		textWidthInPixels = 10;
 		pixelsInBetween = 4.0;
 		visibility = false;
-		nrCharOnLine = 0;
 		font = 0;
 		lShift = false;
 		rShift = false;
@@ -53,8 +52,6 @@ namespace Arya
 	{
 		if(initialized) return true;
 
-		if((!Root::shared().getWindowWidth()) || (!Root::shared().getWindowHeight())) return false;
-		nrCharOnLine = (Root::shared().getWindowWidth()-(Root::shared().getWindowWidth() % textWidthInPixels))/textWidthInPixels;
 		font = FontManager::shared().getFont("courier.ttf"); //font to be used
 		if(!font) return false;
 
@@ -79,6 +76,7 @@ namespace Arya
 
 	bool Console::keyDown(int key, bool keyDown)
 	{
+		int nrCharOnLine = (Root::shared().getWindowWidth()-(Root::shared().getWindowWidth() % textWidthInPixels))/textWidthInPixels;
 		bool keyHandled = true;
 		if(visibility == false)
 		{
@@ -236,6 +234,7 @@ namespace Arya
 
 	void Console::addOutputText(string textToBeAdded)
 	{
+		int nrCharOnLine = (Root::shared().getWindowWidth()-(Root::shared().getWindowWidth() % textWidthInPixels))/textWidthInPixels;
 		addLine(textToBeAdded);
 		if(textToBeAdded.length() <= (unsigned)nrCharOnLine) 
 		{
