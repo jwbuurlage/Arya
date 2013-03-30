@@ -96,7 +96,7 @@ namespace Arya
             Window(vec2 _relativePosition, vec2 _absolutePosition, vec2 _size,
 				Texture* _backgroundTexture, int flags, string _title,
 				vec4 _backgroundColor = vec4(1.0));
-            ~Window() { }
+            ~Window();
 
             void draw();
 

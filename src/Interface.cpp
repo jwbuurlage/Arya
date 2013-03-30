@@ -137,6 +137,12 @@ namespace Arya
 		isActive = false;
 	}
 
+	Window::~Window()
+	{
+		if(isActive)
+			Interface::shared().makeInactive(this);
+	}
+
 	void Window::setActiveState(bool active)
 	{
 		isActive = active;
