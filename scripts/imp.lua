@@ -1,8 +1,8 @@
 local imp = createUnitType(newUnitTypeId)
 
 imp.displayname = "The Boss"
-imp.modelname="imp"
-imp.radius = 30.0
+imp.modelname="monkey"
+imp.radius = 50.0
 imp.attackRadius = 15.0
 imp.viewRadius = 10.0
 imp.speed = 10.0

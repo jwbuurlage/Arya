@@ -395,22 +395,15 @@ namespace Arya
 
 		// ------------------------
 		// TODO: remove test window
-		vec2 windowSize = vec2(300.0f, 300.0f);
+		vec2 windowSize = vec2(100.0f, 100.0f);
 		Window* w = new Window(vec2(1.0f), -1.0f * windowSize - vec2(20.0f), windowSize, 
 				TextureManager::shared().getTexture("white"),  
-				WINDOW_DRAGGABLE | WINDOW_RESIZABLE | WINDOW_CLOSABLE, "Test Window",
-				vec4(0.0f, 0.0f, 0.3f, 0.6f));
+				0, "",
+				vec4(0.0f, 0.0f, 0.0f, 0.0f));
 
 		Font* f = FontManager::shared().getFont("DejaVuSans.ttf");
 
-		Label* l = new Label(vec2(-1.0f, 1.0f), vec2(20.0f, -30.0f), f, "This is a test window");
-		w->addChild(l);
-		l = new Label(vec2(-1.0f, 1.0f), vec2(20.0f, -50.0f), f, "It is just for testing");
-		w->addChild(l);
-		l = new Label(vec2(-1.0f, 1.0f), vec2(20.0f, -70.0f), f, "For nothing else");
-		w->addChild(l);
-
-		FPSLabel = new Label(vec2(1.0f, -1.0f), vec2(-80.0f, 10.0f), f, "FPS: ");
+		FPSLabel = new Label(vec2(1.0f, 1.0f), vec2(-80.0f, -30.0f), f, "FPS: ");
 		w->addChild(FPSLabel);
 
 		makeActive(w);

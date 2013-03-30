@@ -475,7 +475,7 @@ void GameSessionInput::selectUnit()
 
 void GameSessionInput::initUnitInfoWindow()
 {
-	vec2 windowSize = vec2(300.0f, 150.0f);
+	vec2 windowSize = vec2(150.0f, 80.0f);
 	unitWindow = new Arya::Window(vec2(1.0f, -1.0f), vec2(-20.0f -windowSize.x, 20.0f), windowSize, 
 			TextureManager::shared().getTexture("white"), Arya::WINDOW_DRAGGABLE, "Unit Info",
 			vec4(0.0f, 0.0f, 0.0f, 0.6f));
