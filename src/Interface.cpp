@@ -492,6 +492,8 @@ namespace Arya
 	{
 		windowStack.push_back(w);
 		w->setActiveState(true);
+        //The window could be resized inbetween
+        w->recalculateScreenSizeAndPosition();
 	}
 
 	void Interface::makeInactive(Window* w)
@@ -501,4 +503,10 @@ namespace Arya
 				windowStack.erase(windowStack.begin() + i);
 		w->setActiveState(false);
 	}
+
+    void Interface::recalculatePositions()
+    {
+        for(unsigned int i = 0; i < windowStack.size(); ++i)
+            windowStack[i]->recalculateScreenSizeAndPosition();
+    }
 }

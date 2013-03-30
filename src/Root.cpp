@@ -423,6 +423,7 @@ namespace Arya
 			if(cam)
 				cam->setProjectionMatrix(45.0f, getAspectRatio(), 0.1f, 2000.0f);
 		}
+        if(interface) interface->recalculatePositions();
 	}
 
 	void Root::keyDown(int key, int action)

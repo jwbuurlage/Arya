@@ -43,7 +43,6 @@ namespace Arya
             int nrLines; //visible number of lines of console
             int searchNrLines; //number of lines in which you can search, if more the first one will be kicked
             int textWidthInPixels; //width of character
-            int nrCharOnLine;
             int pixelsInBetween; // pixels in between lines
             bool lShift; // used for key input
             bool rShift; // used for key input
