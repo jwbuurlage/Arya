@@ -181,7 +181,7 @@ namespace Arya
     {
         public:
             Interface();
-            virtual ~Interface() { }
+            virtual ~Interface();
 
             void onFrame(float elapsedTime);
 			void render();

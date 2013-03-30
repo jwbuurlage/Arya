@@ -363,6 +363,23 @@ namespace Arya
 		overlay = 0; 
 	}
 
+	Interface::~Interface()
+	{
+		if(overlay)
+			delete overlay;
+
+		if(onePxRectVAO)
+			glDeleteVertexArrays(1, &onePxRectVAO);
+
+		for(int i = 0; i < windowStack.size(); ++i)
+			delete windowStack[i];
+
+		if(texturedRectProgram)
+			delete texturedRectProgram;
+		if(clusterTexturedRectProgram)
+			delete clusterTexturedRectProgram;
+	}
+
 	bool Interface::init()
 	{
 		// inititialize shader
