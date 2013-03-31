@@ -146,6 +146,9 @@ namespace Arya
 	void Window::setActiveState(bool active)
 	{
 		isActive = active;
+		//disable buttons..
+		for(unsigned int i = 0; i < childElements.size(); ++i)
+			childElements[i]->setActiveState(active);
 	}
 
 	void Window::draw()
@@ -350,6 +353,16 @@ namespace Arya
 			(pScreen.y > screenOffset.y && pScreen.y < screenOffset.y + screenSize.y))
 			return true;
 		return false;
+	}
+
+	void Button::setActiveState(bool active)
+	{
+		if(isActive == active) return;
+		isActive = active;
+		if(isActive)
+			Root::shared().addInputListener(this);
+		else
+			Root::shared().removeInputListener(this);
 	}
 
 	////////////////////////////////
