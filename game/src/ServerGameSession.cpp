@@ -10,7 +10,7 @@
 #include "../include/MapInfo.h"
 #include "Arya.h"
 
-ServerGameSession::ServerGameSession(Server* serv) : GameSession(serv->getScripting()), server(serv)
+ServerGameSession::ServerGameSession(Server* serv) : GameSession(serv->getScripting(), true), server(serv)
 {
 	gameStarted = false;
 	idFactory = 1;
@@ -204,7 +204,7 @@ void ServerGameSession::update(float elapsedTime)
                 //   so that this loop will remove it
                 // - big events like a full faction that loses all its units
                 //   ???????? solution needed ??????
-                unit->update(elapsedTime, map, this);
+                unit->update(elapsedTime);
                 ++it;
             }
         }

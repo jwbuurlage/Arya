@@ -10,7 +10,7 @@
 #include "../include/common/QuadTree.h"
 #include "../include/common/Cells.h"
 
-ClientGameSession::ClientGameSession() : GameSession(Game::shared().getScripting())
+ClientGameSession::ClientGameSession() : GameSession(Game::shared().getScripting(), false)
 {
     unitCells = 0;
     input = 0;
@@ -179,7 +179,7 @@ void ClientGameSession::onFrame(float elapsedTime)
                 onScreen.y /= onScreen.w;
                 (*it)->setScreenPosition(vec2(onScreen.x, onScreen.y));
 
-                (*it)->update(elapsedTime, map);
+                (*it)->update(elapsedTime);
 
                 ++it;
             }
