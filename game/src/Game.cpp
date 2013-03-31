@@ -1,6 +1,6 @@
 #include "../include/common/GameLogger.h"
 #include "../include/Game.h"
-#include "../include/GameSession.h"
+#include "../include/ClientGameSession.h"
 #include "../include/Network.h"
 #include "../include/Events.h"
 #include "../include/Scripting.h"
@@ -198,7 +198,7 @@ bool Game::keyDown(int key, bool keyDown)
 		case 'P':
 			if(keyDown) {
 				if(session) delete session;
-				session = new GameSession;
+				session = new ClientGameSession;
 				if(!session->init()) {
 					GAME_LOG_ERROR("Could not start a new session");
 					Root::shared().stopRendering();
@@ -256,9 +256,11 @@ void Game::handleEvent(Packet& packet)
 			packet >> clientId;
 			//After receiving our client ID we start the session. The server will soon send us the full game state
 			if(session) delete session;
-			session = new GameSession;
+			session = new ClientGameSession;
 
 			if(!session->init()) {
+                delete session;
+                session = 0;
 				GAME_LOG_ERROR("Could not start a new session");
 				Root::shared().stopRendering();
 			}

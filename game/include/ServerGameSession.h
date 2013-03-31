@@ -15,13 +15,14 @@
 //	EVENT_GAME_START and the game timer starts
 
 #pragma once
-#include "Units.h"
-#include "Faction.h"
 #include <vector>
+#include "GameSession.h"
 
 using std::vector;
 
 class Map;
+class Unit;
+class Faction;
 class Server;
 class ServerClient;
 class Packet;
@@ -49,7 +50,7 @@ struct GameInfo
 	} players[MAX_PLAYER_COUNT];
 };
 
-class ServerGameSession : public UnitFactory, public FactionFactory
+class ServerGameSession : public GameSession
 {
     public:
 		//Server class creates a new ServerGameSession
@@ -74,8 +75,8 @@ class ServerGameSession : public UnitFactory, public FactionFactory
         void handlePacket(ServerClient* client, Packet& packet);
 
         int getNewId() { return idFactory++; }
-        Unit* createUnit(int type){ return UnitFactory::createUnit(getNewId(),type); }
-        Faction* createFaction(){ return FactionFactory::createFaction(getNewId()); }
+        Unit* createUnit(int type){ return GameSession::createUnit(getNewId(),type); }
+        Faction* createFaction(){ return GameSession::createFaction(getNewId()); }
 
         unsigned int getClientCount() const { return clientList.size(); }
 

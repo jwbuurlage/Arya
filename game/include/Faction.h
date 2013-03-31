@@ -8,34 +8,15 @@ using Arya::Object;
 
 class Unit;
 class Packet;
-
-class Faction;
-
-//Factory design pattern
-class FactionFactory
-{
-    public:
-        FactionFactory(){}
-        virtual ~FactionFactory();
-
-        //destory factions by calling delete on them
-        Faction* createFaction(int id);
-        Faction* getFactionById(int id);
-    private:
-        map<int,Faction*> factionMap;
-        typedef map<int,Faction*>::iterator factionMapIterator;
-
-        friend class Faction;
-        void destroyFaction(int id);
-};
+class GameSession;
 
 class Faction
 {
     private:
-        friend class FactionFactory;
-        FactionFactory* const factory;
+        friend class GameSession;
+        GameSession* const session;
 
-        Faction(int id, FactionFactory* factory);
+        Faction(int id, GameSession* session);
     public:
         //~Faction deletes all units it has
         //and unregisters itself at factory

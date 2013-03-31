@@ -1,13 +1,13 @@
 #include "Arya.h"
 
-class GameSession;
+class ClientGameSession;
 class Unit;
 using Arya::Rect;
 
 class GameSessionInput : public Arya::InputListener, public Arya::FrameListener
 {
     public:
-        GameSessionInput(GameSession* ses);
+        GameSessionInput(ClientGameSession* ses);
         virtual ~GameSessionInput();
 
         void init();
@@ -26,7 +26,7 @@ class GameSessionInput : public Arya::InputListener, public Arya::FrameListener
 		void setSpecPos(vec3 pos);
 
     private: 
-        GameSession* session;
+        ClientGameSession* session;
 
         //For key movement
         bool goingForward, goingBackward, goingLeft, goingRight, goingUp, goingDown, rotatingLeft, rotatingRight;

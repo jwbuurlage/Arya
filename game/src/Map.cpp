@@ -22,9 +22,6 @@ Map::~Map()
 
     if(hFile) Arya::FileSystem::shared().releaseFile(hFile);
     hFile = 0;
-
-	if(info)
-		delete info;
 }
 
 bool Map::initHeightData()

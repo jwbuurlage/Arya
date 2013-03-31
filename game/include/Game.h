@@ -1,5 +1,4 @@
 #include "Arya.h"
-#include "../include/GameSession.h"
 #include "../include/Events.h"
 
 using Arya::Root;
@@ -17,6 +16,7 @@ using Arya::cvar;
 class Network;
 class EventManager;
 class Scripting;
+class ClientGameSession;
 
 class Game : public Arya::InputListener , public Arya::FrameListener, public EventHandler, public Arya::CommandListener, public Arya::ButtonDelegate
 {
@@ -50,7 +50,7 @@ class Game : public Arya::InputListener , public Arya::FrameListener, public Eve
         Scripting* scripting;
         Network* network;
         EventManager* eventManager;
-        GameSession* session;
+        ClientGameSession* session;
 		bool handleCommand(string command);
 		void createSessionDebug(int sessionHash);
 		void joinSession(int sessionHash);

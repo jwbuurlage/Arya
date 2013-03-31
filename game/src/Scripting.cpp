@@ -1,7 +1,9 @@
 #include "../include/Scripting.h"
 #include "../include/Game.h"
+#include "../include/GameSession.h"
 #include "../include/UnitTypes.h"
 #include "../include/Units.h"
+#include "../include/Faction.h"
 #include "../include/MapInfo.h"
 #include "../include/ServerGameSession.h"
 #include "../include/common/GameLogger.h"
@@ -71,12 +73,9 @@ luabind::object& getCustomUnitData(const Unit& unit)
 void Unit::createScriptData()
 {
     customData = 0;
-
-    Scripting& scripting = Scripting::shared();
-    if(&scripting != 0)
-    {
-        customData = new LuaScriptData(luabind::newtable(scripting.getState()));
-    }
+    Scripting* scripting = session->getScripting();
+    if(scripting)
+        customData = new LuaScriptData(luabind::newtable(scripting->getState()));
 }
 
 void Unit::deleteScriptData()
@@ -196,18 +195,14 @@ void luaPrint(const std::string& msg)
     GAME_LOG_DEBUG("Script: " << msg);
 }
 
-Scripting* Scripting::singleton = 0;
-
 Scripting::Scripting()
 {
-    if(singleton == 0) singleton = this;
     luaState = 0;
 }
 
 Scripting::~Scripting()
 {
     cleanup();
-    if(singleton == this) singleton = 0;
 }
 
 int Scripting::init()
@@ -219,6 +214,7 @@ int Scripting::init()
 
     luabind::open(luaState);
 
+    //Set the script search path for the require function
     luabind::object pak = luabind::globals(luaState)["package"];
     if(pak)
     {

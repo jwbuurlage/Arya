@@ -1,5 +1,5 @@
 #include "../include/GameSessionInput.h"
-#include "../include/GameSession.h"
+#include "../include/ClientGameSession.h"
 #include "../include/Faction.h"
 #include "../include/Units.h"
 #include "../include/Game.h"
@@ -9,7 +9,7 @@
 // for sprintf
 #include <stdio.h>
 
-GameSessionInput::GameSessionInput(GameSession* ses)
+GameSessionInput::GameSessionInput(ClientGameSession* ses)
 {
     session = ses;
 
