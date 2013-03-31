@@ -3,8 +3,9 @@
 #include "../include/Faction.h"
 #include "../include/common/GameLogger.h"
 
-GameSession::GameSession(Scripting* _scripting) : scripting(_scripting)
+GameSession::GameSession(Scripting* _scripting, bool _server) : scripting(_scripting), isServerSession(_server)
 {
+    map = 0;
 }
 
 GameSession::~GameSession()

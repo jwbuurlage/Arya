@@ -116,6 +116,5 @@ class ServerGameSession : public GameSession
 		//and the state is changed to STARTED and the game timer starts
 		bool gameStarted;
 
-        Map* map;
         void initMap();
 };

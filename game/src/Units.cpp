@@ -175,7 +175,7 @@ void Unit::setCellFromList(CellList* cl)
     setCell(cl->cellForPosition(getPosition2()));
 }
 
-void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
+void Unit::update(float timeElapsed)
 {
     //For any units referenced by this unit we must check if they are obsolete
     //Currently the only referenced unit is targetUnit
@@ -272,8 +272,10 @@ void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
 
                 //When the unit dies the server sends a packet
                 //The client leaves the unit alive untill it receives the packet
-                if(serverSession)
+                if(session->isServer())
                 {
+                    //TODO: just call session->onUnitDied() which handles this!!
+                    ServerGameSession* serverSession = (ServerGameSession*)session;
                     if(!targetUnit->isAlive())
                     {
                         targetUnit->getInfo()->onDeath(targetUnit);
@@ -324,6 +326,7 @@ void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
             else
                 newPosition = getPosition2() + distanceToTravel * glm::normalize(diff);
 
+            Map* map = session->getMap();
             float height = (map ? map->heightAtGroundPosition(newPosition.x, newPosition.y) : 0.0f);
             setPosition(vec3(newPosition.x, height, newPosition.y));
         }

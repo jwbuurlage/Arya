@@ -69,7 +69,7 @@ class Unit
         void setSelected(bool sel) { selected = sel; }
         bool isSelected() { return selected; }
 
-        void update(float timeElapsed, Map* map, ServerGameSession* serverSession = 0);
+        void update(float timeElapsed);
 
         vec2 getTargetPosition() const { return targetPosition; }
         void setTargetPosition(vec2 target);

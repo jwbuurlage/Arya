@@ -19,7 +19,6 @@ using Arya::Shader;
 using Arya::ShaderProgram;
 
 class GameSessionInput;
-class Map;
 class Faction;
 
 struct CellList;
@@ -51,7 +50,6 @@ class ClientGameSession :
 
      private:
         GameSessionInput* input;
-        Map* map;
         Faction* localFaction;
         vector<Faction*> factions;
         vector<int> clients;
