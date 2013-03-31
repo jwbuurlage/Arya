@@ -5,11 +5,12 @@
 #include "../include/ServerClientHandler.h"
 #include "../include/EventCodes.h"
 #include "../include/Units.h"
+#include "../include/Faction.h"
 #include "../include/Map.h"
 #include "../include/MapInfo.h"
 #include "Arya.h"
 
-ServerGameSession::ServerGameSession(Server* serv) : server(serv)
+ServerGameSession::ServerGameSession(Server* serv) : GameSession(serv->getScripting()), server(serv)
 {
 	gameStarted = false;
 	idFactory = 1;
@@ -318,6 +319,8 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
 void ServerGameSession::initMap()
 {
     //TODO: The map is now reloaded for every game session. Please.
+    //Also, the server does not even need the map right now.
+    return;
     if(!map)
     {
         map = new Map(theMap);

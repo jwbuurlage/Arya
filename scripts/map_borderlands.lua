@@ -23,7 +23,7 @@ function(factionId, factionSpawnPos)
     print("Spawning faction " .. factionId .. " at position " .. factionSpawnPos .. ". Coordinates: " .. baseX .. "," .. baseZ)
 
     -- Spawn the boss
-    spawnUnit(factionId, "imp", vec2(baseX, baseZ))
+    spawnUnit(factionId, "The Boss", vec2(baseX, baseZ))
 
     -- Spawn the minions
     for i=0,9 do

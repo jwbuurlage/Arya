@@ -1,49 +1,11 @@
 #include "../include/common/GameLogger.h"
 #include "../include/Faction.h"
+#include "../include/GameSession.h"
 #include "../include/Units.h"
 #include "../include/Packet.h"
 #include "../include/FactionColors.h"
 
-FactionFactory::~FactionFactory()
-{
-	while(!factionMap.empty())
-		delete factionMap.begin()->second; //the faction deconstructor will unregister itself
-}
-
-Faction* FactionFactory::createFaction(int id)
-{
-    Faction* faction = getFactionById(id);
-    if(faction)
-    {
-        GAME_LOG_WARNING("Trying to create faction with duplicate id (" << id << ")");
-        return faction;
-    }
-    faction = new Faction(id, this);
-    factionMap.insert(pair<int,Faction*>(faction->getId(),faction));
-    return faction;
-}
-
-//Called from faction deconstructor
-void FactionFactory::destroyFaction(int id)
-{
-    factionMapIterator iter = factionMap.find(id);
-    if(iter == factionMap.end())
-    {
-        GAME_LOG_WARNING("Trying to destory unexisting faction id");
-        return;
-    }
-    factionMap.erase(iter);
-    return;
-}
-
-Faction* FactionFactory::getFactionById(int id)
-{
-    factionMapIterator iter = factionMap.find(id);
-    if(iter == factionMap.end()) return 0;
-    return iter->second;
-}
-
-Faction::Faction(int _id, FactionFactory* _factory) : factory(_factory), id(_id)
+Faction::Faction(int _id, GameSession* _session) : session(_session), id(_id)
 {
 	clientId = -1;
     color = 0;
@@ -57,7 +19,7 @@ Faction::~Faction()
         delete *it;
         it = units.erase(it);
     }
-    factory->destroyFaction(id);
+    session->destroyFaction(id);
 }
 
 void Faction::addUnit(Unit* unit)

@@ -1,64 +1,43 @@
+//GameSession is a base class for ClientGameSession and ServerGameSession
+//It serves as a Unit and Faction factory class
+//Units and Factions are created with createUnit and createFaction
+//and they can be deleted by just calling delete on them.
+//Every Unit and Faction has a pointer to this class
+//so that it can de-register itself at deconstruction
+//Note that the GameSession does not create or delete the scripting class
+//The Scripting class is created/deleted by Game and or Server
+//and all ServerGameSessions share the same Scripting class.
 #pragma once
 
-#include "Arya.h"
-#include "Events.h"
-#include "Units.h"
-#include "Faction.h"
+#include <map>
+using std::map;
 
-#include <vector>
-using std::vector;
+class Scripting;
+class Unit;
+class Faction;
 
-using Arya::Root;
-using Arya::Scene;
-using Arya::Object;
-using Arya::Model;
-using Arya::ModelManager;
-using Arya::Camera;
-using Arya::Texture;
-using Arya::TextureManager;
-using Arya::Shader;
-using Arya::ShaderProgram;
-
-class GameSessionInput;
-class Map;
-
-struct CellList;
-
-class GameSession :
-    public Arya::FrameListener,
-    public EventHandler,
-    public UnitFactory,
-    public FactionFactory
+class GameSession
 {
     public:
-        GameSession();
-        ~GameSession();
+        GameSession(Scripting* scripting);
+        virtual ~GameSession();
 
-        bool init();
-        bool initShaders();
-        bool initVertices();
+        Scripting* getScripting() const { return scripting; }
 
-        void rebuildCellList();
+        Unit* createUnit(int id, int type);
+        Unit* getUnitById(int id);
 
-        Faction* getLocalFaction() const { return localFaction; } ;
-        const vector<Faction*>& getFactions() const { return factions; }
+        Faction* createFaction(int id);
+        Faction* getFactionById(int id);
+    private:
+        friend class Unit;
+        friend class Faction;
+        map<int,Unit*> unitMap;
+        map<int,Faction*> factionMap;
+        typedef map<int,Unit*>::iterator unitMapIterator;
+        typedef map<int,Faction*>::iterator factionMapIterator;
+        void destroyUnit(int id); //called in Unit deconstructor
+        void destroyFaction(int id); //called in Faction deconstructor
 
-        // FrameListener
-        void onFrame(float elapsedTime);
-        void onRender();
-
-        void handleEvent(Packet& packet);
-        CellList* unitCells;
-
-     private:
-        GameSessionInput* input;
-        Map* map;
-        Faction* localFaction;
-        vector<Faction*> factions;
-        vector<int> clients;
-
-        ShaderProgram* decalProgram;
-        GLuint decalVao;
-
-        GLuint selectionDecalHandle;
+        Scripting* const scripting;
 };

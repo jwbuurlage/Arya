@@ -9,6 +9,7 @@ SET(
 	PROJECT_SOURCES
     "../src/Game.cpp"
     "../src/GameSession.cpp"
+    "../src/ClientGameSession.cpp"
     "../src/GameSessionInput.cpp"
     "../src/Scripting.cpp"
     "../src/Map.cpp"

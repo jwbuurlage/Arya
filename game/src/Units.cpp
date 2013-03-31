@@ -4,6 +4,7 @@
 #include "../include/Map.h"
 #include "../include/Game.h"
 #include "../include/EventCodes.h"
+#include "../include/GameSession.h"
 #include "../include/ServerGameSession.h"
 #include "../include/common/Cells.h"
 #include <math.h>
@@ -14,50 +15,8 @@
 
 using Arya::Root;
 
-UnitFactory::~UnitFactory()
+Unit::Unit(int _type, int _id, GameSession* _session) : session(_session), id(_id)
 {
-    if(!unitMap.empty())
-    {
-        GAME_LOG_ERROR("List of units is not empty at deconstruction of unit factory (gamesession). Possible memory leak");
-    }
-}
-
-Unit* UnitFactory::createUnit(int id, int type)
-{
-    Unit* unit = getUnitById(id);
-    if(unit)
-    {
-        GAME_LOG_WARNING("Trying to create unit with duplicate id (" << id << ")");
-        return unit;
-    }
-    unit = new Unit(type, id, this);
-    unitMap.insert(pair<int,Unit*>(unit->getId(),unit));
-    return unit;
-}
-
-//Called from Unit deconstructor
-void UnitFactory::destroyUnit(int id)
-{
-    unitMapIterator iter = unitMap.find(id);
-    if(iter == unitMap.end())
-    {
-        GAME_LOG_WARNING("Trying to destory unexisting unit id");
-        return;
-    }
-    unitMap.erase(iter);
-    return;
-}
-
-Unit* UnitFactory::getUnitById(int id)
-{
-    unitMapIterator iter = unitMap.find(id);
-    if(iter == unitMap.end()) return 0;
-    return iter->second;
-}
-
-Unit::Unit(int _type, int _id, UnitFactory* factory) : id(_id)
-{
-    unitFactory = factory;
     setType(_type);
     factionId = -1;
     local = false;
@@ -105,7 +64,7 @@ Unit::~Unit()
 
     deleteScriptData();
 
-    unitFactory->destroyUnit(id);
+    session->destroyUnit(id);
 
     setCell(0);
 
@@ -158,7 +117,7 @@ void Unit::checkForEnemies()
             // loop through
             for(unsigned i = 0; i < c->cellPoints.size(); ++i)
             {
-                Unit* unit = unitFactory->getUnitById(c->cellPoints[i]);
+                Unit* unit = session->getUnitById(c->cellPoints[i]);
                 if(!unit) continue;
                 if(unit->factionId == factionId) continue;
                 d = glm::distance(position, unit->getPosition());
@@ -500,7 +459,7 @@ void Unit::deserialize(Packet& pk)
     pk >> targetPosition;
     int targetUnitId;
     pk >> targetUnitId;
-    if(targetUnitId) targetUnit = unitFactory->getUnitById(targetUnitId);
+    if(targetUnitId) targetUnit = session->getUnitById(targetUnitId);
 }
 void Unit::getDebugText()
 {

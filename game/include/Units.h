@@ -3,10 +3,6 @@
 #include "Arya.h"
 #include "UnitTypes.h"
 
-#include <map>
-using std::map;
-using std::pair;
-
 using Arya::Object;
 using Arya::Rect;
 using Arya::Root;
@@ -28,44 +24,27 @@ typedef enum
 } UnitStance;
 
 class Packet;
-
 class Unit;
-
 class Map;
+class GameSession;
 class ServerGameSession;
-
+class LuaScriptData;
 struct CellList;
 struct Cell;
-
-//Factory design pattern
-class UnitFactory
-{
-    public:
-        UnitFactory(){};
-        virtual ~UnitFactory();
-
-        //destory units by calling delete on them
-        Unit* createUnit(int id, int type);
-        Unit* getUnitById(int id);
-    private:
-        map<int,Unit*> unitMap;
-        typedef map<int,Unit*>::iterator unitMapIterator;
-
-        friend class Unit;
-        void destroyUnit(int id);
-};
-
-class LuaScriptData;
 
 class Unit
 {
     private:
-        friend class UnitFactory;
-        UnitFactory* unitFactory;
+        //Only GameSession can create units
+        //This ensures that every unit is registered
+        //at the session and that every unit has a pointer
+        //to the session
+        friend class GameSession;
+        GameSession* const session;
 
-        Unit(int _type, int id, UnitFactory* factory);
+        Unit(int _type, int id, GameSession* session);
     public:
-        ~Unit(); //unregisters itself at unit factory
+        ~Unit(); //unregisters itself at session
 
         void setPosition(const vec3& pos);
         vec3 getPosition() const { return position; }
