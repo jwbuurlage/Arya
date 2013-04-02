@@ -66,4 +66,5 @@ class MapInfo
         //This will call the script callback function
         virtual void onLoad(ServerGameSession* serversession) {};
         virtual void onLoadFaction(ServerGameSession* serversession, int factionId, int factionSpawnPos) {};
+        virtual void onUpdate(ServerGameSession* serversession, float elapsedTime) {};
 };

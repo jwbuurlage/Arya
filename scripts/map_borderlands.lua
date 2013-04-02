@@ -17,6 +17,8 @@ end
 map.onLoad =
 function()
     print("Spawning neutral unit!")
+    spawnTimer = 0
+    spawnCounter = 0
     neutralFactionId = createFaction()
     spawnUnit(neutralFactionId, "The Boss", vec2(-15,  0))
     spawnUnit(neutralFactionId, "The Boss", vec2( 15,  0))
@@ -47,6 +49,16 @@ function(factionId, factionSpawnPos)
 end
 
 map.onUpdate =
-function(elapsedTimeOrTotalTime)
+function(elapsedTime)
+    spawnTimer = spawnTimer + elapsedTime
+    if spawnTimer > 3 then
+        spawnTimer = spawnTimer - 3
+        spawnUnit(neutralFactionId, "ogros", vec2(40*math.sin(spawnCounter), 40*math.cos(spawnCounter)))
+        spawnCounter = spawnCounter + 1
+    end
     --check for units near the center
+    --local unitList = getUnitsNearLocation(vec2(0,0), 30)
+    --for unit in unitList do
+    --  checkToWhichFactionTheyBelong
+    --end
 end

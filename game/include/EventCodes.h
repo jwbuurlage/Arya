@@ -110,6 +110,12 @@ typedef enum
 	//------------------------
 	EVENT_UNIT_DIED,
 
+    // - Faction ID
+    // - Unit ID
+    // - serialized unit
+    EVENT_UNIT_SPAWNED,
+
+
 	//------------------------
 	// - Faction ID
 	//------------------------
