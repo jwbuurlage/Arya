@@ -288,20 +288,29 @@ namespace Arya
 		time+=dt;
 
         // update patches LOD
+        mat4 vpMatrix = curScene->getCamera()->getVPMatrix();
         vec3 camPos = curScene->getCamera()->getRealCameraPosition();
 
-        for(unsigned int i = 0; i < patches.size(); ++i) {
+        for(unsigned int i = 0; i < patches.size(); ++i)
+        {
             Patch& p = patches[i];
-            vec3 pPos = vec3(p.position.x, -100.0f, p.position.y);
-            if(distance(pPos, camPos) < 300.0f)
+            vec4 onScreen(vpMatrix * vec4(p.position.x, -100.0f, p.position.y, 1.0));
+            onScreen /= onScreen.w;
+            if(onScreen.x < -2.0 || onScreen.x > 2.0 || onScreen.y < -2.0 || onScreen.y > 2.0)
+            {
+                p.lod = -1;
+                continue;
+            }
+            float dist = distance(vec3(p.position.x, -100.0f, p.position.y), camPos);
+            if(dist < 300.0f)
                 p.lod = 0;
-            else if(distance(pPos, camPos) < 600.0f)
+            else if(dist < 600.0f)
                 p.lod = 1;
-            else if(distance(pPos, camPos) < 900.0f)
+            else if(dist < 900.0f)
                 p.lod = 2;
-            else if(distance(pPos, camPos) < 1200.0f)
+            else if(dist < 1200.0f)
                 p.lod = 3;
-            else if(distance(pPos, camPos) < 1500.0f)
+            else if(dist < 1500.0f)
                 p.lod = 4;
             else
                 p.lod = levelMax -1;
