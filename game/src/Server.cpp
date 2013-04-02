@@ -61,6 +61,7 @@ Server::~Server()
 
 void Server::run()
 {
+    GameLoggerInstance->enableGameConsoleOutput(false);
     prepareServer();
     GAME_LOG_INFO("Server started on port " << port);
     reactor->run();
@@ -68,6 +69,7 @@ void Server::run()
 
 void Server::runInThread()
 {
+    GameLoggerInstance->enableGameConsoleOutput(false);
     prepareServer();
     thread.start(*reactor);
     GAME_LOG_INFO("Server started on port " << port);

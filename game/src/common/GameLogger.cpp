@@ -10,12 +10,14 @@ class InternalStream
 {
     public:
         Poco::ThreadLocal<std::stringstream> streambuff;
+        Poco::ThreadLocal<bool> outputGraphical;
 };
 
 GameLogger::GameLogger(void)
 {
     if(!GameLoggerInstance) GameLoggerInstance = this;
     internalStream = new InternalStream;
+    *internalStream->outputGraphical = true;
     consoleLogLevel = L_INFO | L_WARNING | L_ERROR | L_CRITICALERROR | L_DEBUG;
     fileLogLevel = L_WARNING | L_ERROR | L_CRITICALERROR;
     gameConsoleLogLevel = L_INFO | L_WARNING | L_ERROR | L_CRITICALERROR | L_DEBUG;
@@ -34,6 +36,11 @@ std::stringstream& GameLogger::getStream()
     return *(internalStream->streambuff);
 }
 
+void GameLogger::enableGameConsoleOutput(bool enable)
+{
+    *internalStream->outputGraphical = enable;
+}
+
 void GameLogger::log(LOGLEVEL type, const char* logText)
 {
     *this << type << logText << endLog;
@@ -49,7 +56,7 @@ void GameLogger::flush()
         filestream << getStream().str() << std::endl;
     }
 #ifndef SERVERONLY
-    if(gameConsoleLogLevel & currentLogLevel)
+    if(*internalStream->outputGraphical && (gameConsoleLogLevel & currentLogLevel))
     {
         if(&Arya::Console::shared() && Arya::Console::shared().isInitialized())
             Arya::Console::shared().addOutputText(getStream().str());
