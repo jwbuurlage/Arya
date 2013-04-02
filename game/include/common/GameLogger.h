@@ -34,6 +34,8 @@ public:
     int fileLogLevel;
     int gameConsoleLogLevel;
 
+    void enableGameConsoleOutput(bool enable);
+
     //This can be used instead of the << operators
     //It will append a newline
     void log(LOGLEVEL type, const char* logText); //log will append newline

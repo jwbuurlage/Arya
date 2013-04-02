@@ -51,6 +51,7 @@ void Game::run()
 		scripting->init();
 
 		scripting->execute("units.lua");
+		scripting->execute("maps.lua");
 
 		Arya::CommandHandler::shared().addCommandListener("createsession" ,this);
 		Arya::CommandHandler::shared().addCommandListener("joinsession" ,this);

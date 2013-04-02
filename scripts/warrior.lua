@@ -16,12 +16,10 @@ warrior.attackSound = "yes.wav"
 
 warrior.onSpawn = 
 function(unit)
-    print("all hail warrior " .. unit.id .. " who has now spawned")
 end
 
 warrior.onDeath = 
 function(unit)
-    print("oh no unit " .. unit.id .. " died :(")
 end
 
 warrior.onDamage = 
