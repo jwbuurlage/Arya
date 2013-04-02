@@ -14,6 +14,7 @@
 #include "Camera.h"
 #include "Shaders.h"
 #include "Interface.h"
+#include "Decals.h"
 
 #include "Overlay.h"
 
@@ -292,12 +293,19 @@ namespace Arya
             }
         }
 
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glViewport(0, 0, Root::shared().getWindowWidth(), Root::shared().getWindowHeight());
+
+        //------------------------------
+        // TERRAIN AND DECALS
+        //------------------------------
+
+        currentTerrain->render(camera);
+		Decals::shared().render();
+
         //------------------------------
         // NORMAL PASS
         //------------------------------
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glViewport(0, 0, Root::shared().getWindowWidth(), Root::shared().getWindowHeight());
 
         basicProgram->use();
 
@@ -341,8 +349,6 @@ namespace Arya
         }
 
         Root::shared().checkForErrors("scene render end");
-
-        currentTerrain->render(camera);
 
     }
 }

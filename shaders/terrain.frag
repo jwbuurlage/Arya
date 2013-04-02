@@ -49,6 +49,7 @@ void main()
 	FragColor=vec4(0.0, 0.0, 0.0, 1.0);
 	FragColor.xyz+=splatSample.r*color1.xyz+splatSample.g*color2.xyz+splatSample.b*color3.xyz;
 	FragColor.xyz/=(splatSample.r + splatSample.g + splatSample.b);
+	//FragColor.xyz += vec3(0.10);
 	FragColor.a=1.0;
 
     vec4 posOnShadowTex = lightOrthoMatrix * posOut;

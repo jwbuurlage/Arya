@@ -5,6 +5,7 @@
 
 using Arya::Object;
 using Arya::Rect;
+using Arya::Decal;
 using Arya::Root;
 
 typedef enum
@@ -66,7 +67,7 @@ class Unit
         void setType(int _type);
         UnitInfo* getInfo() const { return unitInfo; }
 
-        void setSelected(bool sel) { selected = sel; }
+        void setSelected(bool sel);
         bool isSelected() { return selected; }
 
         void update(float timeElapsed);
@@ -144,6 +145,7 @@ class Unit
         float dyingTime;
 
         Rect* healthBar;
+		Decal* selectionDecal;
         vec2 screenPosition;
         vec3 tintColor;
 };

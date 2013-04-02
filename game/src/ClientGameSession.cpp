@@ -195,7 +195,7 @@ void ClientGameSession::onFrame(float elapsedTime)
 
 void ClientGameSession::onRender()
 {
-    if(!localFaction) return;
+	return;
 
     glDisable(GL_CULL_FACE);
     glEnable(GL_BLEND);

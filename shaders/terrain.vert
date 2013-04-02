@@ -29,7 +29,7 @@ void main()
     texCoo = patchOffset + texCooPatch;
     vec4 pos = scaleMatrix * vec4(texCoo.x-0.5, height(texCoo), texCoo.y-0.5, 1.0);
 
-    float textureDelta = 1.0/512.0;
+    float textureDelta = 0.001953125; // 1/512
     float A = height(texCoo + vec2(0.0,textureDelta));
     float B = height(texCoo + vec2(textureDelta,0.0));
     float C = height(texCoo + vec2(0.0,-textureDelta));

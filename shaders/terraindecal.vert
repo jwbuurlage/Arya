@@ -2,23 +2,34 @@
 #extension GL_ARB_explicit_attrib_location : require
 
 uniform mat4 vpMatrix;
-uniform mat4 scaleMatrix;
+uniform vec2 oneOverTerrainSize;
 
-uniform vec3 groundPosition;
-uniform float unitRadius;
-uniform float yOffset;
-
+uniform sampler2D heightMap;
+layout (location = 0) in vec2 posIn;
 out vec2 texcoo;
 
-layout (location = 0) in vec2 position;
+uniform float scaleFactor;
+uniform vec2 offset;
+
+float height(vec2 tco)
+{
+    vec4 h = vec4(0.0);
+    h = texture(heightMap, tco);
+    return h.r;
+}
 
 void main()
 {
-    vec4 pos = vec4(groundPosition.x + unitRadius * (position.x - 0.5f),
-                        groundPosition.y + yOffset,
-                        groundPosition.z + unitRadius * (position.y - 0.5f),
-                        1.0);
-
-    texcoo = position;
-    gl_Position = vpMatrix * pos;
+	texcoo = posIn;
+	vec2 position = posIn;
+	
+	position -= vec2(0.5);
+	position *= scaleFactor;
+	position += offset;
+	
+	gl_Position = vpMatrix * vec4(
+		position.x,
+		150.0 * height( vec2(position.x * oneOverTerrainSize.x, position.y * oneOverTerrainSize.y) + vec2(0.5) ),
+		position.y,
+		1.0 );
 }

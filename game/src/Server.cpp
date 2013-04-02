@@ -189,8 +189,12 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
 			{
 				int sessionHash;
 				int clientCount;
+
 				packet >> sessionHash;
 				packet >> clientCount;
+
+				GAME_LOG_INFO("THE SESSION MADE WAS: " << sessionHash);
+
 				if(clientCount > 4)
 				{
 					GAME_LOG_WARNING("Lobby server tried to create session with " << clientCount << " players. This server can not handle this.");
@@ -233,6 +237,8 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
 				int sessionHash;
 				int clientHash;
 				packet >> sessionHash >> clientHash;
+
+				GAME_LOG_INFO("SESSION HASH: " << sessionHash << " " << clientHash);
 
                 ServerGameSession* session = 0;
 				sessionIterator iter = sessionList.find(sessionHash);

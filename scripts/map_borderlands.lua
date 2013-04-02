@@ -1,8 +1,8 @@
 local map = createMap(newMapTypeId)
 
 map.maxPlayers = 4
-map.width = 1024.0
-map.height = 1024.0
+map.width = 2000.0
+map.height = 2000.0
 map.name = "Borderlands"
 map.heightmap = "borderlands_heightmap.raw"
 map.heightmapSize = 1025
@@ -21,6 +21,10 @@ function(factionId, factionSpawnPos)
     local baseZ = -250 + 500 * math.floor(factionSpawnPos/2)
 
     print("Spawning faction " .. factionId .. " at position " .. factionSpawnPos .. ". Coordinates: " .. baseX .. "," .. baseZ)
+
+    spawnUnit(factionId, "Mill", vec2(baseX + 100, baseZ))
+    spawnUnit(factionId, "House", vec2(baseX - 100, baseZ))
+    -- spawnUnit(factionId, "Chapel", vec2(baseX, baseZ + 100))
 
     -- Spawn the boss
     spawnUnit(factionId, "The Boss", vec2(baseX, baseZ))

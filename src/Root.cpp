@@ -9,6 +9,7 @@
 #include "Fonts.h"
 #include "Textures.h"
 #include "Scene.h"
+#include "Decals.h"
 #include "Console.h"
 #include "Config.h"
 #include "Commands.h"
@@ -49,6 +50,7 @@ namespace Arya
         FontManager::create();
         SoundManager::create();
         Console::create();
+        Decals::create();
 
         //Some classes should be initialized
         //before the graphics, like Config.
@@ -75,6 +77,7 @@ namespace Arya
         Config::destroy();
         CommandHandler::destroy();
         FileSystem::destroy();
+		Decals::destroy();
 
         //TODO: Check if GLEW, GLFW, Shaders, Objects were still initated
         //Only clean them up if needed
@@ -126,6 +129,8 @@ namespace Arya
 		addInputListener(&Console::shared());
 
 		checkForErrors("end of root init");
+
+		Decals::shared().init();
 
 		LOG_INFO("Root initialized");
 

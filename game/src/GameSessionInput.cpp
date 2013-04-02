@@ -42,7 +42,7 @@ GameSessionInput::~GameSessionInput()
 
 void GameSessionInput::init()
 {
-    selectionRect->fillColor = vec4(1.0, 1.0, 1.0, 0.2);
+    selectionRect->fillColor = vec4(0.5, 1.0, 0.5, 0.1);
 
 	initUnitInfoWindow();
 }
@@ -51,7 +51,6 @@ void GameSessionInput::setSpecPos(vec3 pos)
 {
 	specPos = pos; 
 }
-
 
 void GameSessionInput::onFrame(float elapsedTime)
 {

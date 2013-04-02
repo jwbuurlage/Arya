@@ -1,14 +1,14 @@
 #version 400
 #extension GL_ARB_explicit_attrib_location : require
 
-uniform sampler2D selectionTexture;
-uniform vec3 uColor;
+in vec2 texcoo;
+
+uniform sampler2D decalTexture;
+uniform vec3 decalColor;
 
 layout (location = 0) out vec4 fragColor;
 
-in vec2 texcoo;
-
 void main()
 {
-    fragColor = vec4(uColor, 1.0) * texture(selectionTexture, texcoo);
+    fragColor = vec4(decalColor, 1.0) * texture(decalTexture, texcoo);
 }

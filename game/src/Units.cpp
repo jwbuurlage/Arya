@@ -53,6 +53,15 @@ Unit::Unit(int _type, int _id, GameSession* _session) : session(_session), id(_i
     //healthBar->offsetInPixels = vec2(-12.5, 25.0);
     //Root::shared().getOverlay()->addRect(healthBar);
 
+	// selection decal
+	if(!session->isServer())
+		selectionDecal = new Decal(Arya::TextureManager::shared().getTexture("selection.png"),
+				vec2(0.0, 0.0),
+				unitInfo->radius,
+				vec3(0.5) );
+	else
+		selectionDecal = 0;
+
     //Register at Game session unit id map
 }
 
@@ -76,6 +85,19 @@ Unit::~Unit()
 void Unit::setObject(Object* obj)
 {
     object = obj;
+}
+
+void Unit::setSelected(bool _sel)
+{
+	if(!(selected == _sel))
+	{
+		if(_sel)
+			Arya::Decals::shared().addDecal(selectionDecal);
+		else
+			Arya::Decals::shared().removeDecal(selectionDecal);
+	}
+
+	selected = _sel;
 }
 
 void Unit::setType(int _type)
@@ -147,6 +169,7 @@ void Unit::setPosition(const vec3& pos)
 {
     position = pos;
     if(object) object->setPosition(pos);
+	if(selectionDecal) selectionDecal->setPos(getPosition2());
 
     if(currentCell)
     {

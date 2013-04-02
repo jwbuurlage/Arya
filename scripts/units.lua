@@ -18,3 +18,12 @@ require("ranger")
 newUnitTypeId = 2;
 require("imp")
 
+newUnitTypeId = 3;
+require("house")
+
+newUnitTypeId = 4;
+require("chapel")
+
+newUnitTypeId = 5;
+require("mill")
+

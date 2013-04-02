@@ -90,12 +90,12 @@ void Unit::deleteScriptData()
 
 //This is temporary, see MapInfo.h
 MapInfo* theMap = new MapInfo(0, 4,
-				1024.0f,
-				1024.0f,
+				2048.0f,
+				2048.0f,
 				"Borderlands",
-				"heightmap.raw",
+				"borderlands_heightmap.raw",
 				1025,
-				"splatmap.tga",
+				"borderlands_splatmap.tga",
 				"grass.tga,snow.tga,rock.tga,dirt.tga");
 
 ServerGameSession* callbackSession = 0;

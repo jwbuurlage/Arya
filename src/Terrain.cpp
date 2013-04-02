@@ -285,6 +285,7 @@ namespace Arya
 
     void Terrain::update(float dt, Scene* curScene)
     {
+
 		time+=dt;
 
         // update patches LOD

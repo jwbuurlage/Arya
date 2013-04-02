@@ -3,6 +3,10 @@
 #include <vector>
 using std::vector;
 
+#include <iostream>
+using std::cerr;
+using std::endl;
+
 namespace Arya
 {
 	DrawableText::DrawableText(Font* _font, string _text)
@@ -102,6 +106,7 @@ namespace Arya
 
 		GLuint vertexBuffer;
 		glGenBuffers(1, &vertexBuffer);
+
 		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
         glBufferData(GL_ARRAY_BUFFER, 
 				sizeof(GLfloat) * index,
