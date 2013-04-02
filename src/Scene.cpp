@@ -251,6 +251,12 @@ namespace Arya
         {
             if( objects[i]->model == 0 ) continue;
             if(objects[i]->isObsolete()) continue;
+            
+            vec4 onScreen(objects[i]->getPosition(), 1.0);
+            onScreen = camera->getVPMatrix() * onScreen;
+            onScreen /= onScreen.w;
+            if(onScreen.x < -2.0 || onScreen.x > 2.0 || onScreen.y < -2.0 || onScreen.y > 2.0) continue;
+
             basicProgram->setUniform3fv("tintColor", objects[i]->getTintColor());
 
             basicProgram->setUniformMatrix4fv("mMatrix", objects[i]->getMoveMatrix());
@@ -299,6 +305,12 @@ namespace Arya
         {
             if( objects[i]->model == 0 ) continue;
             if(objects[i]->isObsolete()) continue;
+
+            vec4 onScreen(objects[i]->getPosition(), 1.0);
+            onScreen = camera->getVPMatrix() * onScreen;
+            onScreen /= onScreen.w;
+            if(onScreen.x < -1.1 || onScreen.x > 1.1 || onScreen.y < -1.1 || onScreen.y > 1.1) continue;
+
             basicProgram->setUniform3fv("tintColor", objects[i]->getTintColor());
 
             basicProgram->setUniformMatrix4fv("mMatrix", objects[i]->getMoveMatrix());
