@@ -14,6 +14,16 @@ function()
 	print("totally loading up these borders in those lands")
 end
 
+map.onLoad =
+function()
+    print("Spawning neutral unit!")
+    neutralFactionId = createFaction()
+    spawnUnit(neutralFactionId, "The Boss", vec2(-15,  0))
+    spawnUnit(neutralFactionId, "The Boss", vec2( 15,  0))
+    spawnUnit(neutralFactionId, "The Boss", vec2(  0,-15))
+    spawnUnit(neutralFactionId, "The Boss", vec2(  0, 15))
+end
+
 map.onLoadFaction =
 function(factionId, factionSpawnPos)
     -- This will give one of the 4 corners
@@ -34,4 +44,9 @@ function(factionId, factionSpawnPos)
         spawnUnit(factionId, "ogros", vec2(baseX + 20*math.floor(i/5) + 20, baseZ + 20*(i%5) - 40))
         spawnUnit(factionId, "hep", vec2(baseX - 20*math.floor(i/5) - 20, baseZ + 20*(i%5) - 40))
     end
+end
+
+map.onUpdate =
+function(elapsedTimeOrTotalTime)
+    --check for units near the center
 end

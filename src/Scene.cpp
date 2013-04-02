@@ -2,6 +2,7 @@
 #include <string.h>
 #include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
 #include "common/Listeners.h"
 #include "common/Logger.h"
@@ -24,6 +25,8 @@ using std::endl;
 using std::vector;
 using glm::vec3;
 
+const float PI = 3.14159265358979323846264338327950288f;
+
 namespace Arya
 {	
     Scene::Scene()
@@ -32,7 +35,7 @@ namespace Arya
         currentTerrain = 0; 
         camera = 0;
         basicProgram = 0;
-        lightDirection=vec3(0.7,0.7,0.0);
+        lightDirection=glm::normalize(vec3(0.7,0.7,0.2));
         init();
     }
 
@@ -142,14 +145,8 @@ namespace Arya
                 break;
         }
 
-        orthoShadowCubeMatrix = glm::ortho(-100.0, 100.0, 0.0, 200.0, -100.0, 100.0);
-
-        rotateToLightDirMatrix = glm::rotate(mat4(1.0),
-                glm::acos(glm::dot(glm::normalize(lightDirection),
-                        vec3(0.0, 0.0, 1.0))) * (180.0f / 3.141592653589793f),
-                glm::cross(lightDirection, vec3(0.0, 0.0, 1.0)));
-
-        lightOrthoMatrix = orthoShadowCubeMatrix * rotateToLightDirMatrix;
+        orthoShadowCubeMatrix = glm::ortho(-100.0, 100.0, -100.0, 100.0, -100.0, 100.0);
+        lightOrthoMatrix = orthoShadowCubeMatrix;
 
         return true;
     }
@@ -213,29 +210,23 @@ namespace Arya
         camera->update(elapsedTime);
         currentTerrain->update(elapsedTime, this);
 
-        GLfloat depth;
-        glReadPixels(0, 0, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
-        vec4 resultBL = camera->getInverseVPMatrix() * vec4(-1.0, -1.0, depth, 1.0);
-        resultBL /= resultBL.w;
-        glReadPixels(Root::shared().getWindowWidth() - 1, Root::shared().getWindowHeight() - 1, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
-        vec4 resultTR = camera->getInverseVPMatrix() * vec4(1.0, 1.0, depth, 1.0);
-        resultTR /= resultTR.w;
+        //
+        // Calculate the shadow projection matrix
+        //
 
-        float shadowBoxHalfWidth = (resultTR.x - resultBL.x) * 0.5f;
-        float shadowBoxHalfHeight = (resultBL.z - resultTR.z) * 0.5f;
-        vec3 translationToCenter = vec3(resultBL.x + shadowBoxHalfWidth, 0.0f, resultTR.z + shadowBoxHalfHeight);
+        //assumes lightDirection is normalized
+        float lightPitch = 90.0f - (180.0f/PI)*glm::acos(lightDirection.y); //[-180,180] positive means pointing upward
+        float lightYaw = (180.0f/PI)*glm::atan(lightDirection.x , lightDirection.z);
+        rotateToLightDirMatrix = mat4(1.0f);
+        rotateToLightDirMatrix = glm::rotate( rotateToLightDirMatrix, lightPitch, vec3(1.0, 0.0, 0.0) );
+        rotateToLightDirMatrix = glm::rotate( rotateToLightDirMatrix, -lightYaw, vec3(0.0, 1.0, 0.0) );
+        rotateToLightDirMatrix = glm::translate( rotateToLightDirMatrix, -camera->getPosition() );
+        
+        float shadowBoxSize = 2.0f*camera->getZoom();
+        //left,right,bottom,top,near,far
+        orthoShadowCubeMatrix = glm::ortho(-shadowBoxSize, shadowBoxSize, -shadowBoxSize, shadowBoxSize, -shadowBoxSize, shadowBoxSize);
 
-        // shadow stuff
-        orthoShadowCubeMatrix = glm::ortho(-shadowBoxHalfWidth, shadowBoxHalfWidth, -300.0f, 300.0f, -shadowBoxHalfHeight, shadowBoxHalfHeight);
-
-        rotateToLightDirMatrix = glm::rotate(mat4(1.0),
-                glm::acos(glm::dot(glm::normalize(lightDirection),
-                        vec3(0.0, 0.0, 1.0))) * (180.0f / 3.141592653589793f),
-                glm::cross(lightDirection, vec3(0.0, 0.0, 1.0)));
-
-        mat4 translationMatrix = glm::translate(mat4(1.0), -translationToCenter);
-
-        lightOrthoMatrix = orthoShadowCubeMatrix * rotateToLightDirMatrix* translationMatrix;
+        lightOrthoMatrix = orthoShadowCubeMatrix * rotateToLightDirMatrix;
     }
 
     void Scene::render()
@@ -255,12 +246,18 @@ namespace Arya
         basicProgram->use();
 
         basicProgram->setUniformMatrix4fv("vpMatrix", lightOrthoMatrix);
-        basicProgram->setUniformMatrix4fv("viewMatrix", camera->getVMatrix());
+        //basicProgram->setUniformMatrix4fv("viewMatrix", camera->getVMatrix());
 
         for(unsigned int i = 0; i < objects.size(); ++i)
         {
             if( objects[i]->model == 0 ) continue;
             if(objects[i]->isObsolete()) continue;
+            
+            vec4 onScreen(objects[i]->getPosition(), 1.0);
+            onScreen = camera->getVPMatrix() * onScreen;
+            onScreen /= onScreen.w;
+            if(onScreen.x < -2.0 || onScreen.x > 2.0 || onScreen.y < -2.0 || onScreen.y > 2.0) continue;
+
             basicProgram->setUniform3fv("tintColor", objects[i]->getTintColor());
 
             basicProgram->setUniformMatrix4fv("mMatrix", objects[i]->getMoveMatrix());
@@ -310,12 +307,18 @@ namespace Arya
         basicProgram->use();
 
         basicProgram->setUniformMatrix4fv("vpMatrix", camera->getVPMatrix());
-        basicProgram->setUniformMatrix4fv("viewMatrix", camera->getVMatrix());
+        //basicProgram->setUniformMatrix4fv("viewMatrix", camera->getVMatrix());
 
         for(unsigned int i = 0; i < objects.size(); ++i)
         {
             if( objects[i]->model == 0 ) continue;
             if(objects[i]->isObsolete()) continue;
+
+            vec4 onScreen(objects[i]->getPosition(), 1.0);
+            onScreen = camera->getVPMatrix() * onScreen;
+            onScreen /= onScreen.w;
+            if(onScreen.x < -1.1 || onScreen.x > 1.1 || onScreen.y < -1.1 || onScreen.y > 1.1) continue;
+
             basicProgram->setUniform3fv("tintColor", objects[i]->getTintColor());
 
             basicProgram->setUniformMatrix4fv("mMatrix", objects[i]->getMoveMatrix());

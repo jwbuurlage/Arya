@@ -56,6 +56,9 @@ namespace Arya
             //we subclass Object in a clever way
             //so no extra space is needed.
             vector<Object*> objects;
+
+            //lightDirection points TO the light
+            //it should always be normalized
 			vec3 lightDirection;
 
             Terrain* currentTerrain;
