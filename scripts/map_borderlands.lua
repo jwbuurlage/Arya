@@ -18,10 +18,10 @@ map.onLoad =
 function()
     print("Spawning neutral unit!")
     neutralFactionId = createFaction()
-    spawnUnit(factionId, "The Boss", vec2(-10,  0))
-    spawnUnit(factionId, "The Boss", vec2( 10,  0))
-    spawnUnit(factionId, "The Boss", vec2(  0,-10))
-    spawnUnit(factionId, "The Boss", vec2(  0, 10))
+    spawnUnit(neutralFactionId, "The Boss", vec2(-15,  0))
+    spawnUnit(neutralFactionId, "The Boss", vec2( 15,  0))
+    spawnUnit(neutralFactionId, "The Boss", vec2(  0,-15))
+    spawnUnit(neutralFactionId, "The Boss", vec2(  0, 15))
 end
 
 map.onLoadFaction =
