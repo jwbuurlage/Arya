@@ -16,13 +16,11 @@ ranger.attackSound = "yes.wav"
 
 ranger.onSpawn =
 function(unit)
-    print("rangerdude " .. unit.id .. " has now spawned and will kick your ass")
     unit.customData.attackCount = 0
 end
 
 ranger.onDeath = 
 function(unit)
-    print("oh no ranger " .. unit.id .. " died :(")
 end
 
 ranger.onDamage = 
