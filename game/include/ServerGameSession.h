@@ -78,6 +78,13 @@ class ServerGameSession : public GameSession
         Unit* createUnit(int type){ return GameSession::createUnit(getNewId(),type); }
         Faction* createFaction();
 
+        //sends to all clients
+        //The reason that this is not inside createUnit is
+        //that we first want to set unit properties like position
+        //before sending the packet
+        void sendUnitSpawnPacket(Unit* unit);
+
+        //connected clients, can be spectators
         unsigned int getClientCount() const { return clientList.size(); }
 
 		Packet* createPacket(int id);
@@ -86,6 +93,7 @@ class ServerGameSession : public GameSession
 		bool isGameStarted() const { return gameStarted; }
         void startGame();
 
+        vector<Unit*> getUnitsNearLocation(float x, float z, float distance);
     private:
         Server* const server;
         int idFactory;

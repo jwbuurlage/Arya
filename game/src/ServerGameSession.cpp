@@ -122,6 +122,17 @@ void ServerGameSession::removeClient(ServerClient* client)
     }
 }
 
+void ServerGameSession::sendUnitSpawnPacket(Unit* unit)
+{
+    if(clientList.empty()) return;
+    if(unit->getFactionId() == -1) return;
+    Packet* pak = server->createPacket(EVENT_UNIT_SPAWNED);
+    *pak << unit->getFactionId();
+    *pak << unit->getId();
+    unit->serialize(*pak);
+    sendToAllClients(pak);
+}
+
 Packet* ServerGameSession::createFullStatePacket()
 {
 	Packet* pak = server->createPacket(EVENT_GAME_FULLSTATE);
@@ -170,6 +181,23 @@ void ServerGameSession::sendToAllClients(Packet* pak)
 void ServerGameSession::startGame()
 {
 
+}
+
+vector<Unit*> ServerGameSession::getUnitsNearLocation(float x, float z, float distance)
+{
+    vector<Unit*> result;
+	for(factionIterator fac = factionList.begin(); fac != factionList.end(); ++fac)
+	{
+		Faction* faction = *fac;
+        for(list<Unit*>::iterator it = faction->getUnits().begin();
+                it != faction->getUnits().end(); )
+        {
+            Unit* unit = *it;
+            if( glm::distance(unit->getPosition2(), vec2(x,z)) < distance )
+                result.push_back(unit);
+        }
+    }
+    return result;
 }
 
 void ServerGameSession::update(float elapsedTime)
@@ -229,6 +257,8 @@ void ServerGameSession::update(float elapsedTime)
             }
         }
     }
+
+    theMap->onUpdate(this, elapsedTime);
 }
 
 void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)

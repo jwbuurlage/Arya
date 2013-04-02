@@ -60,6 +60,7 @@ bool ClientGameSession::init()
     Game::shared().getEventManager()->addEventHandler(EVENT_MOVE_UNIT, this);
     Game::shared().getEventManager()->addEventHandler(EVENT_ATTACK_MOVE_UNIT, this);
     Game::shared().getEventManager()->addEventHandler(EVENT_UNIT_DIED, this);
+    Game::shared().getEventManager()->addEventHandler(EVENT_UNIT_SPAWNED, this);
     Game::shared().getEventManager()->addEventHandler(EVENT_PLAYER_DEFEAT, this);
     Game::shared().getEventManager()->addEventHandler(EVENT_PLAYER_VICTORY, this);
 
@@ -432,6 +433,45 @@ void ClientGameSession::handleEvent(Packet& packet)
                                   {
                                       unit->makeDead();
                                       unit->getInfo()->onDeath(unit);
+                                  }
+                              }
+                              break;
+
+        case EVENT_UNIT_SPAWNED:
+                              {
+                                  int factionId, unitId;
+                                  packet >> factionId >> unitId;
+                                  Faction* faction = getFactionById(factionId);
+                                  if(!faction)
+                                  {
+                                      GAME_LOG_WARNING("Unit spawn packet received for invalid faction!");
+                                  }
+                                  else
+                                  {
+                                      Unit* unit = getUnitById(unitId);
+                                      bool newUnit = false;
+                                      if(unit)
+                                          GAME_LOG_WARNING("Spawn packet for unit that already existed");
+                                      else
+                                      {
+                                          newUnit = true;
+                                          unit = createUnit(unitId, 0);
+                                      }
+                                      unit->deserialize(packet);
+                                      if(faction == localFaction) unit->setLocal(true);
+                                      if(newUnit) faction->addUnit(unit);
+                                      if(newUnit) unit->setCellFromList(unitCells);
+
+                                      unit->getInfo()->onSpawn(unit);
+
+                                      Object* obj = unit->getObject();
+                                      if(!obj) obj = Root::shared().getScene()->createObject();
+                                      obj->setModel(ModelManager::shared().getModel(unit->getInfo()->modelname + ".aryamodel"));
+                                      obj->setAnimation("stand");
+                                      unit->setObject(obj);
+
+                                      float heightModel = map->heightAtGroundPosition(unit->getPosition().x, unit->getPosition().z);
+                                      unit->setPosition(vec3(unit->getPosition().x, heightModel, unit->getPosition().z));
                                   }
                               }
                               break;

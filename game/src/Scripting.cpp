@@ -131,8 +131,21 @@ class LuaMapInfo : public MapInfo
             }
         }
 
+        void onUpdate(ServerGameSession* serversession, float elapsedTime)
+        {
+            if(objOnUpdate && luabind::type(objOnUpdate) == LUA_TFUNCTION)
+            {
+                ServerGameSession* oldsession = callbackSession;
+                callbackSession = serversession;
+                try{ luabind::call_function<void>(objOnUpdate, elapsedTime); }
+                catch(luabind::error& e){ GAME_LOG_ERROR("Script error: " << e.what()); }
+                callbackSession = oldsession;
+            }
+        }
+
         luabind::object objOnLoad;
         luabind::object objOnLoadFaction;
+        luabind::object objOnUpdate;
 };
 
 LuaMapInfo* createMap(int typeId)
@@ -196,14 +209,23 @@ void spawnUnit(int factionId, const std::string& unitType, const LuaVec2& pos)
                 faction->addUnit(unit);
                 //Call the unit script callback
                 unit->getInfo()->onSpawn(unit);
+                callbackSession->sendUnitSpawnPacket(unit);
             }
         }
     }
 }
 
-void getUnitsNearLocation(vec2 location)
+std::vector<Unit*> getUnitsNearLocation(LuaVec2 location, float distance)
 {
-
+    if(callbackSession == 0)
+    {
+        GAME_LOG_WARNING("Script called spawnUnit but no game session was set");
+        return std::vector<Unit*>();
+    }
+    else
+    {
+        return callbackSession->getUnitsNearLocation(location.x, location.y, distance);
+    }
 }
 
 //
@@ -306,6 +328,7 @@ int Scripting::init()
         luabind::class_<LuaMapInfo, MapInfo>("MapInfo")
             .def_readwrite("onLoad", &LuaMapInfo::objOnLoad)
             .def_readwrite("onLoadFaction", &LuaMapInfo::objOnLoadFaction)
+            .def_readwrite("onUpdate", &LuaMapInfo::objOnUpdate)
             .def_readwrite("maxPlayers", &LuaMapInfo::maxPlayers)
             .def_readwrite("width", &LuaMapInfo::width)
             .def_readwrite("height", &LuaMapInfo::height)
