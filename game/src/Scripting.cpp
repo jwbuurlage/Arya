@@ -98,6 +98,7 @@ MapInfo* theMap = new MapInfo(0, 4,
 				"splatmap.tga",
 				"grass.tga,snow.tga,rock.tga,dirt.tga");
 
+//TODO: Make this thread-local if server becomes multi-threaded
 ServerGameSession* callbackSession = 0;
 
 class LuaMapInfo : public MapInfo
@@ -154,6 +155,20 @@ class LuaVec3
         float x, y, z;
 };
 
+int createFaction()
+{
+    if(callbackSession == 0)
+    {
+        GAME_LOG_WARNING("Script called createFaction but no game session was set");
+        return 0;
+    }
+    else
+    {
+		Faction* faction = callbackSession->createFaction();
+        return faction->getId();
+    }
+}
+
 void spawnUnit(int factionId, const std::string& unitType, const LuaVec2& pos)
 {
     if(callbackSession == 0)
@@ -184,6 +199,11 @@ void spawnUnit(int factionId, const std::string& unitType, const LuaVec2& pos)
             }
         }
     }
+}
+
+void getUnitsNearLocation(vec2 location)
+{
+
 }
 
 //
@@ -256,7 +276,9 @@ int Scripting::init()
             .def_readwrite("y", &LuaVec3::y)
             .def_readwrite("z", &LuaVec3::z),
 
+        luabind::def("createFaction", &createFaction),
         luabind::def("spawnUnit", &spawnUnit),
+        luabind::def("getUnitsNearLocation", &getUnitsNearLocation),
 
         luabind::def("createUnitType", &createLuaUnitType),
         luabind::class_<UnitInfo>("UnitInfoBase"), //should not be used in scripts directly

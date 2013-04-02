@@ -76,7 +76,7 @@ class ServerGameSession : public GameSession
 
         int getNewId() { return idFactory++; }
         Unit* createUnit(int type){ return GameSession::createUnit(getNewId(),type); }
-        Faction* createFaction(){ return GameSession::createFaction(getNewId()); }
+        Faction* createFaction();
 
         unsigned int getClientCount() const { return clientList.size(); }
 
@@ -95,11 +95,12 @@ class ServerGameSession : public GameSession
         vector<ServerClient*> clientList;
         typedef vector<ServerClient*>::iterator clientIterator;
 
-		//Important:
+		//!! Important:
 		//the order of this list corresponds to the
 		//order of the players in GameInfo
-		//Neutral factions are not in this list
-		vector<Faction*> clientFactionList;
+        //The first 'gameInfo.playerCount' factions correspond to the
+        //players, and the other factions are neutrals or created by scripts
+		vector<Faction*> factionList;
 		typedef vector<Faction*>::iterator factionIterator;
 
 		GameInfo gameInfo;

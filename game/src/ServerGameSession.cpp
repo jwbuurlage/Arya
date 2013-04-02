@@ -32,37 +32,41 @@ ServerGameSession::ServerGameSession(Server* serv) : GameSession(serv->getScript
 ServerGameSession::~ServerGameSession()
 {
     //Deleting the factions will cause all units to be deleted
-	for(factionIterator it = clientFactionList.begin(); it != clientFactionList.end(); ++it)
+	for(factionIterator it = factionList.begin(); it != factionList.end(); ++it)
 		delete *it;
-	clientFactionList.clear();
+	factionList.clear();
 }
 
 void ServerGameSession::initialize()
 {
-	if(!clientFactionList.empty())
+	if(!factionList.empty())
 	{
 		GAME_LOG_WARNING("ServerGameSession initialize called but factionlist was already populated. Removing old factions.");
-		for(factionIterator it = clientFactionList.begin(); it != clientFactionList.end(); ++it)
+		for(factionIterator it = factionList.begin(); it != factionList.end(); ++it)
 			delete *it;
-		clientFactionList.clear();
+		factionList.clear();
 	}
+
+	//create factions
+	for(int i = 0; i < gameInfo.playerCount; ++i)
+	{
+		Faction* faction = createFaction();
+		faction->setColor(gameInfo.players[i].color);
+    }
+
+    //Note that the script can also create factions at onLoad
 
     //TODO: change this theMap thing to something else, see MapInfo.h
     theMap->onLoad(this);
-
-	//create faction
-	for(int i = 0; i < gameInfo.playerCount; ++i)
-	{
-		//createFaction will register it to the list
-		Faction* faction = createFaction();
-		faction->setColor(gameInfo.players[i].color);
-        clientFactionList.push_back(faction);
-    }
-    //call the scripts faction load function
-    //we use seperate loops to ensure all factions have been created
-    //in case the script needs this
     for(int i = 0; i < gameInfo.playerCount; ++i)
-        theMap->onLoadFaction(this, clientFactionList[i]->getId(), gameInfo.players[i].slot);
+        theMap->onLoadFaction(this, factionList[i]->getId(), gameInfo.players[i].slot);
+}
+
+Faction* ServerGameSession::createFaction()
+{
+    Faction* faction = GameSession::createFaction(getNewId());
+    factionList.push_back(faction);
+    return faction;
 }
 
 void ServerGameSession::addClient(ServerClient* client, int index)
@@ -76,14 +80,14 @@ void ServerGameSession::addClient(ServerClient* client, int index)
     {
         GAME_LOG_WARNING("ServerClient was already in a session and then added to another gamesession");
     }
-	if(clientFactionList.empty())
+	if(factionList.empty())
 	{
 		GAME_LOG_ERROR("ServerGameSession addClient called before session was initialized!");
 		return;
 	}
     client->setSession(this);
-	client->setFaction(clientFactionList[index]);
-	clientFactionList[index]->setClientId(client->getClientId());
+	client->setFaction(factionList[index]);
+	factionList[index]->setClientId(client->getClientId());
     clientList.push_back(client);
     //Send the full game state (only to the new client)
 	client->handler->sendPacket(createFullStatePacket());
@@ -122,9 +126,9 @@ Packet* ServerGameSession::createFullStatePacket()
 {
 	Packet* pak = server->createPacket(EVENT_GAME_FULLSTATE);
 
-	*pak << (int)clientFactionList.size();
+	*pak << (int)factionList.size();
 
-	for(factionIterator iter = clientFactionList.begin(); iter != clientFactionList.end(); ++iter)
+	for(factionIterator iter = factionList.begin(); iter != factionList.end(); ++iter)
 	{
 		Faction* faction = *iter;
 
@@ -170,7 +174,7 @@ void ServerGameSession::startGame()
 
 void ServerGameSession::update(float elapsedTime)
 {
-	for(factionIterator fac = clientFactionList.begin(); fac != clientFactionList.end(); ++fac)
+	for(factionIterator fac = factionList.begin(); fac != factionList.end(); ++fac)
 	{
 		Faction* faction = *fac;
 
