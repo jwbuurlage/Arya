@@ -17,6 +17,7 @@ using Arya::Root;
 
 Unit::Unit(int _type, int _id, GameSession* _session) : session(_session), id(_id)
 {
+	selectionDecal = 0;
     setType(_type);
     factionId = -1;
     local = false;
@@ -55,12 +56,12 @@ Unit::Unit(int _type, int _id, GameSession* _session) : session(_session), id(_i
 
 	// selection decal
 	if(!session->isServer())
+	{
 		selectionDecal = new Decal(Arya::TextureManager::shared().getTexture("selection.png"),
 				vec2(0.0, 0.0),
 				unitInfo->radius,
 				vec3(0.5) );
-	else
-		selectionDecal = 0;
+	}
 
     //Register at Game session unit id map
 }
@@ -106,6 +107,9 @@ void Unit::setType(int _type)
     unitInfo = getUnitInfo(_type);
     if(unitInfo == 0)
         GAME_LOG_ERROR("UnitInfo for type " << type << " not found! This will crash");
+	else	
+		if(selectionDecal)
+			selectionDecal->scale = unitInfo->radius;
 }
 
 void Unit::checkForEnemies()
@@ -169,7 +173,8 @@ void Unit::setPosition(const vec3& pos)
 {
     position = pos;
     if(object) object->setPosition(pos);
-	if(selectionDecal) selectionDecal->setPos(getPosition2());
+	if(selectionDecal)
+		selectionDecal->setPos(getPosition2());
 
     if(currentCell)
     {
