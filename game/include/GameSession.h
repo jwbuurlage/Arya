@@ -1,64 +1,56 @@
+//GameSession is a base class for ClientGameSession and ServerGameSession
+//It serves as a Unit and Faction factory class
+//Units and Factions are created with createUnit and createFaction
+//and they can be deleted by just calling delete on them.
+//Every Unit and Faction has a pointer to this class
+//so that it can de-register itself at deconstruction
+//Note that this subclass does not create or delete the Scripting or Map class
+//The Scripting class is created/deleted by Game and or Server
+//and all ServerGameSessions share the same Scripting class.
+//The Map class is created by the ClientGameSessions subclass and or Server
 #pragma once
 
-#include "Arya.h"
-#include "Events.h"
-#include "Units.h"
-#include "Faction.h"
+#include <map>
 
-#include <vector>
-using std::vector;
-
-using Arya::Root;
-using Arya::Scene;
-using Arya::Object;
-using Arya::Model;
-using Arya::ModelManager;
-using Arya::Camera;
-using Arya::Texture;
-using Arya::TextureManager;
-using Arya::Shader;
-using Arya::ShaderProgram;
-
-class GameSessionInput;
+class Scripting;
+class Unit;
+class Faction;
 class Map;
 
-struct CellList;
-
-class GameSession :
-    public Arya::FrameListener,
-    public EventHandler,
-    public UnitFactory,
-    public FactionFactory
+class GameSession
 {
     public:
-        GameSession();
-        ~GameSession();
+        GameSession(Scripting* scripting, bool isServer);
+        virtual ~GameSession();
 
-        bool init();
-        bool initShaders();
-        bool initVertices();
+        bool isServer() const { return isServerSession; }
 
-        void rebuildCellList();
+        Scripting* getScripting() const { return scripting; }
+        Map* getMap() const { return map; }
 
-        Faction* getLocalFaction() const { return localFaction; } ;
-        const vector<Faction*>& getFactions() const { return factions; }
+        Unit* createUnit(int id, int type);
+        Unit* getUnitById(int id);
 
-        // FrameListener
-        void onFrame(float elapsedTime);
-        void onRender();
-
-        void handleEvent(Packet& packet);
-        CellList* unitCells;
-
-     private:
-        GameSessionInput* input;
+        Faction* createFaction(int id);
+        Faction* getFactionById(int id);
+    protected:
         Map* map;
-        Faction* localFaction;
-        vector<Faction*> factions;
-        vector<int> clients;
 
-        ShaderProgram* decalProgram;
-        GLuint decalVao;
+    private:
+        friend class Unit;
+        friend class Faction;
+        //We have to use std:: here because we also have a variable called map
+        std::map<int,Unit*> unitMap;
+        std::map<int,Faction*> factionMap;
+        typedef std::map<int,Unit*>::iterator unitMapIterator;
+        typedef std::map<int,Faction*>::iterator factionMapIterator;
+        void destroyUnit(int id); //called in Unit deconstructor
+        void destroyFaction(int id); //called in Faction deconstructor
 
-        GLuint selectionDecalHandle;
+        Scripting* const scripting;
+
+        //This bool specifies if this session is a server session.
+        //It is used by the Unit update loop to decide wether it should
+        //send event packets or do nothing.
+        bool isServerSession;
 };

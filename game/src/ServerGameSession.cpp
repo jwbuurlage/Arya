@@ -5,11 +5,12 @@
 #include "../include/ServerClientHandler.h"
 #include "../include/EventCodes.h"
 #include "../include/Units.h"
+#include "../include/Faction.h"
 #include "../include/Map.h"
 #include "../include/MapInfo.h"
 #include "Arya.h"
 
-ServerGameSession::ServerGameSession(Server* serv) : server(serv)
+ServerGameSession::ServerGameSession(Server* serv) : GameSession(serv->getScripting(), true), server(serv)
 {
 	gameStarted = false;
 	idFactory = 1;
@@ -31,52 +32,41 @@ ServerGameSession::ServerGameSession(Server* serv) : server(serv)
 ServerGameSession::~ServerGameSession()
 {
     //Deleting the factions will cause all units to be deleted
-	for(factionIterator it = clientFactionList.begin(); it != clientFactionList.end(); ++it)
+	for(factionIterator it = factionList.begin(); it != factionList.end(); ++it)
 		delete *it;
-	clientFactionList.clear();
+	factionList.clear();
 }
 
 void ServerGameSession::initialize()
 {
-	if(!clientFactionList.empty())
+	if(!factionList.empty())
 	{
 		GAME_LOG_WARNING("ServerGameSession initialize called but factionlist was already populated. Removing old factions.");
-		for(factionIterator it = clientFactionList.begin(); it != clientFactionList.end(); ++it)
+		for(factionIterator it = factionList.begin(); it != factionList.end(); ++it)
 			delete *it;
-		clientFactionList.clear();
+		factionList.clear();
 	}
 
-    //TODO: change this, see MapInfo.h
-    theMap->onLoad();
-
-	//create factions and start units
+	//create factions
 	for(int i = 0; i < gameInfo.playerCount; ++i)
 	{
-		//createFaction will register it to the list
 		Faction* faction = createFaction();
 		faction->setColor(gameInfo.players[i].color);
+    }
 
-        int num = gameInfo.players[i].slot;
-        vec3 basePos( -250.0f + 500.0f * (num%2), 0.0f, -250.0f + 500.0f * (num/2) ); //one of the 4 corners of map
-		for(int i = 0; i < 10; ++i)
-		{
-			Unit* unit = createUnit(0);
-            unit->setPosition(basePos + vec3(20.0f+20.0f*(i/5), 0.0f, -40.0f + 20.0f*(i%5)));
-			faction->addUnit(unit);
-            unit->getInfo()->onSpawn(unit);
+    //Note that the script can also create factions at onLoad
 
-			unit = createUnit(1);
-            unit->setPosition(basePos + vec3(-(20.0f+20.0f*(i/5)), 0.0f, -40.0f + 20.0f*(i%5)));
-			faction->addUnit(unit);
-            unit->getInfo()->onSpawn(unit);
-		}
+    //TODO: change this theMap thing to something else, see MapInfo.h
+    theMap->onLoad(this);
+    for(int i = 0; i < gameInfo.playerCount; ++i)
+        theMap->onLoadFaction(this, factionList[i]->getId(), gameInfo.players[i].slot);
+}
 
-        Unit* u = createUnit(2);
-        u->setPosition(basePos);
-        faction->addUnit(u);
-
-        clientFactionList.push_back(faction);
-	}
+Faction* ServerGameSession::createFaction()
+{
+    Faction* faction = GameSession::createFaction(getNewId());
+    factionList.push_back(faction);
+    return faction;
 }
 
 void ServerGameSession::addClient(ServerClient* client, int index)
@@ -90,14 +80,14 @@ void ServerGameSession::addClient(ServerClient* client, int index)
     {
         GAME_LOG_WARNING("ServerClient was already in a session and then added to another gamesession");
     }
-	if(clientFactionList.empty())
+	if(factionList.empty())
 	{
 		GAME_LOG_ERROR("ServerGameSession addClient called before session was initialized!");
 		return;
 	}
     client->setSession(this);
-	client->setFaction(clientFactionList[index]);
-	clientFactionList[index]->setClientId(client->getClientId());
+	client->setFaction(factionList[index]);
+	factionList[index]->setClientId(client->getClientId());
     clientList.push_back(client);
     //Send the full game state (only to the new client)
 	client->handler->sendPacket(createFullStatePacket());
@@ -132,13 +122,24 @@ void ServerGameSession::removeClient(ServerClient* client)
     }
 }
 
+void ServerGameSession::sendUnitSpawnPacket(Unit* unit)
+{
+    if(clientList.empty()) return;
+    if(unit->getFactionId() == -1) return;
+    Packet* pak = server->createPacket(EVENT_UNIT_SPAWNED);
+    *pak << unit->getFactionId();
+    *pak << unit->getId();
+    unit->serialize(*pak);
+    sendToAllClients(pak);
+}
+
 Packet* ServerGameSession::createFullStatePacket()
 {
 	Packet* pak = server->createPacket(EVENT_GAME_FULLSTATE);
 
-	*pak << (int)clientFactionList.size();
+	*pak << (int)factionList.size();
 
-	for(factionIterator iter = clientFactionList.begin(); iter != clientFactionList.end(); ++iter)
+	for(factionIterator iter = factionList.begin(); iter != factionList.end(); ++iter)
 	{
 		Faction* faction = *iter;
 
@@ -182,9 +183,26 @@ void ServerGameSession::startGame()
 
 }
 
+vector<Unit*> ServerGameSession::getUnitsNearLocation(float x, float z, float distance)
+{
+    vector<Unit*> result;
+	for(factionIterator fac = factionList.begin(); fac != factionList.end(); ++fac)
+	{
+		Faction* faction = *fac;
+        for(list<Unit*>::iterator it = faction->getUnits().begin();
+                it != faction->getUnits().end(); )
+        {
+            Unit* unit = *it;
+            if( glm::distance(unit->getPosition2(), vec2(x,z)) < distance )
+                result.push_back(unit);
+        }
+    }
+    return result;
+}
+
 void ServerGameSession::update(float elapsedTime)
 {
-	for(factionIterator fac = clientFactionList.begin(); fac != clientFactionList.end(); ++fac)
+	for(factionIterator fac = factionList.begin(); fac != factionList.end(); ++fac)
 	{
 		Faction* faction = *fac;
 
@@ -218,7 +236,7 @@ void ServerGameSession::update(float elapsedTime)
                 //   so that this loop will remove it
                 // - big events like a full faction that loses all its units
                 //   ???????? solution needed ??????
-                unit->update(elapsedTime, map, this);
+                unit->update(elapsedTime);
                 ++it;
             }
         }
@@ -239,6 +257,8 @@ void ServerGameSession::update(float elapsedTime)
             }
         }
     }
+
+    theMap->onUpdate(this, elapsedTime);
 }
 
 void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
@@ -333,6 +353,8 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
 void ServerGameSession::initMap()
 {
     //TODO: The map is now reloaded for every game session. Please.
+    //Also, the server does not even need the map right now.
+    return;
     if(!map)
     {
         map = new Map(theMap);

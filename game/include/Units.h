@@ -3,12 +3,9 @@
 #include "Arya.h"
 #include "UnitTypes.h"
 
-#include <map>
-using std::map;
-using std::pair;
-
 using Arya::Object;
 using Arya::Rect;
+using Arya::Decal;
 using Arya::Root;
 
 typedef enum
@@ -28,44 +25,27 @@ typedef enum
 } UnitStance;
 
 class Packet;
-
 class Unit;
-
 class Map;
+class GameSession;
 class ServerGameSession;
-
+class LuaScriptData;
 struct CellList;
 struct Cell;
-
-//Factory design pattern
-class UnitFactory
-{
-    public:
-        UnitFactory(){};
-        virtual ~UnitFactory();
-
-        //destory units by calling delete on them
-        Unit* createUnit(int id, int type);
-        Unit* getUnitById(int id);
-    private:
-        map<int,Unit*> unitMap;
-        typedef map<int,Unit*>::iterator unitMapIterator;
-
-        friend class Unit;
-        void destroyUnit(int id);
-};
-
-class LuaScriptData;
 
 class Unit
 {
     private:
-        friend class UnitFactory;
-        UnitFactory* unitFactory;
+        //Only GameSession can create units
+        //This ensures that every unit is registered
+        //at the session and that every unit has a pointer
+        //to the session
+        friend class GameSession;
+        GameSession* const session;
 
-        Unit(int _type, int id, UnitFactory* factory);
+        Unit(int _type, int id, GameSession* session);
     public:
-        ~Unit(); //unregisters itself at unit factory
+        ~Unit(); //unregisters itself at session
 
         void setPosition(const vec3& pos);
         vec3 getPosition() const { return position; }
@@ -87,10 +67,10 @@ class Unit
         void setType(int _type);
         UnitInfo* getInfo() const { return unitInfo; }
 
-        void setSelected(bool sel) { selected = sel; }
+        void setSelected(bool sel);
         bool isSelected() { return selected; }
 
-        void update(float timeElapsed, Map* map, ServerGameSession* serverSession = 0);
+        void update(float timeElapsed);
 
         vec2 getTargetPosition() const { return targetPosition; }
         void setTargetPosition(vec2 target);
@@ -165,6 +145,7 @@ class Unit
         float dyingTime;
 
         Rect* healthBar;
+		Decal* selectionDecal;
         vec2 screenPosition;
         vec3 tintColor;
 };

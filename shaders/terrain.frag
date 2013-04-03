@@ -8,6 +8,7 @@ uniform sampler2D texture3;
 uniform sampler2D texture4;
 uniform sampler2D shadowMap;
 
+uniform vec3 lightDirection;
 uniform vec4 parameters1; //specAmp, specPow, ambient, diffuse
 uniform vec4 parameters2;
 uniform vec4 parameters3;
@@ -23,8 +24,6 @@ out vec4 FragColor;
 
 void main()
 {
-	vec3 lightDirection=vec3(0.7,0.7,0.0);//MUST BE REPLACED
-	
     float lightFraction = max(0.0,dot(normalize(normalOut), lightDirection));
 
 	vec4 tColor = vec4(0.0);
@@ -49,6 +48,7 @@ void main()
 	FragColor=vec4(0.0, 0.0, 0.0, 1.0);
 	FragColor.xyz+=splatSample.r*color1.xyz+splatSample.g*color2.xyz+splatSample.b*color3.xyz;
 	FragColor.xyz/=(splatSample.r + splatSample.g + splatSample.b);
+	//FragColor.xyz += vec3(0.10);
 	FragColor.a=1.0;
 
     vec4 posOnShadowTex = lightOrthoMatrix * posOut;

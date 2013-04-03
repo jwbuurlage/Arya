@@ -28,7 +28,7 @@ class Connection
         ~Connection()
         {
             delete socket;
-            delete dataBuffer;
+            delete[] dataBuffer;
         }
 
         void setEventManager(EventManager* handler)
@@ -100,10 +100,23 @@ class Connection
                             int packetSize = *(int*)(dataBuffer + 4); //this is including the header
                             if(packetSize > bufferSizeTotal)
                             {
-                                GAME_LOG_WARNING("Packet does not fit in buffer. Possible hack attempt. Removing client. Packet size = " << packetSize);
-                                socket->close();
-                                connected = false;
-                                return;
+                                if(packetSize > 5*1024*1024) //5 MB
+                                {
+                                    GAME_LOG_WARNING("Packet does not fit in buffer. Possible hack attempt. Removing client. Packet size = " << packetSize);
+                                    socket->close();
+                                    connected = false;
+                                    return;
+                                }
+                                else
+                                {
+                                    //Packet is too large. Allocate bigger buffer.
+                                    char* newBuffer = new char[packetSize+1];
+                                    memmove(newBuffer, dataBuffer, bytesReceived);
+                                    delete[] dataBuffer;
+                                    dataBuffer = newBuffer;
+                                    bufferSizeTotal = packetSize+1;
+                                }
+                                break;
                             }
                             if(bytesReceived >= packetSize)
                             {
@@ -212,7 +225,7 @@ class Connection
 
         EventManager* eventManager;
 
-        const int bufferSizeTotal;
+        int bufferSizeTotal;
         char* dataBuffer;
         int bytesReceived;
 };

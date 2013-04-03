@@ -55,7 +55,9 @@ namespace Arya
             virtual ~InterfaceElement();
 
             virtual void draw() { }
+			virtual void setActiveState(bool active) { }
 
+			bool getActiveState(){return isActive;}
 			void setParent(InterfaceElement* _parent);
 			void recalculateScreenSizeAndPosition();
 			vec2 getScreenOffset() const { return screenOffset; }
@@ -80,6 +82,7 @@ namespace Arya
 			vec4 colorMask; // i.e. vec4(1.0, 0.0, 0.0, 1.0) is blue filter
 
             vector<InterfaceElement*> childElements;
+			bool isActive;
 	};
 	
 	typedef enum
@@ -96,12 +99,11 @@ namespace Arya
             Window(vec2 _relativePosition, vec2 _absolutePosition, vec2 _size,
 				Texture* _backgroundTexture, int flags, string _title,
 				vec4 _backgroundColor = vec4(1.0));
-            ~Window() { }
+            ~Window();
 
             void draw();
 
 			void setActiveState(bool active);
-			bool getActiveState(){return isActive;}
 			void setSize(vec2 _size);
 
 			// ButtonDelegate
@@ -112,7 +114,6 @@ namespace Arya
 			Button* titleButton;
 			Image* background;
 			string title;
-			bool isActive;
 			int flags;
     };
 
@@ -161,6 +162,7 @@ namespace Arya
 			bool mouseDown(MOUSEBUTTON button, bool buttonDown, int x, int y);
 			bool mouseMoved(int x, int y, int dx, int dy);
 
+			void setActiveState(bool active);
 			bool pointIsInside(vec2 p);
 			void setSize(vec2 _size);
 
@@ -181,7 +183,7 @@ namespace Arya
     {
         public:
             Interface();
-            virtual ~Interface() { }
+            virtual ~Interface();
 
             void onFrame(float elapsedTime);
 			void render();
@@ -190,6 +192,9 @@ namespace Arya
 
 			void makeActive(Window* w);
 			void makeInactive(Window* w);
+
+            //Recalculate all windows, when the user resizes the main window
+            void recalculatePositions();
 
 			GLuint getOnePxRectVAO() const { return onePxRectVAO; };
 			Overlay* getOverlay() const { return overlay; }

@@ -4,6 +4,7 @@
 #include "../include/Map.h"
 #include "../include/Game.h"
 #include "../include/EventCodes.h"
+#include "../include/GameSession.h"
 #include "../include/ServerGameSession.h"
 #include "../include/common/Cells.h"
 #include <math.h>
@@ -14,50 +15,9 @@
 
 using Arya::Root;
 
-UnitFactory::~UnitFactory()
+Unit::Unit(int _type, int _id, GameSession* _session) : session(_session), id(_id)
 {
-    if(!unitMap.empty())
-    {
-        GAME_LOG_ERROR("List of units is not empty at deconstruction of unit factory (gamesession). Possible memory leak");
-    }
-}
-
-Unit* UnitFactory::createUnit(int id, int type)
-{
-    Unit* unit = getUnitById(id);
-    if(unit)
-    {
-        GAME_LOG_WARNING("Trying to create unit with duplicate id (" << id << ")");
-        return unit;
-    }
-    unit = new Unit(type, id, this);
-    unitMap.insert(pair<int,Unit*>(unit->getId(),unit));
-    return unit;
-}
-
-//Called from Unit deconstructor
-void UnitFactory::destroyUnit(int id)
-{
-    unitMapIterator iter = unitMap.find(id);
-    if(iter == unitMap.end())
-    {
-        GAME_LOG_WARNING("Trying to destory unexisting unit id");
-        return;
-    }
-    unitMap.erase(iter);
-    return;
-}
-
-Unit* UnitFactory::getUnitById(int id)
-{
-    unitMapIterator iter = unitMap.find(id);
-    if(iter == unitMap.end()) return 0;
-    return iter->second;
-}
-
-Unit::Unit(int _type, int _id, UnitFactory* factory) : id(_id)
-{
-    unitFactory = factory;
+	selectionDecal = 0;
     setType(_type);
     factionId = -1;
     local = false;
@@ -94,6 +54,15 @@ Unit::Unit(int _type, int _id, UnitFactory* factory) : id(_id)
     //healthBar->offsetInPixels = vec2(-12.5, 25.0);
     //Root::shared().getOverlay()->addRect(healthBar);
 
+	// selection decal
+	if(!session->isServer())
+	{
+		selectionDecal = new Decal(Arya::TextureManager::shared().getTexture("selection.png"),
+				vec2(0.0, 0.0),
+				unitInfo->radius,
+				vec3(0.5) );
+	}
+
     //Register at Game session unit id map
 }
 
@@ -105,7 +74,7 @@ Unit::~Unit()
 
     deleteScriptData();
 
-    unitFactory->destroyUnit(id);
+    session->destroyUnit(id);
 
     setCell(0);
 
@@ -119,12 +88,28 @@ void Unit::setObject(Object* obj)
     object = obj;
 }
 
+void Unit::setSelected(bool _sel)
+{
+	if(!(selected == _sel))
+	{
+		if(_sel)
+			Arya::Decals::shared().addDecal(selectionDecal);
+		else
+			Arya::Decals::shared().removeDecal(selectionDecal);
+	}
+
+	selected = _sel;
+}
+
 void Unit::setType(int _type)
 {
     type = _type;
     unitInfo = getUnitInfo(_type);
     if(unitInfo == 0)
         GAME_LOG_ERROR("UnitInfo for type " << type << " not found! This will crash");
+	else	
+		if(selectionDecal)
+			selectionDecal->scale = unitInfo->radius;
 }
 
 void Unit::checkForEnemies()
@@ -158,7 +143,7 @@ void Unit::checkForEnemies()
             // loop through
             for(unsigned i = 0; i < c->cellPoints.size(); ++i)
             {
-                Unit* unit = unitFactory->getUnitById(c->cellPoints[i]);
+                Unit* unit = session->getUnitById(c->cellPoints[i]);
                 if(!unit) continue;
                 if(unit->factionId == factionId) continue;
                 d = glm::distance(position, unit->getPosition());
@@ -188,6 +173,8 @@ void Unit::setPosition(const vec3& pos)
 {
     position = pos;
     if(object) object->setPosition(pos);
+	if(selectionDecal)
+		selectionDecal->setPos(getPosition2());
 
     if(currentCell)
     {
@@ -216,7 +203,7 @@ void Unit::setCellFromList(CellList* cl)
     setCell(cl->cellForPosition(getPosition2()));
 }
 
-void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
+void Unit::update(float timeElapsed)
 {
     //For any units referenced by this unit we must check if they are obsolete
     //Currently the only referenced unit is targetUnit
@@ -313,8 +300,10 @@ void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
 
                 //When the unit dies the server sends a packet
                 //The client leaves the unit alive untill it receives the packet
-                if(serverSession)
+                if(session->isServer())
                 {
+                    //TODO: just call session->onUnitDied() which handles this!!
+                    ServerGameSession* serverSession = (ServerGameSession*)session;
                     if(!targetUnit->isAlive())
                     {
                         targetUnit->getInfo()->onDeath(targetUnit);
@@ -365,6 +354,7 @@ void Unit::update(float timeElapsed, Map* map, ServerGameSession* serverSession)
             else
                 newPosition = getPosition2() + distanceToTravel * glm::normalize(diff);
 
+            Map* map = session->getMap();
             float height = (map ? map->heightAtGroundPosition(newPosition.x, newPosition.y) : 0.0f);
             setPosition(vec3(newPosition.x, height, newPosition.y));
         }
@@ -494,11 +484,13 @@ void Unit::deserialize(Packet& pk)
     setType(_type);
     pk >> factionId;
     pk >> position;
-    pk >> (int&)unitState;
+    int _unitState;
+    pk >> _unitState;
+    unitState = (UnitState)_unitState;
     pk >> targetPosition;
     int targetUnitId;
     pk >> targetUnitId;
-    if(targetUnitId) targetUnit = unitFactory->getUnitById(targetUnitId);
+    if(targetUnitId) targetUnit = session->getUnitById(targetUnitId);
 }
 void Unit::getDebugText()
 {

@@ -46,6 +46,9 @@ void EventManager::removeEventHandler(EventHandler* handler)
 
 Event& EventManager::createEvent(int Id)
 {
+	// TEMPORARY UNTIL WE HAVE LOBBY serveraddress
+	return *network->createSessionPacket(Id);
+
     if( Id >= MARKER_MINIMUM_GAME_PACKET_ID ) return *network->createSessionPacket(Id);
     else return *network->createLobbyPacket(Id);
 }

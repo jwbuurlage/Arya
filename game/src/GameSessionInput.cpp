@@ -1,5 +1,5 @@
 #include "../include/GameSessionInput.h"
-#include "../include/GameSession.h"
+#include "../include/ClientGameSession.h"
 #include "../include/Faction.h"
 #include "../include/Units.h"
 #include "../include/Game.h"
@@ -9,7 +9,7 @@
 // for sprintf
 #include <stdio.h>
 
-GameSessionInput::GameSessionInput(GameSession* ses)
+GameSessionInput::GameSessionInput(ClientGameSession* ses)
 {
     session = ses;
 
@@ -42,7 +42,7 @@ GameSessionInput::~GameSessionInput()
 
 void GameSessionInput::init()
 {
-    selectionRect->fillColor = vec4(1.0, 1.0, 1.0, 0.2);
+    selectionRect->fillColor = vec4(0.5, 1.0, 0.5, 0.1);
 
 	initUnitInfoWindow();
 }
@@ -51,7 +51,6 @@ void GameSessionInput::setSpecPos(vec3 pos)
 {
 	specPos = pos; 
 }
-
 
 void GameSessionInput::onFrame(float elapsedTime)
 {
@@ -354,13 +353,22 @@ void GameSessionInput::moveSelectedUnits()
         }
     }
 
+    vec2 centerPos(0,0);
     vector<int> unitIds;
-    for(list<Unit*>::iterator it = lf->getUnits().begin();
-            it != lf->getUnits().end(); ++it)
+    vector<vec2> unitPositions;
+    for(list<Unit*>::iterator it = lf->getUnits().begin(); it != lf->getUnits().end(); ++it)
         if((*it)->isSelected())
+        {
+            centerPos += (*it)->getPosition2();
+            unitPositions.push_back((*it)->getPosition2());
             unitIds.push_back((*it)->getId());
+        }
 
     int numSelected = unitIds.size();
+
+    if(!numSelected) return;
+
+    centerPos /= (float)numSelected;
 
     if(best_unit)
     {
@@ -371,21 +379,57 @@ void GameSessionInput::moveSelectedUnits()
             ev << unitIds[i] << best_unit->getId();
 
         ev.send();
-
-        return;
     }
+    else
+    {
+        //From centerPos to clickPos
+        vec2 target(clickPos.x, clickPos.z);
+        vec2 direction = target - centerPos;
+        if(glm::length(direction) > 0.01)
+        {
+            direction = glm::normalize(direction);
+            vec2 perpendicular(-direction.y, direction.x); //right hand rule
 
-    int perRow = (int)(glm::sqrt((float)numSelected));
-    //int currentIndex = 0;
-    float spread = 10.0f;
+            //TODO: Bipartite matching that also takes into account collissions when units want to change their relative positions
+            //For now the algorithm is greedy: starts at the point the furthest away and takes the nearest unit to that point
 
-    Event& ev = Game::shared().getEventManager()->createEvent(EVENT_MOVE_UNIT_REQUEST);
-    ev << numSelected;
-    for(unsigned int i = 0; i < unitIds.size(); ++i)
-        ev << unitIds[i] << vec2(clickPos.x + spread*((signed)(i % perRow) - perRow / 2),
-                        clickPos.z + spread*((signed)i / perRow - perRow / 2));
+            float spread = 10.0f;
+            int perRow = (int)(glm::sqrt((float)numSelected));
 
-    ev.send();
+            direction *= spread;
+            perpendicular *= spread;
+
+            Event& ev = Game::shared().getEventManager()->createEvent(EVENT_MOVE_UNIT_REQUEST);
+            ev << numSelected;
+            for(int i = 0; i < numSelected; ++i)
+            {
+                //This loops over the target spots in such a way that it first loops the points that are furthest away.
+                //When the units are coming from the BOTTOM the order is like this:
+                //1 2 3
+                //4 5 6
+                //7 8 9
+                vec2 targetSpot = target + float(perRow/2 - i/perRow)*direction + float(i%perRow - perRow/2)*perpendicular;
+                //Select closest unit
+                int bestIndex = -1;
+                float bestDistance = 0;
+                for(unsigned int j = 0; j < unitIds.size(); ++j)
+                {
+                    float dist = glm::distance(unitPositions[j],targetSpot);
+                    if(bestIndex == -1 || dist < bestDistance)
+                    {
+                        bestIndex = j;
+                        bestDistance = dist;
+                    }
+                }
+                ev << unitIds[bestIndex] << targetSpot;
+                //Remove the unit from the list. This is how we mark it as used.
+                //The list is not needed after this
+                unitIds.erase(unitIds.begin()+bestIndex);
+                unitPositions.erase(unitPositions.begin()+bestIndex);
+            }
+            ev.send();
+        }
+    }
 }
 
 
@@ -430,7 +474,7 @@ void GameSessionInput::selectUnit()
 
 void GameSessionInput::initUnitInfoWindow()
 {
-	vec2 windowSize = vec2(300.0f, 150.0f);
+	vec2 windowSize = vec2(150.0f, 80.0f);
 	unitWindow = new Arya::Window(vec2(1.0f, -1.0f), vec2(-20.0f -windowSize.x, 20.0f), windowSize, 
 			TextureManager::shared().getTexture("white"), Arya::WINDOW_DRAGGABLE, "Unit Info",
 			vec4(0.0f, 0.0f, 0.0f, 0.6f));

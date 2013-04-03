@@ -60,6 +60,7 @@ SET(
     "../src/Sounds.cpp"
     "../src/Commands.cpp"
     "../src/DrawableText.cpp"
+    "../src/Decals.cpp"
     )
 
 SET(

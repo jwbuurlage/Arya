@@ -1,5 +1,4 @@
 #include "Arya.h"
-#include "../include/GameSession.h"
 #include "../include/Events.h"
 
 using Arya::Root;
@@ -17,8 +16,9 @@ using Arya::cvar;
 class Network;
 class EventManager;
 class Scripting;
+class ClientGameSession;
 
-class Game : public Arya::InputListener , public Arya::FrameListener, public EventHandler, public Arya::CommandListener
+class Game : public Arya::InputListener , public Arya::FrameListener, public EventHandler, public Arya::CommandListener, public Arya::ButtonDelegate
 {
     public:
         Game();
@@ -39,15 +39,18 @@ class Game : public Arya::InputListener , public Arya::FrameListener, public Eve
         Scripting* getScripting() const { return scripting; }
 
         int getClientId() const { return clientId; }
-
+		void buttonClicked(Arya::Button* sender);
+	
     private:
         static Game* singleton;
+
+		Arya::Window* menuWindow;
 
         Root* root;
         Scripting* scripting;
         Network* network;
         EventManager* eventManager;
-        GameSession* session;
+        ClientGameSession* session;
 		bool handleCommand(string command);
 		void createSessionDebug(int sessionHash);
 		void joinSession(int sessionHash);
@@ -57,4 +60,11 @@ class Game : public Arya::InputListener , public Arya::FrameListener, public Eve
         //We want to check the network
         //every 5 frames
         float timeSinceNetworkPoll;
+
+		// menu and related functions
+		bool initMenu();
+		bool startLocalGame();
+		bool startOnlineGame();
+		bool startMapEditorSession();
+		bool newSession(string serveraddr);
 };

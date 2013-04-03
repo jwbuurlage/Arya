@@ -15,13 +15,14 @@
 //	EVENT_GAME_START and the game timer starts
 
 #pragma once
-#include "Units.h"
-#include "Faction.h"
 #include <vector>
+#include "GameSession.h"
 
 using std::vector;
 
 class Map;
+class Unit;
+class Faction;
 class Server;
 class ServerClient;
 class Packet;
@@ -49,7 +50,7 @@ struct GameInfo
 	} players[MAX_PLAYER_COUNT];
 };
 
-class ServerGameSession : public UnitFactory, public FactionFactory
+class ServerGameSession : public GameSession
 {
     public:
 		//Server class creates a new ServerGameSession
@@ -74,9 +75,16 @@ class ServerGameSession : public UnitFactory, public FactionFactory
         void handlePacket(ServerClient* client, Packet& packet);
 
         int getNewId() { return idFactory++; }
-        Unit* createUnit(int type){ return UnitFactory::createUnit(getNewId(),type); }
-        Faction* createFaction(){ return FactionFactory::createFaction(getNewId()); }
+        Unit* createUnit(int type){ return GameSession::createUnit(getNewId(),type); }
+        Faction* createFaction();
 
+        //sends to all clients
+        //The reason that this is not inside createUnit is
+        //that we first want to set unit properties like position
+        //before sending the packet
+        void sendUnitSpawnPacket(Unit* unit);
+
+        //connected clients, can be spectators
         unsigned int getClientCount() const { return clientList.size(); }
 
 		Packet* createPacket(int id);
@@ -85,6 +93,7 @@ class ServerGameSession : public UnitFactory, public FactionFactory
 		bool isGameStarted() const { return gameStarted; }
         void startGame();
 
+        vector<Unit*> getUnitsNearLocation(float x, float z, float distance);
     private:
         Server* const server;
         int idFactory;
@@ -94,11 +103,12 @@ class ServerGameSession : public UnitFactory, public FactionFactory
         vector<ServerClient*> clientList;
         typedef vector<ServerClient*>::iterator clientIterator;
 
-		//Important:
+		//!! Important:
 		//the order of this list corresponds to the
 		//order of the players in GameInfo
-		//Neutral factions are not in this list
-		vector<Faction*> clientFactionList;
+        //The first 'gameInfo.playerCount' factions correspond to the
+        //players, and the other factions are neutrals or created by scripts
+		vector<Faction*> factionList;
 		typedef vector<Faction*>::iterator factionIterator;
 
 		GameInfo gameInfo;
@@ -115,6 +125,5 @@ class ServerGameSession : public UnitFactory, public FactionFactory
 		//and the state is changed to STARTED and the game timer starts
 		bool gameStarted;
 
-        Map* map;
         void initMap();
 };

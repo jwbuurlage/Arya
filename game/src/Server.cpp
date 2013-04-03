@@ -28,6 +28,7 @@ Server::Server()
     reactor = 0;
     acceptor = 0;
     port = 13337;
+    scripting = 0;
     clientIdFactory = 100;
     sessionIdFactory = 10000;
 }
@@ -54,10 +55,13 @@ Server::~Server()
         delete cl->second;
     }
     clientList.clear();
+
+    if(scripting) delete scripting;
 }
 
 void Server::run()
 {
+    GameLoggerInstance->enableGameConsoleOutput(false);
     prepareServer();
     GAME_LOG_INFO("Server started on port " << port);
     reactor->run();
@@ -65,6 +69,7 @@ void Server::run()
 
 void Server::runInThread()
 {
+    GameLoggerInstance->enableGameConsoleOutput(false);
     prepareServer();
     thread.start(*reactor);
     GAME_LOG_INFO("Server started on port " << port);
@@ -102,9 +107,10 @@ void Server::prepareServer()
     //By having two instances of FileSystem we would load many files
     //twice which would be stupid
     if(&Arya::FileSystem::shared() == 0) Arya::FileSystem::create();
-    if(&Scripting::shared() == 0)
+
+    if(scripting == 0)
     {
-        Scripting* scripting = new Scripting;
+        scripting = new Scripting;
         scripting->init();
         scripting->execute("units.lua");
         scripting->execute("maps.lua");
@@ -183,8 +189,12 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
 			{
 				int sessionHash;
 				int clientCount;
+
 				packet >> sessionHash;
 				packet >> clientCount;
+
+				GAME_LOG_INFO("THE SESSION MADE WAS: " << sessionHash);
+
 				if(clientCount > 4)
 				{
 					GAME_LOG_WARNING("Lobby server tried to create session with " << clientCount << " players. This server can not handle this.");
@@ -227,6 +237,8 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
 				int sessionHash;
 				int clientHash;
 				packet >> sessionHash >> clientHash;
+
+				GAME_LOG_INFO("SESSION HASH: " << sessionHash << " " << clientHash);
 
                 ServerGameSession* session = 0;
 				sessionIterator iter = sessionList.find(sessionHash);

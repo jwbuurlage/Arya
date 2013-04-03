@@ -16,6 +16,7 @@ class Packet;
 class Server;
 class ServerClient;
 class ServerGameSession;
+class Scripting;
 
 class Server
 {
@@ -42,6 +43,8 @@ class Server
 
         void deletePacket(Packet* pak);
 
+        Scripting* getScripting() const { return scripting; }
+
     private:
         Poco::Thread thread;
         Poco::Net::ServerSocket* serverSocket;
@@ -55,13 +58,15 @@ class Server
         unsigned int frameCounter;
         sf::Time fpsTime;
 
+        Scripting* scripting;
+
         //List of all clients, can be in any game session
         //ServerClient contains a pointer to their game session
         map<ServerClientHandler*,ServerClient*> clientList;
         typedef map<ServerClientHandler*,ServerClient*>::iterator clientIterator;
         int clientIdFactory;
 
-        //GameSession contains a list of ServerClients
+        //ServerGameSession contains a list of ServerClients
         map<int,ServerGameSession*> sessionList;
         typedef map<int,ServerGameSession*>::iterator sessionIterator;
         int sessionIdFactory;
