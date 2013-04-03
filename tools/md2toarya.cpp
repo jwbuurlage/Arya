@@ -259,7 +259,7 @@ int main(int argc, char* argv[])
     //The animation info does not come from the source file. It is static MD2 animation data
     if( animated )
     {
-        cout << "Model is animated. Storing animation info" << endl;
+       cout << "Model is animated. Storing animation info" << endl;
 
         *(int*)pointer = 21; pointer += 4; //21 animations
         for(int i = 0; i < 21; ++i)
@@ -294,6 +294,9 @@ int main(int argc, char* argv[])
     //        int texIndex = triangleInput[tri].tex[m];
     //    }
     //}
+	
+	float* boundingBoxPointer = (float*) pointer;
+	pointer+= 6*sizeof(float);
 
     //Vertex data
     cout << "Building vertex buffer" << endl;
@@ -350,6 +353,12 @@ int main(int argc, char* argv[])
             }
         }
     }
+	boundingBoxPointer[0] = minX;
+	boundingBoxPointer[1] = maxX;
+	boundingBoxPointer[2] = minY;
+	boundingBoxPointer[3] = maxY;
+	boundingBoxPointer[4] = minZ;
+	boundingBoxPointer[5] = maxZ;
 
     int vertexCount = header->nTriangles * 3; //vertex count per frame
     pointer += header->nFrames * vertexCount * 8 * sizeof(float);
