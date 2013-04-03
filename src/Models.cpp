@@ -116,6 +116,12 @@ namespace Arya
 
     Model::Model()
     {
+		minX = 0.0f;
+		maxX = 0.0f;
+		minY = 0.0f;
+		maxY = 0.0f;
+		minZ = 0.0f;
+		maxZ = 0.0f;
         refCount = 0;
         animationData = 0;
     }
@@ -147,6 +153,18 @@ namespace Arya
         meshes.push_back(mesh);
         mesh->addRef();
     }
+
+	vec3 Model::getBoundingBoxVertex(int vertexNumber)
+	{
+		if(vertexNumber == 0) return vec3(minX, minY, minZ);
+		if(vertexNumber == 1) return vec3(minX, minY, maxZ);
+		if(vertexNumber == 2) return vec3(minX, maxY, minZ);
+		if(vertexNumber == 3) return vec3(minX, maxY, maxZ);
+		if(vertexNumber == 4) return vec3(maxX, minY, minZ);
+		if(vertexNumber == 5) return vec3(maxX, minY, maxZ);
+		if(vertexNumber == 6) return vec3(maxX, maxY, minZ);
+		if(vertexNumber == 7) return vec3(maxX, maxY, maxZ);
+	}	
 
     void Model::addMaterial(Material* mat)
     {
@@ -293,6 +311,15 @@ namespace Arya
             }
 
             delete[] nameBuf;
+
+			float* boundingBoxData = (float*)pointer;
+			pointer += 6*sizeof(float);
+			model->minX = boundingBoxData[0];
+			model->maxX = boundingBoxData[1];
+			model->minY = boundingBoxData[2];
+			model->maxY = boundingBoxData[3];
+			model->minZ = boundingBoxData[4];
+			model->maxZ = boundingBoxData[5];
 
             //Parse all meshes
             for(int s = 0; s < header->submeshCount; ++s)
