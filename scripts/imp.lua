@@ -16,5 +16,5 @@ imp.attackSound = "noMercy.wav"
 
 imp.onDamage = 
 function(victim, attacker, damage)
-    print("STOP ATTACKING THE IMP YOU FAGGOTS. IMP ONLY HAS " .. victim.health .. " HP LEFT!")
+    --print("STOP ATTACKING THE IMP YOU FAGGOTS. IMP ONLY HAS " .. victim.health .. " HP LEFT!")
 end

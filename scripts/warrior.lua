@@ -24,7 +24,7 @@ end
 
 warrior.onDamage = 
 function(victim, attacker, damage)
-    print("Ogre " .. victim.id .. " received massive damage (" .. damage .. " teradmg). Only " .. victim.health .. " hp left. Unit " .. attacker.id .. " (" .. attacker.health .. " hp), please be careful in the future")
+    --print("Ogre " .. victim.id .. " received massive damage (" .. damage .. " teradmg). Only " .. victim.health .. " hp left. Unit " .. attacker.id .. " (" .. attacker.health .. " hp), please be careful in the future")
 end
 
 print("warrior lua script reporting for motherfucking duty")

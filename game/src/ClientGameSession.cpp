@@ -459,7 +459,6 @@ void ClientGameSession::handleEvent(Packet& packet)
                                       }
                                       unit->deserialize(packet);
                                       if(faction == localFaction) unit->setLocal(true);
-                                      if(newUnit) faction->addUnit(unit);
                                       if(newUnit) unit->setCellFromList(unitCells);
 
                                       unit->getInfo()->onSpawn(unit);
@@ -472,6 +471,10 @@ void ClientGameSession::handleEvent(Packet& packet)
 
                                       float heightModel = map->heightAtGroundPosition(unit->getPosition().x, unit->getPosition().z);
                                       unit->setPosition(vec3(unit->getPosition().x, heightModel, unit->getPosition().z));
+
+                                      //This must happen after the object is set, because
+                                      //then it will set the correct tint color
+                                      if(newUnit) faction->addUnit(unit);
                                   }
                               }
                               break;

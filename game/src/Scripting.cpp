@@ -8,6 +8,7 @@
 #include "../include/ServerGameSession.h"
 #include "../include/common/GameLogger.h"
 #include <luabind/luabind.hpp>
+#include <luabind/iterator_policy.hpp>
 #include <lua.hpp>
 
 //TODO: move Scripting::execute to another cpp file
@@ -182,7 +183,7 @@ int createFaction()
     }
 }
 
-void spawnUnit(int factionId, const std::string& unitType, const LuaVec2& pos)
+void spawnUnit(int factionId, int unitType, const LuaVec2& pos)
 {
     if(callbackSession == 0)
     {
@@ -200,7 +201,7 @@ void spawnUnit(int factionId, const std::string& unitType, const LuaVec2& pos)
             UnitInfo* info = getUnitInfo(unitType);
             if(!info)
             {
-                GAME_LOG_WARNING("Script called spawnUnit with invalid unit type");
+                GAME_LOG_WARNING("Script called spawnUnit with invalid unit type (" << unitType << ")");
             }
             else
             {
@@ -215,17 +216,34 @@ void spawnUnit(int factionId, const std::string& unitType, const LuaVec2& pos)
     }
 }
 
-std::vector<Unit*> getUnitsNearLocation(LuaVec2 location, float distance)
+void spawnUnit(int factionId, const std::string& unitType, const LuaVec2& pos)
 {
-    if(callbackSession == 0)
+    UnitInfo* info = getUnitInfo(unitType);
+    if(!info)
     {
-        GAME_LOG_WARNING("Script called spawnUnit but no game session was set");
-        return std::vector<Unit*>();
+        GAME_LOG_WARNING("Script called spawnUnit with invalid unit type: " << unitType);
     }
     else
     {
-        return callbackSession->getUnitsNearLocation(location.x, location.y, distance);
+        spawnUnit(factionId, info->typeId, pos);
     }
+}
+
+
+std::vector<Unit*> myVectorTest;
+
+std::vector<Unit*>& getUnitsNearLocation(LuaVec2 location, float distance)
+{
+    myVectorTest.clear();
+    if(callbackSession == 0)
+    {
+        GAME_LOG_WARNING("Script called spawnUnit but no game session was set");
+    }
+    else
+    {
+        callbackSession->getUnitsNearLocation(location.x, location.y, distance, myVectorTest);
+    }
+    return myVectorTest;
 }
 
 //
@@ -284,7 +302,8 @@ int Scripting::init()
 
         luabind::class_<Unit>("Unit") //scripts may not create these, so no constructor
             .property("id", &Unit::getId)
-            .property("type", &Unit::getType)
+            .property("factionId", &Unit::getFactionId)
+            .property("typeId", &Unit::getType)
             .property("health", &Unit::getHealth)
             .property("customData", &getCustomUnitData),
 
@@ -299,8 +318,9 @@ int Scripting::init()
             .def_readwrite("z", &LuaVec3::z),
 
         luabind::def("createFaction", &createFaction),
-        luabind::def("spawnUnit", &spawnUnit),
-        luabind::def("getUnitsNearLocation", &getUnitsNearLocation),
+        luabind::def("spawnUnit", (void(*)(int,const std::string&,const LuaVec2&))&spawnUnit),
+        luabind::def("spawnUnit", (void(*)(int,int               ,const LuaVec2&))&spawnUnit),
+        luabind::def("getUnitsNearLocation", &getUnitsNearLocation, luabind::return_stl_iterator),
 
         luabind::def("createUnitType", &createLuaUnitType),
         luabind::class_<UnitInfo>("UnitInfoBase"), //should not be used in scripts directly

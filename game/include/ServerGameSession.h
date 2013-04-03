@@ -93,7 +93,7 @@ class ServerGameSession : public GameSession
 		bool isGameStarted() const { return gameStarted; }
         void startGame();
 
-        vector<Unit*> getUnitsNearLocation(float x, float z, float distance);
+        void getUnitsNearLocation(float x, float z, float distance, vector<Unit*>& result);
     private:
         Server* const server;
         int idFactory;
