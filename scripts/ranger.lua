@@ -26,6 +26,6 @@ end
 ranger.onDamage = 
 function(victim, attacker, damage)
     victim.customData.attackCount = victim.customData.attackCount + 1
-    print("Ranger " .. victim.id .. " received massive damage (" .. damage .. " teradmg). Only " .. victim.health .. " hp left. Unit " .. attacker.id .. " (" .. attacker.health .. " hp), please be careful in the future")
+    --print("Ranger " .. victim.id .. " received massive damage (" .. damage .. " teradmg). Only " .. victim.health .. " hp left. Unit " .. attacker.id .. " (" .. attacker.health .. " hp), please be careful in the future")
     print("Ranger " .. victim.id .. " has been attacked " .. victim.customData.attackCount .. " times")
 end

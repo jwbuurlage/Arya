@@ -8,6 +8,9 @@
 
 using std::vector;
 
+#include <glm/glm.hpp>
+using glm::vec3;
+
 namespace Arya
 {
     enum ModelType
@@ -62,6 +65,7 @@ namespace Arya
             void addRef(){ refCount++; }
             void release(){ refCount--; }
 
+			vec3 getBoundingBoxVertex(int vertexNumber);
         protected:
             //Private constructor because only
             //ModelManager is allowed to create these
@@ -80,6 +84,13 @@ namespace Arya
             vector<Material*> materials;
 
             AnimationData* animationData;
+
+			float minX; // Values needed to define
+			float maxX; // bounding box for model.
+			float minY;
+			float maxY;
+			float minZ;
+			float maxZ;
 
             int refCount;
             //TODO: keep a list of objects that

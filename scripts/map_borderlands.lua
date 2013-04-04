@@ -18,12 +18,12 @@ map.onLoad =
 function()
     print("Spawning neutral unit!")
     spawnTimer = 0
-    spawnCounter = 0
     neutralFactionId = createFaction()
-    spawnUnit(neutralFactionId, "The Boss", vec2(-15,  0))
-    spawnUnit(neutralFactionId, "The Boss", vec2( 15,  0))
-    spawnUnit(neutralFactionId, "The Boss", vec2(  0,-15))
-    spawnUnit(neutralFactionId, "The Boss", vec2(  0, 15))
+    spawnUnit(neutralFactionId, "The Boss", vec2(0,0))
+    --spawnUnit(neutralFactionId, "The Boss", vec2(-15,  0))
+    --spawnUnit(neutralFactionId, "The Boss", vec2( 15,  0))
+    --spawnUnit(neutralFactionId, "The Boss", vec2(  0,-15))
+    --spawnUnit(neutralFactionId, "The Boss", vec2(  0, 15))
 end
 
 map.onLoadFaction =
@@ -53,12 +53,47 @@ function(elapsedTime)
     spawnTimer = spawnTimer + elapsedTime
     if spawnTimer > 3 then
         spawnTimer = spawnTimer - 3
-        spawnUnit(neutralFactionId, "ogros", vec2(40*math.sin(spawnCounter), 40*math.cos(spawnCounter)))
-        spawnCounter = spawnCounter + 1
+
+        --check for units near the center
+        --check for the unit type that occurs most
+        local unitCountPerFaction = {}
+        local unitCountPerType = {}
+        local unitList = getUnitsNearLocation(vec2(0,0), 50)
+        for unit in unitList do
+            if unit.factionId ~= neutralFactionId then
+                unitCountPerFaction[unit.factionId] = (unitCountPerFaction[unit.factionId] or 0) + 1
+                unitCountPerType[unit.typeId] = (unitCountPerFaction[unit.typeId] or 0) + 1
+            end
+        end
+
+        --Check for a maximum faction, but only if it is unique
+        local maxCount = 0
+        local bestFactionId = nil
+        for factionId, unitCount in pairs(unitCountPerFaction) do
+            if unitCount > maxCount then
+                maxCount = unitCount
+                bestFactionId = factionId
+            elseif unitCount == maxCount then
+                bestFactionId = nil
+            end
+        end
+        if not (bestFactionId == nil) then
+            --Check for maximum unit type
+            local maxTypeCount = 0
+            local bestTypeId = nil
+            for typeId, count in pairs(unitCountPerType) do
+                if count > maxTypeCount then
+                    maxTypeCount= count
+                    bestTypeId = typeId
+                end
+            end
+            if not (bestTypeId == nil) then
+                --spawn just outside the circle that we look inside
+                spawnCounter = (spawnCounter or 0) + 1
+                spawnUnit(bestFactionId, bestTypeId, vec2(55*math.sin(spawnCounter), 55*math.cos(spawnCounter)))
+            else
+                print("warning: could not find bestTypeId")
+            end
+        end
     end
-    --check for units near the center
-    --local unitList = getUnitsNearLocation(vec2(0,0), 30)
-    --for unit in unitList do
-    --  checkToWhichFactionTheyBelong
-    --end
 end

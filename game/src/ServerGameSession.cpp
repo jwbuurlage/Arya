@@ -183,21 +183,20 @@ void ServerGameSession::startGame()
 
 }
 
-vector<Unit*> ServerGameSession::getUnitsNearLocation(float x, float z, float distance)
+void ServerGameSession::getUnitsNearLocation(float x, float z, float distance, vector<Unit*>& result)
 {
-    vector<Unit*> result;
+    result.clear();
 	for(factionIterator fac = factionList.begin(); fac != factionList.end(); ++fac)
 	{
 		Faction* faction = *fac;
-        for(list<Unit*>::iterator it = faction->getUnits().begin();
-                it != faction->getUnits().end(); )
+        for(list<Unit*>::iterator it = faction->getUnits().begin(); it != faction->getUnits().end(); ++it)
         {
             Unit* unit = *it;
             if( glm::distance(unit->getPosition2(), vec2(x,z)) < distance )
                 result.push_back(unit);
         }
     }
-    return result;
+    return;
 }
 
 void ServerGameSession::update(float elapsedTime)

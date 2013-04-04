@@ -260,12 +260,22 @@ namespace Arya
         {
             if( objects[i]->model == 0 ) continue;
             if(objects[i]->isObsolete()) continue;
-            
-			// culling
-            vec4 onScreen(objects[i]->getPosition(), 1.0);
-            onScreen = camera->getVPMatrix() * onScreen;
-            onScreen /= onScreen.w;
-            if(onScreen.x < -2.0 || onScreen.x > 2.0 || onScreen.y < -2.0 || onScreen.y > 2.0) continue;
+
+			//culling
+			mat4 totalMatrix = camera->getVPMatrix() * objects[i]->getMoveMatrix();
+			bool flag = false;
+			for(int j = 0; j < 8; j++)
+			{
+				vec4 onScreen(objects[i]->model->getBoundingBoxVertex(j), 1.0);
+				onScreen = totalMatrix * onScreen;
+				onScreen /= onScreen.w;
+				if(!(onScreen.x < -2.0 || onScreen.x > 2.0 || onScreen.y < -2.0 || onScreen.y > 2.0))
+				{
+					flag = true;
+					break;
+				}
+			}
+			if(flag == false) continue;           
 
 			// fog of war
 			if(!fm->isVisible(objects[i]->getPosition2()))
@@ -327,11 +337,20 @@ namespace Arya
             if( objects[i]->model == 0 ) continue;
             if(objects[i]->isObsolete()) continue;
 
-			// culling 
-            vec4 onScreen(objects[i]->getPosition(), 1.0);
-            onScreen = camera->getVPMatrix() * onScreen;
-            onScreen /= onScreen.w;
-            if(onScreen.x < -1.1 || onScreen.x > 1.1 || onScreen.y < -1.1 || onScreen.y > 1.1) continue;
+			mat4 totalMatrix = camera->getVPMatrix() * objects[i]->getMoveMatrix();
+			bool flag = false;
+			for(int j = 0; j < 8; j++)
+			{
+				vec4 onScreen(objects[i]->model->getBoundingBoxVertex(j), 1.0);
+				onScreen = totalMatrix * onScreen;
+				onScreen /= onScreen.w;
+				if(!(onScreen.x < -1.0 || onScreen.x > 1.0 || onScreen.y < -1.0 || onScreen.y > 1.0))
+				{
+					flag = true;
+					break;
+				}
+			}
+			if(flag == false) continue;
 
 			// fog of war
 			if(!fm->isVisible(objects[i]->getPosition2()))
