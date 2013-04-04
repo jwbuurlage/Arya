@@ -11,6 +11,7 @@
 #include "Camera.h"
 #include "Textures.h"
 #include "Files.h"
+#include "FogMap.h"
 
 #include <string>
 using std::string;
@@ -376,6 +377,12 @@ namespace Arya
         glActiveTexture(GL_TEXTURE7);
         glBindTexture(GL_TEXTURE_2D, Root::shared().getScene()->getShadowDepthTextureHandle());
 
+        terrainProgram->setUniform1i("fogMap", 6);
+        glActiveTexture(GL_TEXTURE6);
+        //glBindTexture(GL_TEXTURE_2D, heightMapHandle);
+        glBindTexture(GL_TEXTURE_2D, Root::shared().getScene()->getFogMap()->getFogMapTextureHandle());
+
+
         for(unsigned int i = 0; i < patches.size(); ++i) {
             Patch& p = patches[i];
             if(p.lod < 0) continue;
@@ -386,6 +393,7 @@ namespace Arya
             glDrawElements(GL_TRIANGLE_STRIP, indexCount[p.lod], GL_UNSIGNED_INT, (void*)0);
         }
 
+		/* 
         glEnable(GL_BLEND);
 
 		waterProgram->use();
@@ -418,7 +426,7 @@ namespace Arya
             glDrawElements(GL_TRIANGLE_STRIP, indexCount[p.lod], GL_UNSIGNED_INT, (void*)0);
         }
 
-        glDisable(GL_BLEND);
+        glDisable(GL_BLEND); */
 
         Root::shared().checkForErrors("terrain render end");
     }

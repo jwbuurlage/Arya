@@ -3,6 +3,7 @@
 
 uniform sampler2D splatTexture;
 uniform sampler2D heightMap;
+uniform sampler2D fogMap;
 uniform mat4 vpMatrix;
 uniform mat4 scaleMatrix;
 uniform mat4 viewMatrix;

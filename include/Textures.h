@@ -14,7 +14,7 @@ namespace Arya
             GLuint height;
             //we could add more info about
             //bit depths and mipmap info and so on
-        private:
+        //private:
             //Only TextureManager can create Textures
             friend class TextureManager;
             friend class ResourceManager<Texture>;

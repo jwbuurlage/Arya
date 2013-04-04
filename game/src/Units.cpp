@@ -18,6 +18,8 @@ using Arya::Root;
 Unit::Unit(int _type, int _id, GameSession* _session) : session(_session), id(_id)
 {
 	selectionDecal = 0;
+	unitVisionary = 0;
+
     setType(_type);
     factionId = -1;
     local = false;
@@ -54,15 +56,6 @@ Unit::Unit(int _type, int _id, GameSession* _session) : session(_session), id(_i
     //healthBar->offsetInPixels = vec2(-12.5, 25.0);
     //Root::shared().getOverlay()->addRect(healthBar);
 
-	// selection decal
-	if(!session->isServer())
-	{
-		selectionDecal = new Decal(Arya::TextureManager::shared().getTexture("selection.png"),
-				vec2(0.0, 0.0),
-				unitInfo->radius,
-				vec3(0.5) );
-	}
-
     //Register at Game session unit id map
 }
 
@@ -71,6 +64,15 @@ Unit::~Unit()
     if(targetUnit)
         targetUnit->release();
     if(object) object->setObsolete();
+
+	if(selectionDecal)
+		delete selectionDecal;
+
+	if(unitVisionary)
+	{
+		Root::shared().getScene()->getFogMap()->removeVisionary(unitVisionary);
+		delete unitVisionary;
+	}
 
     deleteScriptData();
 
@@ -92,13 +94,39 @@ void Unit::setSelected(bool _sel)
 {
 	if(!(selected == _sel))
 	{
-		if(_sel)
-			Arya::Decals::shared().addDecal(selectionDecal);
-		else
-			Arya::Decals::shared().removeDecal(selectionDecal);
+		if(selectionDecal)
+		{
+			if(_sel)
+				Arya::Decals::shared().addDecal(selectionDecal);
+			else
+				Arya::Decals::shared().removeDecal(selectionDecal);
+		}
 	}
 
 	selected = _sel;
+}
+
+void Unit::updateGraphics()
+{
+	if(!local || session->isServer()) return;
+
+	if(!selectionDecal)
+	{
+		selectionDecal = new Decal(Arya::TextureManager::shared().getTexture("selection.png"),
+					vec2(0.0, 0.0),
+					unitInfo->radius,
+					vec3(0.5) );
+	}
+	else
+	{
+		selectionDecal->scale = unitInfo->radius;
+	}
+
+	if(!unitVisionary)
+	{
+		unitVisionary = new Visionary(&position2, &unitInfo->viewRadius);
+		Root::shared().getScene()->getFogMap()->addVisionary(unitVisionary);
+	}
 }
 
 void Unit::setType(int _type)
@@ -107,9 +135,8 @@ void Unit::setType(int _type)
     unitInfo = getUnitInfo(_type);
     if(unitInfo == 0)
         GAME_LOG_ERROR("UnitInfo for type " << type << " not found! This will crash");
-	else	
-		if(selectionDecal)
-			selectionDecal->scale = unitInfo->radius;
+	else
+		updateGraphics();
 }
 
 void Unit::checkForEnemies()
@@ -172,6 +199,7 @@ void Unit::checkForEnemies()
 void Unit::setPosition(const vec3& pos)
 {
     position = pos;
+	position2 = vec2(pos.x, pos.z);
     if(object) object->setPosition(pos);
 	if(selectionDecal)
 		selectionDecal->setPos(getPosition2());

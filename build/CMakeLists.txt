@@ -61,6 +61,7 @@ SET(
     "../src/Commands.cpp"
     "../src/DrawableText.cpp"
     "../src/Decals.cpp"
+	"../src/FogMap.cpp"
     )
 
 SET(

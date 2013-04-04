@@ -20,6 +20,7 @@ namespace Arya
     class Camera;
     class Shader;
     class ShaderProgram;
+	class FogMap;
 
     class Scene : public FrameListener
     {
@@ -38,6 +39,7 @@ namespace Arya
             Terrain* getTerrain() const { return currentTerrain; };
 
             Camera* getCamera() { return camera; };
+            FogMap* getFogMap() { return fm; };
 
             Object* createObject();
 
@@ -76,5 +78,6 @@ namespace Arya
             mat4 lightOrthoMatrix;
 
             ShaderProgram* basicProgram;
+			FogMap* fm;
     };
 }

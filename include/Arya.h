@@ -18,6 +18,7 @@
 #include "Scripting.h"
 #include "Interface.h"
 #include "Decals.h"
+#include "FogMap.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

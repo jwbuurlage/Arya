@@ -4,6 +4,7 @@
 #include <vector>
 #include <glm/glm.hpp>
 
+using glm::vec2;
 using glm::vec3;
 using glm::mat4;
 using std::vector;
@@ -19,6 +20,7 @@ namespace Arya
         public:
             void setPosition(vec3 pos){ position = pos; updateMatrix = true; }
             const vec3& getPosition() const { return position; }
+            vec2 getPosition2() const { return vec2(position.x, position.z); }
 
             void setYaw(float y){ yaw = y; updateMatrix = true; }
             float getYaw() const { return yaw; }

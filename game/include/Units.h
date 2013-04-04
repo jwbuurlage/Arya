@@ -7,6 +7,7 @@ using Arya::Object;
 using Arya::Rect;
 using Arya::Decal;
 using Arya::Root;
+using Arya::Visionary;
 
 typedef enum
 {
@@ -101,7 +102,7 @@ class Unit
         int getId() const { return id; }
         int getFactionId() const { return factionId; }
         void setFactionId(int id) { factionId = id; }
-        void setLocal(bool value = true){ local = value; }
+        void setLocal(bool value = true){ local = value; updateGraphics(); }
         bool isLocal() const { return local; }
 
         float getRadius() const { return unitInfo->radius; }
@@ -110,6 +111,7 @@ class Unit
         void deserialize(Packet& pk);
 
 		void getDebugText();
+		void updateGraphics();
 
         //Must be public because it must be accessed by some
         //scripting functions
@@ -117,6 +119,7 @@ class Unit
     private:
         Object* object; //object->position and object->yaw are always the same as Unit::position and Unit::yaw
         vec3 position; //since server has no Object, position is stored here
+        vec2 position2; // we want to hold this reference for vision
         float yaw;
 
         UnitInfo* unitInfo;
@@ -146,6 +149,7 @@ class Unit
 
         Rect* healthBar;
 		Decal* selectionDecal;
+		Visionary* unitVisionary;
         vec2 screenPosition;
         vec3 tintColor;
 };

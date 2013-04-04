@@ -16,6 +16,7 @@
 #include "Shaders.h"
 #include "Interface.h"
 #include "Decals.h"
+#include "FogMap.h"
 
 #include "Overlay.h"
 
@@ -34,6 +35,7 @@ namespace Arya
         initialized = false;
         currentTerrain = 0; 
         camera = 0;
+		fm = 0;
         basicProgram = 0;
         lightDirection=glm::normalize(vec3(0.7,0.7,0.2));
         init();
@@ -66,6 +68,10 @@ namespace Arya
         }
 
         initialized = true;
+
+		/* make fogmap */
+		fm = new FogMap(400, 2048.0);
+		fm->init();
 
         return true;
     }
@@ -227,6 +233,8 @@ namespace Arya
         orthoShadowCubeMatrix = glm::ortho(-shadowBoxSize, shadowBoxSize, -shadowBoxSize, shadowBoxSize, -shadowBoxSize, shadowBoxSize);
 
         lightOrthoMatrix = orthoShadowCubeMatrix * rotateToLightDirMatrix;
+
+		fm->update();
     }
 
     void Scene::render()
@@ -253,10 +261,15 @@ namespace Arya
             if( objects[i]->model == 0 ) continue;
             if(objects[i]->isObsolete()) continue;
             
+			// culling
             vec4 onScreen(objects[i]->getPosition(), 1.0);
             onScreen = camera->getVPMatrix() * onScreen;
             onScreen /= onScreen.w;
             if(onScreen.x < -2.0 || onScreen.x > 2.0 || onScreen.y < -2.0 || onScreen.y > 2.0) continue;
+
+			// fog of war
+			if(!fm->isVisible(objects[i]->getPosition2()))
+				continue;
 
             basicProgram->setUniform3fv("tintColor", objects[i]->getTintColor());
 
@@ -314,12 +327,15 @@ namespace Arya
             if( objects[i]->model == 0 ) continue;
             if(objects[i]->isObsolete()) continue;
 
+			// culling 
             vec4 onScreen(objects[i]->getPosition(), 1.0);
             onScreen = camera->getVPMatrix() * onScreen;
             onScreen /= onScreen.w;
             if(onScreen.x < -1.1 || onScreen.x > 1.1 || onScreen.y < -1.1 || onScreen.y > 1.1) continue;
 
-            basicProgram->setUniform3fv("tintColor", objects[i]->getTintColor());
+			// fog of war
+			if(!fm->isVisible(objects[i]->getPosition2()))
+				continue;
 
             basicProgram->setUniformMatrix4fv("mMatrix", objects[i]->getMoveMatrix());
 
