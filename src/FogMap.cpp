@@ -46,12 +46,13 @@ namespace Arya
 	{
 		int centerX, centerY;
 		positionToIndex(pos, centerX, centerY);
-		return fogData[centerY*fogMapSize + centerX] > 0;
+		return fogData[centerY*fogMapSize + centerX] > 63;
 	}
 
 	void FogMap::init()
 	{
 		fogData = new unsigned char[fogMapSize * fogMapSize];
+		fogDeltaData = new unsigned char[fogMapSize * fogMapSize];
 
 		precalculateBresenhemCircles();
 		initTexture();
@@ -95,7 +96,7 @@ namespace Arya
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, fogMapSize, fogMapSize, 0, GL_RED, GL_UNSIGNED_BYTE, fogData);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, fogMapSize, fogMapSize, 0, GL_RED, GL_UNSIGNED_BYTE, fogDeltaData);
 	}
 
 	void FogMap::addVisionary(Visionary* visionary)
@@ -199,7 +200,33 @@ namespace Arya
 
 	void FogMap::clear()
 	{
-		memset(fogData, 0, fogMapSize * fogMapSize);
+		//TODO: THIS IS VERY SLOW AND SUBUPTIMAL
+		//memset(fogData, 0, fogMapSize * fogMapSize);
+		for(int i = 0; i < fogMapSize * fogMapSize; ++i)
+			fogData[i] = fogData[i] > 0 ? 63 : 0;
+	}
+
+	void FogMap::blur()
+	{
+		// 5 px gaussian blur
+		int px = 2;
+		for(int i = 0; i < fogMapSize; ++i)
+			for(int j = 0; j < fogMapSize; ++j)
+			{
+				int sum = 0;
+				int num = 0;
+				for(int dx = -px; dx <= px; ++dx)
+					for(int dy = -px; dy <= px; ++dy)
+					{
+						if((i + dy) * fogMapSize + (j + dx) < 0 ||
+							(i + dy) * fogMapSize + (j + dx) > fogMapSize * fogMapSize - 1)
+							continue;
+						num++;
+						sum += fogData[(i + dy) * fogMapSize + (j + dx)];
+					}
+				int average = sum / num;
+				fogDeltaData[i * fogMapSize + j] = (char)average;
+			}
 	}
 
 	void FogMap::update()
@@ -208,6 +235,7 @@ namespace Arya
 		for(int i = 0; i < visionaries.size(); ++i)
 			colorize(*visionaries[i]->pos, *visionaries[i]->radius);
 
+		blur();
 		updateTexture();
 	}
 

@@ -36,6 +36,7 @@ namespace Arya
 			void initTexture();
 			void updateTexture();
 			void clear();
+			void blur();
 			void colorize(vec2 position, float radius);
 			void update();
 

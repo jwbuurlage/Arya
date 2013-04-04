@@ -281,7 +281,6 @@ namespace Arya
 			if(!fm->isVisible(objects[i]->getPosition2()))
 				continue;
 
-            basicProgram->setUniform3fv("tintColor", objects[i]->getTintColor());
 
             basicProgram->setUniformMatrix4fv("mMatrix", objects[i]->getMoveMatrix());
 
@@ -356,6 +355,7 @@ namespace Arya
 			if(!fm->isVisible(objects[i]->getPosition2()))
 				continue;
 
+			basicProgram->setUniform3fv("tintColor", objects[i]->getTintColor());
             basicProgram->setUniformMatrix4fv("mMatrix", objects[i]->getMoveMatrix());
 
             int frame = 0;
