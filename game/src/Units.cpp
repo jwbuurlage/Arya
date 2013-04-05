@@ -31,6 +31,7 @@ Unit::Unit(int _type, int _id, GameSession* _session) : session(_session), id(_i
 
     object = 0;
     position = vec3(0.0f);
+    position2 = vec2(0.0f);
     yaw = 0.0f;
 
     selected = false;

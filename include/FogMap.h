@@ -38,7 +38,7 @@ namespace Arya
 			void clear();
 			void blur();
 			void colorize(vec2 position, float radius);
-			void update();
+			void update(float elapsedTime);
 
 			bool isVisible(vec2 pos);
 			void addVisionary(Visionary* visionary);
@@ -49,6 +49,8 @@ namespace Arya
 
 		private:
 			int fogMapSize; //pixelcount of one side
+
+			float fogUpdateTime;
 
 			// 1st bit is for 'explored'
 			// 2nd bit is for 'visible'

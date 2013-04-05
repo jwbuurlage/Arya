@@ -10,6 +10,7 @@ using std::endl;
 #include "Textures.h"
 
 #define MAX_CIRCLE_SIZE 40
+#define UPDATE_TIME 0.2f
 
 namespace Arya
 {
@@ -60,30 +61,18 @@ namespace Arya
 
 	void FogMap::initTexture()
 	{
-		//void glTexSubImage2D(	GLenum target,
-		//GLint level,
-		//GLint xoffset,
-		//GLint yoffset,
-		//GLsizei width,
-		//GLsizei height,
-		//GLenum format,
-		//GLenum type,
-		//const GLvoid * pixels);
-		//
         glGenTextures(1, &fogMapTextureHandle);
 		updateTexture();
 
-		// TODO: remove this shit
-		// Window(vec2 _relativePosition, vec2 _absolutePosition, vec2 _size,
-				//Texture* _backgroundTexture, int flags, string _title,
-				//vec4 _backgroundColor = vec4(1.0));
-
+		//----------------------------------------------------------------
+		// TODO: move this shit to minimap
 		Texture* t = new Texture();
 		t->handle = fogMapTextureHandle;
 
 		Window* w = new Window(
 				vec2(-1.0), vec2(0.0), vec2(400.0, 400.0), t, 0, "" );
 		Interface::shared().makeActive(w);
+		//----------------------------------------------------------------
 	}
 
 	void FogMap::updateTexture()
@@ -229,8 +218,12 @@ namespace Arya
 			}
 	}
 
-	void FogMap::update()
+	void FogMap::update(float elapsedTime)
 	{
+		fogUpdateTime += elapsedTime;
+		if(fogUpdateTime < UPDATE_TIME)
+			return;
+		fogUpdateTime -= UPDATE_TIME;
 		clear();
 		for(int i = 0; i < visionaries.size(); ++i)
 			colorize(*visionaries[i]->pos, *visionaries[i]->radius);

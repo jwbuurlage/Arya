@@ -188,6 +188,9 @@ namespace Arya
         if(basicProgram) delete basicProgram;
         basicProgram = 0;
 
+		if(fm) delete fm;
+		fm = 0;
+
         for(unsigned int i = 0; i < objects.size(); ++i)
             delete objects[i];
         objects.clear();
@@ -234,7 +237,7 @@ namespace Arya
 
         lightOrthoMatrix = orthoShadowCubeMatrix * rotateToLightDirMatrix;
 
-		fm->update();
+		fm->update(elapsedTime);
     }
 
     void Scene::render()
