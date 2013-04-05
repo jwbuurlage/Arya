@@ -293,8 +293,6 @@ void ClientGameSession::handleEvent(Packet& packet)
 
                         if(faction == localFaction) unit->setLocal(true);
 
-                        unit->getInfo()->onSpawn(unit);
-
                         Object* obj = unit->getObject();
                         if(!obj) obj = Root::shared().getScene()->createObject();
 
@@ -314,6 +312,8 @@ void ClientGameSession::handleEvent(Packet& packet)
                         {
 							input->setSpecPos(unit->getPosition());
                         }
+
+                        unit->getInfo()->onSpawn(unit);
                     }
 
                     //now allIDs contains a list of units that were not in the packet so they must be deleted
@@ -461,8 +461,6 @@ void ClientGameSession::handleEvent(Packet& packet)
                                       if(faction == localFaction) unit->setLocal(true);
                                       if(newUnit) unit->setCellFromList(unitCells);
 
-                                      unit->getInfo()->onSpawn(unit);
-
                                       Object* obj = unit->getObject();
                                       if(!obj) obj = Root::shared().getScene()->createObject();
                                       obj->setModel(ModelManager::shared().getModel(unit->getInfo()->modelname + ".aryamodel"));
@@ -475,6 +473,8 @@ void ClientGameSession::handleEvent(Packet& packet)
                                       //This must happen after the object is set, because
                                       //then it will set the correct tint color
                                       if(newUnit) faction->addUnit(unit);
+
+                                      unit->getInfo()->onSpawn(unit);
                                   }
                               }
                               break;
