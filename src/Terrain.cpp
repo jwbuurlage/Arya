@@ -291,8 +291,6 @@ namespace Arya
         mat4 vpScaleMatrix = curScene->getCamera()->getVPMatrix() * scaleMatrix;
         vec3 camPos = curScene->getCamera()->getRealCameraPosition();
 
-        int cullCounter = 0;
-
         float delta = 1.0f/((float)patchCount);
         for(unsigned int i = 0; i < patches.size(); ++i)
         {
@@ -312,7 +310,6 @@ namespace Arya
             if(!inScreen)
             {
                 p.lod = -1;
-                cullCounter++;
                 continue;
             }
             float dist = distance(vec3(scaleMatrix[0][0] * p.position.x, 0.0f, scaleMatrix[2][2] * p.position.y), camPos);
@@ -329,7 +326,6 @@ namespace Arya
             else
                 p.lod = levelMax -1;
         }
-        LOG_DEBUG("CULLCOUNTER = " << cullCounter);
     }
 
     //---------------------------------------
