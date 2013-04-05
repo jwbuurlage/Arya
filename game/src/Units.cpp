@@ -491,7 +491,6 @@ void Unit::receiveDamage(float dmg, Unit* attacker)
 
 void Unit::setTintColor(vec3 tC)
 {
-    tC = (local ? vec3(1.0, 0, 0) : vec3(0,1.0,0));
     tintColor = tC;
     if(object) object->setTintColor(tC);
     //healthBar->fillColor = vec4(tintColor, 1.0);
