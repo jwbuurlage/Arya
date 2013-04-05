@@ -9,7 +9,6 @@ uniform mat4 scaleMatrix;
 uniform mat4 viewMatrix;
 
 uniform vec3 lightDirection;
-uniform vec2 patchPosition;
 uniform vec2 patchOffset;
 
 layout (location = 0) in vec2 texCooPatch;
