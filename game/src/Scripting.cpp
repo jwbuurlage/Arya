@@ -328,7 +328,7 @@ int Scripting::init()
             //.def(luabind::constructor<int>()) //no constructor because they should be created by createUnitType
             .def_readwrite("onSpawn", &LuaUnitType::objOnSpawn)
             .def_readwrite("onDeath", &LuaUnitType::objOnDeath)
-            .def_readwrite("onDamage", &LuaUnitType::objOnDamage)
+            //.def_readwrite("onDamage", &LuaUnitType::objOnDamage) //takes too much fps
             .def_readwrite("displayname", &LuaUnitType::displayname)
             .def_readwrite("modelname", &LuaUnitType::modelname)
             .def_readwrite("radius", &LuaUnitType::radius)

@@ -20,17 +20,18 @@ Unit::Unit(int _type, int _id, GameSession* _session) : session(_session), id(_i
 	selectionDecal = 0;
 	unitVisionary = 0;
 
-    setType(_type);
     factionId = -1;
     local = false;
     obsolete = false;
     refCount = 0;
+    setType(_type);
 
     customData = 0;
     createScriptData();
 
     object = 0;
     position = vec3(0.0f);
+    position2 = vec2(0.0f);
     yaw = 0.0f;
 
     selected = false;
@@ -108,7 +109,7 @@ void Unit::setSelected(bool _sel)
 
 void Unit::updateGraphics()
 {
-	if(!local || session->isServer()) return;
+    if(!local || session->isServer()) return;
 
 	if(!selectionDecal)
 	{
@@ -536,6 +537,7 @@ void Unit::receiveDamage(float dmg, Unit* attacker)
 
 void Unit::setTintColor(vec3 tC)
 {
+    tC = (local ? vec3(1.0, 0, 0) : vec3(0,1.0,0));
     tintColor = tC;
     if(object) object->setTintColor(tC);
     //healthBar->fillColor = vec4(tintColor, 1.0);
