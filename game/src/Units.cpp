@@ -196,6 +196,50 @@ void Unit::checkForEnemies()
 #endif
 }
 
+bool Unit::checkForCollision(vec2 checkPosition, float checkHeight)
+{
+	if(!(unitState == UNIT_RUNNING || unitState == UNIT_ATTACKING_OUT_OF_RANGE || unitState == UNIT_ATTACKING)) 
+		return false;
+
+    if(glm::abs((getPosition().y - checkHeight)/glm::distance(checkPosition,getPosition2())) > 1.) return true;
+
+	if(!currentCell) return false;
+
+    CellList* list = currentCell->cellList;
+    if(!list) return false;
+    int curx = currentCell->cellx;
+    int cury = currentCell->celly;
+
+    Cell* c;
+    float collisionRadius = getRadius();
+
+    float d;
+    // loop through neighbours
+    for(int dx = -1; dx <= 1; ++dx)
+	{
+        for(int dy = -1; dy <= 1; ++dy)
+        {
+            if(curx + dx >= list->gridSize || curx + dx < 0) continue;
+            if(cury + dy >= list->gridSize || cury + dy < 0) continue;
+            c = list->cellForIndex(curx + dx, cury + dy);
+            // loop through
+            for(unsigned i = 0; i < c->cellPoints.size(); ++i)
+            {
+                Unit* unit = session->getUnitById(c->cellPoints[i]);
+				if(unit == this) continue;
+                if(!unit) continue;
+                d = glm::distance(checkPosition, unit->getPosition2());
+
+                if(d < collisionRadius)
+                {
+                    return true;
+                }
+            }
+        }
+	}
+	return false;
+}
+
 void Unit::setPosition(const vec3& pos)
 {
     position = pos;
@@ -381,10 +425,12 @@ void Unit::update(float timeElapsed)
             }
             else
                 newPosition = getPosition2() + distanceToTravel * glm::normalize(diff);
-
-            Map* map = session->getMap();
-            float height = (map ? map->heightAtGroundPosition(newPosition.x, newPosition.y) : 0.0f);
-            setPosition(vec3(newPosition.x, height, newPosition.y));
+			Map* map = session->getMap();
+			float height = (map ? map->heightAtGroundPosition(newPosition.x, newPosition.y) : 0.0f);
+			if(!checkForCollision(newPosition,height))
+			{
+				setPosition(vec3(newPosition.x, height, newPosition.y));
+			}
         }
     }
     else
