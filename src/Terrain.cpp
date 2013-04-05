@@ -200,8 +200,6 @@ namespace Arya
                 Patch p;
                 p.offset = vec2((1.0 / patchCount)*j, (1.0 / patchCount)*i);
                 p.position = (vec2(-0.5 + 0.5 / patchCount) + p.offset);
-                p.position.x *= w;
-                p.position.y *= w;
                 p.lod = -1;
                 patches.push_back(p);
             }
@@ -290,20 +288,34 @@ namespace Arya
 		time+=dt;
 
         // update patches LOD
-        mat4 vpMatrix = curScene->getCamera()->getVPMatrix();
+        mat4 vpScaleMatrix = curScene->getCamera()->getVPMatrix() * scaleMatrix;
         vec3 camPos = curScene->getCamera()->getRealCameraPosition();
 
+        int cullCounter = 0;
+
+        float delta = 1.0f/((float)patchCount);
         for(unsigned int i = 0; i < patches.size(); ++i)
         {
             Patch& p = patches[i];
-            vec4 onScreen(vpMatrix * vec4(p.position.x, -100.0f, p.position.y, 1.0));
-            onScreen /= onScreen.w;
-            if(onScreen.x < -2.0 || onScreen.x > 2.0 || onScreen.y < -2.0 || onScreen.y > 2.0)
+            //Project the 4 corners on the screen
+            bool inScreen = false;
+            for(int j = 0; j < 4; ++j)
+            {
+                vec4 onScreen = vpScaleMatrix * vec4(p.offset.x -0.5 + delta*(j%2), 0, p.offset.y -0.5 + delta*(j/2), 1.0);
+                onScreen /= onScreen.w;
+                if(onScreen.x > -1.1 && onScreen.x < 1.1 && onScreen.y > -1.1 && onScreen.y < 1.1)
+                {
+                    inScreen = true;
+                    break;
+                }
+            }
+            if(!inScreen)
             {
                 p.lod = -1;
+                cullCounter++;
                 continue;
             }
-            float dist = distance(vec3(p.position.x, -100.0f, p.position.y), camPos);
+            float dist = distance(vec3(scaleMatrix[0][0] * p.position.x, 0.0f, scaleMatrix[2][2] * p.position.y), camPos);
             if(dist < 300.0f)
                 p.lod = 0;
             else if(dist < 600.0f)
@@ -317,6 +329,7 @@ namespace Arya
             else
                 p.lod = levelMax -1;
         }
+        LOG_DEBUG("CULLCOUNTER = " << cullCounter);
     }
 
     //---------------------------------------
@@ -387,7 +400,6 @@ namespace Arya
             Patch& p = patches[i];
             if(p.lod < 0) continue;
             terrainProgram->setUniform2fv("patchOffset", p.offset);
-            terrainProgram->setUniform2fv("patchPosition", p.position);
 
             glBindVertexArray(vaoHandles[p.lod]);
             glDrawElements(GL_TRIANGLE_STRIP, indexCount[p.lod], GL_UNSIGNED_INT, (void*)0);
@@ -419,7 +431,6 @@ namespace Arya
             Patch& p = patches[i];
             if(p.lod < 0) continue;
             waterProgram->setUniform2fv("patchOffset", p.offset);
-            waterProgram->setUniform2fv("patchPosition", p.position);
 			waterProgram->setUniform1f("time", time);
 
             glBindVertexArray(vaoHandles[p.lod]);
