@@ -81,17 +81,14 @@ namespace Arya
 		decals.push_back(d);
 	}
 
-	void Decals::removeDecal(Decal* d)
-	{
-		for(int i = 0; i < decals.size(); ++i)
-			if(decals[i] == d)
-			{
-				  decals.erase(decals.begin() + i);
-				  return;
-			  }
-			
-		LOG_WARNING("Trying to delete decal which does not exist");
-	}
+    void Decals::removeDecal(Decal* d)
+    {
+        for(vector<Decal*>::iterator iter = decals.begin(); iter != decals.end(); )
+        {
+            if( *iter == d ) iter = decals.erase(iter);
+            else ++iter;
+        }
+    }
 
 	void Decals::clear()
 	{
