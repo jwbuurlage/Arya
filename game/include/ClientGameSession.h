@@ -59,4 +59,5 @@ class ClientGameSession :
 
         GLuint selectionDecalHandle;
 		void initPathfinding();
+		unsigned char* pathfindingMap;
 };
