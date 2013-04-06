@@ -6,11 +6,14 @@
 #include "Scene.h"
 #include "Terrain.h"
 #include "FogMap.h"
+#include "Camera.h"
 
 #include <glm/glm.hpp>
 using glm::vec2;
+using glm::vec3;
+using glm::mat4;
 
-#define UPDATE_TIME 0.2f
+#define UPDATE_TIME 0.1f
 
 namespace Arya
 {
@@ -33,6 +36,7 @@ namespace Arya
 	{
 		if(mmWindow) delete mmWindow;
 		if(mmProgram) delete mmProgram;
+		if(mmCameraLinesProgram) delete mmCameraLinesProgram;
 	}
 
 	GLuint MiniMap::getMMTextureHandle() const
@@ -42,7 +46,7 @@ namespace Arya
 
 	bool MiniMap::init()
 	{
-		size = 300;
+		size = 200;
 
 		GLuint tmpHandle;
 		glGenTextures(1, &tmpHandle);
@@ -75,6 +79,12 @@ namespace Arya
 				"../shaders/minimap.vert",
 				"../shaders/minimap.frag");
 		if(!mmProgram->isValid()) return false;
+
+		mmCameraLinesProgram = new ShaderProgram("cameraLines",
+				"../shaders/whitelines.vert",
+				"../shaders/whitelines.frag");
+		if(!mmCameraLinesProgram->isValid()) return false;
+
 		return true;
 	}
 
@@ -97,7 +107,7 @@ namespace Arya
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		Root::shared().checkForErrors("after");
+		Root::shared().checkForErrors("after minimap fbo");
 
 		return true;
 	}
@@ -106,10 +116,10 @@ namespace Arya
 	{
 		/* FOR TEXTURES */
 		GLfloat vertexAndTextureData[] = {
-			-1.0f, 	-1.0f, 	0.0f, 	0.0f,
-			1.0f, 	-1.0f, 	1.0f, 	0.0f,
-			-1.0f, 	 1.0f, 	0.0f, 	1.0f,
-			1.0f, 	 1.0f, 	1.0f, 	1.0f,
+			-1.0f, 	-1.0f, 	0.0f, 	1.0f,
+			1.0f, 	-1.0f, 	1.0f, 	1.0f,
+			-1.0f, 	 1.0f, 	0.0f, 	0.0f,
+			1.0f, 	 1.0f, 	1.0f, 	0.0f,
 		};
 
 		GLuint vertexBuffer;
@@ -126,6 +136,8 @@ namespace Arya
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(0, 2, GL_FLOAT, false, 4*sizeof(GLfloat), reinterpret_cast<GLbyte*>(0));
 		glVertexAttribPointer(1, 2, GL_FLOAT, false, 4*sizeof(GLfloat), reinterpret_cast<GLbyte*>(8));
+
+		glLineWidth(4.0f);
 
 		/* FOR CAMERA */
 		GLfloat cameraVertices[] = {
@@ -159,6 +171,26 @@ namespace Arya
 			return;
 		waitTime -= UPDATE_TIME;
 
+		vec3 camPos = scene->getCamera()->getPosition();
+		mat4 terrainScale = scene->getTerrain()->getScaleMatrix();
+		double xSize = terrainScale[0][0];
+		double zSize = terrainScale[2][2];
+		vec2 relativePos = vec2(camPos.x / xSize, - (camPos.z / zSize));
+
+		/* FOR CAMERA */
+		GLfloat cameraVertices[] = {
+			relativePos.x - 0.1f, relativePos.y - 0.1f,
+			relativePos.x - 0.1f, relativePos.y + 0.1f,
+			relativePos.x + 0.1f, relativePos.y + 0.1f,
+			relativePos.x + 0.1f, relativePos.y - 0.1f
+		};
+
+		glBindBuffer(GL_ARRAY_BUFFER, cameraCornersVBO);
+		glBufferData(GL_ARRAY_BUFFER,
+				sizeof(cameraVertices),
+				cameraVertices,
+				GL_DYNAMIC_DRAW);
+
 		render(scene);
 	}
 
@@ -183,6 +215,10 @@ namespace Arya
 
 		glBindVertexArray(screenVAO);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+		mmCameraLinesProgram->use();
+		glBindVertexArray(cameraCornersVAO);
+		glDrawArrays(GL_LINE_LOOP, 0, 4);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, Root::shared().getWindowWidth(), Root::shared().getWindowHeight());

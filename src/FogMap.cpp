@@ -10,7 +10,7 @@ using std::endl;
 #include "Textures.h"
 
 #define MAX_CIRCLE_SIZE 40
-#define UPDATE_TIME 0.2f
+#define UPDATE_TIME 0.1f
 
 namespace Arya
 {
