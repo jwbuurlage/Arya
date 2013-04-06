@@ -373,6 +373,18 @@ void GameSessionInput::moveSelectedUnits()
 	//From centerPos to clickPos
 	vec2 target(clickPos.x, clickPos.z);
 	if(best_unit) target = best_unit->getPosition2();
+	std::vector<vec2> centerNodes;
+	findPath(centerPos,target,centerNodes);
+	for(list<Unit*>::iterator it = lf->getUnits().begin(); it != lf->getUnits().end(); ++it)
+		if((*it)->isSelected())
+		{
+			(*it)->getPathNodes().clear();
+			for(int i = 0; i < centerNodes.size(); i++)
+			{
+				(*it)->getPathNodes().push_back((*it)->getPosition2() - centerPos + centerNodes[i]);
+			}
+		}
+	
 	vec2 direction = target - centerPos;
 	if(best_unit && glm::length(direction) < 30)
 	{
@@ -393,7 +405,7 @@ void GameSessionInput::moveSelectedUnits()
 		//For now the algorithm is greedy: starts at the point the furthest away and takes the nearest unit to that point
 
 		float spread = 20.0f;
-		int perRow = (int)(glm::sqrt((float)numSelected));
+		int perRow = (int)(glm::sqrt((float)numSelected) + 0.99);
 
 		direction *= spread;
 		perpendicular *= spread;
