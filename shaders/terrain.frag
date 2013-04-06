@@ -1,4 +1,4 @@
-#version 400
+#version 140
 #extension GL_ARB_explicit_attrib_location : require
 
 uniform sampler2D splatTexture;

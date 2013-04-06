@@ -527,7 +527,7 @@ void ClientGameSession::initPathfinding()
 			}
 			else
 			{
-				heightMap[i * amountOfPixels + j] = map->heightAtGroundPosition(i*xChange,j*zChange);
+				heightMap[i * amountOfPixels + j] = map->heightAtGroundPosition(i*xChange-(map->getSize()*0.5),j*zChange-(map->getSize()*0.5));
 			}
 		}
 	}
