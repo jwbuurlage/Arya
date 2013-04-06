@@ -47,6 +47,7 @@ namespace Arya
 			int size;
 
 			ShaderProgram* mmProgram;
+			ShaderProgram* mmCameraLinesProgram;
 			float waitTime;
 
 			// Interface
