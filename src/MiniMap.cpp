@@ -32,7 +32,6 @@ namespace Arya
 	MiniMap::~MiniMap()
 	{
 		if(mmWindow) delete mmWindow;
-		if(mmTexture) delete mmTexture;
 		if(mmProgram) delete mmProgram;
 	}
 
@@ -45,8 +44,9 @@ namespace Arya
 	{
 		size = 300;
 
-		mmTexture = new Texture();
-		glGenTextures(1, &mmTexture->handle);
+		GLuint tmpHandle;
+		glGenTextures(1, &tmpHandle);
+		mmTexture = TextureManager::shared().createTextureFromHandle("minimap", tmpHandle);
 
 		if(!initShader()) {
 			LOG_ERROR("Could not initialize mini-map shaders");
@@ -198,8 +198,8 @@ namespace Arya
         glBindFramebuffer(GL_FRAMEBUFFER, mmFrameBufferObject);
         glViewport(0, 0, size, size);
 
-		//glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
-        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 		mmProgram->use();
 
