@@ -206,6 +206,9 @@ void Unit::checkForEnemies()
 
 bool Unit::checkForCollision(vec2 checkPosition, float checkHeight)
 {
+    //Temporary disable collissions
+    return false;
+
 	if(!(unitState == UNIT_RUNNING || unitState == UNIT_ATTACKING_OUT_OF_RANGE || unitState == UNIT_ATTACKING)) 
 		return false;
 
