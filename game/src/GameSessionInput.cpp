@@ -374,12 +374,12 @@ void GameSessionInput::moveSelectedUnits()
 	vec2 target(clickPos.x, clickPos.z);
 	if(best_unit) target = best_unit->getPosition2();
 	std::vector<vec2> centerNodes;
-	findPath(centerPos,target,centerNodes);
+	session->findPath(centerPos,target,centerNodes);
 	for(list<Unit*>::iterator it = lf->getUnits().begin(); it != lf->getUnits().end(); ++it)
 		if((*it)->isSelected())
 		{
 			(*it)->getPathNodes().clear();
-			for(int i = 0; i < centerNodes.size(); i++)
+			for(unsigned int i = 0; i < centerNodes.size(); i++)
 			{
 				(*it)->getPathNodes().push_back((*it)->getPosition2() - centerPos + centerNodes[i]);
 			}
