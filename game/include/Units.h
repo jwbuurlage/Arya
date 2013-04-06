@@ -78,6 +78,7 @@ class Unit
         void setTargetPosition(vec2 target);
         Unit* getTargetUnit() const { return targetUnit; }
         void setTargetUnit(Unit* unit);
+		std::vector<vec2>& getPathNodes() const {return pathNodes;}
 
         void setUnitState(UnitState state);
         UnitState getUnitState() const { return unitState; }
@@ -138,6 +139,7 @@ class Unit
 
         // movement and attack
         vec2 targetPosition;
+		std::vector<vec2> pathNodes;
         Unit* targetUnit;
         UnitState unitState;
         Cell* currentCell;
