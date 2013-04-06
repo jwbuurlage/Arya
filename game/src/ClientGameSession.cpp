@@ -167,6 +167,7 @@ void ClientGameSession::rebuildCellList()
 void ClientGameSession::onFrame(float elapsedTime)
 {
 	if(!localFaction) return;
+    gameTimer += elapsedTime;
 	// update units
 	mat4 vpMatrix = Root::shared().getScene()->getCamera()->getVPMatrix();
 	for(unsigned int i = 0; i < factions.size(); ++i)
@@ -247,7 +248,12 @@ void ClientGameSession::handleEvent(Packet& packet)
 	{
 		case EVENT_GAME_FULLSTATE:
 			{
-				GAME_LOG_DEBUG("Full game state received!");
+                float newGameTime;
+                packet >> newGameTime;
+
+                GAME_LOG_DEBUG("Full game state received. Old gametimer = " << gameTimer << ". New server gametime = " << newGameTime);
+
+                gameTimer = newGameTime;
 
 				int count;
 				packet >> count;
@@ -401,10 +407,13 @@ void ClientGameSession::handleEvent(Packet& packet)
 			break;
 
 		case EVENT_MOVE_UNIT: {
+                                  float sendTime;
+                                  packet >> sendTime;
+
 								  int numUnits;
 								  packet >> numUnits;
 
-                                  GAME_LOG_DEBUG("Move packet for " << numUnits << " units!");
+                                  GAME_LOG_DEBUG("Move packet for " << numUnits << " units. " << (gameTimer - sendTime) << " delay. Sent at " << sendTime << ". Recieved at " << gameTimer);
 
 								  int unitId;
                                   int nodeCount;

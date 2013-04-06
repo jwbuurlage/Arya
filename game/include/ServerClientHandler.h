@@ -76,6 +76,7 @@ class ServerReactor : public SocketReactor
         ~ServerReactor() {}
 
         void onBusy();
+        void onIdle();
 
     private:
         Server* server;

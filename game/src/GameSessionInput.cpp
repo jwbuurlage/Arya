@@ -431,6 +431,7 @@ void GameSessionInput::moveSelectedUnits()
 
         //Relative positions to center have been calculated. Now send the packet
         Event& ev = Game::shared().getEventManager()->createEvent(EVENT_MOVE_UNIT_REQUEST);
+        ev << session->getGameTime();
         ev << numSelected;
         for(int i = 0; i < numSelected; ++i)
         {

@@ -119,8 +119,11 @@ void ServerClientHandler::onWritable(const AutoPtr<WritableNotification>& notifi
                     delete pak->first;
                 pak = packets.erase(pak);
             }
-            //always break because packets should be sent in order
-            break;
+            else
+            {
+                //break because packets should be sent in order so we have to wait untill this packet is sent
+                break;
+            }
         }
         else
         {
@@ -193,6 +196,13 @@ void ServerClientHandler::handlePacket(char* data, int packetSize)
 void ServerReactor::onBusy()
 {
     server->update();
+    Poco::Thread::yield(); //give cpu time to other thread
+}
+
+void ServerReactor::onIdle()
+{
+    server->update();
+    Poco::Thread::sleep(5);
 }
 
 ConnectionAcceptor::ConnectionAcceptor(ServerSocket& socket, SocketReactor& reactor, Server* serv) : SocketAcceptor(socket, reactor), server(serv)

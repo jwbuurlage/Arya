@@ -137,6 +137,8 @@ Packet* ServerGameSession::createFullStatePacket()
 {
 	Packet* pak = server->createPacket(EVENT_GAME_FULLSTATE);
 
+    *pak << gameTimer;
+
 	*pak << (int)factionList.size();
 
 	for(factionIterator iter = factionList.begin(); iter != factionList.end(); ++iter)
@@ -201,6 +203,7 @@ void ServerGameSession::getUnitsNearLocation(float x, float z, float distance, v
 
 void ServerGameSession::update(float elapsedTime)
 {
+    gameTimer += elapsedTime;
 	for(factionIterator fac = factionList.begin(); fac != factionList.end(); ++fac)
 	{
 		Faction* faction = *fac;
@@ -272,6 +275,9 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
             {
                 if(faction)
                 {
+                    float sendTime;
+                    packet >> sendTime;
+
                     int count;
                     packet >> count;
 
@@ -302,6 +308,7 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
                     {
                         Packet* outPak = server->createPacket(EVENT_MOVE_UNIT);
 
+                        *outPak << sendTime;
                         *outPak << (int)validUnits.size();
                         for(unsigned int i = 0; i < validUnits.size(); ++i)
                         {
