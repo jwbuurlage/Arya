@@ -121,6 +121,7 @@ void Unit::updateGraphics()
 	else
 	{
 		selectionDecal->scale = unitInfo->radius;
+        selectionDecal->color = tintColor;
 	}
 
 	if(!unitVisionary)
@@ -146,7 +147,10 @@ void Unit::checkForEnemies()
     if(unitState != UNIT_IDLE)
         return;
 
-    if(timeSinceLastAttackRequest < 1.0f) return;
+    //TODO: Instead of trying to stop the spam with a timer
+    //we should actually check if this specific request has been
+    //answered or not
+    if(timeSinceLastAttackRequest < 0.3f) return;
 
     if(!currentCell) return;
 
@@ -409,22 +413,27 @@ void Unit::setUnitState(UnitState state)
     switch(unitState)
     {
         case UNIT_IDLE:
+            setTintColor(vec3(0.0,0.0,0.0));
             object->setAnimation("stand");
             break;
 
         case UNIT_RUNNING:
+            setTintColor(vec3(0.0,1.0,0.0));
             object->setAnimation("run");
             break;
 
         case UNIT_ATTACKING_OUT_OF_RANGE:
+            setTintColor(vec3(0.0,0.0,1.0));
             object->setAnimation("crouch_walk");
             break;
 
         case UNIT_ATTACKING:
+            setTintColor(vec3(1.0,0.0,0.0));
             object->setAnimation("attack");
             break;
 
         case UNIT_DYING:
+            setTintColor(vec3(1.0,1.0,1.0));
             object->setAnimation("death_fallback");
             break;
     }
@@ -493,6 +502,7 @@ void Unit::setTintColor(vec3 tC)
 {
     tintColor = tC;
     if(object) object->setTintColor(tC);
+    if(selectionDecal) selectionDecal->color = tC;
     //healthBar->fillColor = vec4(tintColor, 1.0);
 }
 
