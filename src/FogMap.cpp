@@ -59,6 +59,8 @@ namespace Arya
 		fogData = new unsigned char[fogMapSize * fogMapSize];
 		fogDeltaData = new unsigned char[fogMapSize * fogMapSize];
 
+        memset(fogData, 0, sizeof(unsigned char)*fogMapSize*fogMapSize);
+
 		precalculateBresenhemCircles();
 		initTexture();
 		return true;
