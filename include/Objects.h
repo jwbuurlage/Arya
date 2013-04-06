@@ -35,6 +35,7 @@ namespace Arya
             Model* getModel() const { return model; }
 
             void setAnimation(const char* name);
+            void setAnimationTime(float time); //for the currently set animation
 
             AnimationState* getAnimationState() const { return animState; }
             void updateAnimation(float elapsedTime);

@@ -53,6 +53,11 @@ namespace Arya
         if( animState ) animState->setAnimation(name);
     }
 
+    void Object::setAnimationTime(float time)
+    {
+        if( animState ) animState->setAnimationTime(time);
+    }
+
     void Object::updateAnimation(float elapsedTime)
     {
         if( animState ) animState->updateAnimation(elapsedTime);

@@ -1,7 +1,6 @@
 local warrior = createUnitType(newUnitTypeId)
 
 warrior.displayname = "Ogre of Doom"
-warrior.modelname="ogros"
 warrior.radius = 10.0
 warrior.attackRadius = 5.0
 warrior.viewRadius = 100.0
@@ -13,6 +12,13 @@ warrior.attackSpeed = 1.0
 warrior.canMoveWhileAttacking = true
 warrior.selectionSound = "yes.wav"
 warrior.attackSound = "yes.wav"
+
+warrior.modelname="ogros"
+warrior.animationIdle = "stand"
+warrior.animationMove = "run"
+warrior.animationAttack = "attack"
+warrior.animationAttackOutOfRange = "crouch_walk"
+warrior.animationDie = "death_fallback"
 
 warrior.onSpawn = 
 function(unit)

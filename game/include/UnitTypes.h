@@ -16,31 +16,8 @@ void registerNewUnitInfo(UnitInfo* info);
 class UnitInfo
 {
 	public:
-		UnitInfo(int type) : typeId(type) { registerNewUnitInfo(this); }
-
-		UnitInfo(int type, const char* name,
-				float _radius, float _attackRadius, float _viewRadius,
-				float _speed, float _yawSpeed,
-				float _maxHealth, float _damage, float _attackSpeed, bool _canMoveWhileAttacking,
-				const char* _selectionSound, const char* _attackSound)
-			: typeId(type)
-		{
-			registerNewUnitInfo(this);
-			displayname = name;
-			modelname = name;
-			radius = _radius;
-			attackRadius = _attackRadius;
-			viewRadius = _viewRadius;
-			speed = _speed;
-			yawSpeed = _yawSpeed;
-			maxHealth = _maxHealth;
-			damage = _damage;
-			attackSpeed = _attackSpeed;
-			canMoveWhileAttacking = _canMoveWhileAttacking;
-			selectionSound = _selectionSound;
-			attackSound = _attackSound;
-		}
-		virtual ~UnitInfo(){}
+		UnitInfo(int type);
+		virtual ~UnitInfo();
 
 		//Call these from the game
 		//They will call the appropriate script
@@ -66,6 +43,11 @@ class UnitInfo
 
 		string selectionSound;
 		string attackSound;
-};
 
+        string animationIdle;
+        string animationMove;
+        string animationAttack;
+        string animationAttackOutOfRange;
+        string animationDie;
+};
 

@@ -60,6 +60,7 @@ namespace Arya
                 curFrame = 0;
                 timer = 0.0f;
                 interpolation = 0.0f;
+                speedFactor = 1.0f;
             }
             ~VertexAnimationState() {}
 
@@ -79,13 +80,14 @@ namespace Arya
                 curFrame = 0;
                 timer = 0.0f;
                 interpolation = 0.0f;
+                speedFactor = 1.0f;
             }
 
             void updateAnimation(float elapsedTime)
             {
                 if(!curAnim) return;
 
-                timer += elapsedTime;
+                timer += elapsedTime * speedFactor;
 
                 //Advance frames
                 //It is a loop because it is possible to skip more
@@ -103,6 +105,24 @@ namespace Arya
             int getCurFrame(){ return startFrame + curFrame; }
             float getInterpolation(){ return interpolation; }
 
+            float getAnimationTime()
+            {
+                if(!curAnim) return 0.0f;
+
+                float time = 0.0f;
+                for(int i = 0; i <= (curAnim->endFrame - curAnim->startFrame); ++i)
+                {
+                    time += curAnim->frameTimes[i];
+                }
+                return time;
+            }
+
+            void setAnimationTime(float newTime)
+            {
+                if(newTime > 0.0001)
+                    speedFactor = getAnimationTime() / newTime;
+            }
+
         private:
             VertexAnimationData* animData;
 
@@ -112,6 +132,7 @@ namespace Arya
             int curFrame; //current frame RELATIVE TO STARTFRAME
             float timer;
             float interpolation; //in range [0,1]
+            float speedFactor;
     };
 
     Model::Model()
@@ -154,17 +175,22 @@ namespace Arya
         mesh->addRef();
     }
 
-	vec3 Model::getBoundingBoxVertex(int vertexNumber)
-	{
-		if(vertexNumber == 0) return vec3(minX, minY, minZ);
-		if(vertexNumber == 1) return vec3(minX, minY, maxZ);
-		if(vertexNumber == 2) return vec3(minX, maxY, minZ);
-		if(vertexNumber == 3) return vec3(minX, maxY, maxZ);
-		if(vertexNumber == 4) return vec3(maxX, minY, minZ);
-		if(vertexNumber == 5) return vec3(maxX, minY, maxZ);
-		if(vertexNumber == 6) return vec3(maxX, maxY, minZ);
-		if(vertexNumber == 7) return vec3(maxX, maxY, maxZ);
-	}	
+    vec3 Model::getBoundingBoxVertex(int vertexNumber)
+    {
+        switch(vertexNumber)
+        {
+            case 0: return vec3(minX, minY, minZ);
+            case 1: return vec3(minX, minY, maxZ);
+            case 2: return vec3(minX, maxY, minZ);
+            case 3: return vec3(minX, maxY, maxZ);
+            case 4: return vec3(maxX, minY, minZ);
+            case 5: return vec3(maxX, minY, maxZ);
+            case 6: return vec3(maxX, maxY, minZ);
+            case 7: return vec3(maxX, maxY, maxZ);
+            default: break;
+        }
+        return vec3(0,0,0);
+    }	
 
     void Model::addMaterial(Material* mat)
     {
