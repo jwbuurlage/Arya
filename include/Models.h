@@ -39,6 +39,11 @@ namespace Arya
 
             virtual int getCurFrame() = 0;
             virtual float getInterpolation() = 0;
+
+            //For currently set animation:
+            virtual float getAnimationTime() = 0;
+            //Change speed of current animation
+            virtual void setAnimationTime(float newTime) = 0;
     };
 
     //Base class for animation data

@@ -341,7 +341,12 @@ int Scripting::init()
             .def_readwrite("attackSpeed", &LuaUnitType::attackSpeed)
             .def_readwrite("canMoveWhileAttacking", &LuaUnitType::canMoveWhileAttacking)
             .def_readwrite("selectionSound", &LuaUnitType::selectionSound)
-            .def_readwrite("attackSound", &LuaUnitType::attackSound),
+            .def_readwrite("attackSound", &LuaUnitType::attackSound)
+            .def_readwrite("animationIdle", &LuaUnitType::animationIdle)
+            .def_readwrite("animationMove", &LuaUnitType::animationMove)
+            .def_readwrite("animationAttack", &LuaUnitType::animationAttack)
+            .def_readwrite("animationAttackOutOfRange", &LuaUnitType::animationAttackOutOfRange)
+            .def_readwrite("animationDie", &LuaUnitType::animationDie),
 
         luabind::def("createMap", &createMap),
         luabind::class_<MapInfo>("MapInfoBase"), //it will segfault without this line

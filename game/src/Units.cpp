@@ -609,27 +609,28 @@ void Unit::setUnitState(UnitState state)
 	{
 		case UNIT_IDLE:
 			setTintColor(vec3(0.0,0.0,0.0));
-			object->setAnimation("stand");
+			object->setAnimation(unitInfo->animationIdle.c_str());
 			break;
 
 		case UNIT_RUNNING:
 			setTintColor(vec3(0.0,1.0,0.0));
-			object->setAnimation("run");
+			object->setAnimation(unitInfo->animationMove.c_str());
 			break;
 
 		case UNIT_ATTACKING_OUT_OF_RANGE:
 			setTintColor(vec3(0.0,0.0,1.0));
-			object->setAnimation("crouch_walk");
+			object->setAnimation(unitInfo->animationAttackOutOfRange.c_str());
 			break;
 
 		case UNIT_ATTACKING:
 			setTintColor(vec3(1.0,0.0,0.0));
-			object->setAnimation("attack");
+			object->setAnimation(unitInfo->animationAttack.c_str());
+            object->setAnimationTime(unitInfo->attackSpeed);
 			break;
 
 		case UNIT_DYING:
 			setTintColor(vec3(1.0,1.0,1.0));
-			object->setAnimation("death_fallback");
+			object->setAnimation(unitInfo->animationDie.c_str());
 			break;
 	}
 #endif

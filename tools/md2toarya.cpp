@@ -156,9 +156,10 @@ int main(int argc, char* argv[])
 
     if( argc < 3 )
     {
-        cout << "Usage: " << argv[0] << " md2file.md2 outputfile.aryamodel [scalefactor translatevector]" << endl;
+        cout << "Usage: " << argv[0] << " md2file.md2 outputfile.aryamodel [scalefactor translatevector] [special_animations]" << endl;
         cout << "Example: " << argv[0] << " ogros.md2 ogros.aryamodel" << endl;
         cout << "Example: " << argv[0] << " ogros.md2 ogros.aryamodel 0.2 0 -5 0" << endl;
+        cout << "Example: " << argv[0] << " ogros.md2 ogros.aryamodel 0.2 0 -5 0 1" << endl;
         return 0;
     }
 
@@ -166,6 +167,7 @@ int main(int argc, char* argv[])
     string outputfilename;
     float scaleFactor = 1.0f;
     float transX = 0.0f, transY = 0.0f, transZ = 0.0f;
+    bool specialAnimations = false;
 
     inputfilename = argv[1];
     outputfilename = argv[2];
@@ -174,6 +176,12 @@ int main(int argc, char* argv[])
         stringstream parser;
         parser << argv[3] << " " << argv[4] << " " << argv[5] << " " << argv[6];
         parser >> scaleFactor >> transX >> transY >> transZ;
+    }
+    if( argc >= 8 )
+    {
+        stringstream parser;
+        parser << argv[7];
+        parser >> specialAnimations;
     }
 
     ifstream inputfile;
@@ -259,22 +267,84 @@ int main(int argc, char* argv[])
     //The animation info does not come from the source file. It is static MD2 animation data
     if( animated )
     {
-       cout << "Model is animated. Storing animation info" << endl;
+        cout << "Model is animated. Storing animation info" << endl;
 
-        *(int*)pointer = 21; pointer += 4; //21 animations
-        for(int i = 0; i < 21; ++i)
+        if(specialAnimations)
         {
-            //name, startframe, endframe, (end-start) times the FPS
-            int len = strlen(MD2animationNameList[i]);
-            for(int j = 0; j < len; ++j) *pointer++ = MD2animationNameList[i][j];
-            *pointer++ = 0; //0 terminate
+            int* animationCount = (int*)pointer; pointer += 4;
 
-            *(int*)pointer = MD2animationlist[i].firstFrame; pointer += 4;
-            *(int*)pointer = MD2animationlist[i].lastFrame; pointer += 4;
-            for(int j = 0; j <= MD2animationlist[i].lastFrame - MD2animationlist[i].firstFrame; ++j)
+            char animName[17] = {0}; //buffer
+
+            string animationName;
+            int startFrame = 0, endFrame = 0;
+
+            *animationCount = 0;
+
+            for(int fr = 0; fr < header->nFrames; ++fr)
             {
-                *(float*)pointer = 1.0f/((float)MD2animationlist[i].fps);
-                pointer += 4;
+                frame* inputFrame = (frame*)(inputData + header->oFrames + fr * header->frameSize);
+
+                for(int i = 0; i < 16; ++i)
+                {
+                    animName[i] = inputFrame->name[i];
+                    if(animName[i] == 0) break;
+                    if(animName[i] >= '0' && animName[i] <= '9')
+                    {
+                        animName[i] = 0;
+                        break;
+                    }
+                }
+                cout << "DEBUG: frame name: " << inputFrame->name << ". Parsed animation name: " << animName << endl;
+
+                //Check if this is a new animation or an existing one
+                if(animationName == animName)
+                {
+                    endFrame = fr; //update endframe
+                }
+                //New animation, or this was last frame
+                if(fr == header->nFrames - 1 || animationName != animName)
+                {
+                    //new animation. save previous one
+                    if(!animationName.empty())
+                    {
+                        cout << "DEBUG: Saving animation: " << animationName << ". Frames " << startFrame << " - " << endFrame << endl;
+                        *animationCount += 1;
+                        //save name
+                        for(unsigned int j = 0; j < animationName.size(); ++j) *pointer++ = animationName[j];
+                        *pointer++ = 0; //0-terminate
+
+                        *(int*)pointer = startFrame; pointer += 4;
+                        *(int*)pointer = endFrame; pointer += 4;
+                        for(int j = 0; j <= endFrame - startFrame; ++j)
+                        {
+                            *(float*)pointer = 1.0f/9.0f;
+                            pointer += 4;
+                        }
+                    }
+                    //new animation
+                    animationName = animName;
+                    startFrame = fr;
+                    endFrame = fr;
+                }
+            }
+        }
+        else
+        {
+            *(int*)pointer = 21; pointer += 4; //21 animations
+            for(int i = 0; i < 21; ++i)
+            {
+                //name, startframe, endframe, (end-start) times the FPS
+                int len = strlen(MD2animationNameList[i]);
+                for(int j = 0; j < len; ++j) *pointer++ = MD2animationNameList[i][j];
+                *pointer++ = 0; //0 terminate
+
+                *(int*)pointer = MD2animationlist[i].firstFrame; pointer += 4;
+                *(int*)pointer = MD2animationlist[i].lastFrame; pointer += 4;
+                for(int j = 0; j <= MD2animationlist[i].lastFrame - MD2animationlist[i].firstFrame; ++j)
+                {
+                    *(float*)pointer = 1.0f/((float)MD2animationlist[i].fps);
+                    pointer += 4;
+                }
             }
         }
     }
@@ -319,8 +389,6 @@ int main(int argc, char* argv[])
     for(int fr = 0; fr < header->nFrames; ++fr)
     {
         frame* inputFrame = (frame*)(inputData + header->oFrames + fr * header->frameSize);
-
-        cout << "DEBUG: frame name: " << inputFrame->name << endl;
 
         for(int tri = 0; tri < header->nTriangles; ++tri)
         {
