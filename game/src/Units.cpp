@@ -67,7 +67,10 @@ Unit::~Unit()
     if(object) object->setObsolete();
 
 	if(selectionDecal)
+    {
+        Decals::shared().removeDecal(selectionDecal);
 		delete selectionDecal;
+    }
 
 	if(unitVisionary)
 	{
