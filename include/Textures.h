@@ -14,7 +14,7 @@ namespace Arya
             GLuint height;
             //we could add more info about
             //bit depths and mipmap info and so on
-        //private:
+        private:
             //Only TextureManager can create Textures
             friend class TextureManager;
             friend class ResourceManager<Texture>;
@@ -32,6 +32,8 @@ namespace Arya
 
             //If no texture found it will return 0
             Texture* getTexture( std::string filename ){ return getResource(filename); }
+
+            Texture* createTextureFromHandle(std::string name, GLuint handle);
 
         private:
             Texture* loadResource( std::string filename );

@@ -63,6 +63,20 @@ namespace Arya
         return texture;
     }
 
+    Texture* TextureManager::createTextureFromHandle(std::string name, GLuint handle)
+    {
+        if(resourceLoaded(name)) return getTexture(name);
+
+        Texture* texture = new Texture;
+        addResource(name, texture);
+        texture->handle = handle;
+        //Get width and height
+        glBindTexture(GL_TEXTURE_2D, texture->handle);
+        glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, (GLint*)&texture->width);
+        glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, (GLint*)&texture->width);
+        return texture;
+    }
+
     void TextureManager::loadDefaultTexture(){
         if( resourceLoaded("default") ) return;
 
