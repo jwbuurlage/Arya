@@ -146,7 +146,9 @@ class Connection
                             sendPacket(*pak);
                             delete *pak;
                             pak = packets.erase(pak);
-                            break; //next packet can be done on next frame
+                            //We could break here so that packets are spreaded
+                            //accross different frames
+                            //break;
                         }
                         else
                         {

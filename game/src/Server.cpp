@@ -136,10 +136,10 @@ void Server::update()
     //Display fps every minute
     frameCounter++;
     fpsTime += timer.getElapsedTime();
-    if(fpsTime.asMilliseconds() >= 60000)
+    if(fpsTime.asMilliseconds() >= 10000)
     {
         GAME_LOG_INFO("Server fps: " << ((float)frameCounter) / fpsTime.asSeconds() );
-        fpsTime -= sf::milliseconds(60000);
+        fpsTime -= sf::milliseconds(10000);
         frameCounter = 0;
     }
 
