@@ -137,8 +137,6 @@ namespace Arya
 		glVertexAttribPointer(0, 2, GL_FLOAT, false, 4*sizeof(GLfloat), reinterpret_cast<GLbyte*>(0));
 		glVertexAttribPointer(1, 2, GL_FLOAT, false, 4*sizeof(GLfloat), reinterpret_cast<GLbyte*>(8));
 
-		glLineWidth(4.0f);
-
 		/* FOR CAMERA */
 		GLfloat cameraVertices[] = {
 			-0.5f, -0.5f,
