@@ -21,6 +21,7 @@ namespace Arya
 
 		fogData = 0;
 		fogDeltaData = 0;
+        bresenhemCircles = 0;
 	}
 
 	FogMap::~FogMap()
@@ -30,9 +31,12 @@ namespace Arya
 		if(fogData)
 			delete[] fogData;
 
-		for(int i = 0; i < MAX_CIRCLE_SIZE; ++i)
-			delete[] bresenhemCircles[i];
-		delete[] bresenhemCircles;
+        if(bresenhemCircles)
+        {
+            for(int i = 0; i < MAX_CIRCLE_SIZE; ++i)
+                delete[] bresenhemCircles[i];
+            delete[] bresenhemCircles;
+        }
 	}
 
 	void FogMap::positionToIndex(vec2 pos, int& centerX, int& centerY)
