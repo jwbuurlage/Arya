@@ -138,6 +138,7 @@ class Unit
 
         // movement and attack
         vec2 targetPosition;
+		std::vector<vec2> pathNodes;
         Unit* targetUnit;
         UnitState unitState;
         Cell* currentCell;
