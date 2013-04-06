@@ -10,5 +10,5 @@ layout(location=0) out vec4 color;
 
 void main()
 {
-	color = vec4(0.5, 0.0, 0.0, 1.0); //vec4(texture(heightmap, texCoo).r * texture(fogmap, texCoo).r, 1.0);
+	color = vec4(vec3(texture(heightmap, texCoo).r * texture(fogmap, texCoo).r), 1.0);
 }

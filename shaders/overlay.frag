@@ -14,5 +14,5 @@ vec4 overlayColor(vec2 tex)
 
 void main()
 {
-    fragColor = uColor * overlayColor(texCoo).r;
+    fragColor = uColor * overlayColor(texCoo);
 }

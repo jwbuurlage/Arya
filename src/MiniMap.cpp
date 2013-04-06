@@ -80,6 +80,8 @@ namespace Arya
 
 	bool MiniMap::initFBO()
 	{
+		Root::shared().checkForErrors("before minimap fbo");
+
 		glGenFramebuffers(1, &mmFrameBufferObject);
 		glBindFramebuffer(GL_FRAMEBUFFER, mmFrameBufferObject);
 
@@ -93,43 +95,10 @@ namespace Arya
 		GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT0};
 		glDrawBuffers(1, drawBuffers);
 
-        switch(glCheckFramebufferStatus(GL_FRAMEBUFFER)) {
-            case GL_FRAMEBUFFER_COMPLETE:
-                LOG_INFO("Minimap Framebuffer is complete");
-                break;
-
-            case GL_FRAMEBUFFER_UNSUPPORTED:
-                LOG_ERROR("Framebuffer is unsupported");
-                return false;
-
-                break;
-
-            case GL_FRAMEBUFFER_UNDEFINED:
-                LOG_ERROR("Framebuffer is undefined");
-                return false;
-                break;
-
-            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-                LOG_ERROR("Framebuffer has incomplete attachment");
-                return false;
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-                LOG_ERROR("Framebuffer is missing attachment");
-                return false;
-                break;
-
-            case 0:
-                LOG_ERROR("FBO: An error occured");
-                return false;
-                break;
-
-            default:
-                LOG_ERROR("Unknown FBO status");
-                return false;
-                break;
-        }
-
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		Root::shared().checkForErrors("after");
+
 		return true;
 	}
 
