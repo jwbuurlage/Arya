@@ -388,7 +388,7 @@ void GameSessionInput::moveSelectedUnits()
 
         //Find a path
         std::vector<vec2> pathNodes;
-        session->findPath(centerPos,target,pathNodes);
+        //session->findPath(centerPos,target,pathNodes);
         if(pathNodes.empty()) pathNodes.push_back(target);
 
         //Now calculate the position of each unit relative to each other
