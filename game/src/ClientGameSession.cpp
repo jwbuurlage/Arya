@@ -404,6 +404,8 @@ void ClientGameSession::handleEvent(Packet& packet)
 								  int numUnits;
 								  packet >> numUnits;
 
+                                  GAME_LOG_DEBUG("Move packet for " << numUnits << " units!");
+
 								  int unitId;
                                   int nodeCount;
                                   vec2 tempPos;
