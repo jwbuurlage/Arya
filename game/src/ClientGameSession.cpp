@@ -9,6 +9,9 @@
 #include "../include/Units.h"
 #include "../include/common/QuadTree.h"
 #include "../include/common/Cells.h"
+#include <queue>
+#include <algorithm>
+using std::priority_queue;
 
 ClientGameSession::ClientGameSession() : GameSession(Game::shared().getScripting(), false)
 {
@@ -50,7 +53,7 @@ ClientGameSession::~ClientGameSession()
 
 	Game::shared().getEventManager()->removeEventHandler(this);
 
-	if(pathfindingMap) delete pathfindingMap;
+	if(pathfindingMap) delete[] pathfindingMap;
 
 	GAME_LOG_INFO("Ended session");
 }
@@ -532,41 +535,185 @@ void ClientGameSession::initPathfinding()
 		}
 	}
 
-	//7 8 9
-	//4 5 6
-	//1 2 3
-	int j = 0;
-	for(int i = 0; i < amountOfPixelsSquared; i++)
+    //
+    //bit numbers
+    //
+	// x 5 6 7
+	// ^ 3   4
+	// | 0 1 2
+    // | ---> z
+    //
+	for(int i = 0; i < amountOfPixels; i++)
 	{
-		j = 0;
-		for(int dx = -1; dx <= 1; dx++)
-		{
-			for(int dz = -1; dz <= 1; dz++)
-			{
-				if(dx == 0 && dz == 0) continue;
-				j += 1;
-				if(glm::abs(dx) == 1 && glm::abs(dz) == 1)
-				{
-					if(1 > glm::abs(heightMap[i + dx + dz] - heightMap[i])/(glm::sqrt(xChange * xChange + zChange * zChange)))
-					{
-						pathfindingMap[i] |= (1 << (8-j));
-					}
-				}
-				if(glm::abs(dx) == 1 && dz == 0)
-				{
-					if(1 > glm::abs(heightMap[i + dx + dz] - heightMap[i])/(xChange))
-					{
-						pathfindingMap[i] |= (1 << (8-j));
-					}
-				}
-				if(glm::abs(dz) == 1 && dx == 0)
-				{
-					if(1 > glm::abs(heightMap[i + dx + dz] - heightMap[i])/(zChange))
-					{
-						pathfindingMap[i] |= (1 << (8-j));
-					}
-				}
-			}
-		}
-	}
+        for(int j = 0; j < amountOfPixels; j++)
+        {
+            float curHeight = heightMap[i*amountOfPixels+j];
+            int bitnum = 0;
+            for(int dx = -1; dx <= 1; dx++)
+            {
+                for(int dz = -1; dz <= 1; dz++)
+                {
+                    if(dx == 0 && dz == 0) continue;
+
+                    int newI = i + dx, newJ = j + dz;
+                    bool canWalk = true;
+
+                    if(newI < 0 || newJ < 0 || newI >= amountOfPixels || newJ >= amountOfPixels)
+                    {
+                        canWalk = false;
+                    }
+                    else
+                    {
+                        float newHeight = heightMap[newI*amountOfPixels+newJ];
+                        float slope = (newHeight - curHeight)/(xChange*glm::sqrt(dx*dx+dz*dz));
+                        canWalk = glm::abs(slope) < 1;
+                    }
+                    if(canWalk) pathfindingMap[i*amountOfPixels+j] |= (1 << bitnum);
+                    else pathfindingMap[i*amountOfPixels+j] &= ~(1 << bitnum);
+                    bitnum++;
+                }
+            }
+        }
+    }
+}
+
+struct pathnode
+{
+    pathnode(){}
+    pathnode(int _i, int _j, pathnode* _parent = 0, pathnode* endnode = 0)
+    {
+        i = _i;
+        j = _j;
+        parent = _parent;
+        dist_estimate = 0;
+        if(parent)
+        {
+            int di = i - parent->i;
+            int dj = j - parent->j;
+            dist = parent->dist + glm::sqrt(di*di+dj*dj);
+        }
+        else
+        {
+            dist = 0;
+        }
+        if(endnode) update(*endnode);
+    }
+    ~pathnode(){}
+
+    bool operator==(const pathnode& rhs) const { return i == rhs.i && j == rhs.j; }
+
+    bool operator<(const pathnode& rhs) const { return dist_estimate > rhs.dist_estimate; }
+
+    void update(const pathnode& endnode)
+    {
+        int di = endnode.i - i, dj = endnode.j - j;
+        dist_estimate = dist + glm::sqrt(di*di+dj*dj);
+    }
+
+    int i, j;
+    float dist; //from start to current
+    float dist_estimate; //includes dist
+    pathnode* parent;
+};
+
+struct CompareObject
+{
+    bool operator()(pathnode* lhs, pathnode* rhs)
+    {
+        return *lhs < *rhs;
+    }
+};
+
+bool ClientGameSession::findPath(const vec2& start, const vec2& end, vector<vec2>& outNodes)
+{
+    outNodes.clear();
+    if(!map) return false;
+
+    const int amountOfPixels = 400;
+    int startI = (int)(start.x/map->getSize() + 0.5)*amountOfPixels;
+    int startJ = (int)(start.y/map->getSize() + 0.5)*amountOfPixels;
+
+    if(startI < 0 || startI >= amountOfPixels || startJ < 0 || startJ >= amountOfPixels)
+    {
+        GAME_LOG_WARNING("Invalid start point at findPath");
+        return false;
+    }
+
+    int endI = (int)(end.x/map->getSize() + 0.5)*amountOfPixels;
+    int endJ = (int)(end.y/map->getSize() + 0.5)*amountOfPixels;
+
+    if(endI < 0 || endI >= amountOfPixels || endJ < 0 || endJ >= amountOfPixels)
+    {
+        GAME_LOG_WARNING("Invalid end point at findPath");
+        return false;
+    }
+
+    //Now do A-start algorithm from start to end on heightMap
+    pathnode endnode(endI, endJ);
+    pathnode startnode(startI, startJ, 0, &endnode);
+
+    //Since we need the actual path and not only the distance we have to save
+    //the nodes somewhere, so we use this array. Except for startnode and endnode
+    //It also serves as an upper bound for the iteration process to make sure it does not lag the game
+    const int MAX_NODES = 2048;
+    pathnode* nodeStorage = new pathnode[MAX_NODES];
+    int curStorage = 0;
+
+    bool* visited = new bool[amountOfPixels*amountOfPixels];
+    memset(visited, 0, sizeof(bool)*amountOfPixels*amountOfPixels);
+
+    priority_queue<pathnode*,vector<pathnode*>,CompareObject> q;
+    q.push(&startnode);
+
+    bool pathFound = false;
+    while(!q.empty())
+    {
+        pathnode& curnode = *(q.top());
+        q.pop();
+
+        if(curnode == endnode)
+        {
+            endnode = curnode; //copy distance and parent info
+            pathFound = true;
+            break;
+        }
+
+        if(visited[curnode.i*amountOfPixels+curnode.j]) continue;
+        visited[curnode.i*amountOfPixels+curnode.j] = true;
+
+        //Add neighbors
+        int bitnum = 0;
+        for(int dx = -1; dx <= 1; dx++)
+        {
+            for(int dz = -1; dz <= 1; dz++)
+            {
+                if(dx == 0 && dz == 0) continue;
+                bool canWalk = (pathfindingMap[curnode.i*amountOfPixels+curnode.j] & (1<<bitnum)) != 0;
+                bitnum++;
+
+                if(!canWalk) continue;
+
+                //Call the constructor on the already allocated storage space
+                new (&nodeStorage[curStorage]) pathnode(curnode.i+dx,curnode.j+dz,&curnode,&endnode);
+                q.push(&nodeStorage[curStorage]);
+                ++curStorage;
+            }
+        }
+
+    }
+    if(pathFound)
+    {
+        pathnode* curnode = &endnode;
+        while(curnode->parent)
+        {
+            outNodes.push_back(vec2( map->getSize()*(float(curnode->i)/float(amountOfPixels) - 0.5), map->getSize()*(float(curnode->j)/float(amountOfPixels) - 0.5) ));
+            curnode = curnode->parent;
+        }
+        std::reverse(outNodes.begin(), outNodes.end());
+    }
+
+    delete[] nodeStorage;
+    delete[] visited;
+
+    return pathFound;
 }

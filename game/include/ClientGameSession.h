@@ -48,6 +48,7 @@ class ClientGameSession :
         void handleEvent(Packet& packet);
         CellList* unitCells;
 
+        bool findPath(const vec2& start, const vec2& end, vector<vec2>& outNodes);
      private:
         GameSessionInput* input;
         Faction* localFaction;
