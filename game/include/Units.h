@@ -74,11 +74,11 @@ class Unit
 
         void update(float timeElapsed);
 
-        vec2 getTargetPosition() const { return targetPosition; }
-        void setTargetPosition(vec2 target);
+        void setTargetPosition(vec2 target); //sets pathNode to single vec2
+        void setTargetPath(const std::vector<vec2>& newPath);
+        const std::vector<vec2>& getTargetPath() const { return pathNodes; }
         Unit* getTargetUnit() const { return targetUnit; }
         void setTargetUnit(Unit* unit);
-		std::vector<vec2>& getPathNodes(){ return pathNodes; }
 
         void setUnitState(UnitState state);
         UnitState getUnitState() const { return unitState; }
@@ -138,7 +138,6 @@ class Unit
         void deleteScriptData();
 
         // movement and attack
-        vec2 targetPosition;
 		std::vector<vec2> pathNodes;
         Unit* targetUnit;
         UnitState unitState;

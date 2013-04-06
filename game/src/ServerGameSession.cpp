@@ -280,14 +280,20 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
                     for(int i = 0; i < count; ++i)
                     {
                         int unitId;
-                        vec2 targetPos;
-                        packet >> unitId >> targetPos;
-
+                        int nodeCount;
+                        vector<vec2> pathNodes;
+                        packet >> unitId >> nodeCount;
+                        for(int i = 0; i < nodeCount; ++i)
+                        {
+                            vec2 temp;
+                            packet >> temp;
+                            pathNodes.push_back(temp);
+                        }
                         Unit* unit = getUnitById(unitId);
-                        if(unit)
+                        if(unit && nodeCount >= 1)
                         {
                             //TODO: check if valid movement
-                            unit->setTargetPosition(targetPos);
+                            unit->setTargetPath(pathNodes);
                             validUnits.push_back(unit);
                         }
                     }
@@ -299,7 +305,12 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
                         *outPak << (int)validUnits.size();
                         for(unsigned int i = 0; i < validUnits.size(); ++i)
                         {
-                            *outPak << validUnits[i]->getId() << validUnits[i]->getTargetPosition();
+                            *outPak << validUnits[i]->getId();
+                            *outPak << (int)validUnits[i]->getTargetPath().size();
+                            for(unsigned int j = 0; j < validUnits[i]->getTargetPath().size(); ++j)
+                            {
+                                *outPak << validUnits[i]->getTargetPath()[j];
+                            }
                         }
                         sendToAllClients(outPak);
                     }

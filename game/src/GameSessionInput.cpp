@@ -345,15 +345,15 @@ void GameSessionInput::moveSelectedUnits()
                 it != session->getFactions()[j]->getUnits().end(); ++it)
         {
             dist = glm::distance((*it)->getPosition(), clickPos);
-            if(dist < 2.0 * (*it)->getInfo()->radius
-                    && dist < best_distance) {
+            if(dist < (*it)->getInfo()->radius && dist < best_distance)
+            {
                 best_distance = dist; 
                 best_unit = (*it);
             }
         }
     }
 
-    vec2 centerPos(0,0);
+    vec2 centerPos(0,0); //average position of selected units
     vector<int> unitIds;
     vector<vec2> unitPositions;
     for(list<Unit*>::iterator it = lf->getUnits().begin(); it != lf->getUnits().end(); ++it)
@@ -370,23 +370,8 @@ void GameSessionInput::moveSelectedUnits()
 
     centerPos /= (float)numSelected;
 
-	//From centerPos to clickPos
-	vec2 target(clickPos.x, clickPos.z);
-	if(best_unit) target = best_unit->getPosition2();
-	std::vector<vec2> centerNodes;
-	session->findPath(centerPos,target,centerNodes);
-	for(list<Unit*>::iterator it = lf->getUnits().begin(); it != lf->getUnits().end(); ++it)
-		if((*it)->isSelected())
-		{
-			(*it)->getPathNodes().clear();
-			for(unsigned int i = 0; i < centerNodes.size(); i++)
-			{
-				(*it)->getPathNodes().push_back((*it)->getPosition2() - centerPos + centerNodes[i]);
-			}
-		}
-	
-	vec2 direction = target - centerPos;
-	if(best_unit && glm::length(direction) < 30)
+    //FOR NOW: we only use pathfinding for normal walking, not for attacking
+	if(best_unit)
 	{
 		Event& ev = Game::shared().getEventManager()->createEvent(EVENT_ATTACK_MOVE_UNIT_REQUEST);
 
@@ -396,13 +381,21 @@ void GameSessionInput::moveSelectedUnits()
 
 		ev.send();
 	}
-	if((!best_unit && glm::length(direction) > 0.01) || (best_unit && glm::length(direction) > 30))
-	{
-		direction = glm::normalize(direction);
-		vec2 perpendicular(-direction.y, direction.x); //right hand rule
+    else
+    {
+        //Movement from centerPos to clickPos
+        vec2 target(clickPos.x, clickPos.z);
 
-		//TODO: Bipartite matching that also takes into account collissions when units want to change their relative positions
-		//For now the algorithm is greedy: starts at the point the furthest away and takes the nearest unit to that point
+        //Find a path
+        std::vector<vec2> pathNodes;
+        session->findPath(centerPos,target,pathNodes);
+        if(pathNodes.empty()) pathNodes.push_back(target);
+
+        //Now calculate the position of each unit relative to each other
+        vector<vec2> relativePositions(unitIds.size());
+
+        vec2 direction = glm::normalize(target - centerPos);
+		vec2 perpendicular(-direction.y, direction.x); //right hand rule
 
 		float spread = 20.0f;
 		int perRow = (int)(glm::sqrt((float)numSelected) + 0.99);
@@ -410,8 +403,7 @@ void GameSessionInput::moveSelectedUnits()
 		direction *= spread;
 		perpendicular *= spread;
 
-		Event& ev = Game::shared().getEventManager()->createEvent(EVENT_MOVE_UNIT_REQUEST);
-		ev << numSelected;
+        vector<bool> unitTaken(unitIds.size(),false);
 		for(int i = 0; i < numSelected; ++i)
 		{
 			//This loops over the target spots in such a way that it first loops the points that are furthest away.
@@ -423,8 +415,9 @@ void GameSessionInput::moveSelectedUnits()
 			//Select closest unit
 			int bestIndex = -1;
 			float bestDistance = 0;
-			for(unsigned int j = 0; j < unitIds.size(); ++j)
+			for(int j = 0; j < numSelected; ++j)
 			{
+                if(unitTaken[j]) continue;
 				float dist = glm::distance(unitPositions[j],targetSpot);
 				if(bestIndex == -1 || dist < bestDistance)
 				{
@@ -432,16 +425,25 @@ void GameSessionInput::moveSelectedUnits()
 					bestDistance = dist;
 				}
 			}
-			ev << unitIds[bestIndex] << targetSpot;
-			//Remove the unit from the list. This is how we mark it as used.
-			//The list is not needed after this
-			unitIds.erase(unitIds.begin()+bestIndex);
-			unitPositions.erase(unitPositions.begin()+bestIndex);
+            relativePositions[bestIndex] = targetSpot - target;
+            unitTaken[bestIndex] = true;
 		}
+
+        //Relative positions to center have been calculated. Now send the packet
+        Event& ev = Game::shared().getEventManager()->createEvent(EVENT_MOVE_UNIT_REQUEST);
+        ev << numSelected;
+        for(int i = 0; i < numSelected; ++i)
+        {
+            ev << unitIds[i];
+            ev << (int)pathNodes.size();
+            for(unsigned int j = 0; j < pathNodes.size(); ++j)
+            {
+                ev << pathNodes[j] + relativePositions[i];
+            }
+        }
 		ev.send();
 	}
 }
-
 
 void GameSessionInput::selectUnit()
 {

@@ -405,14 +405,18 @@ void ClientGameSession::handleEvent(Packet& packet)
 								  packet >> numUnits;
 
 								  int unitId;
-								  vec2 unitTargetPosition;
-								  for(int i = 0; i < numUnits; ++i) {
+                                  int nodeCount;
+                                  vec2 tempPos;
+                                  vector<vec2> pathNodes;
+								  for(int i = 0; i < numUnits; ++i)
+                                  {
 									  packet >> unitId;
-									  packet >> unitTargetPosition;
+                                      packet >> nodeCount;
+                                      pathNodes.clear();
+                                      for(int i = 0; i < nodeCount; ++i){ packet >> tempPos; pathNodes.push_back(tempPos); }
 									  Unit* unit = getUnitById(unitId);
-									  if(unit) unit->setTargetPosition(unitTargetPosition);
+									  if(unit) unit->setTargetPath(pathNodes);
 								  }
-
 								  break;
 							  }
 
