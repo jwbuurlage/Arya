@@ -17,6 +17,7 @@
 #include "Interface.h"
 #include "Decals.h"
 #include "FogMap.h"
+#include "MiniMap.h"
 
 #include "Overlay.h"
 
@@ -67,11 +68,14 @@ namespace Arya
             camera->setProjectionMatrix(45.0f, Root::shared().getAspectRatio(), 0.1f, 2000.0f);
         }
 
-        initialized = true;
-
 		/* make fogmap */
 		fm = new FogMap(400, 2048.0);
-		fm->init();
+		if(!fm->init()) return false;
+
+		minimap = new MiniMap();
+		if(!minimap->init()) return false;
+
+        initialized = true;
 
         return true;
     }
@@ -238,6 +242,7 @@ namespace Arya
         lightOrthoMatrix = orthoShadowCubeMatrix * rotateToLightDirMatrix;
 
 		fm->update(elapsedTime);
+		minimap->update(elapsedTime, this);
     }
 
     void Scene::render()
@@ -250,6 +255,8 @@ namespace Arya
 
         glBindFramebuffer(GL_FRAMEBUFFER, shadowFBOHandle);
         glViewport(0, 0, 2048, 2048);
+
+        // glDrawBuffer(GL_NONE);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);

@@ -68,6 +68,9 @@ namespace Arya
     {
         public:
             ShaderProgram(string name);
+			ShaderProgram(string name,
+						string vertexFile,
+						string fragmentFile);
             ~ShaderProgram();
 
             void attach(Shader* shader);
@@ -76,6 +79,7 @@ namespace Arya
 
             string getName() { return name; };
             GLuint getHandle() { return handle; };
+			bool isValid() const { return valid; }
 
             GLuint getUniformLocation(const char* name);
             void setUniform1i(const char* name, int val);
@@ -90,6 +94,7 @@ namespace Arya
 
             GLuint handle;
             bool linked;
+			bool valid;
             string name;
 
             vector<Shader*> shaders;

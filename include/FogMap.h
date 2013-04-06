@@ -29,7 +29,7 @@ namespace Arya
 			FogMap(int _fogMapSize, float _representedSize);
 			~FogMap();
 
-			void init();
+			bool init();
 			void initTexture();
 			void updateTexture();
 			void clear();

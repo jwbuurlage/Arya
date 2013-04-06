@@ -62,6 +62,7 @@ SET(
     "../src/DrawableText.cpp"
     "../src/Decals.cpp"
 	"../src/FogMap.cpp"
+	"../src/MiniMap.cpp"
     )
 
 SET(

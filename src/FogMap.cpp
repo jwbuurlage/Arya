@@ -54,29 +54,20 @@ namespace Arya
 		return fogData[centerY*fogMapSize + centerX] > 63;
 	}
 
-	void FogMap::init()
+	bool FogMap::init()
 	{
 		fogData = new unsigned char[fogMapSize * fogMapSize];
 		fogDeltaData = new unsigned char[fogMapSize * fogMapSize];
 
 		precalculateBresenhemCircles();
 		initTexture();
+		return true;
 	}
 
 	void FogMap::initTexture()
 	{
         glGenTextures(1, &fogMapTextureHandle);
 		updateTexture();
-
-		//----------------------------------------------------------------
-		// TODO: move this shit to minimap
-		Texture* t = new Texture();
-		t->handle = fogMapTextureHandle;
-
-		Window* w = new Window(
-				vec2(-1.0), vec2(0.0), vec2(400.0, 400.0), t, 0, "" );
-		Interface::shared().makeActive(w);
-		//----------------------------------------------------------------
 	}
 
 	void FogMap::updateTexture()

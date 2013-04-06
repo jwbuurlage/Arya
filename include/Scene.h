@@ -5,6 +5,7 @@
 #include <map>
 #include <glm/glm.hpp>
 
+#include "Materials.h"
 #include "Root.h"
 
 using std::string;
@@ -21,6 +22,7 @@ namespace Arya
     class Shader;
     class ShaderProgram;
 	class FogMap;
+	class MiniMap;
 
     class Scene : public FrameListener
     {
@@ -40,6 +42,7 @@ namespace Arya
 
             Camera* getCamera() { return camera; };
             FogMap* getFogMap() { return fm; };
+            MiniMap* getMiniMap() { return minimap; };
 
             Object* createObject();
 
@@ -79,5 +82,6 @@ namespace Arya
 
             ShaderProgram* basicProgram;
 			FogMap* fm;
+			MiniMap* minimap;
     };
 }

@@ -111,7 +111,34 @@ namespace Arya
         linked = false;
         this->name = name;
         init();
+		valid = false;
     }
+
+	ShaderProgram::ShaderProgram(string name,
+			string vertexFile,
+			string fragmentFile)
+	{
+		handle = 0;
+		linked = false;
+		this->name = name;
+		init();
+
+		valid = false;
+
+		Shader* vertex = new Shader(Arya::VERTEX);
+		if(!vertex->addSourceFile(vertexFile)) return;
+		if(!vertex->compile()) return;
+
+		Shader* fragment = new Shader(Arya::FRAGMENT);
+		if(!fragment->addSourceFile(fragmentFile)) return;
+		if(!fragment->compile()) return;
+
+		attach(vertex);
+		attach(fragment);
+		if(!link()) return;
+
+		valid = true;
+	}
 
     ShaderProgram::~ShaderProgram()
     {
@@ -166,6 +193,8 @@ namespace Arya
 
             return false;
         }
+
+		valid = true;
         return true;
     }
 
