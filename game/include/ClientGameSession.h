@@ -58,4 +58,5 @@ class ClientGameSession :
         GLuint decalVao;
 
         GLuint selectionDecalHandle;
+		void initPathfinding();
 };

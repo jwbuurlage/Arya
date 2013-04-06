@@ -202,7 +202,7 @@ bool Unit::checkForCollision(vec2 checkPosition, float checkHeight)
 	if(!(unitState == UNIT_RUNNING || unitState == UNIT_ATTACKING_OUT_OF_RANGE || unitState == UNIT_ATTACKING)) 
 		return false;
 
-    if(glm::abs((getPosition().y - checkHeight)/glm::distance(checkPosition,getPosition2())) > 1.) return true;
+    if(glm::abs((getPosition().y - checkHeight)/glm::distance(checkPosition,getPosition2())) > 10.) return true;
 
 	if(!currentCell) return false;
 
@@ -231,7 +231,7 @@ bool Unit::checkForCollision(vec2 checkPosition, float checkHeight)
                 if(!unit) continue;
                 d = glm::distance(checkPosition, unit->getPosition2());
 
-                if(d < collisionRadius)
+                if(d < collisionRadius*0.5f)
                 {
                     return true;
                 }

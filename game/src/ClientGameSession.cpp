@@ -97,6 +97,8 @@ bool ClientGameSession::init()
 
     unitCells = new CellList(64, map->getSize());
 
+	initPathfinding();
+
     return true;
 }
 
@@ -501,4 +503,47 @@ void ClientGameSession::handleEvent(Packet& packet)
                               GAME_LOG_INFO("ClientGameSession: unknown event received! (" << id << ")");
                               break;
     }
+	void ClientGameSession::initPathfinding()
+	{
+		int amountOfPixels = 402;
+
+		int amountOfPixelsSquared = amountOfPixels * amountOfPixels;
+		unsigned char pathfindingMap[amountOfPixelsSquared] = {0};
+		float xValues[amountOfPixels] = {0};
+		float zValues[amountOfPixels] = {0};
+		float xChange = 0.f;
+		float zChange = 0.f;
+		float heightMap[amountOfPixelsSquared] = {0};
+		for(int i = 0; i < amountOfPixels; i++ )
+		{
+			for(int j = 0; j < amountOfPixels; j++)
+			{
+				heightMap[i * amountOfPixels + j] = map->heightAtGroundPosition(i*xChange,j*zChange);
+			}
+		}
+		for(int i = 0; i < amountOfPixelsSquared; i++)
+		{
+			for(int dx = -1; dx <= 1; dx++)
+			{
+				for(int dz = -1; dz <= 1; dz++)
+				{
+					if(dx == 0 && dz == 0) continue;
+					if(glm::abs(dx) == 1 && glm::abs(dz) == 1)
+					{
+						if(heightMap[i + dx + dz] - heightMap[i]/(glm::sqrt(xChange * xChange + zChange * zChange)));
+					}
+					if(glm::abs(dx) == 1 && dz == 0)
+					{
+						if(heightMap[i + dx + dz] - heightMap[i]/(xChange));
+					}
+					if(glm::abs(dz) == 1 && dx == 0)
+					{
+						if(heightMap[i + dx + dz] - heightMap[i]/(zChange));
+					}
+					pathfindingMap[i] | (1 << j);
+
+				}
+			}
+		}
+	}
 }
