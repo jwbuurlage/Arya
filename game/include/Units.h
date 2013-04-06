@@ -57,6 +57,7 @@ class Unit
         void setCellFromList(CellList* cl);
         Cell* getCell() const { return currentCell; }
         void checkForEnemies();
+		bool checkForCollision(vec2 checkPosition, float checkHeight);
 
         void setYaw(float y){ yaw = y; if(object) object->setYaw(y); }
         float getYaw() const { return yaw; }

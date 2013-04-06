@@ -370,66 +370,64 @@ void GameSessionInput::moveSelectedUnits()
 
     centerPos /= (float)numSelected;
 
-    if(best_unit)
-    {
-        Event& ev = Game::shared().getEventManager()->createEvent(EVENT_ATTACK_MOVE_UNIT_REQUEST);
+	//From centerPos to clickPos
+	vec2 target(clickPos.x, clickPos.z);
+	if(best_unit) target = best_unit->getPosition2();
+	vec2 direction = target - centerPos;
+	if(best_unit && glm::length(direction) < 30)
+	{
+		Event& ev = Game::shared().getEventManager()->createEvent(EVENT_ATTACK_MOVE_UNIT_REQUEST);
 
-        ev << numSelected;
-        for(unsigned int i = 0; i < unitIds.size(); ++i)
-            ev << unitIds[i] << best_unit->getId();
+		ev << numSelected;
+		for(unsigned int i = 0; i < unitIds.size(); ++i)
+			ev << unitIds[i] << best_unit->getId();
 
-        ev.send();
-    }
-    else
-    {
-        //From centerPos to clickPos
-        vec2 target(clickPos.x, clickPos.z);
-        vec2 direction = target - centerPos;
-        if(glm::length(direction) > 0.01)
-        {
-            direction = glm::normalize(direction);
-            vec2 perpendicular(-direction.y, direction.x); //right hand rule
+		ev.send();
+	}
+	if((!best_unit && glm::length(direction) > 0.01) || (best_unit && glm::length(direction) > 30))
+	{
+		direction = glm::normalize(direction);
+		vec2 perpendicular(-direction.y, direction.x); //right hand rule
 
-            //TODO: Bipartite matching that also takes into account collissions when units want to change their relative positions
-            //For now the algorithm is greedy: starts at the point the furthest away and takes the nearest unit to that point
+		//TODO: Bipartite matching that also takes into account collissions when units want to change their relative positions
+		//For now the algorithm is greedy: starts at the point the furthest away and takes the nearest unit to that point
 
-            float spread = 10.0f;
-            int perRow = (int)(glm::sqrt((float)numSelected));
+		float spread = 20.0f;
+		int perRow = (int)(glm::sqrt((float)numSelected));
 
-            direction *= spread;
-            perpendicular *= spread;
+		direction *= spread;
+		perpendicular *= spread;
 
-            Event& ev = Game::shared().getEventManager()->createEvent(EVENT_MOVE_UNIT_REQUEST);
-            ev << numSelected;
-            for(int i = 0; i < numSelected; ++i)
-            {
-                //This loops over the target spots in such a way that it first loops the points that are furthest away.
-                //When the units are coming from the BOTTOM the order is like this:
-                //1 2 3
-                //4 5 6
-                //7 8 9
-                vec2 targetSpot = target + float(perRow/2 - i/perRow)*direction + float(i%perRow - perRow/2)*perpendicular;
-                //Select closest unit
-                int bestIndex = -1;
-                float bestDistance = 0;
-                for(unsigned int j = 0; j < unitIds.size(); ++j)
-                {
-                    float dist = glm::distance(unitPositions[j],targetSpot);
-                    if(bestIndex == -1 || dist < bestDistance)
-                    {
-                        bestIndex = j;
-                        bestDistance = dist;
-                    }
-                }
-                ev << unitIds[bestIndex] << targetSpot;
-                //Remove the unit from the list. This is how we mark it as used.
-                //The list is not needed after this
-                unitIds.erase(unitIds.begin()+bestIndex);
-                unitPositions.erase(unitPositions.begin()+bestIndex);
-            }
-            ev.send();
-        }
-    }
+		Event& ev = Game::shared().getEventManager()->createEvent(EVENT_MOVE_UNIT_REQUEST);
+		ev << numSelected;
+		for(int i = 0; i < numSelected; ++i)
+		{
+			//This loops over the target spots in such a way that it first loops the points that are furthest away.
+			//When the units are coming from the BOTTOM the order is like this:
+			//1 2 3
+			//4 5 6
+			//7 8 9
+			vec2 targetSpot = target + float(perRow/2 - i/perRow)*direction + float(i%perRow - perRow/2)*perpendicular;
+			//Select closest unit
+			int bestIndex = -1;
+			float bestDistance = 0;
+			for(unsigned int j = 0; j < unitIds.size(); ++j)
+			{
+				float dist = glm::distance(unitPositions[j],targetSpot);
+				if(bestIndex == -1 || dist < bestDistance)
+				{
+					bestIndex = j;
+					bestDistance = dist;
+				}
+			}
+			ev << unitIds[bestIndex] << targetSpot;
+			//Remove the unit from the list. This is how we mark it as used.
+			//The list is not needed after this
+			unitIds.erase(unitIds.begin()+bestIndex);
+			unitPositions.erase(unitPositions.begin()+bestIndex);
+		}
+		ev.send();
+	}
 }
 
 

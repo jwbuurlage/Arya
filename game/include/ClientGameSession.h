@@ -58,4 +58,6 @@ class ClientGameSession :
         GLuint decalVao;
 
         GLuint selectionDecalHandle;
+		void initPathfinding();
+		unsigned char* pathfindingMap;
 };
