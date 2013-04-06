@@ -17,10 +17,7 @@ namespace Arya
 			radius = _radius;
 		}
 
-		~Visionary()
-		{
-
-		}
+		~Visionary() { }
 
 		vec2* pos;
 		float* radius;
@@ -40,23 +37,26 @@ namespace Arya
 			void colorize(vec2 position, float radius);
 			void update(float elapsedTime);
 
+			// This returns whether a certain position is visible by the local player
 			bool isVisible(vec2 pos);
+			GLuint getFogMapTextureHandle() const { return fogMapTextureHandle; };
+
 			void addVisionary(Visionary* visionary);
 			void removeVisionary(Visionary* visionary);
-
-			// TODO: NOT YET IMPLEMENTED
-			GLuint getFogMapTextureHandle() const { return fogMapTextureHandle; };
 
 		private:
 			int fogMapSize; //pixelcount of one side
 
 			float fogUpdateTime;
 
+			// as it is now, 255 means visible and 67 means explored
+			// maybe later:
 			// 1st bit is for 'explored'
 			// 2nd bit is for 'visible'
 			unsigned char* fogData;
 
 			// not sure what to do with this yet
+			// currently use it to store the blurred texture data
 			unsigned char* fogDeltaData; // TODO: how to use this?
 
 			void precalculateBresenhemCircles();

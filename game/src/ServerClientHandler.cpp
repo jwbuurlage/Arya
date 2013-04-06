@@ -72,7 +72,7 @@ void ServerClientHandler::onReadable(const AutoPtr<ReadableNotification>& notifi
         bytesReceived += n;
 
         //Check if we received the packet header
-        if(bytesReceived >= 12)
+        while(bytesReceived >= 12)
         {
             if( *(int*)dataBuffer != PACKETMAGICINT )
             {
@@ -96,6 +96,10 @@ void ServerClientHandler::onReadable(const AutoPtr<ReadableNotification>& notifi
                 if(extraSize > 0)
                     memmove(dataBuffer, dataBuffer + packetSize, extraSize);
                 bytesReceived = extraSize;
+            }
+            else
+            {
+                break;
             }
         }
     }
