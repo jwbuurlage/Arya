@@ -68,7 +68,7 @@ Unit::~Unit()
 
 	if(selectionDecal)
     {
-        Decals::shared().removeDecal(selectionDecal);
+        Arya::Decals::shared().removeDecal(selectionDecal);
 		delete selectionDecal;
     }
 
