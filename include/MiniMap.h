@@ -36,6 +36,7 @@ namespace Arya
 			// Camera part
 			GLuint cameraCornersVBO;
 			GLuint cameraCornersVAO;
+            GLuint vertexBuffer;
 			
 			// for drawing textures
 			GLuint screenVAO;

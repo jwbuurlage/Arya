@@ -24,6 +24,7 @@ namespace Arya
 		screenVAO = 0;
 		mmFrameBufferObject = 0;
 		size = 0; 
+        vertexBuffer = 0;
 
 		mmWindow = 0;
 		mmProgram = 0;
@@ -37,6 +38,15 @@ namespace Arya
 		if(mmWindow) delete mmWindow;
 		if(mmProgram) delete mmProgram;
 		if(mmCameraLinesProgram) delete mmCameraLinesProgram;
+
+        if(vertexBuffer)
+            glDeleteBuffers(1, &vertexBuffer);
+        if(cameraCornersVBO)
+            glDeleteBuffers(1, &cameraCornersVBO);
+        if(screenVAO)
+            glDeleteVertexArrays(1, &screenVAO);
+        if(cameraCornersVAO)
+            glDeleteVertexArrays(1, &cameraCornersVAO);
 	}
 
 	GLuint MiniMap::getMMTextureHandle() const
@@ -122,7 +132,6 @@ namespace Arya
 			1.0f, 	 1.0f, 	1.0f, 	0.0f,
 		};
 
-		GLuint vertexBuffer;
 		glGenBuffers(1, &vertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 		glBufferData(GL_ARRAY_BUFFER,
