@@ -391,6 +391,9 @@ namespace Arya
 		if(onePxRectVAO)
 			glDeleteVertexArrays(1, &onePxRectVAO);
 
+        if(fpsWindow)
+            delete fpsWindow;
+
 		for(int i = 0; i < windowStack.size(); ++i)
 			delete windowStack[i];
 
@@ -398,9 +401,6 @@ namespace Arya
 			delete texturedRectProgram;
 		if(clusterTexturedRectProgram)
 			delete clusterTexturedRectProgram;
-
-        if(fpsWindow)
-            delete fpsWindow;
 	}
 
 	bool Interface::init()
