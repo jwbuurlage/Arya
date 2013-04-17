@@ -375,6 +375,8 @@ namespace Arya
 		count = 0;
 		overlay = 0; 
 
+        fpsWindow = 0;
+
         vbo = 0;
         onePxRectVAO = 0;
 	}
@@ -396,6 +398,9 @@ namespace Arya
 			delete texturedRectProgram;
 		if(clusterTexturedRectProgram)
 			delete clusterTexturedRectProgram;
+
+        if(fpsWindow)
+            delete fpsWindow;
 	}
 
 	bool Interface::init()
@@ -433,10 +438,8 @@ namespace Arya
 			return false;
 		}
 
-		// ------------------------
-		// TODO: remove test window
 		vec2 windowSize = vec2(100.0f, 100.0f);
-		Window* w = new Window(vec2(1.0f), -1.0f * windowSize - vec2(20.0f), windowSize, 
+		fpsWindow = new Window(vec2(1.0f), -1.0f * windowSize - vec2(20.0f), windowSize, 
 				TextureManager::shared().getTexture("white"),  
 				0, "",
 				vec4(0.0f, 0.0f, 0.0f, 0.0f));
@@ -444,11 +447,9 @@ namespace Arya
 		Font* f = FontManager::shared().getFont("DejaVuSans.ttf");
 
 		FPSLabel = new Label(vec2(1.0f, 1.0f), vec2(-80.0f, -30.0f), f, "FPS: ");
-		w->addChild(FPSLabel);
+		fpsWindow->addChild(FPSLabel);
 
-		makeActive(w);
-		// TODO: remove test window
-		// -----------------------
+		makeActive(fpsWindow);
 		
 		return true;
 	}

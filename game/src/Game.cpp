@@ -34,6 +34,8 @@ Game::~Game()
 	if(network) delete network;
 	if(scripting) delete scripting;
 	if(root) delete &Root::shared();
+
+    if(menuWindow) delete menuWindow;
 }
 
 void Game::run()

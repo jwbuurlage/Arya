@@ -47,12 +47,4 @@ class GameSessionInput : public Arya::InputListener, public Arya::FrameListener
         bool doUnitMovementNextFrame;
         bool doUnitSelectionNextFrame;
         void selectUnit();
-
-		// Unit window
-		Arya::Window* unitWindow;
-		Arya::Label* damageLabel;
-		Arya::Label* healthLabel;
-		
-		void initUnitInfoWindow();
-		void updateUnitInfoWindow(Unit* unit);
 };
