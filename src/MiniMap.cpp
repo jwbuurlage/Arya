@@ -137,8 +137,6 @@ namespace Arya
 		glVertexAttribPointer(0, 2, GL_FLOAT, false, 4*sizeof(GLfloat), reinterpret_cast<GLbyte*>(0));
 		glVertexAttribPointer(1, 2, GL_FLOAT, false, 4*sizeof(GLfloat), reinterpret_cast<GLbyte*>(8));
 
-		glLineWidth(4.0f);
-
 		/* FOR CAMERA */
 		GLfloat cameraVertices[] = {
 			-0.5f, -0.5f,
@@ -199,9 +197,6 @@ namespace Arya
         glBindFramebuffer(GL_FRAMEBUFFER, mmFrameBufferObject);
         glViewport(0, 0, size, size);
 
-		// glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
 		mmProgram->use();
 
 		// TEXTURES

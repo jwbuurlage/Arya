@@ -24,6 +24,9 @@ namespace Arya
 	{
 		// TODO: This does NOT delete the vertex buffers we should keep 
 		// a reference to them as well.
+        
+        if(vbo)
+            glDeleteBuffers(1, &vbo);
 		if(vao)
 			glDeleteVertexArrays(1, &vao);
 	}
@@ -104,10 +107,9 @@ namespace Arya
 
 		vertexCount = index / 4;
 
-		GLuint vertexBuffer;
-		glGenBuffers(1, &vertexBuffer);
+		glGenBuffers(1, &vbo);
 
-		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, 
 				sizeof(GLfloat) * index,
                 vertexAndTextureData,
@@ -117,7 +119,7 @@ namespace Arya
 
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(0, 2, GL_FLOAT, false, 4*sizeof(GLfloat), reinterpret_cast<GLbyte*>(0));

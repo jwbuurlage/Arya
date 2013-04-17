@@ -240,10 +240,11 @@ bool Game::mouseMoved(int x, int y, int dx, int dy)
 
 void Game::onFrame(float elapsedTime)
 {
+		network->update();
+        return;
 	timeSinceNetworkPoll += elapsedTime;
 	if(timeSinceNetworkPoll > NETWORK_POLL)
 	{
-		network->update();
 		timeSinceNetworkPoll = 0.0f;
 	}
 }

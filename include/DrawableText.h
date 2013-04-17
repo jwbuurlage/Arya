@@ -25,6 +25,7 @@ namespace Arya
 		private:
 			Font* font;
 			string text;
+            GLuint vbo;
 			GLuint vao;
 			vec2 size;
 			int vertexCount;
