@@ -151,7 +151,7 @@ namespace Arya
             }
         }
         if(handle)
-            glDeleteShader(handle);
+            glDeleteProgram(handle);
     }
 
     bool ShaderProgram::init()

@@ -38,7 +38,7 @@ namespace Arya
 		setCvarWithoutSave("goingrightgame","D", TYPE_STRING);
 		setCvarWithoutSave("goingdowngame","Z", TYPE_STRING);
 		setCvarWithoutSave("goingupgame","X", TYPE_STRING);
-		setCvarWithoutSave("synchronizegame","!", TYPE_STRING);
+		setCvarWithoutSave("synchronizegame","U", TYPE_STRING);
 
         loadConfigFile("config.txt");
         return true;

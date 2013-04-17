@@ -28,6 +28,7 @@ Game::Game()
 Game::~Game()
 {
 	Arya::CommandHandler::shared().removeCommandListener(this);
+    if(menuWindow) delete menuWindow;
 	//Delete session before eventmanager, or else it will crash
 	if(session) delete session;
 	if(eventManager) delete eventManager;
@@ -35,7 +36,6 @@ Game::~Game()
 	if(scripting) delete scripting;
 	if(root) delete &Root::shared();
 
-    if(menuWindow) delete menuWindow;
 }
 
 void Game::run()

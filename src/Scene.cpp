@@ -38,6 +38,7 @@ namespace Arya
         camera = 0;
 		fm = 0;
         basicProgram = 0;
+        shadowDepthTextureHandle = 0;
         lightDirection=glm::normalize(vec3(0.7,0.7,0.2));
         init();
     }
@@ -194,6 +195,12 @@ namespace Arya
 
 		if(fm) delete fm;
 		fm = 0;
+
+        if(shadowDepthTextureHandle) glDeleteTextures(1, &shadowDepthTextureHandle);
+        shadowDepthTextureHandle = 0;
+
+        if(shadowFBOHandle) glDeleteFramebuffers(1, &shadowFBOHandle);
+        shadowFBOHandle = 0;
 
         for(unsigned int i = 0; i < objects.size(); ++i)
             delete objects[i];
