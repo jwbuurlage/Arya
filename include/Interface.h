@@ -212,6 +212,8 @@ namespace Arya
 			GLuint onePxRectVAO;
             GLuint vbo;
 
+            Window* fpsWindow ;
+
             vector<Rect*> rects;
 			vector<Window*> windowStack;
     };

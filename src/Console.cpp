@@ -37,6 +37,7 @@ namespace Arya
 		cLock = false;
 		upCount = 0;
 		consoleColor= vec4(0,0,0,0.4);
+        consoleWindow = 0;
 
 		CommandHandler::shared().addCommandListener("consoleColor", this);
 		CommandHandler::shared().addCommandListener("hide", this);
@@ -46,6 +47,9 @@ namespace Arya
 	{
 		CommandHandler::shared().removeCommandListener(this);
 		cleanup();
+
+        if(consoleWindow)
+            delete consoleWindow;
 	}
 
 	bool Console::init()

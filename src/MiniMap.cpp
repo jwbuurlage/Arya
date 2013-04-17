@@ -47,6 +47,8 @@ namespace Arya
             glDeleteVertexArrays(1, &screenVAO);
         if(cameraCornersVAO)
             glDeleteVertexArrays(1, &cameraCornersVAO);
+        if(mmFrameBufferObject)
+            glDeleteFramebuffers(1, &mmFrameBufferObject);
 	}
 
 	GLuint MiniMap::getMMTextureHandle() const

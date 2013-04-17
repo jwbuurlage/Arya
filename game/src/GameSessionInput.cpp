@@ -28,10 +28,6 @@ GameSessionInput::GameSessionInput(ClientGameSession* ses)
     doUnitMovementNextFrame = false;
     doUnitSelectionNextFrame = false;
 
-	unitWindow = 0;
-	damageLabel = 0;
-	healthLabel = 0;
-
     selectionRect = Root::shared().getOverlay()->createRect();
 }
 
@@ -43,8 +39,6 @@ GameSessionInput::~GameSessionInput()
 void GameSessionInput::init()
 {
     selectionRect->fillColor = vec4(0.5, 1.0, 0.5, 0.1);
-
-	initUnitInfoWindow();
 }
 
 void GameSessionInput::setSpecPos(vec3 pos)
@@ -317,7 +311,6 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
             if(!firstUnitSelected) 
 			{
 				SoundManager::shared().play((*it)->getInfo()->selectionSound);
-				updateUnitInfoWindow(*it);
 			}
             firstUnitSelected = true;
 			if(leftControlPressed) (*it)->getDebugText();
@@ -478,41 +471,4 @@ void GameSessionInput::selectUnit()
         best_unit->setSelected(true);
 		if(leftControlPressed) best_unit->getDebugText();
     }
-}
-
-
-//////////////////////////
-// Unit window
-//////////////////////////
-
-void GameSessionInput::initUnitInfoWindow()
-{
-	vec2 windowSize = vec2(150.0f, 80.0f);
-	unitWindow = new Arya::Window(vec2(1.0f, -1.0f), vec2(-20.0f -windowSize.x, 20.0f), windowSize, 
-			TextureManager::shared().getTexture("white"), Arya::WINDOW_DRAGGABLE, "Unit Info",
-			vec4(0.0f, 0.0f, 0.0f, 0.6f));
-
-	Arya::Font* f = Arya::FontManager::shared().getFont("DejaVuSans-Bold.ttf");
-	healthLabel = new Arya::Label(vec2(-1.0f, 1.0f), vec2(20.0f, -30.0f), f, "Health: lalalal");
-	unitWindow->addChild(healthLabel);
-
-	damageLabel = new Arya::Label(vec2(-1.0f, 1.0f), vec2(20.0f, -50.0f), f, "Name: lalalal");
-	unitWindow->addChild(damageLabel);
-
-	Arya::Interface::shared().makeActive(unitWindow);
-}
-
-void GameSessionInput::updateUnitInfoWindow(Unit* unit)
-{
-	if(!damageLabel || !healthLabel)
-	{
-		GAME_LOG_WARNING("Updating uninitialized unit info window");
-		return;
-	}
-
-	char buffer [50];
-    sprintf (buffer, "Max Health: %.2f", unit->getInfo()->maxHealth);
-	healthLabel->setText(string(buffer));
-    sprintf (buffer, "Damage: %.2f", unit->getInfo()->damage);
-	damageLabel->setText(string(buffer));
 }
