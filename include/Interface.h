@@ -137,7 +137,7 @@ namespace Arya
         public:
 			Label(vec2 _relativePosition, vec2 _absolutePosition,
 				Font* _font, string _text, vec4 _colorMask = vec4(1.0));
-           ~Label() { }
+           ~Label();
 
             void draw();
 			void setText(string _t);

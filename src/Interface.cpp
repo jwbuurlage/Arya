@@ -141,6 +141,8 @@ namespace Arya
 	{
 		if(isActive)
 			Interface::shared().makeInactive(this);
+
+
 	}
 
 	void Window::setActiveState(bool active)
@@ -237,6 +239,12 @@ namespace Arya
 		dt = new DrawableText(_font, _text);
 		size = dt->getSize();
 	}
+
+    Label::~Label()
+    {
+        if(dt)
+            delete dt;
+    }
 
 	void Label::draw()
 	{
