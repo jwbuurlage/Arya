@@ -12,6 +12,7 @@ namespace Arya
 	DrawableText::DrawableText(Font* _font, string _text)
 	{
 		vao = 0;
+        vbo = 0;
 
 		font = _font;
 		text = _text;

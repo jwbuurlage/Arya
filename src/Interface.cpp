@@ -374,6 +374,9 @@ namespace Arya
 		time = 0.0;
 		count = 0;
 		overlay = 0; 
+
+        vbo = 0;
+        onePxRectVAO = 0;
 	}
 
 	Interface::~Interface()
@@ -381,6 +384,8 @@ namespace Arya
 		if(overlay)
 			delete overlay;
 
+        if(vbo)
+            glDeleteBuffers(1, &vbo);
 		if(onePxRectVAO)
 			glDeleteVertexArrays(1, &onePxRectVAO);
 
@@ -409,7 +414,6 @@ namespace Arya
 			1.0,        1.0
 		};
 
-		GLuint vbo;
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), vertices, GL_STATIC_DRAW); 

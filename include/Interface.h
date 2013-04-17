@@ -210,6 +210,7 @@ namespace Arya
 			ShaderProgram* texturedRectProgram;
 			ShaderProgram* clusterTexturedRectProgram;
 			GLuint onePxRectVAO;
+            GLuint vbo;
 
             vector<Rect*> rects;
 			vector<Window*> windowStack;

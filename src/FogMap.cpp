@@ -22,6 +22,7 @@ namespace Arya
 		fogData = 0;
 		fogDeltaData = 0;
         bresenhemCircles = 0;
+        fogMapTextureHandle = 0;
 	}
 
 	FogMap::~FogMap()
@@ -37,6 +38,9 @@ namespace Arya
                 delete[] bresenhemCircles[i];
             delete[] bresenhemCircles;
         }
+
+        if(fogMapTextureHandle)
+            glDeleteTextures(1, &fogMapTextureHandle);
 	}
 
 	void FogMap::positionToIndex(vec2 pos, int& centerX, int& centerY)
