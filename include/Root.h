@@ -45,6 +45,7 @@ namespace Arya
 			mat4 getPixelToScreenTransform() const;
 
             vec3 getDepthResult(){ return clickScreenLocation; }
+            void readDepth() { readDepthNextFrame = true; }
 
             float getAspectRatio() const { if(windowHeight == 0) return 0; return windowWidth/(float)windowHeight; }
 
@@ -80,6 +81,7 @@ namespace Arya
             int mouseX, mouseY, mouseWheelPos; //To supply relative movement
 
             vec3 clickScreenLocation;
+            bool readDepthNextFrame;
 
             friend void GLFWCALL windowSizeCallback(int width, int height);
             friend void GLFWCALL keyCallback(int key, int action);
