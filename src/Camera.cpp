@@ -51,6 +51,10 @@ namespace Arya
         //		for now probably just the y = -20 plane.
         //---------------------------------------------
 
+        // prevent camera from bugging. TODO: proper fix
+        if(elapsedTime > 1.0)
+            elapsedTime = 0.0;
+
         vec3 ToMove = targetPosition - position;
         float dist = ToMove.length();
 

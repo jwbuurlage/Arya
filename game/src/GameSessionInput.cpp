@@ -25,8 +25,8 @@ GameSessionInput::GameSessionInput(ClientGameSession* ses)
 	specPos = vec3(0.0f,150.0f,0.0f);
     originalMousePos = vec2(0.0);
 
-    doUnitMovementNextFrame = false;
-    doUnitSelectionNextFrame = false;
+    waitWithUnitMovementNextFrames = 0;
+    waitWithUnitSelectionNextFrames = 0;
 
     selectionRect = Root::shared().getOverlay()->createRect();
 }
@@ -71,17 +71,11 @@ void GameSessionInput::onFrame(float elapsedTime)
 
     specPos += specMovement * elapsedTime;
 
-    if(doUnitMovementNextFrame)
-    {
-        doUnitMovementNextFrame = false;
+    if(waitWithUnitMovementNextFrames-- == 1)
         moveSelectedUnits();
-    }
 
-    if(doUnitSelectionNextFrame)
-    {
-        doUnitSelectionNextFrame = false;
+    if(waitWithUnitSelectionNextFrames-- == 1)
         selectUnit();
-    }
 
     return;
 }
@@ -167,7 +161,8 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
         {
             if(originalMousePos == vec2(x, y))
             {
-                doUnitSelectionNextFrame = true;
+                waitWithUnitSelectionNextFrames = 2;
+                Root::shared().readDepth();
             }
             else
             {
@@ -186,7 +181,10 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
         draggingRightMouse = (buttonDown == true);
 
         if(!draggingRightMouse)
-            doUnitMovementNextFrame = true;
+        {
+            waitWithUnitMovementNextFrames = 2;
+            Root::shared().readDepth();
+        }
     }
 
     return false;

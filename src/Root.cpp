@@ -40,6 +40,7 @@ namespace Arya
         scene = 0;
         oldTime = 0;
         interface = 0;
+        readDepthNextFrame = false;
 
         FileSystem::create();
         CommandHandler::create();
@@ -298,17 +299,22 @@ namespace Arya
 
 			checkForErrors("callback onRender");
 
-			GLfloat depth;
-			glReadPixels(mouseX, mouseY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+            if(readDepthNextFrame)
+            {
+                GLfloat depth;
+                glReadPixels(mouseX, mouseY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
 
-			vec4 screenPos(2.0f * mouseX /((float)windowWidth) - 1.0f, 2.0f * mouseY/((float)windowHeight) - 1.0f, 2.0f*depth-1.0f, 1.0);
+                vec4 screenPos(2.0f * mouseX /((float)windowWidth) - 1.0f, 2.0f * mouseY/((float)windowHeight) - 1.0f, 2.0f*depth-1.0f, 1.0);
 
-			screenPos = scene->getCamera()->getInverseVPMatrix() * screenPos;
-			screenPos /= screenPos.w; 
+                screenPos = scene->getCamera()->getInverseVPMatrix() * screenPos;
+                screenPos /= screenPos.w; 
 
-			clickScreenLocation.x = screenPos.x;
-			clickScreenLocation.y = screenPos.y;
-			clickScreenLocation.z = screenPos.z;
+                clickScreenLocation.x = screenPos.x;
+                clickScreenLocation.y = screenPos.y;
+                clickScreenLocation.z = screenPos.z;
+
+                readDepthNextFrame = false;
+            }
 		}
 
 		if(interface)
