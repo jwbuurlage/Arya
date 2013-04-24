@@ -102,8 +102,6 @@ namespace Arya
 
 	bool MiniMap::initFBO()
 	{
-		Root::shared().checkForErrors("before minimap fbo");
-
 		glGenFramebuffers(1, &mmFrameBufferObject);
 		glBindFramebuffer(GL_FRAMEBUFFER, mmFrameBufferObject);
 
@@ -118,8 +116,6 @@ namespace Arya
 		glDrawBuffers(1, drawBuffers);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		Root::shared().checkForErrors("after minimap fbo");
 
 		return true;
 	}

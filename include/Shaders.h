@@ -98,5 +98,6 @@ namespace Arya
             string name;
 
             vector<Shader*> shaders;
+            map<string,GLuint> uniforms;
     };
 }

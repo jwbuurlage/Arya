@@ -100,18 +100,18 @@ namespace Arya
         terrainProgram->attach(terrainFragment);
         if(!(terrainProgram->link())) return false;
 
-		Shader* waterVertex = new Shader(VERTEX);
-        if(!(waterVertex->addSourceFile("../shaders/water.vert"))) return false;
-        if(!(waterVertex->compile())) return false;
+		//Shader* waterVertex = new Shader(VERTEX);
+        //if(!(waterVertex->addSourceFile("../shaders/water.vert"))) return false;
+        //if(!(waterVertex->compile())) return false;
 
-        Shader* waterFragment = new Shader(FRAGMENT);
-        if(!(waterFragment->addSourceFile("../shaders/water.frag"))) return false;
-        if(!(waterFragment->compile())) return false;
+        //Shader* waterFragment = new Shader(FRAGMENT);
+        //if(!(waterFragment->addSourceFile("../shaders/water.frag"))) return false;
+        //if(!(waterFragment->compile())) return false;
 
-        waterProgram = new ShaderProgram("basic");
-        waterProgram->attach(waterVertex);
-        waterProgram->attach(waterFragment);
-        if(!(waterProgram->link())) return false;
+        //waterProgram = new ShaderProgram("basic");
+        //waterProgram->attach(waterVertex);
+        //waterProgram->attach(waterFragment);
+        //if(!(waterProgram->link())) return false;
 
         //This happens in the game engine now
         //string heightMapString(heightMapName);
@@ -341,8 +341,6 @@ namespace Arya
             0.5f, 0.5f, 0.5f, 1.0f
         );
 
-        Root::shared().checkForErrors("terrain render start");
-
         terrainProgram->use();
         terrainProgram->setUniformMatrix4fv("vpMatrix", cam->getVPMatrix());
 		terrainProgram->setUniformMatrix4fv("viewMatrix", cam->getVMatrix());
@@ -434,7 +432,5 @@ namespace Arya
         }
 
         glDisable(GL_BLEND); */
-
-        Root::shared().checkForErrors("terrain render end");
     }
 }

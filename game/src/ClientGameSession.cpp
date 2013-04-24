@@ -20,6 +20,7 @@ ClientGameSession::ClientGameSession() : GameSession(Game::shared().getScripting
 	map = 0;
 	localFaction = 0;
 
+    decalVbo = 0;
 	decalVao = 0;
 	decalProgram = 0;
 	selectionDecalHandle = 0;
@@ -28,6 +29,12 @@ ClientGameSession::ClientGameSession() : GameSession(Game::shared().getScripting
 
 ClientGameSession::~ClientGameSession()
 {
+    if(decalVbo)
+        glDeleteBuffers(1, &decalVbo);
+
+    if(decalVao)
+        glDeleteVertexArrays(1, &decalVao);
+
 	if(decalProgram)
 		delete decalProgram;
 
@@ -135,9 +142,8 @@ bool ClientGameSession::initVertices()
 		1.0, 1.0
 	};
 
-	GLuint vbo;
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glGenBuffers(1, &decalVbo);
+	glBindBuffer(GL_ARRAY_BUFFER, decalVbo);
 	glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), vertices, GL_STATIC_DRAW); 
 
 	glGenVertexArrays(1, &decalVao);

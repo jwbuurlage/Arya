@@ -37,15 +37,24 @@ namespace Arya
 		decalProgram = 0;
 		decalVao = 0;
 		indexCount = 0;
+        vertexBuffer = 0;
+        indexBuffer = 0;
 	}
 
 	Decals::~Decals()
 	{
+        if(decalVao)
+            glDeleteVertexArrays(1, &decalVao);
+        
+        if(indexBuffer)
+            glDeleteBuffers(1, &indexBuffer);
+
+        if(vertexBuffer)
+            glDeleteBuffers(1, &vertexBuffer);
+
 		if(decalProgram)
 			delete decalProgram;
 
-		if(decalVao)
-			glDeleteVertexArrays(1, &decalVao);
 	}
 
 	bool Decals::init()
@@ -133,9 +142,7 @@ namespace Arya
 			indices[c++] = indices[c-1];
 		}
 
-		GLuint indexBuffer;
 		glGenBuffers(1, &indexBuffer);
-
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
 			sizeof(GLuint) * c,

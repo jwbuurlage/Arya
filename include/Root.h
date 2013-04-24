@@ -48,9 +48,6 @@ namespace Arya
             void readDepth() { readDepthNextFrame = true; }
 
             float getAspectRatio() const { if(windowHeight == 0) return 0; return windowWidth/(float)windowHeight; }
-
-            //Usage: checkForErrors("root initialization")
-            bool checkForErrors(const char* stateInfo = 0);
         private:
             bool initGLFW();
             bool initGLEW();

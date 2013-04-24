@@ -209,7 +209,11 @@ namespace Arya
 
     GLuint ShaderProgram::getUniformLocation(const char* name)
     {
-        return glGetUniformLocation(handle, name);
+        map<string,GLuint>::iterator it = uniforms.find(name);
+        if(it != uniforms.end()) return it->second;
+        GLuint loc = glGetUniformLocation(handle, name);
+        uniforms.insert(std::pair<string,GLuint>(name, loc));
+        return loc;
     }
 
     void ShaderProgram::setUniform1i(const char* name, int val)

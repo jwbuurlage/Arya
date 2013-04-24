@@ -56,5 +56,6 @@ namespace Arya
 			ShaderProgram* decalProgram;
 			GLuint decalVao; // do we want LODs like in terrain?
 			GLuint vertexBuffer;
+            GLuint indexBuffer;
 	};
 }

@@ -16,7 +16,7 @@ namespace Arya
 	{
 		public:
 			MiniMap();
-			~MiniMap();
+			virtual ~MiniMap();
 
 			bool init();
 			void update(float elapsedTime, Scene* scene);

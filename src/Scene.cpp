@@ -37,7 +37,9 @@ namespace Arya
         currentTerrain = 0; 
         camera = 0;
 		fm = 0;
+        minimap = 0;
         basicProgram = 0;
+        shadowFBOHandle = 0;
         shadowDepthTextureHandle = 0;
         lightDirection=glm::normalize(vec3(0.7,0.7,0.2));
         init();
@@ -196,6 +198,9 @@ namespace Arya
 		if(fm) delete fm;
 		fm = 0;
 
+        if(minimap) delete minimap;
+        minimap = 0;
+
         if(shadowDepthTextureHandle) glDeleteTextures(1, &shadowDepthTextureHandle);
         shadowDepthTextureHandle = 0;
 
@@ -254,8 +259,6 @@ namespace Arya
 
     void Scene::render()
     {
-        Root::shared().checkForErrors("scene render start");
-
         //------------------------------
         // SHADOW PASS
         //------------------------------
@@ -402,8 +405,6 @@ namespace Arya
                 }
             }
         }
-
-        Root::shared().checkForErrors("scene render end");
 
     }
 }

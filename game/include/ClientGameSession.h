@@ -56,6 +56,7 @@ class ClientGameSession :
         vector<int> clients;
 
         ShaderProgram* decalProgram;
+        GLuint decalVbo;
         GLuint decalVao;
 
         GLuint selectionDecalHandle;

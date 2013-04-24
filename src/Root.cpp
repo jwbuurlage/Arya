@@ -96,8 +96,6 @@ namespace Arya
         if(!initGLFW()) return false;
         if(!initGLEW()) return false;
 
-        checkForErrors("start of root init");
-
         // set GL stuff
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
@@ -128,8 +126,6 @@ namespace Arya
 		}
 		addFrameListener(&Console::shared());
 		addInputListener(&Console::shared());
-
-		checkForErrors("end of root init");
 
 		Decals::shared().init();
 
@@ -269,8 +265,6 @@ namespace Arya
 			LOG_WARNING("No OpenGL 3.1 support! Continuing");
 		}
 
-		checkForErrors("glew initalization");
-
 		return true;
 	}
 
@@ -282,13 +276,9 @@ namespace Arya
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		checkForErrors("root render start");
-
 		if(scene)
 		{
 			scene->render();
-
-			checkForErrors("scene render");
 
 			for(std::list<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();)
 			{
@@ -296,8 +286,6 @@ namespace Arya
 				std::list<FrameListener*>::iterator iter = it++;
 				(*iter)->onRender();
 			}
-
-			checkForErrors("callback onRender");
 
             if(readDepthNextFrame)
             {
@@ -320,8 +308,6 @@ namespace Arya
 		if(interface)
 			interface->render();
 
-		checkForErrors("root render end");
-
 		glfwSwapBuffers();
 	}
 
@@ -333,71 +319,6 @@ namespace Arya
 	mat4 Root::getPixelToScreenTransform() const
 	{
 		return glm::scale(mat4(1.0), vec3(2.0/windowWidth, 2.0/windowHeight, 1.0));
-	}
-
-	bool Root::checkForErrors(const char* stateInfo)
-	{
-		GLenum err = glGetError();
-		if(err != GL_NO_ERROR)
-		{
-			if(!stateInfo || stateInfo[0] == 0)
-				AryaLogger << Logger::L_ERROR << "OpenGL error: ";
-			else
-				AryaLogger << Logger::L_ERROR << "OpenGL error at " << stateInfo << ". Error: ";
-			switch(err)
-			{
-				case GL_INVALID_ENUM:
-					AryaLogger << "Invalid enum";
-					break;
-				case GL_INVALID_VALUE:
-					AryaLogger << "Invalid numerical value";
-					break;
-				case GL_INVALID_OPERATION:
-					AryaLogger << "Invalid operation in current state";
-					break;
-				case GL_STACK_OVERFLOW:
-					AryaLogger << "Stack overflow";
-					break;
-				case GL_STACK_UNDERFLOW:
-					AryaLogger << "Stack underflow";
-					break;
-				case GL_OUT_OF_MEMORY:
-					AryaLogger << "Out of memory";
-					break;
-				case GL_INVALID_FRAMEBUFFER_OPERATION:
-					AryaLogger << "Invalid framebuffer operation. Additional information: ";
-					{
-						GLenum fberr = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-						switch(fberr){
-							case GL_FRAMEBUFFER_COMPLETE:
-								AryaLogger << "framebuffer is complete";
-								break;
-							case GL_FRAMEBUFFER_UNSUPPORTED:
-								AryaLogger << "framebuffer is unsupported";
-								break;
-							case GL_FRAMEBUFFER_UNDEFINED:
-								AryaLogger << "framebuffer undefined";
-								break;
-							case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-								AryaLogger << "framebuffer has incomplete attachment";
-								break;
-							case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-								AryaLogger << "framebuffer is missing attachment";
-								break;
-							default:
-								AryaLogger << "unkown fbo error code: " << fberr;
-								break;
-						}
-					}
-					break;
-				default:
-					AryaLogger << "Unkown error. Code: " << err;
-					break;
-			}
-			AryaLogger << endLog;
-			return true;
-		}
-		return false;
 	}
 
 	void Root::addInputListener(InputListener* listener)
