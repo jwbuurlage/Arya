@@ -444,6 +444,7 @@ void GameSessionInput::selectUnit()
         unselectAll();
 
     vec3 clickPos = Root::shared().getDepthResult();
+    vec2 clickPos2(clickPos.x, clickPos.z);
 
     Faction* lf = session->getLocalFaction();
     if(!lf) return;
@@ -456,7 +457,7 @@ void GameSessionInput::selectUnit()
     for(list<Unit*>::iterator it = lf->getUnits().begin();
             it != lf->getUnits().end(); ++it)
     {
-        dist = glm::distance((*it)->getPosition(), clickPos);
+        dist = glm::distance((*it)->getPosition2(), clickPos2);
         if(dist < 2.0 * (*it)->getInfo()->radius
                 && dist < best_distance) {
             best_distance = dist; 
