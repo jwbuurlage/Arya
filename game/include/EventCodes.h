@@ -124,5 +124,11 @@ typedef enum
 	//------------------------
 	// - Faction ID
 	//------------------------
-	EVENT_PLAYER_VICTORY
+	EVENT_PLAYER_VICTORY,
+
+    //
+    // - Unit type ID
+    // - vec2 location
+    //
+    EVENT_SPAWN_REQUEST
 } EventCode;

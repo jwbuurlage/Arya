@@ -42,6 +42,7 @@ Unit::Unit(int _type, int _id, GameSession* _session) : session(_session), id(_i
 	health = unitInfo->maxHealth;
 	timeSinceLastAttack = unitInfo->attackSpeed + 1.0f;
 	timeSinceLastAttackRequest = 2.0f;
+    timeSinceLastScriptUpdate = 0.0f;
 
 	dyingTime = 0.0f;
 
@@ -299,6 +300,16 @@ void Unit::update(float timeElapsed)
 
 	timeSinceLastAttackRequest += timeElapsed;
 	timeSinceLastAttack += timeElapsed;
+    timeSinceLastScriptUpdate += timeElapsed;
+
+    if(timeSinceLastScriptUpdate > 1.0f)
+    {
+        if(session->isServer())
+        {
+            getInfo()->onUpdate(this, timeSinceLastScriptUpdate);
+        }
+        timeSinceLastScriptUpdate -= 1.0f;
+    }
 
 	if(unitState == UNIT_IDLE)
 		return;

@@ -48,6 +48,8 @@ class Unit
     public:
         ~Unit(); //unregisters itself at session
 
+        GameSession* getSession() const { return session; }
+
         void setPosition(const vec3& pos);
         vec3 getPosition() const { return position; }
 		vec2 getPosition2() const { return vec2(position.x, position.z); }
@@ -148,6 +150,7 @@ class Unit
         float timeSinceLastAttackRequest; //to prevent spamming the server
         float timeSinceLastAttack;
         float dyingTime;
+        float timeSinceLastScriptUpdate;
 
         Rect* healthBar;
 		Decal* selectionDecal;

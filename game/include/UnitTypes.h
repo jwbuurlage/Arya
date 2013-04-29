@@ -24,6 +24,7 @@ class UnitInfo
 		virtual void onDeath(Unit* unit){};
 		virtual void onSpawn(Unit* unit){};
 		virtual void onDamage(Unit* victim, Unit* attacker, float damage){};
+        virtual void onUpdate(Unit* unit, float elapsedTime){}; //only once per second to avoid high cpu load
 
 		const int typeId;
 

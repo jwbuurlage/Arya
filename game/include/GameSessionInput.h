@@ -34,6 +34,11 @@ class GameSessionInput : public Arya::InputListener, public Arya::FrameListener
         bool draggingLeftMouse, draggingRightMouse;
 		bool slowMode; //Precise movement
 
+        //After clicking on "build house" or "cast skill" or "attack move"
+        //you have to click on the map to complete this action.
+        //The following bool specifies if we are in this state
+        bool awaitingPlacement;
+
         bool leftShiftPressed;
 		bool leftControlPressed;
 
@@ -46,5 +51,8 @@ class GameSessionInput : public Arya::InputListener, public Arya::FrameListener
         Rect* selectionRect;
         int waitWithUnitMovementNextFrames;
         int waitWithUnitSelectionNextFrames;
+        int waitWithBuildingPlacementNextFrames;
         void selectUnit();
+
+        void placeBuilding();
 };

@@ -361,6 +361,20 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
                 }
             }
             break;
+        case EVENT_SPAWN_REQUEST:
+            {
+                int typeId;
+                vec2 unitpos;
+                packet >> typeId >> unitpos;
+
+                Unit* unit = createUnit(typeId);
+                unit->setPosition(vec3(unitpos.x, 0, unitpos.y));
+                faction->addUnit(unit);
+                //Call the unit script callback
+                unit->getInfo()->onSpawn(unit);
+                sendUnitSpawnPacket(unit);
+            }
+            break;
         default:
             break;
     }

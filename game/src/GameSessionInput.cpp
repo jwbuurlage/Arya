@@ -18,6 +18,7 @@ GameSessionInput::GameSessionInput(ClientGameSession* ses)
     mouseLeft = mouseRight = mouseTop = mouseBot = false;
     draggingLeftMouse = draggingRightMouse = false;
     slowMode = false;
+    awaitingPlacement = false;
     leftShiftPressed = false;
 	leftControlPressed = false;
     forceDirection = vec3(0.0f);
@@ -27,6 +28,7 @@ GameSessionInput::GameSessionInput(ClientGameSession* ses)
 
     waitWithUnitMovementNextFrames = 0;
     waitWithUnitSelectionNextFrames = 0;
+    waitWithBuildingPlacementNextFrames = 0;
 
     selectionRect = Root::shared().getOverlay()->createRect();
 }
@@ -76,6 +78,9 @@ void GameSessionInput::onFrame(float elapsedTime)
 
     if(waitWithUnitSelectionNextFrames-- == 1)
         selectUnit();
+
+    if(waitWithBuildingPlacementNextFrames-- == 1)
+        placeBuilding();
 
     return;
 }
@@ -132,6 +137,13 @@ bool GameSessionInput::keyDown(int key, bool keyDown)
 			Event& ev = Game::shared().getEventManager()->createEvent(EVENT_GAME_FULLSTATE_REQUEST);
 			ev.send();
 		}
+        else if(key == 'B')
+        {
+            if(!awaitingPlacement)
+            {
+                awaitingPlacement = true;
+            }
+        }
         else keyHandled = false;
 
     if( DirectionChanged ){
@@ -151,28 +163,37 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
     //TODO: Send to UI manager and see if it was handled. If not, then do this:
     if(button == Arya::BUTTON_LEFT)
     {
-        draggingLeftMouse = (buttonDown == true);
-
-        if(draggingLeftMouse)
+        if(awaitingPlacement)
         {
-            originalMousePos = vec2(x, y);
+            awaitingPlacement = false;
+            waitWithBuildingPlacementNextFrames = 2;
+            Root::shared().readDepth();
         }
         else
         {
-            if(originalMousePos == vec2(x, y))
+            draggingLeftMouse = (buttonDown == true);
+
+            if(draggingLeftMouse)
             {
-                waitWithUnitSelectionNextFrames = 2;
-                Root::shared().readDepth();
+                originalMousePos = vec2(x, y);
             }
             else
             {
-                selectUnits(-1.0 + 2.0 * selectionRect->offsetInPixels.x / Root::shared().getWindowWidth(), 
-                        -1.0 + 2.0 * (selectionRect->offsetInPixels.x + selectionRect->sizeInPixels.x) / Root::shared().getWindowWidth(),
-                        -1.0 + 2.0 * selectionRect->offsetInPixels.y / Root::shared().getWindowHeight(), 
-                        -1.0 + 2.0 * (selectionRect->offsetInPixels.y + selectionRect->sizeInPixels.y) / Root::shared().getWindowHeight());
+                if(originalMousePos == vec2(x, y))
+                {
+                    waitWithUnitSelectionNextFrames = 2;
+                    Root::shared().readDepth();
+                }
+                else
+                {
+                    selectUnits(-1.0 + 2.0 * selectionRect->offsetInPixels.x / Root::shared().getWindowWidth(), 
+                            -1.0 + 2.0 * (selectionRect->offsetInPixels.x + selectionRect->sizeInPixels.x) / Root::shared().getWindowWidth(),
+                            -1.0 + 2.0 * selectionRect->offsetInPixels.y / Root::shared().getWindowHeight(), 
+                            -1.0 + 2.0 * (selectionRect->offsetInPixels.y + selectionRect->sizeInPixels.y) / Root::shared().getWindowHeight());
 
-                selectionRect->offsetInPixels = vec2(0.0);
-                selectionRect->sizeInPixels = vec2(0.0);
+                    selectionRect->offsetInPixels = vec2(0.0);
+                    selectionRect->sizeInPixels = vec2(0.0);
+                }
             }
         }
     }
@@ -471,4 +492,15 @@ void GameSessionInput::selectUnit()
         best_unit->setSelected(true);
 		if(leftControlPressed) best_unit->getDebugText();
     }
+}
+
+void GameSessionInput::placeBuilding()
+{
+    vec3 clickPos = Root::shared().getDepthResult();
+    vec2 clickPos2(clickPos.x, clickPos.z);
+
+    Event& ev = Game::shared().getEventManager()->createEvent(EVENT_SPAWN_REQUEST);
+    ev << 3; //UnitTypeId
+    ev << clickPos2;
+    ev.send();
 }

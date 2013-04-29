@@ -15,6 +15,19 @@
 //so that we dont need to inclue Arya.h here
 #include "../include/Files.h"
 
+
+//Whenever the script wants to call a function like 'spawnUnit'
+//we have to know which game session this belongs to (server has multiple session)
+//We solve this in the following way: whenever we call a script function
+//we set the variable callbackSession to that specific session and then call
+//the lua script. Note that this only works because this is all single-threaded
+//
+//A better solution would be to create a separate lua state object for each session
+//and then set the game session pointer as custom user data of this lua state.
+
+//TODO: Make this thread-local if server becomes multi-threaded
+ServerGameSession* callbackSession = 0;
+
 //
 // ------------- Unit Info -------------
 //
@@ -30,11 +43,13 @@ class LuaUnitType : public UnitInfo
         void onDeath(Unit* unit);
         void onSpawn(Unit* unit);
         void onDamage(Unit* victim, Unit* attacker, float damage);
+        void onUpdate(Unit* unit, float elapsedTime);
 
         //These are set by the script, they represent functions
         luabind::object objOnDeath;
         luabind::object objOnSpawn;
         luabind::object objOnDamage;
+        luabind::object objOnUpdate;
 };
 
 LuaUnitType* createLuaUnitType(int type)
@@ -45,15 +60,31 @@ LuaUnitType* createLuaUnitType(int type)
 
 void LuaUnitType::onDeath(Unit* unit)
 {
+    ServerGameSession* oldsession = callbackSession;
+    callbackSession = (ServerGameSession*)unit->getSession();
     if(objOnDeath && luabind::type(objOnDeath) == LUA_TFUNCTION) try{ luabind::call_function<void>(objOnDeath, unit); }catch(luabind::error& e){ GAME_LOG_ERROR("Script error: " << e.what()); }
+    callbackSession = oldsession;
 }
 void LuaUnitType::onSpawn(Unit* unit)
 {
+    ServerGameSession* oldsession = callbackSession;
+    callbackSession = (ServerGameSession*)unit->getSession();
     if(objOnSpawn && luabind::type(objOnSpawn) == LUA_TFUNCTION) try{ luabind::call_function<void>(objOnSpawn, unit); }catch(luabind::error& e){ GAME_LOG_ERROR("Script error: " << e.what()); }
+    callbackSession = oldsession;
 }
 void LuaUnitType::onDamage(Unit* victim, Unit* attacker, float damage)
 {
+    ServerGameSession* oldsession = callbackSession;
+    callbackSession = (ServerGameSession*)victim->getSession();
     if(objOnDamage && luabind::type(objOnDamage) == LUA_TFUNCTION) try{ luabind::call_function<void>(objOnDamage, victim, attacker, damage); }catch(luabind::error& e){ GAME_LOG_ERROR("Script error: " << e.what()); }
+    callbackSession = oldsession;
+}
+void LuaUnitType::onUpdate(Unit* unit, float elapsedTime)
+{
+    ServerGameSession* oldsession = callbackSession;
+    callbackSession = (ServerGameSession*)unit->getSession();
+    if(objOnUpdate && luabind::type(objOnUpdate) == LUA_TFUNCTION) try{ luabind::call_function<void>(objOnUpdate, unit, elapsedTime); }catch(luabind::error& e){ GAME_LOG_ERROR("Script error: " << e.what()); }
+    callbackSession = oldsession;
 }
 
 //This is a member of the Unit class
@@ -98,9 +129,6 @@ MapInfo* theMap = new MapInfo(0, 4,
 				1025,
 				"borderlands_splatmap.tga",
 				"grass.tga,snow.tga,rock.tga,dirt.tga");
-
-//TODO: Make this thread-local if server becomes multi-threaded
-ServerGameSession* callbackSession = 0;
 
 class LuaMapInfo : public MapInfo
 {
@@ -158,6 +186,7 @@ class LuaVec2
 {
     public:
         LuaVec2(float _x, float _y) : x(_x), y(_y) {}
+        LuaVec2(const vec2& pos) : x(pos.x), y(pos.y) {}
         ~LuaVec2() {}
         float x, y;
 };
@@ -165,9 +194,15 @@ class LuaVec3
 {
     public:
         LuaVec3(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
+        LuaVec3(const vec3& pos) : x(pos.x), y(pos.y), z(pos.z) {}
         ~LuaVec3() {}
         float x, y, z;
 };
+
+LuaVec2 getUnitPosition(const Unit& unit)
+{
+    return LuaVec2(unit.getPosition2());
+}
 
 int createFaction()
 {
@@ -305,6 +340,7 @@ int Scripting::init()
             .property("factionId", &Unit::getFactionId)
             .property("typeId", &Unit::getType)
             .property("health", &Unit::getHealth)
+            .property("position", &getUnitPosition)
             .property("customData", &getCustomUnitData),
 
         luabind::class_<LuaVec2>("vec2")
@@ -329,6 +365,7 @@ int Scripting::init()
             .def_readwrite("onSpawn", &LuaUnitType::objOnSpawn)
             .def_readwrite("onDeath", &LuaUnitType::objOnDeath)
             //.def_readwrite("onDamage", &LuaUnitType::objOnDamage) //takes too much fps
+            .def_readwrite("onUpdate", &LuaUnitType::objOnUpdate)
             .def_readwrite("displayname", &LuaUnitType::displayname)
             .def_readwrite("modelname", &LuaUnitType::modelname)
             .def_readwrite("radius", &LuaUnitType::radius)
