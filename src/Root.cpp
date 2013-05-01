@@ -167,6 +167,12 @@ namespace Arya
 		running = true;
 		while(running)
 		{
+            //Calling OpenGL draw functions will queueu instructions for the GPU
+            //When calling glfwSwapBuffers the program waits untill the GPU is done
+            //Therefore that is the moment that we should do the game logic and physics
+            //and so on and do the buffer swap afterwards.
+            render();
+
 			if(!oldTime)
 				oldTime = glfwGetTime();
 			else {
@@ -182,10 +188,28 @@ namespace Arya
 				oldTime = pollTime;
 			}
 
-			render();
+            //Handle input
+            glfwPollEvents();
+            if( glfwGetWindowParam(GLFW_OPENED) == 0 ) running = false;
 
-			glfwPollEvents();
-			if( glfwGetWindowParam(GLFW_OPENED) == 0 ) running = false;
+            if(readDepthNextFrame && scene)
+            {
+                GLfloat depth;
+                glReadPixels(mouseX, mouseY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+
+                vec4 screenPos(2.0f * mouseX /((float)windowWidth) - 1.0f, 2.0f * mouseY/((float)windowHeight) - 1.0f, 2.0f*depth-1.0f, 1.0);
+
+                screenPos = scene->getCamera()->getInverseVPMatrix() * screenPos;
+                screenPos /= screenPos.w; 
+
+                clickScreenLocation.x = screenPos.x;
+                clickScreenLocation.y = screenPos.y;
+                clickScreenLocation.z = screenPos.z;
+
+                readDepthNextFrame = false;
+            }
+            //Swap buffers
+            glfwSwapBuffers();
 		}
 	}
 
@@ -209,6 +233,7 @@ namespace Arya
 		}
 
 		glfwSetWindowTitle("Arya");
+        glfwDisable(GLFW_AUTO_POLL_EVENTS);
 		glfwEnable(GLFW_MOUSE_CURSOR);
 		glfwSetWindowSizeCallback(windowSizeCallback);
 		glfwSetKeyCallback(keyCallback);
@@ -245,6 +270,7 @@ namespace Arya
 		}
 
 		glfwSetWindowTitle("Arya");
+        glfwDisable(GLFW_AUTO_POLL_EVENTS);
 		glfwEnable(GLFW_MOUSE_CURSOR);
 		glfwSetWindowSizeCallback(windowSizeCallback);
 		glfwSetKeyCallback(keyCallback);
@@ -275,7 +301,6 @@ namespace Arya
 		glClearColor(0.0, 0.0, 0.0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
-
 		if(scene)
 		{
 			scene->render();
@@ -287,28 +312,9 @@ namespace Arya
 				(*iter)->onRender();
 			}
 
-            if(readDepthNextFrame)
-            {
-                GLfloat depth;
-                glReadPixels(mouseX, mouseY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
-
-                vec4 screenPos(2.0f * mouseX /((float)windowWidth) - 1.0f, 2.0f * mouseY/((float)windowHeight) - 1.0f, 2.0f*depth-1.0f, 1.0);
-
-                screenPos = scene->getCamera()->getInverseVPMatrix() * screenPos;
-                screenPos /= screenPos.w; 
-
-                clickScreenLocation.x = screenPos.x;
-                clickScreenLocation.y = screenPos.y;
-                clickScreenLocation.z = screenPos.z;
-
-                readDepthNextFrame = false;
-            }
 		}
-
 		if(interface)
 			interface->render();
-
-		glfwSwapBuffers();
 	}
 
 	Overlay* Root::getOverlay() const

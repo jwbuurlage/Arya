@@ -26,9 +26,9 @@ GameSessionInput::GameSessionInput(ClientGameSession* ses)
 	specPos = vec3(0.0f,150.0f,0.0f);
     originalMousePos = vec2(0.0);
 
-    waitWithUnitMovementNextFrames = 0;
-    waitWithUnitSelectionNextFrames = 0;
-    waitWithBuildingPlacementNextFrames = 0;
+    unitMovementNextFrame = false;
+    unitSelectionNextFrame = false;
+    buildingPlacementNextFrame = false;
 
     selectionRect = Root::shared().getOverlay()->createRect();
 }
@@ -73,14 +73,17 @@ void GameSessionInput::onFrame(float elapsedTime)
 
     specPos += specMovement * elapsedTime;
 
-    if(waitWithUnitMovementNextFrames-- == 1)
+    if(unitMovementNextFrame)
         moveSelectedUnits();
+    unitMovementNextFrame = false;
 
-    if(waitWithUnitSelectionNextFrames-- == 1)
+    if(unitSelectionNextFrame)
         selectUnit();
+    unitSelectionNextFrame = false;
 
-    if(waitWithBuildingPlacementNextFrames-- == 1)
+    if(buildingPlacementNextFrame)
         placeBuilding();
+    buildingPlacementNextFrame = false;
 
     return;
 }
@@ -166,7 +169,7 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
         if(awaitingPlacement)
         {
             awaitingPlacement = false;
-            waitWithBuildingPlacementNextFrames = 2;
+            buildingPlacementNextFrame = true;
             Root::shared().readDepth();
         }
         else
@@ -181,7 +184,7 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
             {
                 if(originalMousePos == vec2(x, y))
                 {
-                    waitWithUnitSelectionNextFrames = 2;
+                    unitSelectionNextFrame = true;
                     Root::shared().readDepth();
                 }
                 else
@@ -203,7 +206,7 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
 
         if(!draggingRightMouse)
         {
-            waitWithUnitMovementNextFrames = 2;
+            unitMovementNextFrame = true;
             Root::shared().readDepth();
         }
     }

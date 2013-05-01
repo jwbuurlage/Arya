@@ -49,9 +49,9 @@ class GameSessionInput : public Arya::InputListener, public Arya::FrameListener
         vec2 originalMousePos;
 
         Rect* selectionRect;
-        int waitWithUnitMovementNextFrames;
-        int waitWithUnitSelectionNextFrames;
-        int waitWithBuildingPlacementNextFrames;
+        bool unitMovementNextFrame;
+        bool unitSelectionNextFrame;
+        bool buildingPlacementNextFrame;
         void selectUnit();
 
         void placeBuilding();
