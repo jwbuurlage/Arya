@@ -41,6 +41,7 @@ namespace Arya
         indexBuffer = 0;
 
         gridSize = 10.0f;
+        gridEnabled = true;
 	}
 
 	Decals::~Decals()
@@ -168,7 +169,7 @@ namespace Arya
 
         // grid
         // how many points fit on the terrain?
-        double tWidth = Root::shared().getScene()->getTerrain()->getScaleMatrix()[0][0];
+        float tWidth = 1024.0f;
         int n = (int)(2.0 * tWidth / gridSize);
 
 		GLfloat* gridVertexData = new GLfloat[2*n*n];
@@ -177,64 +178,51 @@ namespace Arya
         for(int i = 0; i < n; ++i)
             for(int j = 0; j < n; ++j)
             {
-                gridVertexData[gridIndex++] = 0.0f;
-                gridVertexData[gridIndex++] = 0.0f;
+                gridVertexData[gridIndex++] = -tWidth + j * gridSize;
+                gridVertexData[gridIndex++] = -tWidth + i * gridSize;
             }
-        
-		/* int index = 0;
-		for(int i = 0; i < lod; ++i)
-			for(int j = 0; j < lod; ++j)
-			{
-				vertexAndTextureData[index++] = j * (1.0f/(lod-1));
-				vertexAndTextureData[index++] = i * (1.0f/(lod-1));
-			}
 
-		glGenBuffers(1, &vertexBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+        
+		glGenBuffers(1, &gridVertexBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, gridVertexBuffer);
         glBufferData(GL_ARRAY_BUFFER, 
-				sizeof(GLfloat) * index,
-                vertexAndTextureData,
+				sizeof(GLfloat) * gridIndex,
+                gridVertexData,
                 GL_STATIC_DRAW);
 
-		GLuint* indices = new GLuint[2*lod*lod+lod];
+		GLuint* gridIndices = new GLuint[4*n*n];
+        gridIndex = 0;
+        // horizontal lines
+		for(int i = 0; i < n; ++i)
+            for(int j = 0; j < n-1; ++j) {
+                gridIndices[gridIndex++] = i * n + j;
+                gridIndices[gridIndex++] = i * n + j + 1;
+                gridIndices[gridIndex++] = j * n + i;
+                gridIndices[gridIndex++] = (j+1) * n + i;
 
-		int c = 0;
-		int row = 0;
-		for(int j = 0; j < lod -1; ++j) {
-			if(row++ % 2 == 0)
-				for(int i = 0; i < lod; ++i) {
-					indices[c++] = j*lod + i;
-					indices[c++] = (j+1)*lod + i;
-				}
-			else
-				for(int i = 0; i < lod; ++i) {
-					indices[c++] = j*lod + lod - 1 - i;
-					indices[c++] = (j+1)*lod + lod - 1 - i;
-				}
-			indices[c++] = indices[c-1];
-		}
+            }
 
-		glGenBuffers(1, &indexBuffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+		glGenBuffers(1, &gridIndexBuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gridIndexBuffer);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-			sizeof(GLuint) * c,
-			indices,
+			sizeof(GLuint) * gridIndex,
+			gridIndices,
 			GL_STATIC_DRAW);
 
 		indexCount = c;
+        gridIndexCount = gridIndex;
 
-		delete[] vertexAndTextureData;
-		delete[] indices;
+        delete[] gridIndices;
+		delete[] gridVertexData;
 
-		glGenVertexArrays(1, &decalVao);
-		glBindVertexArray(decalVao);
+		glGenVertexArrays(1, &gridVao);
+		glBindVertexArray(gridVao);
 
 		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, gridVertexBuffer);
 		glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, (void*)0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-
-        glBindVertexArray(0); */
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gridIndexBuffer);
+        glBindVertexArray(0); 
 
 		return true;
 	}
@@ -272,7 +260,15 @@ namespace Arya
         // if grid enabled draw it...
         if(gridEnabled)
         {
-            // draw it
+			decalProgram->setUniform1i("decalTexture", 1);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, TextureManager::shared().getTexture("white")->handle);
+			decalProgram->setUniform3fv("decalColor", vec3(0.5f));
+			decalProgram->setUniform1f("scaleFactor", 1.0f);
+			decalProgram->setUniform2fv("offset", vec2(0.0f));
+
+            glBindVertexArray(gridVao);
+            glDrawElements(GL_LINES, gridIndexCount, GL_UNSIGNED_INT, (void*)0);
         }
 
 		glEnable(GL_CULL_FACE);

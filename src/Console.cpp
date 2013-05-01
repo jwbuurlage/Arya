@@ -275,17 +275,17 @@ namespace Arya
 
 	bool Console::changeConsoleColor(float r, float g, float b)
 	{
-		bool flag = true;
 		if( r >= 0.0f && r <= 1.0f && g >= 0.0f && g <= 1.0f && b >= 0.0f && b <= 1.0f ) 
 		{
-			consoleColor = vec4(r,g,b,0.4f);
+			consoleColor = vec4(r, g, b, 0.5f);
 			if(consoleWindow) 
 			{
 				consoleWindow->setColorMask(consoleColor);
 			}
 		}
-		else flag = false;
-		return flag;
+        else
+            return false;
+		return true;
 	}
 
 	bool Console::handleCommand(string command)
@@ -301,6 +301,7 @@ namespace Arya
 			parser >> float1 >> float2 >> float3;
 			changeConsoleColor(float1, float2, float3);
 			Config::shared().editConfigFile(command);
+            changeConsoleColor(float1, float2, float3);
 		}
 		if(CommandHandler::shared().splitLineCommand(command) == "hide")
 		{

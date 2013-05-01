@@ -67,7 +67,6 @@ namespace Arya
 			GLuint gridVao; // do we want LODs like in terrain?
 			GLuint gridVertexBuffer;
             GLuint gridIndexBuffer;
-
-
+            int gridIndexCount;
 	};
 }
