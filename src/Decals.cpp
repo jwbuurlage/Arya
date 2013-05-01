@@ -142,7 +142,8 @@ namespace Arya
 					indices[c++] = j*lod + lod - 1 - i;
 					indices[c++] = (j+1)*lod + lod - 1 - i;
 				}
-			indices[c++] = indices[c-1];
+			indices[c] = indices[c-1];
+            ++c;
 		}
 
 		glGenBuffers(1, &indexBuffer);
