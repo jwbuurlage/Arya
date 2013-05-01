@@ -490,28 +490,28 @@ void Unit::setUnitState(UnitState state)
 	switch(unitState)
 	{
 		case UNIT_IDLE:
-			setTintColor(vec3(0.0,0.0,0.0));
+			//setTintColor(vec3(0.0,0.0,0.0));
 			object->setAnimation(unitInfo->animationIdle.c_str());
 			break;
 
 		case UNIT_RUNNING:
-			setTintColor(vec3(0.0,1.0,0.0));
+			//setTintColor(vec3(0.0,1.0,0.0));
 			object->setAnimation(unitInfo->animationMove.c_str());
 			break;
 
 		case UNIT_ATTACKING_OUT_OF_RANGE:
-			setTintColor(vec3(0.0,0.0,1.0));
+			//setTintColor(vec3(0.0,0.0,1.0));
 			object->setAnimation(unitInfo->animationAttackOutOfRange.c_str());
 			break;
 
 		case UNIT_ATTACKING:
-			setTintColor(vec3(1.0,0.0,0.0));
+			//setTintColor(vec3(1.0,0.0,0.0));
 			object->setAnimation(unitInfo->animationAttack.c_str());
             object->setAnimationTime(unitInfo->attackSpeed);
 			break;
 
 		case UNIT_DYING:
-			setTintColor(vec3(1.0,1.0,1.0));
+			//setTintColor(vec3(1.0,1.0,1.0));
 			object->setAnimation(unitInfo->animationDie.c_str());
 			break;
 	}
