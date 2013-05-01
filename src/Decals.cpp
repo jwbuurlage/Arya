@@ -39,6 +39,8 @@ namespace Arya
 		indexCount = 0;
         vertexBuffer = 0;
         indexBuffer = 0;
+
+        gridSize = 10.0f;
 	}
 
 	Decals::~Decals()
@@ -164,6 +166,76 @@ namespace Arya
 
         glBindVertexArray(0);
 
+        // grid
+        // how many points fit on the terrain?
+        double tWidth = Root::shared().getScene()->getTerrain()->getScaleMatrix()[0][0];
+        int n = (int)(2.0 * tWidth / gridSize);
+
+		GLfloat* gridVertexData = new GLfloat[2*n*n];
+
+        int gridIndex = 0;
+        for(int i = 0; i < n; ++i)
+            for(int j = 0; j < n; ++j)
+            {
+                gridVertexData[gridIndex++] = 0.0f;
+                gridVertexData[gridIndex++] = 0.0f;
+            }
+        
+		/* int index = 0;
+		for(int i = 0; i < lod; ++i)
+			for(int j = 0; j < lod; ++j)
+			{
+				vertexAndTextureData[index++] = j * (1.0f/(lod-1));
+				vertexAndTextureData[index++] = i * (1.0f/(lod-1));
+			}
+
+		glGenBuffers(1, &vertexBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+        glBufferData(GL_ARRAY_BUFFER, 
+				sizeof(GLfloat) * index,
+                vertexAndTextureData,
+                GL_STATIC_DRAW);
+
+		GLuint* indices = new GLuint[2*lod*lod+lod];
+
+		int c = 0;
+		int row = 0;
+		for(int j = 0; j < lod -1; ++j) {
+			if(row++ % 2 == 0)
+				for(int i = 0; i < lod; ++i) {
+					indices[c++] = j*lod + i;
+					indices[c++] = (j+1)*lod + i;
+				}
+			else
+				for(int i = 0; i < lod; ++i) {
+					indices[c++] = j*lod + lod - 1 - i;
+					indices[c++] = (j+1)*lod + lod - 1 - i;
+				}
+			indices[c++] = indices[c-1];
+		}
+
+		glGenBuffers(1, &indexBuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+			sizeof(GLuint) * c,
+			indices,
+			GL_STATIC_DRAW);
+
+		indexCount = c;
+
+		delete[] vertexAndTextureData;
+		delete[] indices;
+
+		glGenVertexArrays(1, &decalVao);
+		glBindVertexArray(decalVao);
+
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+		glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, (void*)0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+
+        glBindVertexArray(0); */
+
 		return true;
 	}
 
@@ -196,6 +268,12 @@ namespace Arya
 
             glDrawElements(GL_TRIANGLE_STRIP, indexCount, GL_UNSIGNED_INT, (void*)0);
 		}
+
+        // if grid enabled draw it...
+        if(gridEnabled)
+        {
+            // draw it
+        }
 
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);

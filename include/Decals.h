@@ -45,11 +45,17 @@ namespace Arya
 			void removeDecal(Decal* d);
 			void clear();
 
+            void enableGrid() { gridEnabled = true; }
+            void disableGrid() { gridEnabled = false; }
+
 		private:
 			vector<Decal*> decals;
 
 			bool initShaders();
 			bool initVertices();
+
+            bool gridEnabled;
+            float gridSize;
 
 			int indexCount;
 
@@ -57,5 +63,11 @@ namespace Arya
 			GLuint decalVao; // do we want LODs like in terrain?
 			GLuint vertexBuffer;
             GLuint indexBuffer;
+
+			GLuint gridVao; // do we want LODs like in terrain?
+			GLuint gridVertexBuffer;
+            GLuint gridIndexBuffer;
+
+
 	};
 }

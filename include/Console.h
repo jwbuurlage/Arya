@@ -32,6 +32,7 @@ namespace Arya
             bool visibility; //visibility of the kernel
             string currentLine;
 
+            void updateCurrentLine();
             void toggleVisibilityConsole();
             void enterInput();
             void addOutputText(string textToBeAdded);

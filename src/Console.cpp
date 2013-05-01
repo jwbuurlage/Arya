@@ -12,6 +12,9 @@
 using namespace std;
 using std::stringstream;
 
+#define MAX_INPUT_LENGTH 50
+#define MAX_LINES 25
+
 namespace Arya
 {
 	template<> Console* Singleton<Console>::singleton = 0;
@@ -68,7 +71,7 @@ namespace Arya
 				vec2(10.0f, -consoleWindowSize.y - 10.0f), 
 				consoleWindowSize,
 				TextureManager::shared().getTexture("white"), 
-				WINDOW_DRAGGABLE | WINDOW_RESIZABLE | WINDOW_CLOSABLE, 
+				WINDOW_DRAGGABLE | WINDOW_CLOSABLE, 
 				"Console",
 				consoleColor);
 		Interface::shared().makeInactive(consoleWindow);
@@ -105,7 +108,6 @@ namespace Arya
 					if(keyDown && (currentLine.length() < (unsigned)nrCharOnLine))
 					{
 						currentLine.push_back(key);
-						lines[0]->setText(currentLine);
 					}
 				}
 				else
@@ -113,19 +115,16 @@ namespace Arya
 					if((keyDown && currentLine.length() < (unsigned)nrCharOnLine)) 
 					{
 						currentLine.push_back(key - 'A' + 'a');
-						lines[0]->setText(currentLine);
 					}
 				}
 			}
 			else if(key >= '0' && key <= '9' && keyDown && (currentLine.length() < (unsigned)nrCharOnLine)) 
 			{
 				currentLine.push_back(key);
-				lines[0]->setText(currentLine);
 			}
 			else if(key >= GLFW_KEY_KP_0  && key <= GLFW_KEY_KP_9  && keyDown && (currentLine.length() < (unsigned)nrCharOnLine)) 
 			{
 				currentLine.push_back(key+2);
-				lines[0]->setText(currentLine);
 			}
 			else if (keyDown && key == GLFW_KEY_KP_ADD && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
 			else if (keyDown && key == GLFW_KEY_KP_SUBTRACT && currentLine.length() < (unsigned)nrCharOnLine) currentLine.push_back(key);
@@ -158,7 +157,6 @@ namespace Arya
 					case GLFW_KEY_BACKSPACE: if(keyDown && currentLine.length() > 0)
 											 {
 												 currentLine.erase(currentLine.end()-1);
-												 lines[0]->setText(currentLine);
 											 }; break;
 					case GLFW_KEY_SPACE: if(keyDown) currentLine.push_back(key); break;
 					case GLFW_KEY_RSHIFT: if(!rShift) rShift = true; else rShift = false; break;
@@ -182,9 +180,19 @@ namespace Arya
 					default: keyHandled = false; break;
 				}
 			}
+
+            updateCurrentLine();
 		}
 		return keyHandled;
 	}
+
+    void Console::updateCurrentLine()
+    {
+        if(currentLine.length() > MAX_INPUT_LENGTH)
+            return;
+
+        lines[0]->setText(currentLine);
+    }
 
 	void Console::onFrame(float elapsedTime)
 	{
@@ -219,7 +227,13 @@ namespace Arya
 		CommandHandler::shared().onCommand(currentLine);
 		for(int i = 0; ((unsigned)i < history.size()); i++)
 		{
-			lines[i+1]->setText(history[history.size()-1-i]);
+            if(i+1 > MAX_LINES)
+                break;
+            if(history[history.size()-1-i].length() > MAX_INPUT_LENGTH)
+                lines[i+1]->setText(history[history.size()-1-i].substr(0, MAX_INPUT_LENGTH));
+            else
+                lines[i+1]->setText(history[history.size()-1-i]);
+
 		}
 		upCount = 0;
 		currentLine = "";
@@ -273,6 +287,7 @@ namespace Arya
 		else flag = false;
 		return flag;
 	}
+
 	bool Console::handleCommand(string command)
 	{
 		bool flag = true;
@@ -294,10 +309,16 @@ namespace Arya
 		else flag = false;
 		return flag;
 	}
+
 	void Console::addLine(string text)
 	{
+        if(lines.size() > MAX_LINES)
+            return;
+
+        if(text.length() > 50)
+            text = text.substr(0, 50);
 		Label* label = new Label(vec2(-1.0f, -1.0f),
-				vec2(0.0f, (lines.size()+1)*20.0f),
+				vec2(10.0f, (lines.size()+1)*20.0f),
 				font,
 				text);
 		lines.push_back(label);

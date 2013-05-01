@@ -8,6 +8,35 @@ using Arya::Scene;
 using Arya::Terrain;
 using Arya::Material;
 
+//////////////////////
+// GRIDS
+//////////////////////
+
+class GridNode
+{
+    public: 
+        GridNode();
+        ~GridNode();
+
+    private:
+        bool passable;
+        bool buildable;
+        bool occupied;
+        // ...
+};
+
+class Grid
+{
+    public: 
+        Grid();
+        ~Grid();
+
+    private:
+        GridNode* nodes;
+};
+
+//////////////////////
+
 class MapInfo;
 
 class Map
@@ -22,6 +51,7 @@ class Map
         //loads graphical data: only for client
         bool initGraphics(Scene* scene);
 
+        GridNode* nodeForGroundPosition(float x, float z);
         float heightAtGroundPosition(float x, float z);
         float getSize() const { return scaleVector.x; }
 
@@ -29,6 +59,8 @@ class Map
         Scene* scene;
         Arya::File* hFile;
         vec3 scaleVector;
+
+        Grid* mainGrid;
 
         bool terrainInitialized;
 		MapInfo* info;
