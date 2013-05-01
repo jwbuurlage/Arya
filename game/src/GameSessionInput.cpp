@@ -142,7 +142,7 @@ bool GameSessionInput::keyDown(int key, bool keyDown)
 		}
         else if(key == 'B')
         {
-            if(!awaitingPlacement)
+            if(!draggingLeftMouse)
             {
                 awaitingPlacement = true;
             }
@@ -164,15 +164,18 @@ bool GameSessionInput::keyDown(int key, bool keyDown)
 bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int x, int y)
 {
     //TODO: Send to UI manager and see if it was handled. If not, then do this:
-    if(button == Arya::BUTTON_LEFT)
+    if(awaitingPlacement)
     {
-        if(awaitingPlacement)
+        if(button == Arya::BUTTON_LEFT)
         {
             awaitingPlacement = false;
             buildingPlacementNextFrame = true;
             Root::shared().readDepth();
         }
-        else
+    }
+    else
+    {
+        if(button == Arya::BUTTON_LEFT)
         {
             draggingLeftMouse = (buttonDown == true);
 
@@ -199,18 +202,17 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
                 }
             }
         }
-    }
-    else if(button == Arya::BUTTON_RIGHT)
-    {
-        draggingRightMouse = (buttonDown == true);
-
-        if(!draggingRightMouse)
+        else if(button == Arya::BUTTON_RIGHT)
         {
-            unitMovementNextFrame = true;
-            Root::shared().readDepth();
+            draggingRightMouse = (buttonDown == true);
+
+            if(!draggingRightMouse)
+            {
+                unitMovementNextFrame = true;
+                Root::shared().readDepth();
+            }
         }
     }
-
     return false;
 }
 
