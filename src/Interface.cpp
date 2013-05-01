@@ -519,6 +519,7 @@ namespace Arya
 	void Interface::render()
 	{
 		glDisable(GL_DEPTH_TEST);
+        glDepthMask(GL_FALSE);
 		glEnable(GL_BLEND);
 
 		for(int i = 0; i < windowStack.size(); ++i)
@@ -527,8 +528,8 @@ namespace Arya
 		overlay->render();
 
 		glDisable(GL_BLEND);
+        glDepthMask(GL_TRUE);
 		glEnable(GL_DEPTH_TEST);
-
 	}
 
 	void Interface::makeActive(Window* w)

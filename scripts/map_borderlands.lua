@@ -89,7 +89,7 @@ function(elapsedTime)
             end
             if not (bestTypeId == nil) then
                 --spawn just outside the circle that we look inside
-                spawnCounter = (spawnCounter or 0) + 1
+                spawnCounter = (spawnCounter or 0) + 1 --initialize if it doesnt exist
                 spawnUnit(bestFactionId, bestTypeId, vec2(55*math.sin(spawnCounter), 55*math.cos(spawnCounter)))
             else
                 print("warning: could not find bestTypeId")

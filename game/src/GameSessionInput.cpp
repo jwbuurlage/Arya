@@ -18,6 +18,7 @@ GameSessionInput::GameSessionInput(ClientGameSession* ses)
     mouseLeft = mouseRight = mouseTop = mouseBot = false;
     draggingLeftMouse = draggingRightMouse = false;
     slowMode = false;
+    awaitingPlacement = false;
     leftShiftPressed = false;
 	leftControlPressed = false;
     forceDirection = vec3(0.0f);
@@ -25,8 +26,9 @@ GameSessionInput::GameSessionInput(ClientGameSession* ses)
 	specPos = vec3(0.0f,150.0f,0.0f);
     originalMousePos = vec2(0.0);
 
-    waitWithUnitMovementNextFrames = 0;
-    waitWithUnitSelectionNextFrames = 0;
+    unitMovementNextFrame = false;
+    unitSelectionNextFrame = false;
+    buildingPlacementNextFrame = false;
 
     selectionRect = Root::shared().getOverlay()->createRect();
 }
@@ -71,11 +73,17 @@ void GameSessionInput::onFrame(float elapsedTime)
 
     specPos += specMovement * elapsedTime;
 
-    if(waitWithUnitMovementNextFrames-- == 1)
+    if(unitMovementNextFrame)
         moveSelectedUnits();
+    unitMovementNextFrame = false;
 
-    if(waitWithUnitSelectionNextFrames-- == 1)
+    if(unitSelectionNextFrame)
         selectUnit();
+    unitSelectionNextFrame = false;
+
+    if(buildingPlacementNextFrame)
+        placeBuilding();
+    buildingPlacementNextFrame = false;
 
     return;
 }
@@ -132,6 +140,13 @@ bool GameSessionInput::keyDown(int key, bool keyDown)
 			Event& ev = Game::shared().getEventManager()->createEvent(EVENT_GAME_FULLSTATE_REQUEST);
 			ev.send();
 		}
+        else if(key == 'B')
+        {
+            if(!draggingLeftMouse)
+            {
+                awaitingPlacement = true;
+            }
+        }
         else keyHandled = false;
 
     if( DirectionChanged ){
@@ -149,44 +164,55 @@ bool GameSessionInput::keyDown(int key, bool keyDown)
 bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int x, int y)
 {
     //TODO: Send to UI manager and see if it was handled. If not, then do this:
-    if(button == Arya::BUTTON_LEFT)
+    if(awaitingPlacement)
     {
-        draggingLeftMouse = (buttonDown == true);
-
-        if(draggingLeftMouse)
+        if(button == Arya::BUTTON_LEFT)
         {
-            originalMousePos = vec2(x, y);
-        }
-        else
-        {
-            if(originalMousePos == vec2(x, y))
-            {
-                waitWithUnitSelectionNextFrames = 2;
-                Root::shared().readDepth();
-            }
-            else
-            {
-                selectUnits(-1.0 + 2.0 * selectionRect->offsetInPixels.x / Root::shared().getWindowWidth(), 
-                        -1.0 + 2.0 * (selectionRect->offsetInPixels.x + selectionRect->sizeInPixels.x) / Root::shared().getWindowWidth(),
-                        -1.0 + 2.0 * selectionRect->offsetInPixels.y / Root::shared().getWindowHeight(), 
-                        -1.0 + 2.0 * (selectionRect->offsetInPixels.y + selectionRect->sizeInPixels.y) / Root::shared().getWindowHeight());
-
-                selectionRect->offsetInPixels = vec2(0.0);
-                selectionRect->sizeInPixels = vec2(0.0);
-            }
-        }
-    }
-    else if(button == Arya::BUTTON_RIGHT)
-    {
-        draggingRightMouse = (buttonDown == true);
-
-        if(!draggingRightMouse)
-        {
-            waitWithUnitMovementNextFrames = 2;
+            awaitingPlacement = false;
+            buildingPlacementNextFrame = true;
             Root::shared().readDepth();
         }
     }
+    else
+    {
+        if(button == Arya::BUTTON_LEFT)
+        {
+            draggingLeftMouse = (buttonDown == true);
 
+            if(draggingLeftMouse)
+            {
+                originalMousePos = vec2(x, y);
+            }
+            else
+            {
+                if(originalMousePos == vec2(x, y))
+                {
+                    unitSelectionNextFrame = true;
+                    Root::shared().readDepth();
+                }
+                else
+                {
+                    selectUnits(-1.0 + 2.0 * selectionRect->offsetInPixels.x / Root::shared().getWindowWidth(), 
+                            -1.0 + 2.0 * (selectionRect->offsetInPixels.x + selectionRect->sizeInPixels.x) / Root::shared().getWindowWidth(),
+                            -1.0 + 2.0 * selectionRect->offsetInPixels.y / Root::shared().getWindowHeight(), 
+                            -1.0 + 2.0 * (selectionRect->offsetInPixels.y + selectionRect->sizeInPixels.y) / Root::shared().getWindowHeight());
+
+                    selectionRect->offsetInPixels = vec2(0.0);
+                    selectionRect->sizeInPixels = vec2(0.0);
+                }
+            }
+        }
+        else if(button == Arya::BUTTON_RIGHT)
+        {
+            draggingRightMouse = (buttonDown == true);
+
+            if(!draggingRightMouse)
+            {
+                unitMovementNextFrame = true;
+                Root::shared().readDepth();
+            }
+        }
+    }
     return false;
 }
 
@@ -319,6 +345,7 @@ void GameSessionInput::selectUnits(float x_min, float x_max, float y_min, float 
 void GameSessionInput::moveSelectedUnits()
 {
     vec3 clickPos = Root::shared().getDepthResult();
+    vec2 clickPos2(clickPos.x, clickPos.z);
 
     Faction* lf = session->getLocalFaction();
     if(!lf) return;
@@ -335,7 +362,7 @@ void GameSessionInput::moveSelectedUnits()
         for(list<Unit*>::iterator it = session->getFactions()[j]->getUnits().begin();
                 it != session->getFactions()[j]->getUnits().end(); ++it)
         {
-            dist = glm::distance((*it)->getPosition(), clickPos);
+            dist = glm::distance((*it)->getPosition2(), clickPos2);
             if(dist < (*it)->getInfo()->radius && dist < best_distance)
             {
                 best_distance = dist; 
@@ -443,6 +470,7 @@ void GameSessionInput::selectUnit()
         unselectAll();
 
     vec3 clickPos = Root::shared().getDepthResult();
+    vec2 clickPos2(clickPos.x, clickPos.z);
 
     Faction* lf = session->getLocalFaction();
     if(!lf) return;
@@ -455,7 +483,7 @@ void GameSessionInput::selectUnit()
     for(list<Unit*>::iterator it = lf->getUnits().begin();
             it != lf->getUnits().end(); ++it)
     {
-        dist = glm::distance((*it)->getPosition(), clickPos);
+        dist = glm::distance((*it)->getPosition2(), clickPos2);
         if(dist < 2.0 * (*it)->getInfo()->radius
                 && dist < best_distance) {
             best_distance = dist; 
@@ -469,4 +497,15 @@ void GameSessionInput::selectUnit()
         best_unit->setSelected(true);
 		if(leftControlPressed) best_unit->getDebugText();
     }
+}
+
+void GameSessionInput::placeBuilding()
+{
+    vec3 clickPos = Root::shared().getDepthResult();
+    vec2 clickPos2(clickPos.x, clickPos.z);
+
+    Event& ev = Game::shared().getEventManager()->createEvent(EVENT_SPAWN_REQUEST);
+    ev << 3; //UnitTypeId
+    ev << clickPos2;
+    ev.send();
 }

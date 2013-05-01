@@ -42,6 +42,7 @@ Unit::Unit(int _type, int _id, GameSession* _session) : session(_session), id(_i
 	health = unitInfo->maxHealth;
 	timeSinceLastAttack = unitInfo->attackSpeed + 1.0f;
 	timeSinceLastAttackRequest = 2.0f;
+    timeSinceLastScriptUpdate = 0.0f;
 
 	dyingTime = 0.0f;
 
@@ -299,6 +300,16 @@ void Unit::update(float timeElapsed)
 
 	timeSinceLastAttackRequest += timeElapsed;
 	timeSinceLastAttack += timeElapsed;
+    timeSinceLastScriptUpdate += timeElapsed;
+
+    if(timeSinceLastScriptUpdate > 1.0f)
+    {
+        if(session->isServer())
+        {
+            getInfo()->onUpdate(this, timeSinceLastScriptUpdate);
+        }
+        timeSinceLastScriptUpdate -= 1.0f;
+    }
 
 	if(unitState == UNIT_IDLE)
 		return;
@@ -479,28 +490,28 @@ void Unit::setUnitState(UnitState state)
 	switch(unitState)
 	{
 		case UNIT_IDLE:
-			setTintColor(vec3(0.0,0.0,0.0));
+			//setTintColor(vec3(0.0,0.0,0.0));
 			object->setAnimation(unitInfo->animationIdle.c_str());
 			break;
 
 		case UNIT_RUNNING:
-			setTintColor(vec3(0.0,1.0,0.0));
+			//setTintColor(vec3(0.0,1.0,0.0));
 			object->setAnimation(unitInfo->animationMove.c_str());
 			break;
 
 		case UNIT_ATTACKING_OUT_OF_RANGE:
-			setTintColor(vec3(0.0,0.0,1.0));
+			//setTintColor(vec3(0.0,0.0,1.0));
 			object->setAnimation(unitInfo->animationAttackOutOfRange.c_str());
 			break;
 
 		case UNIT_ATTACKING:
-			setTintColor(vec3(1.0,0.0,0.0));
+			//setTintColor(vec3(1.0,0.0,0.0));
 			object->setAnimation(unitInfo->animationAttack.c_str());
             object->setAnimationTime(unitInfo->attackSpeed);
 			break;
 
 		case UNIT_DYING:
-			setTintColor(vec3(1.0,1.0,1.0));
+			//setTintColor(vec3(1.0,1.0,1.0));
 			object->setAnimation(unitInfo->animationDie.c_str());
 			break;
 	}
