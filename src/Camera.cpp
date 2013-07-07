@@ -70,7 +70,9 @@ namespace Arya
             }else if( dist > 0.1f ){ //We are at a normal distance from the object. Let camera fly with normal speed
                 //ToMove already has a length, so if the camera is further away from the player,
                 //then the camera will go faster.
-                //When the object is moving in a single direction then the camera will be (PlayerSpeed/2.0f) units behind the object
+                //The speed (in this frame) is equal to 12.0 * distance
+                //When 'targetPosition' is moving at a constant speed v in a single direction then,
+                //once stable, the camera will be at v/12 units behind the targetPosition
                 position += ToMove * 12.0f * elapsedTime; //speed is proportional to distance
             }else{ //Really close
                 vec3 newMove = glm::normalize(ToMove);
