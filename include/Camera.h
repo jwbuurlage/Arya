@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 
 using glm::vec3;
+using glm::vec4;
 using glm::mat4;
 
 namespace Arya
@@ -44,6 +45,9 @@ namespace Arya
             //Checks if a box is visible, used for culling
             bool isBoxVisible(int minX, int maxX, int minY, int maxY, int minZ, int maxZ);
 
+            //Get the intersections of the y=0 surface (ground plane) with the 'screen corners'
+            //Returns the 4 (x,0,z) locations. Order: bottom-left, top-left, top-right, bottom-right
+            void getCornerGroundLocations(vec3 out[4]);
 
             //
             //These should be called by the mouse handler

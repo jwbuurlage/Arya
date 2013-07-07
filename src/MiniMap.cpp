@@ -176,19 +176,23 @@ namespace Arya
 			return;
 		waitTime -= UPDATE_TIME;
 
-		vec3 camPos = scene->getCamera()->getPosition();
-		mat4 terrainScale = scene->getTerrain()->getScaleMatrix();
-		double xSize = terrainScale[0][0];
-		double zSize = terrainScale[2][2];
-		vec2 relativePos = vec2(camPos.x / xSize, - (camPos.z / zSize));
+        vec3 corners[4];
+        scene->getCamera()->getCornerGroundLocations(corners);
 
-		/* FOR CAMERA */
-		GLfloat cameraVertices[] = {
-			relativePos.x - 0.1f, relativePos.y - 0.1f,
-			relativePos.x - 0.1f, relativePos.y + 0.1f,
-			relativePos.x + 0.1f, relativePos.y + 0.1f,
-			relativePos.x + 0.1f, relativePos.y - 0.1f
-		};
+		mat4 terrainScale = scene->getTerrain()->getScaleMatrix();
+		float xSize = terrainScale[0][0];
+		float zSize = terrainScale[2][2];
+
+        //TODO: Understand why this is!?!?!
+        xSize /= 2.0;
+        zSize /= 2.0;
+
+        GLfloat cameraVertices[] = {
+            corners[0].x/xSize, -corners[0].z/zSize,
+            corners[1].x/xSize, -corners[1].z/zSize,
+            corners[2].x/xSize, -corners[2].z/zSize,
+            corners[3].x/xSize, -corners[3].z/zSize
+        };
 
 		glBindBuffer(GL_ARRAY_BUFFER, cameraCornersVBO);
 		glBufferData(GL_ARRAY_BUFFER,

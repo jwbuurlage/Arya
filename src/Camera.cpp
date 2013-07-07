@@ -39,6 +39,7 @@ namespace Arya
 
     void Camera::setProjectionMatrix(float fov, float aspect, float near, float far)
     {
+        //The fov is in the y direction!!
         projectionMatrix = glm::perspective(fov, aspect, near, far);
         inverseProjectionMatrix = glm::inverse(projectionMatrix);
     }
@@ -73,8 +74,14 @@ namespace Arya
                 //The speed (in this frame) is equal to 12.0 * distance
                 //When 'targetPosition' is moving at a constant speed v in a single direction then,
                 //once stable, the camera will be at v/12 units behind the targetPosition
-                position += ToMove * 12.0f * elapsedTime; //speed is proportional to distance
+                if(elapsedTime < 1.0f/12.0f)
+                    position += ToMove * 12.0f * elapsedTime; //speed is proportional to distance
+                else
+                    position = targetPosition;
             }else{ //Really close
+                //Now it is not possible to have a speed proportional to the distance, because
+                //this would result in asymptotic behaviour, where the camera never reaches
+                //the targetposition. Therefore, in this regime, the camera moves at constant speed
                 vec3 newMove = glm::normalize(ToMove);
                 newMove *= 3.0f * elapsedTime; //constant speed of 3.0f units per second
                 if( newMove.length() >= dist ){
@@ -203,6 +210,58 @@ namespace Arya
     {
         updateInverseMatrix();
         return inverseVPMatrix;
+    }
+
+
+    void Camera::getCornerGroundLocations(vec3 out[4])
+    {
+        //This function calculates the intersection of the y=0 surface (ground plane) with the 'screen corners'
+        //Steps:
+        // - transform y=0 plane to eye-space (in this space, camera is at origin, looking in z- direction)
+        //   write it as a point and a normal vector (the point is on the negative z axis)
+        // - intersect lines from origin through (left/right,top/bottom,nearplane) with that plane
+
+        //updateViewProjectionMatrix();
+        updateInverseMatrix();
+        
+        vec4 eyeSpaceSurfaceLocation = vec4(0.0, 0.0, -camDist, 0.0); //TODO: this assume position.y=0
+        //vec4 eyeSpaceSurfaceNormal = viewMatrix * vec4(0.0, 1.0, 0.0, 0.0);
+        vec4 eyeSpaceSurfaceNormal = glm::rotateX(vec4(0.0, 1.0, 0.0, 0.0), -pitch);
+
+		//valType range = tan(radians(fovy/2.0)) * zNear;	
+		//valType left = -range * aspect;
+		//valType right = range * aspect;
+		//valType bottom = -range;
+		//valType top = range;
+        float right = 1.0f/projectionMatrix[0][0];
+        float left = -right;
+        float top = 1.0f/projectionMatrix[1][1];
+        float bottom = -top;
+
+        vec4 corner[4];
+        corner[0] = vec4(left,  bottom, -1.0, 0.0);
+        corner[1] = vec4(left,  top,    -1.0, 0.0);
+        corner[2] = vec4(right, top,    -1.0, 0.0);
+        corner[3] = vec4(right, bottom, -1.0, 0.0);
+
+        float value1 = glm::dot(eyeSpaceSurfaceNormal, eyeSpaceSurfaceLocation);
+
+        for(int i = 0; i < 4; ++i)
+        {
+            float value2 = glm::dot(eyeSpaceSurfaceNormal, corner[i]);
+            if( glm::abs(value2) < 0.0001 )
+            {
+                LOG_WARNING("Camera corner-line may be parallel to ground plane. No intersection");
+                value2 = 0.0001;
+            }
+            vec4 eyeSpaceIntersection = (value1/value2)*corner[i];
+            eyeSpaceIntersection.w = 1.0;
+
+            vec4 worldIntersection = inverseViewMatrix * eyeSpaceIntersection;
+            worldIntersection /= worldIntersection.w;
+
+            out[i] = vec3(worldIntersection.x, worldIntersection.y, worldIntersection.z);
+        }
     }
 
 }
