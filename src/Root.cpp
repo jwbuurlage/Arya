@@ -112,17 +112,23 @@ namespace Arya
 			LOG_WARNING("Could not initialize SoundManager, files not found!");
 		}
 
+        if(!FontManager::shared().initialize())
+        {
+            LOG_ERROR("Could not initialize FontManager, files not found!");
+            return false;
+        }
+
 		if(!interface) interface = new Interface;
 		if(!interface->init())
 		{
-			LOG_INFO("Could not initialize interface");
+			LOG_ERROR("Could not initialize interface");
 			return false;
 		}
 		addFrameListener(interface);
 
 		if(!Console::shared().init()) 
 		{
-			LOG_INFO("Could not initialize console");
+			LOG_ERROR("Could not initialize console");
 			return false;
 		}
 		addFrameListener(&Console::shared());

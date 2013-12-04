@@ -34,7 +34,6 @@ namespace Arya
         private:
             Font* loadResource( std::string filename);
 
-            void loadDefaultFont();
             void makeImage(File* filename,Font* font);
     };
 }

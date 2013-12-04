@@ -18,14 +18,13 @@ namespace Arya
 
     int FontManager::initialize()
     {
-        loadDefaultFont();
-        return 1;
+        defaultResource = loadResource("courier.ttf");
+        return (defaultResource != 0);
     }
-    void FontManager::cleanup(){}
 
-    void FontManager::loadDefaultFont()
+    void FontManager::cleanup()
     {
-        loadResource("courier.ttf");
+        //TODO
     }
 
     Font* FontManager::loadResource(std::string filename)
@@ -33,7 +32,7 @@ namespace Arya
         File* fontfile = FileSystem::shared().getFile(string("fonts/") + filename);
         if( fontfile == 0 )
         {
-            LOG_WARNING("Font not found!");
+            LOG_WARNING("Font not found: " << filename);
             return 0;
         }
         Font* font = new Font;
