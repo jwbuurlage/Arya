@@ -5,9 +5,7 @@
 #include "../include/Game.h"
 #include "../include/Events.h"
 #include "../include/common/GameLogger.h"
-
-// for sprintf
-#include <stdio.h>
+#include <GLFW/glfw3.h>
 
 GameSessionInput::GameSessionInput(ClientGameSession* ses)
 {
@@ -94,9 +92,9 @@ bool GameSessionInput::keyDown(int key, bool keyDown)
 
     bool DirectionChanged = false;
 
-        if(key == GLFW_KEY_LSHIFT) leftShiftPressed = keyDown;
-		else if(key == GLFW_KEY_LCTRL) leftControlPressed = keyDown;
-        else if(key == GLFW_KEY_RSHIFT) slowMode = keyDown;
+        if(key == GLFW_KEY_LEFT_SHIFT) leftShiftPressed = keyDown;
+		else if(key == GLFW_KEY_LEFT_CONTROL) leftControlPressed = keyDown;
+        else if(key == GLFW_KEY_RIGHT_SHIFT) slowMode = keyDown;
 		else if(key == Config::shared().getCvarString("goingforwardgame")[0])
 		{
 			goingForward = keyDown;

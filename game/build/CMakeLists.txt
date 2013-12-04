@@ -41,7 +41,7 @@ IF(APPLE)
 		"PocoFoundation"
 		"pthread"
 		"luabind"
-		"lua"
+        "lua"
 	)
 ELSE()
 	SET(
@@ -51,6 +51,7 @@ ELSE()
 		"PocoFoundation"
 		"pthread"
 		"luabind"
+        "lua5.1"
 	)
 ENDIF()
 

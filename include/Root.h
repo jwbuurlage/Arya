@@ -1,13 +1,14 @@
 #pragma once
 
 #include <list>
-#include <GL/glfw.h>
 #include <glm/glm.hpp>
 #include "common/Listeners.h"
 #include "common/Singleton.h"
 
 using glm::vec3;
 using glm::mat4;
+
+struct GLFWwindow;
 
 namespace Arya
 {
@@ -54,6 +55,7 @@ namespace Arya
             Scene* scene;
             Interface* interface;
 
+            GLFWwindow* glfwWindow;
             int windowWidth, windowHeight;
             int desktopWidth, desktopHeight;
 
@@ -80,10 +82,10 @@ namespace Arya
             vec3 clickScreenLocation;
             bool readDepthNextFrame;
 
-            friend void GLFWCALL windowSizeCallback(int width, int height);
-            friend void GLFWCALL keyCallback(int key, int action);
-            friend void GLFWCALL mouseButtonCallback(int button, int action);
-            friend void GLFWCALL mousePosCallback(int x, int y);
-            friend void GLFWCALL mouseWheelCallback(int pos);
+            friend void mousePosCallback   (GLFWwindow* win, double x, double y);
+            friend void mouseButtonCallback(GLFWwindow* win, int button, int action, int mods);
+            friend void keyCallback        (GLFWwindow* win, int key, int scancode, int action, int mods);
+            friend void mouseWheelCallback (GLFWwindow* win, double scrollX, double scrollY);
+            friend void windowSizeCallback (GLFWwindow* win, int width, int height);
     };
 }

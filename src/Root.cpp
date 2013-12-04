@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include <GL/glew.h>
-#include <GL/glfw.h>
+#include <GLFW/glfw3.h>
 
 #include "Root.h"
 #include "Models.h"
@@ -29,17 +29,18 @@ namespace Arya
     template<> Root* Singleton<Root>::singleton = 0;
 
     //glfw callback functions
-    void GLFWCALL windowSizeCallback(int width, int height);
-    void GLFWCALL keyCallback(int key, int action);
-    void GLFWCALL mouseButtonCallback(int button, int action);
-    void GLFWCALL mousePosCallback(int x, int y);
-    void GLFWCALL mouseWheelCallback(int pos);
+    void mousePosCallback   (GLFWwindow* win, double x, double y);
+    void mouseButtonCallback(GLFWwindow* win, int button, int action, int mods);
+    void keyCallback        (GLFWwindow* win, int key, int scancode, int action, int mods);
+    void mouseWheelCallback (GLFWwindow* win, double scrollX, double scrollY);
+    void windowSizeCallback (GLFWwindow* win, int width, int height);
 
     Root::Root()
     {
         scene = 0;
         oldTime = 0;
         interface = 0;
+        glfwWindow = 0;
         readDepthNextFrame = false;
 
         FileSystem::create();
@@ -190,7 +191,7 @@ namespace Arya
 
             //Handle input
             glfwPollEvents();
-            if( glfwGetWindowParam(GLFW_OPENED) == 0 ) running = false;
+            if( glfwWindowShouldClose(glfwWindow) ) running = false;
 
             if(readDepthNextFrame && scene)
             {
@@ -209,7 +210,7 @@ namespace Arya
                 readDepthNextFrame = false;
             }
             //Swap buffers
-            glfwSwapBuffers();
+            glfwSwapBuffers(glfwWindow);
 		}
 	}
 
@@ -223,23 +224,25 @@ namespace Arya
 		if( fullscreen == fullscr ) return; //no difference
 		fullscreen = fullscr;
 
-		glfwCloseWindow();
+        if(glfwWindow)
+            glfwDestroyWindow(glfwWindow);
 
-		if(!glfwOpenWindow(windowWidth, windowHeight, 0, 0, 0, 0, 32, 0, (fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW)))
+		//if(!glfwOpenWindow(windowWidth, windowHeight, 0, 0, 0, 0, 32, 0, (fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW)))
+        glfwWindow = glfwCreateWindow(windowWidth, windowHeight, "Arya", NULL, NULL);
+        if(!glfwWindow)
 		{
 			LOG_ERROR("Could not re-create window. Closing now.");
 			stopRendering();
 			return;
 		}
 
-		glfwSetWindowTitle("Arya");
-        glfwDisable(GLFW_AUTO_POLL_EVENTS);
-		glfwEnable(GLFW_MOUSE_CURSOR);
-		glfwSetWindowSizeCallback(windowSizeCallback);
-		glfwSetKeyCallback(keyCallback);
-		glfwSetMouseButtonCallback(mouseButtonCallback);
-		glfwSetMousePosCallback(mousePosCallback);
-		glfwSetMouseWheelCallback(mouseWheelCallback);
+        glfwMakeContextCurrent(glfwWindow);
+        glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		glfwSetWindowSizeCallback(glfwWindow, windowSizeCallback);
+		glfwSetKeyCallback(glfwWindow, keyCallback);
+		glfwSetMouseButtonCallback(glfwWindow, mouseButtonCallback);
+		glfwSetCursorPosCallback(glfwWindow, mousePosCallback);
+		glfwSetScrollCallback(glfwWindow, mouseWheelCallback);
 	}
 
 	bool Root::initGLFW()
@@ -250,33 +253,35 @@ namespace Arya
 			return false;
 		}
 
-		GLFWvidmode mode;
-		glfwGetDesktopMode(&mode);
-		desktopWidth = mode.Width;
-		desktopHeight = mode.Height;
+		const GLFWvidmode* mode = glfwGetVideoMode( glfwGetPrimaryMonitor() );
+		desktopWidth = mode->width;
+		desktopHeight = mode->height;
 		if(fullscreen)
 		{
 			windowWidth = desktopWidth;
 			windowHeight = desktopHeight;
 		}
 
-		glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3); // Use OpenGL Core v3.2
-		glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 2);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // Use OpenGL Core v3.2
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 
-		if(!glfwOpenWindow(windowWidth, windowHeight, 0, 0, 0, 0, 32, 0, (fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW)))
+		//if(!glfwOpenWindow(windowWidth, windowHeight, 0, 0, 0, 0, 32, 0, (fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW)))
+        glfwWindow = glfwCreateWindow(windowWidth, windowHeight, "Arya", NULL, NULL);
+        if(!glfwWindow)
 		{
 			LOG_ERROR("Could not open glfw window!");
 			return false;
 		}
 
-		glfwSetWindowTitle("Arya");
-        glfwDisable(GLFW_AUTO_POLL_EVENTS);
-		glfwEnable(GLFW_MOUSE_CURSOR);
-		glfwSetWindowSizeCallback(windowSizeCallback);
-		glfwSetKeyCallback(keyCallback);
-		glfwSetMouseButtonCallback(mouseButtonCallback);
-		glfwSetMousePosCallback(mousePosCallback);
-		glfwSetMouseWheelCallback(mouseWheelCallback);
+        //Every window has an OpenGL context. Make this one active.
+        glfwMakeContextCurrent(glfwWindow);
+
+        glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		glfwSetWindowSizeCallback(glfwWindow, windowSizeCallback);
+		glfwSetKeyCallback(glfwWindow, keyCallback);
+		glfwSetMouseButtonCallback(glfwWindow, mouseButtonCallback);
+		glfwSetCursorPosCallback(glfwWindow, mousePosCallback);
+		glfwSetScrollCallback(glfwWindow, mouseWheelCallback);
 
 		return true;
 	}
@@ -397,28 +402,28 @@ namespace Arya
 			if( (*it)->mouseMoved(x, y, dx, dy) == true ) break;
 	}
 
-	void GLFWCALL windowSizeCallback(int width, int height)
+	void windowSizeCallback(GLFWwindow* win, int width, int height)
 	{
 		Root::shared().windowSizeChanged(width, height);
 	}
 
-	void GLFWCALL keyCallback(int key, int action)
+	void keyCallback(GLFWwindow* win, int key, int scancode, int action, int mods)
 	{
 		Root::shared().keyDown(key, action);
 	}
 
-	void GLFWCALL mouseButtonCallback(int button, int action)
+	void mouseButtonCallback(GLFWwindow* win, int button, int action, int mods)
 	{
 		Root::shared().mouseDown(button, action);
 	}
 
-	void GLFWCALL mousePosCallback(int x, int y)
+	void mousePosCallback(GLFWwindow* win, double x, double y)
 	{
 		Root::shared().mouseMoved(x, y);
 	}
 
-	void GLFWCALL mouseWheelCallback(int pos)
+	void mouseWheelCallback(GLFWwindow* win, double scrollX, double scrollY)
 	{
-		Root::shared().mouseWheelMoved(pos);
+		Root::shared().mouseWheelMoved(scrollY);
 	}
 }

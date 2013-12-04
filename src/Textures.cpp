@@ -2,7 +2,6 @@
 #include "common/Logger.h"
 #include "Files.h"
 #include <sstream>
-#include <GL/glfw.h>
 #include "../ext/stb_image.c"
 
 namespace Arya

@@ -8,6 +8,7 @@
 #include "Interface.h"
 #include "Textures.h"
 #include "common/Logger.h"
+#include <GLFW/glfw3.h>
 #include <sstream>
 using namespace std;
 using std::stringstream;
@@ -87,12 +88,11 @@ namespace Arya
 		bool keyHandled = true;
 		if(visibility == false)
 		{
-			glfwDisable(GLFW_KEY_REPEAT);
+
 			switch(key)
 			{
 				case GLFW_KEY_F6: if(keyDown) 
 								  {
-									  glfwEnable(GLFW_KEY_REPEAT);
 									  toggleVisibilityConsole();
 								  }
 								  break;
@@ -150,7 +150,7 @@ namespace Arya
 			{
 				switch(key)
 				{
-					case GLFW_KEY_ESC:
+					case GLFW_KEY_ESCAPE:
 					case GLFW_KEY_F6: if(keyDown) toggleVisibilityConsole(); break;
 					case GLFW_KEY_KP_ENTER:
 					case GLFW_KEY_ENTER: if(keyDown) enterInput(); break;
@@ -159,9 +159,9 @@ namespace Arya
 												 currentLine.erase(currentLine.end()-1);
 											 }; break;
 					case GLFW_KEY_SPACE: if(keyDown) currentLine.push_back(key); break;
-					case GLFW_KEY_RSHIFT: if(!rShift) rShift = true; else rShift = false; break;
-					case GLFW_KEY_LSHIFT: if(!lShift) lShift = true; else lShift = false; break;
-					case GLFW_KEY_RALT: if(!rAlt) rAlt = true; else rAlt = false; break;
+					case GLFW_KEY_RIGHT_SHIFT: if(!rShift) rShift = true; else rShift = false; break;
+					case GLFW_KEY_LEFT_SHIFT: if(!lShift) lShift = true; else lShift = false; break;
+					case GLFW_KEY_RIGHT_ALT: if(!rAlt) rAlt = true; else rAlt = false; break;
 					case GLFW_KEY_CAPS_LOCK: if(keyDown)
 											 {
 												 if(cLock) cLock = false;

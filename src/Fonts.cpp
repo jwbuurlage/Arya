@@ -5,9 +5,6 @@
 #include "Resources.h"
 #include "common/Logger.h"
 #include "../ext/stb_truetype.h"
-#include <GL/glfw.h>
-#include <iostream>
-using namespace std;
 
 namespace Arya
 {
@@ -36,7 +33,7 @@ namespace Arya
         File* fontfile = FileSystem::shared().getFile(string("fonts/") + filename);
         if( fontfile == 0 )
         {
-            cout << "Font not found!" << endl;
+            LOG_WARNING("Font not found!");
             return 0;
         }
         Font* font = new Font;

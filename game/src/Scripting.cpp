@@ -7,9 +7,9 @@
 #include "../include/MapInfo.h"
 #include "../include/ServerGameSession.h"
 #include "../include/common/GameLogger.h"
+#include <lua.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/iterator_policy.hpp>
-#include <lua.hpp>
 
 //TODO: move Scripting::execute to another cpp file
 //so that we dont need to inclue Arya.h here

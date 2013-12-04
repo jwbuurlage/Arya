@@ -4,6 +4,7 @@
 #include "../include/Network.h"
 #include "../include/Events.h"
 #include "../include/Scripting.h"
+#include <GLFW/glfw3.h>
 #include "Arya.h"
 
 Game* Game::singleton = 0;
@@ -219,7 +220,7 @@ bool Game::keyDown(int key, bool keyDown)
 		case 'O': glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
 		case 'I': glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
 		case GLFW_KEY_F11: Root::shared().setFullscreen(!Root::shared().getFullscreen()); break;
-		case GLFW_KEY_ESC: if(keyDown) Root::shared().stopRendering(); break;
+		case GLFW_KEY_ESCAPE: if(keyDown) Root::shared().stopRendering(); break;
 		default: keyHandled = false; break;
 	}
 	return keyHandled;
