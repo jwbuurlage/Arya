@@ -1,14 +1,16 @@
 ## Building on Linux
 
-Building Borea on Linux requires the following libraries:
+Building on Linux requires the following libraries (latest releases should work):
 
 - `OpenGL` (>= 3.0, with GLSL >= 4.0)
 - `GLEW`
-- `GLFW` (>= 2.7.7) 
-- `Poco` (>= 1.4.5)
+- `GLFW` (>= 3.0.0) 
+- `glm`
+- `SFML`
+- `Poco`
 - `luabind`
 
-Also `CMake` is required for building
+Also `CMake` and general development tools (such as gcc and make) are required for building
 
 Simply navigate to the root directory of the repository and run
 
@@ -16,4 +18,12 @@ Simply navigate to the root directory of the repository and run
     $ cmake .
     $ make
 
-Then open `./bin/AryaGame` to run the game.
+## Running on Linux
+
+Put the required resources in `bin/`, these are currently in a private dropbox folder. Make a file config.txt in `bin/` and insert a line such as
+
+    set sessionhash 10101 int
+
+Where the number should be between 10101-10104
+
+Then open `./bin/AryaGame` to run the game, and start a local game.

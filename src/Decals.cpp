@@ -41,7 +41,7 @@ namespace Arya
         indexBuffer = 0;
 
         gridSize = 10.0f;
-        gridEnabled = true;
+        gridEnabled = false;
 	}
 
 	Decals::~Decals()

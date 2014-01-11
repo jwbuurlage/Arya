@@ -72,7 +72,7 @@ namespace Arya
 				vec2(10.0f, -consoleWindowSize.y - 10.0f), 
 				consoleWindowSize,
 				TextureManager::shared().getTexture("white"), 
-				WINDOW_DRAGGABLE | WINDOW_CLOSABLE, 
+				WINDOW_DRAGGABLE | WINDOW_CLOSABLE | WINDOW_RESIZABLE, 
 				"Console",
 				consoleColor);
 		Interface::shared().makeInactive(consoleWindow);
