@@ -161,7 +161,6 @@ bool GameSessionInput::keyDown(int key, bool keyDown)
 
 bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int x, int y)
 {
-    //TODO: Send to UI manager and see if it was handled. If not, then do this:
     if(awaitingPlacement)
     {
         if(button == Arya::BUTTON_LEFT)
@@ -169,6 +168,7 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
             awaitingPlacement = false;
             buildingPlacementNextFrame = true;
             Root::shared().readDepth();
+            return true;
         }
     }
     else
@@ -180,6 +180,7 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
             if(draggingLeftMouse)
             {
                 originalMousePos = vec2(x, y);
+                return true;
             }
             else
             {
@@ -198,6 +199,7 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
                     selectionRect->offsetInPixels = vec2(0.0);
                     selectionRect->sizeInPixels = vec2(0.0);
                 }
+                return true;
             }
         }
         else if(button == Arya::BUTTON_RIGHT)
@@ -209,6 +211,8 @@ bool GameSessionInput::mouseDown(Arya::MOUSEBUTTON button, bool buttonDown, int 
                 unitMovementNextFrame = true;
                 Root::shared().readDepth();
             }
+
+            return true;
         }
     }
     return false;

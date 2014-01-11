@@ -338,9 +338,12 @@ namespace Arya
 		return glm::scale(mat4(1.0), vec3(2.0/windowWidth, 2.0/windowHeight, 1.0));
 	}
 
+    /* Last in is first in line to respond, convention used because windows are usually added later, and temporary responders have priority
+     * TODO: Some kind of priority system?
+     */
 	void Root::addInputListener(InputListener* listener)
 	{
-		inputListeners.push_back(listener);
+		inputListeners.push_front(listener);
 	}
 
 	void Root::removeInputListener(InputListener* listener)
