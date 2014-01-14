@@ -1,7 +1,9 @@
-/* Decals is a singleton, but render function gets called by terrain (after 
- * terrain is rendered)
- * - To add Decals you shoulde make AND register them 
+/* 
+ * Decals are textures on the terrain
+ * Decals is a singleton which we may have to change in the future..the render function gets called by terrain (after terrain is rendered)
+ * To add Decals you should make and register them 
  */
+
 #pragma once
 
 #include <vector>
