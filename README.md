@@ -8,7 +8,8 @@ Building on Linux requires the following libraries (latest releases should work)
 - `glm`
 - `SFML`
 - `Poco`
-- `luabind`
+- `lua 5.1` (arch package named lua51)
+- `luabind` (compatible with lua 5.1, probably requires boost)
 
 Also `CMake` and general development tools (such as gcc and make) are required for building
 
