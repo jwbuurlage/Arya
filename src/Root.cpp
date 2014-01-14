@@ -382,9 +382,9 @@ namespace Arya
 
 	void Root::keyDown(int key, int action)
 	{
+        //GLFW_PRESS , GLFW_RELEASE , GLFW_REPEAT
 		for( std::list<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
-			if( (*it)->keyDown(key, action == GLFW_PRESS) == true ) break;
-
+			if( (*it)->keyDown(key, action == GLFW_PRESS || action == GLFW_REPEAT) == true ) break;
 	}
 
 	void Root::mouseDown(int button, int action)
@@ -395,8 +395,7 @@ namespace Arya
 
 	void Root::mouseWheelMoved(int pos)
 	{
-		int delta = pos - mouseWheelPos;
-		mouseWheelPos = pos;
+        int delta = (int)pos; //always -1 or 1
 		for( std::list<InputListener*>::iterator it = inputListeners.begin(); it != inputListeners.end(); ++it )
 			if( (*it)->mouseWheelMoved(delta) == true ) break;
 	}

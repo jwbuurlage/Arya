@@ -77,7 +77,7 @@ namespace Arya
             void mouseDown(int button, int action);
             void mouseWheelMoved(int pos);
             void mouseMoved(int x, int y);
-            int mouseX, mouseY, mouseWheelPos; //To supply relative movement
+            int mouseX, mouseY; //To supply relative movement
 
             vec3 clickScreenLocation;
             bool readDepthNextFrame;
