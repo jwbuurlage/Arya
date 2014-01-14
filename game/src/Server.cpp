@@ -181,6 +181,15 @@ void Server::handlePacket(ServerClientHandler* clienthandler, Packet& packet)
     ServerClient* client = iter->second;
 
     switch(packet.getId()){
+        case EVENT_PING:
+            {
+                int timestamp;
+                packet >> timestamp;
+                Packet* outPak = createPacket(EVENT_PING);
+                *outPak << timestamp;
+                clienthandler->sendPacket(outPak);
+            }
+            break;
 		case EVENT_NEW_SESSION:
 			//TODO: authenticate to see if this is an actual lobby server
 			{

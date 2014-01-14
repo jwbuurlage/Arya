@@ -2,7 +2,9 @@
 
 typedef enum
 {
-    // Lobby
+    //
+    // Lobby <--> Client
+    //
 	
 	// - name
 	// - password md5
@@ -14,14 +16,13 @@ typedef enum
 	// - string: reason
 	EVENT_LOGIN_FAILED, //server->client
 
-	EVENT_JOIN_LOBBY = 1001,
+	EVENT_JOIN_LOBBY,
 
     //ranking queries
     //room queries, room joins
     //chats
     //hacks
     //god mode
-
 
 	// - string: game server ip
 	// - int: game server port
@@ -33,10 +34,8 @@ typedef enum
 	EVENT_SESSION_START, //client->server
 	
 	//
-	// All packets above are between LOBBY SERVER and client
+	// Lobby <--> Game Server
 	//
-
-	// The following events are between LOBBY SERVER and GAME SERVER
 	
 	// - int roomid or sessionhash
 	// - int playercount
@@ -45,11 +44,14 @@ typedef enum
 	EVENT_NEW_SESSION, //lobby->game
 
 	//
-	// All packets below are between GAME SERVER and client
+	// Game Server <--> Client
 	//
 	
 	//EventManager uses this number to see if packets are meant for lobby or game server
 	MARKER_MINIMUM_GAME_PACKET_ID = 2000,
+
+    // - timestamp
+    EVENT_PING,
 
 	// - int roomid or sessionhash
 	// - int client hash

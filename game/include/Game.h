@@ -60,6 +60,7 @@ class Game : public Arya::InputListener , public Arya::FrameListener, public Eve
         //We want to check the network
         //every 5 frames
         float timeSinceNetworkPoll;
+        float timeSincePing;
 
 		// menu and related functions
 		bool initMenu();

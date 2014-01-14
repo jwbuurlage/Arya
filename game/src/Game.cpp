@@ -67,6 +67,7 @@ void Game::run()
 
 		network->setPacketHandler(eventManager);
 
+        eventManager->addEventHandler(EVENT_PING, this);
 		eventManager->addEventHandler(EVENT_SESSION_INFO, this);
 		eventManager->addEventHandler(EVENT_CLIENT_ID, this);
 
@@ -166,8 +167,6 @@ bool Game::newSession(string serveraddr)
 {
 	GAME_LOG_INFO("starting new session");
 
-	network->setPacketHandler(eventManager);
-
 	//!!!!!
 	//TEMPORARY:
 	//we assume the client has told the lobby server to start the game (EVENT_SESSION_START)
@@ -243,13 +242,21 @@ bool Game::mouseMoved(int x, int y, int dx, int dy)
 
 void Game::onFrame(float elapsedTime)
 {
-		network->update();
-        return;
-	timeSinceNetworkPoll += elapsedTime;
-	if(timeSinceNetworkPoll > NETWORK_POLL)
-	{
-		timeSinceNetworkPoll = 0.0f;
-	}
+    timeSincePing += elapsedTime;
+    if( timeSincePing > 1.5f ){
+        timeSincePing = 0;
+		Event& ping = eventManager->createEvent(EVENT_PING);
+        ping << 0; //timer
+        ping.send();
+    }
+
+    network->update();
+    //timeSinceNetworkPoll += elapsedTime;
+    //if(timeSinceNetworkPoll > NETWORK_POLL)
+    //{
+    //    timeSinceNetworkPoll = 0.0f;
+    //    network->update();
+    //}
 }
 
 void Game::handleEvent(Packet& packet)
@@ -257,6 +264,14 @@ void Game::handleEvent(Packet& packet)
 	int id = packet.getId();
 	switch(id)
 	{
+        case EVENT_PING:
+            {
+                float timestamp;
+                packet >> timestamp;
+
+                GAME_LOG_DEBUG("Ping " << 1000.0*(timeSincePing) << " ms");
+            }
+            break;
 		case EVENT_CLIENT_ID:
 			packet >> clientId;
 			//After receiving our client ID we start the session. The server will soon send us the full game state
