@@ -50,87 +50,26 @@ typedef enum
 	//EventManager uses this number to see if packets are meant for lobby or game server
 	MARKER_MINIMUM_GAME_PACKET_ID = 2000,
 
-    // - timestamp
     EVENT_PING,
 
-	// - int roomid or sessionhash
-	// - int client hash
     EVENT_JOIN_GAME, //client->server
-
 	EVENT_CLIENT_READY, //client->server
-
-	//some timer sync related things
 	EVENT_GAME_START, //Game timer starts. server->client
-
-    //------------------------
-    // - The client his ID
-    //------------------------
     EVENT_CLIENT_ID,
 
 	EVENT_GAME_FULLSTATE_REQUEST,
     EVENT_GAME_FULLSTATE,
-
-    // - clientID
-    // - Serialized faction
-    //    + UnitCount
-    //    - Serialized unit 
     EVENT_CLIENT_CONNECTED,
-
-    // - Client ID
     EVENT_CLIENT_DISCONNECTED,
 
-    //------------------------
-    // - Number of units NUM
-    // - NUM Unit IDs
-    // - NUM (vec2) positions
-    //------------------------
-    EVENT_MOVE_UNIT_REQUEST = 3000,
-
-    //------------------------
-    // - Number of units NUM
-    //   - Unit ID
-    //   - (vec2) position
-    //------------------------
+    EVENT_MOVE_UNIT_REQUEST,
     EVENT_MOVE_UNIT,
-
-    //------------------------
-    // - Targetunit ID
-    // - Number of units
-    // - Unit IDs
-    //------------------------
     EVENT_ATTACK_MOVE_UNIT_REQUEST,
-
-    //------------------------
-    // - Targetunit ID
-    // - Number of units
-    // - Unit IDs
-    //------------------------
     EVENT_ATTACK_MOVE_UNIT,
-
-	//------------------------
-	// - Unit ID
-	//------------------------
 	EVENT_UNIT_DIED,
-
-    // - Faction ID
-    // - Unit ID
-    // - serialized unit
     EVENT_UNIT_SPAWNED,
-
-
-	//------------------------
-	// - Faction ID
-	//------------------------
 	EVENT_PLAYER_DEFEAT,
-
-	//------------------------
-	// - Faction ID
-	//------------------------
 	EVENT_PLAYER_VICTORY,
-
-    //
-    // - Unit type ID
-    // - vec2 location
-    //
     EVENT_SPAWN_REQUEST
+
 } EventCode;

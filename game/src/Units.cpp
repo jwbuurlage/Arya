@@ -286,7 +286,7 @@ void Unit::setCellFromList(CellList* cl)
 	setCell(cl->cellForPosition(getPosition2()));
 }
 
-void Unit::update(float timeElapsed)
+void Unit::update(float timeElapsed, float gameTime)
 {
 	//For any units referenced by this unit we must check if they are obsolete
 	//Currently the only referenced unit is targetUnit
@@ -532,19 +532,14 @@ void Unit::setTargetUnit(Unit* target)
 	setUnitState(UNIT_ATTACKING_OUT_OF_RANGE);
 }
 
-void Unit::setTargetPosition(vec2 target)
+void Unit::setUnitMovement(float startTime, const vec2& startPos, float startYaw, const std::vector<vec2>& newPath)
 {
-    setTargetPath(std::vector<vec2>(1,target));
-}
+    if(targetUnit)
+        targetUnit->release();
+    targetUnit = 0;
 
-void Unit::setTargetPath(const std::vector<vec2>& newPath)
-{
-	if(targetUnit)
-		targetUnit->release();
-	targetUnit = 0;
-
-	if(unitState == UNIT_DYING)
-		GAME_LOG_DEBUG("Unit " << id << " probable error at setTargetPosition");
+    if(unitState == UNIT_DYING)
+        GAME_LOG_DEBUG("Unit " << id << " probable error at setTargetPosition");
 
     pathNodes = newPath;
     if(pathNodes.empty())

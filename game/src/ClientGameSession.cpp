@@ -257,9 +257,9 @@ void ClientGameSession::handleEvent(Packet& packet)
                 float newGameTime;
                 packet >> newGameTime;
 
-                GAME_LOG_DEBUG("Full game state received. Old gametimer = " << gameTimer << ". New server gametime = " << newGameTime);
+                GAME_LOG_DEBUG("Full game state received. Old gametimer = " << gameTimer << ". New server gametime = " << newGameTime << ". Estimated delay = " << Game::shared().getNetworkDelay());
 
-                gameTimer = newGameTime;
+                gameTimer = newGameTime + Game::shared().getNetworkDelay();
 
 				int count;
 				packet >> count;
@@ -413,21 +413,25 @@ void ClientGameSession::handleEvent(Packet& packet)
 			break;
 
 		case EVENT_MOVE_UNIT: {
-                                  float sendTime;
-                                  packet >> sendTime;
+                                  float serverTime;
+                                  packet >> serverTime;
 
 								  int numUnits;
 								  packet >> numUnits;
 
-                                  GAME_LOG_DEBUG("Move packet for " << numUnits << " units. " << (gameTimer - sendTime) << " delay. Sent at " << sendTime << ". Recieved at " << gameTimer);
+                                  GAME_LOG_DEBUG("Move packet for " << numUnits << " units. " << (gameTimer - serverTime) << " delay. Sent at server time " << serverTime << ". Recieved at " << gameTimer);
 
 								  int unitId;
                                   int nodeCount;
+                                  vec2 pos;
+                                  float yaw;
                                   vec2 tempPos;
                                   vector<vec2> pathNodes;
 								  for(int i = 0; i < numUnits; ++i)
                                   {
 									  packet >> unitId;
+                                      packet >> pos;
+                                      packet >> yaw;
                                       packet >> nodeCount;
                                       pathNodes.clear();
                                       for(int i = 0; i < nodeCount; ++i){ packet >> tempPos; pathNodes.push_back(tempPos); }

@@ -276,7 +276,7 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
                 if(faction)
                 {
                     float sendTime;
-                    packet >> sendTime;
+                    packet >> sendTime; //is ignored for now
 
                     int count;
                     packet >> count;
@@ -308,11 +308,13 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
                     {
                         Packet* outPak = server->createPacket(EVENT_MOVE_UNIT);
 
-                        *outPak << sendTime;
+                        *outPak << gameTimer; //sendTime;
                         *outPak << (int)validUnits.size();
                         for(unsigned int i = 0; i < validUnits.size(); ++i)
                         {
                             *outPak << validUnits[i]->getId();
+                            *outPak << validUnits[i]->getPosition2();
+                            *outPak << validUnits[i]->getYaw();
                             *outPak << (int)validUnits[i]->getTargetPath().size();
                             for(unsigned int j = 0; j < validUnits[i]->getTargetPath().size(); ++j)
                             {

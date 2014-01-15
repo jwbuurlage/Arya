@@ -20,6 +20,12 @@ Game::Game()
 	network = 0;
 	clientId = 0;
 
+    timeSinceNetworkPoll = 0;
+    timeSincePing = 0;
+    networkDelay = 0;
+    for(int i = 0; i < PING_SAMPLES; ++i) pingSample[i] = 0;
+    pingIndex = 0;
+
 	timeSinceNetworkPoll = 1.0f;
 	menuWindow = 0;
 
@@ -269,7 +275,18 @@ void Game::handleEvent(Packet& packet)
                 float timestamp;
                 packet >> timestamp;
 
-                GAME_LOG_DEBUG("Ping " << 1000.0*(timeSincePing) << " ms");
+                pingSample[pingIndex++] = timeSincePing;
+                if(pingIndex == PING_SAMPLES) pingIndex = 0;
+
+                float total = 0;
+                int i;
+                for(i = 0; i < PING_SAMPLES; ++i){
+                    total += pingSample[i];
+                    if(pingSample[i] == 0) break;
+                }
+                total /= i;
+                networkDelay = total*0.5;
+                //GAME_LOG_DEBUG("Ping " << 1000.0*(timeSincePing) << " ms. Average of last 10 pings: " << 1000.0*total);
             }
             break;
 		case EVENT_CLIENT_ID:
