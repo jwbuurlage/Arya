@@ -74,7 +74,7 @@ class Unit
         void setSelected(bool sel);
         bool isSelected() { return selected; }
 
-        void update(float timeElapsed, float gameTime);
+        void update(int timeElapsed, int gameTime); //in ms
 
         void setUnitMovement(float startTime, const vec2& startPos, float startYaw, const std::vector<vec2>& newPath);
         const std::vector<vec2>& getTargetPath() const { return pathNodes; }
@@ -139,6 +139,7 @@ class Unit
         void deleteScriptData();
 
         // movement and attack
+        int lastActionTime;
 		std::vector<vec2> pathNodes;
         Unit* targetUnit;
         UnitState unitState;

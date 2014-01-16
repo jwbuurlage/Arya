@@ -201,7 +201,7 @@ void ServerGameSession::getUnitsNearLocation(float x, float z, float distance, v
     return;
 }
 
-void ServerGameSession::update(float elapsedTime)
+void ServerGameSession::update(int elapsedTime)
 {
     gameTimer += elapsedTime;
 	for(factionIterator fac = factionList.begin(); fac != factionList.end(); ++fac)
@@ -260,7 +260,7 @@ void ServerGameSession::update(float elapsedTime)
         }
     }
 
-    theMap->onUpdate(this, elapsedTime);
+    theMap->onUpdate(this, 0.001f*elapsedTime);
 }
 
 void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
@@ -275,9 +275,6 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
             {
                 if(faction)
                 {
-                    float sendTime;
-                    packet >> sendTime; //is ignored for now
-
                     int count;
                     packet >> count;
 

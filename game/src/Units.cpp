@@ -33,6 +33,7 @@ Unit::Unit(int _type, int _id, GameSession* _session) : session(_session), id(_i
 	position = vec3(0.0f);
 	position2 = vec2(0.0f);
 	yaw = 0.0f;
+    lastActionTime = 0;
 
 	selected = false;
 	unitState = UNIT_IDLE;
@@ -286,8 +287,11 @@ void Unit::setCellFromList(CellList* cl)
 	setCell(cl->cellForPosition(getPosition2()));
 }
 
-void Unit::update(float timeElapsed, float gameTime)
+void Unit::update(int timeElapsed2, int gameTime)
 {
+    float timeElapsed = 0.001f*(gameTime - lastActionTime);
+    lastActionTime = gameTime;
+
 	//For any units referenced by this unit we must check if they are obsolete
 	//Currently the only referenced unit is targetUnit
 	if(targetUnit && !targetUnit->isAlive())
@@ -540,6 +544,12 @@ void Unit::setUnitMovement(float startTime, const vec2& startPos, float startYaw
 
     if(unitState == UNIT_DYING)
         GAME_LOG_DEBUG("Unit " << id << " probable error at setTargetPosition");
+
+    float height = (session->getMap() ? session->getMap()->heightAtGroundPosition(startPos.x, startPos.y) : 0.0f);
+
+    lastActionTime = startTime;
+    setPosition(vec3(startPos.x, height, startPos.y));
+    setYaw(startYaw);
 
     pathNodes = newPath;
     if(pathNodes.empty())

@@ -85,8 +85,8 @@ void Server::prepareServer()
     //Only a single reactor can run at a single moment
     reactor = new ServerReactor(this);
 
-    //50 ms frametime
-    reactor->setTimeout(50);
+    //10 ms frametime
+    reactor->setTimeout(10);
 
     //Create the server socket
     IPAddress any_address;
@@ -144,12 +144,12 @@ void Server::update()
     }
 
     timerDiff += timer.restart();
-    while(timerDiff.asMilliseconds() > 100)
+    while(timerDiff.asMilliseconds() > 20)
     {
-        timerDiff -= sf::milliseconds(100);
+        timerDiff -= sf::milliseconds(20);
         for(sessionIterator iter = sessionList.begin(); iter != sessionList.end(); ++iter)
         {
-            iter->second->update((float)(100.0f/1000.0f));
+            iter->second->update(20); //constant step size of 20 ms
         }
     }
 }
