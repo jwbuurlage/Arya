@@ -38,6 +38,8 @@ class Game : public Arya::InputListener , public Arya::FrameListener, public Eve
         EventManager* getEventManager() const { return eventManager; }
         Scripting* getScripting() const { return scripting; }
 
+        float getNetworkDelay() const { return networkDelay; } //estimated delay between server and client. (half of estimated ping)
+
         int getClientId() const { return clientId; }
 		void buttonClicked(Arya::Button* sender);
 	
@@ -60,6 +62,11 @@ class Game : public Arya::InputListener , public Arya::FrameListener, public Eve
         //We want to check the network
         //every 5 frames
         float timeSinceNetworkPoll;
+        float timeSincePing;
+        float networkDelay; //half of average ping
+        static const int PING_SAMPLES = 10;
+        float pingSample[PING_SAMPLES];
+        int pingIndex; //circular index
 
 		// menu and related functions
 		bool initMenu();

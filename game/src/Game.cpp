@@ -20,6 +20,12 @@ Game::Game()
 	network = 0;
 	clientId = 0;
 
+    timeSinceNetworkPoll = 0;
+    timeSincePing = 0;
+    networkDelay = 0;
+    for(int i = 0; i < PING_SAMPLES; ++i) pingSample[i] = 0;
+    pingIndex = 0;
+
 	timeSinceNetworkPoll = 1.0f;
 	menuWindow = 0;
 
@@ -67,6 +73,7 @@ void Game::run()
 
 		network->setPacketHandler(eventManager);
 
+        eventManager->addEventHandler(EVENT_PING, this);
 		eventManager->addEventHandler(EVENT_SESSION_INFO, this);
 		eventManager->addEventHandler(EVENT_CLIENT_ID, this);
 
@@ -166,8 +173,6 @@ bool Game::newSession(string serveraddr)
 {
 	GAME_LOG_INFO("starting new session");
 
-	network->setPacketHandler(eventManager);
-
 	//!!!!!
 	//TEMPORARY:
 	//we assume the client has told the lobby server to start the game (EVENT_SESSION_START)
@@ -243,13 +248,21 @@ bool Game::mouseMoved(int x, int y, int dx, int dy)
 
 void Game::onFrame(float elapsedTime)
 {
-		network->update();
-        return;
-	timeSinceNetworkPoll += elapsedTime;
-	if(timeSinceNetworkPoll > NETWORK_POLL)
-	{
-		timeSinceNetworkPoll = 0.0f;
-	}
+    timeSincePing += elapsedTime;
+    if( timeSincePing > 1.5f ){
+        timeSincePing = 0;
+		Event& ping = eventManager->createEvent(EVENT_PING);
+        ping << 0; //timer
+        ping.send();
+    }
+
+    network->update();
+    //timeSinceNetworkPoll += elapsedTime;
+    //if(timeSinceNetworkPoll > NETWORK_POLL)
+    //{
+    //    timeSinceNetworkPoll = 0.0f;
+    //    network->update();
+    //}
 }
 
 void Game::handleEvent(Packet& packet)
@@ -257,6 +270,25 @@ void Game::handleEvent(Packet& packet)
 	int id = packet.getId();
 	switch(id)
 	{
+        case EVENT_PING:
+            {
+                float timestamp;
+                packet >> timestamp;
+
+                pingSample[pingIndex++] = timeSincePing;
+                if(pingIndex == PING_SAMPLES) pingIndex = 0;
+
+                float total = 0;
+                int i;
+                for(i = 0; i < PING_SAMPLES; ++i){
+                    total += pingSample[i];
+                    if(pingSample[i] == 0) break;
+                }
+                total /= i;
+                networkDelay = total*0.5;
+                //GAME_LOG_DEBUG("Ping " << 1000.0*(timeSincePing) << " ms. Average of last 10 pings: " << 1000.0*total);
+            }
+            break;
 		case EVENT_CLIENT_ID:
 			packet >> clientId;
 			//After receiving our client ID we start the session. The server will soon send us the full game state

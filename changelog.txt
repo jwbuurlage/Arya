@@ -1,0 +1,27 @@
+Game sends ping to server every second or so and takes the average of the last
+10 pings to calculate the expected network delay (half of ping time).
+
+There is a concept called 'gameTimer', stored in GameSession which is a float,
+the time in seconds since the game started. The server sometimes sends the
+value of its gameTimer and the client tries to have it's value match by using
+the estimated network delay.
+
+Updated movement system to incorporate synchronization between server and
+client. The units start moving when the server receives the move request
+packet, NOT when you click. In future updates, the units WILL start moving on
+your screen when you click, but this is just a prediction and they will move
+very slow untill the client received the server acknowledgement and knows the
+exact movement information.
+
+The Unit class now contains a float 'lastUpdateTime' which is the last
+gameTime at which it was updated. Usually all units are updated at the same
+time so this value will coincide for all units. However when the server
+acknowledges a movement it sends a gameTime and position at that time so that
+the client can synchronize. In such a case the 'lastUpdateTime' is different
+for a moving unit.
+The Unit::update(elapsedTime, gameTime) function now also gets the gameTime
+instead of only the time difference so that it can compute predictions.
+
+EventCodes.h header contained comments about contents of packets but this was
+extremely outdated so I removed it.
+

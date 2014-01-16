@@ -74,10 +74,9 @@ class Unit
         void setSelected(bool sel);
         bool isSelected() { return selected; }
 
-        void update(float timeElapsed);
+        void update(float timeElapsed, float gameTime);
 
-        void setTargetPosition(vec2 target); //sets pathNode to single vec2
-        void setTargetPath(const std::vector<vec2>& newPath);
+        void setUnitMovement(float startTime, const vec2& startPos, float startYaw, const std::vector<vec2>& newPath);
         const std::vector<vec2>& getTargetPath() const { return pathNodes; }
         Unit* getTargetUnit() const { return targetUnit; }
         void setTargetUnit(Unit* unit);
