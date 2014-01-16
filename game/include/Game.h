@@ -59,6 +59,8 @@ class Game : public Arya::InputListener , public Arya::FrameListener, public Eve
 
         int clientId;
 
+        float totalTime;
+        int totalTimems;
         //We want to check the network
         //every 5 frames
         float timeSinceNetworkPoll;

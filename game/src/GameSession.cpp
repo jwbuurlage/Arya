@@ -6,7 +6,7 @@
 GameSession::GameSession(Scripting* _scripting, bool _server) : scripting(_scripting), isServerSession(_server)
 {
     map = 0;
-    gameTimer = 0.0f;
+    gameTimer = 0;
 }
 
 GameSession::~GameSession()

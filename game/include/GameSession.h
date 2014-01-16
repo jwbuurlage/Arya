@@ -27,7 +27,7 @@ class GameSession
 
         Scripting* getScripting() const { return scripting; }
         Map* getMap() const { return map; }
-        float getGameTime() const { return gameTimer; }
+        int getGameTime() const { return gameTimer; }
 
         Unit* createUnit(int id, int type);
         Unit* getUnitById(int id);
@@ -37,8 +37,8 @@ class GameSession
     protected:
         Map* map;
 
-        //Time since start of the game in seconds
-        float gameTimer;
+        //Time since start of the game in milliseconds
+        int gameTimer;
 
     private:
         friend class Unit;

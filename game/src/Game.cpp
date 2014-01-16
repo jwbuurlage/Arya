@@ -20,6 +20,8 @@ Game::Game()
 	network = 0;
 	clientId = 0;
 
+    totalTime = 0;
+    totalTimems = 0;
     timeSinceNetworkPoll = 0;
     timeSincePing = 0;
     networkDelay = 0;
@@ -255,6 +257,11 @@ void Game::onFrame(float elapsedTime)
         ping << 0; //timer
         ping.send();
     }
+
+    totalTime += elapsedTime;
+    int elapsedms = (int)(totalTime*1000.0) - totalTimems;
+    totalTimems += elapsedms;
+    if(session) session->update(elapsedms);
 
     network->update();
     //timeSinceNetworkPoll += elapsedTime;

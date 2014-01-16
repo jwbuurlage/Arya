@@ -42,8 +42,6 @@ ClientGameSession::~ClientGameSession()
 
 	if(map) delete map;
 
-	Root::shared().removeFrameListener(this);
-
 	Root::shared().removeScene();
 
 	Game::shared().getEventManager()->removeEventHandler(this);
@@ -70,7 +68,6 @@ bool ClientGameSession::init()
 
 	Root::shared().addInputListener(input);
 	Root::shared().addFrameListener(input);
-	Root::shared().addFrameListener(this);
 
 	Scene* scene = Root::shared().makeDefaultScene();
 	if(!scene)
@@ -114,7 +111,7 @@ void ClientGameSession::rebuildCellList()
 	}
 }
 
-void ClientGameSession::onFrame(float elapsedTime)
+void ClientGameSession::update(int elapsedTime)
 {
 	if(!localFaction) return;
     gameTimer += elapsedTime;
@@ -165,12 +162,12 @@ void ClientGameSession::handleEvent(Packet& packet)
 	{
 		case EVENT_GAME_FULLSTATE:
 			{
-                float newGameTime;
+                int newGameTime;
                 packet >> newGameTime;
 
                 GAME_LOG_DEBUG("Full game state received. Old gametimer = " << gameTimer << ". New server gametime = " << newGameTime << ". Estimated delay = " << Game::shared().getNetworkDelay());
 
-                gameTimer = newGameTime + Game::shared().getNetworkDelay();
+                gameTimer = newGameTime + (int)(Game::shared().getNetworkDelay()*1000);
 
 				int count;
 				packet >> count;
@@ -324,13 +321,13 @@ void ClientGameSession::handleEvent(Packet& packet)
 			break;
 
 		case EVENT_MOVE_UNIT: {
-                                  float serverTime;
-                                  packet >> serverTime;
+                                  int timeStamp;
+                                  packet >> timeStamp;
 
 								  int numUnits;
 								  packet >> numUnits;
 
-                                  GAME_LOG_DEBUG("Move packet for " << numUnits << " units. " << 1000.0*(gameTimer - serverTime) << " ms delay. Sent at server-gametime " << serverTime << ". Recieved at client-gametime " << gameTimer);
+                                  GAME_LOG_DEBUG("Move packet for " << numUnits << " units. " << (gameTimer - timeStamp) << " ms delay. Sent at server-gametime " << timeStamp << ". Recieved at client-gametime " << gameTimer);
 
 								  int unitId;
                                   int nodeCount;
@@ -347,7 +344,7 @@ void ClientGameSession::handleEvent(Packet& packet)
                                       pathNodes.clear();
                                       for(int i = 0; i < nodeCount; ++i){ packet >> tempPos; pathNodes.push_back(tempPos); }
 									  Unit* unit = getUnitById(unitId);
-                                      if(unit) unit->setUnitMovement(serverTime, pos, yaw, pathNodes);
+                                      if(unit) unit->setUnitMovement(timeStamp, pos, yaw, pathNodes);
 								  }
 								  break;
 							  }

@@ -24,7 +24,6 @@ class Faction;
 struct CellList;
 
 class ClientGameSession :
-    public Arya::FrameListener,
     public EventHandler,
     public GameSession
 {
@@ -39,8 +38,7 @@ class ClientGameSession :
         Faction* getLocalFaction() const { return localFaction; } ;
         const vector<Faction*>& getFactions() const { return factions; }
 
-        // FrameListener
-        void onFrame(float elapsedTime);
+        void update(int elapsedTime); //in ms
         void onRender();
 
         void handleEvent(Packet& packet);

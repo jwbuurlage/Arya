@@ -286,8 +286,10 @@ void Unit::setCellFromList(CellList* cl)
 	setCell(cl->cellForPosition(getPosition2()));
 }
 
-void Unit::update(float timeElapsed, float gameTime)
+void Unit::update(int timeElapsed2, int gameTime)
 {
+    float timeElapsed = 0.001f*timeElapsed2;
+
 	//For any units referenced by this unit we must check if they are obsolete
 	//Currently the only referenced unit is targetUnit
 	if(targetUnit && !targetUnit->isAlive())

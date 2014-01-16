@@ -68,7 +68,7 @@ class ServerGameSession : public GameSession
         void addClient(ServerClient* client, int index);
         void removeClient(ServerClient* client);
 
-        void update(float elapsedTime);
+        void update(int elapsedTime); //in ms
 
 		Packet* createFullStatePacket();
 
