@@ -139,6 +139,7 @@ class Unit
         void deleteScriptData();
 
         // movement and attack
+        int lastActionTime;
 		std::vector<vec2> pathNodes;
         Unit* targetUnit;
         UnitState unitState;

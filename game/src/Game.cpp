@@ -258,18 +258,12 @@ void Game::onFrame(float elapsedTime)
         ping.send();
     }
 
+    network->update();
+
     totalTime += elapsedTime;
     int elapsedms = (int)(totalTime*1000.0) - totalTimems;
     totalTimems += elapsedms;
     if(session) session->update(elapsedms);
-
-    network->update();
-    //timeSinceNetworkPoll += elapsedTime;
-    //if(timeSinceNetworkPoll > NETWORK_POLL)
-    //{
-    //    timeSinceNetworkPoll = 0.0f;
-    //    network->update();
-    //}
 }
 
 void Game::handleEvent(Packet& packet)
