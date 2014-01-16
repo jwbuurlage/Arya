@@ -33,8 +33,6 @@ class ClientGameSession :
         ~ClientGameSession();
 
         bool init();
-        bool initShaders();
-        bool initVertices();
 
         void rebuildCellList();
 

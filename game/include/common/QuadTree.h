@@ -1,3 +1,5 @@
+/* THIS IS NOT USED FOR NOW */
+
 #pragma once
 
 #include <glm/glm.hpp>

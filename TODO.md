@@ -6,7 +6,7 @@
 [ ] Robust server back-end
 
 **Jan-Willem**
-[ ] Extensive debug info, fix cells/quadtree
+[ ] Extensive debug info, fix cells (show in debug first)
 [ ] Combat log
 [ ] Proper menus
 [ ] Culling
