@@ -238,7 +238,7 @@ void ServerGameSession::update(float elapsedTime)
                 //   so that this loop will remove it
                 // - big events like a full faction that loses all its units
                 //   ???????? solution needed ??????
-                unit->update(elapsedTime);
+                unit->update(elapsedTime, gameTimer);
                 ++it;
             }
         }
@@ -299,7 +299,7 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
                         if(unit && nodeCount >= 1)
                         {
                             //TODO: check if valid movement
-                            unit->setTargetPath(pathNodes);
+                            unit->setUnitMovement(gameTimer, unit->getPosition2(), unit->getYaw(), pathNodes);
                             validUnits.push_back(unit);
                         }
                     }
@@ -308,7 +308,7 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
                     {
                         Packet* outPak = server->createPacket(EVENT_MOVE_UNIT);
 
-                        *outPak << gameTimer; //sendTime;
+                        *outPak << gameTimer;
                         *outPak << (int)validUnits.size();
                         for(unsigned int i = 0; i < validUnits.size(); ++i)
                         {

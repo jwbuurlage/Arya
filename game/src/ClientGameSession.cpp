@@ -195,7 +195,7 @@ void ClientGameSession::onFrame(float elapsedTime)
 				onScreen.y /= onScreen.w;
 				(*it)->setScreenPosition(vec2(onScreen.x, onScreen.y));
 
-				(*it)->update(elapsedTime);
+				(*it)->update(elapsedTime, gameTimer);
 
 				++it;
 			}
@@ -419,7 +419,7 @@ void ClientGameSession::handleEvent(Packet& packet)
 								  int numUnits;
 								  packet >> numUnits;
 
-                                  GAME_LOG_DEBUG("Move packet for " << numUnits << " units. " << (gameTimer - serverTime) << " delay. Sent at server time " << serverTime << ". Recieved at " << gameTimer);
+                                  GAME_LOG_DEBUG("Move packet for " << numUnits << " units. " << 1000.0*(gameTimer - serverTime) << " ms delay. Sent at server-gametime " << serverTime << ". Recieved at client-gametime " << gameTimer);
 
 								  int unitId;
                                   int nodeCount;
@@ -436,7 +436,7 @@ void ClientGameSession::handleEvent(Packet& packet)
                                       pathNodes.clear();
                                       for(int i = 0; i < nodeCount; ++i){ packet >> tempPos; pathNodes.push_back(tempPos); }
 									  Unit* unit = getUnitById(unitId);
-									  if(unit) unit->setTargetPath(pathNodes);
+                                      if(unit) unit->setUnitMovement(serverTime, pos, yaw, pathNodes);
 								  }
 								  break;
 							  }
