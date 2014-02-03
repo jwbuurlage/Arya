@@ -341,7 +341,7 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
                         if(unit && target)
                         {
                             //TODO: check if valid movement
-                            unit->setTargetUnit(target);
+                            unit->setTargetUnit(gameTimer, target);
                             validUnits.push_back(unit);
                         }
                     }
@@ -350,6 +350,7 @@ void ServerGameSession::handlePacket(ServerClient* client, Packet& packet)
                     {
                         Packet* outPak = server->createPacket(EVENT_ATTACK_MOVE_UNIT);
 
+                        *outPak << gameTimer;
                         *outPak << (int)validUnits.size();
                         for(unsigned int i = 0; i < validUnits.size(); ++i)
                         {

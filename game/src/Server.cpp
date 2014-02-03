@@ -97,9 +97,9 @@ void Server::prepareServer()
     //It will register to the reactor
     acceptor = new ConnectionAcceptor(*serverSocket, *reactor, this);
 
-    timer.restart();
-    timerDiff = sf::Time::Zero;
-    fpsTime = sf::Time::Zero;
+    serverStart = std::chrono::steady_clock::now();
+    lastUpdate = 0;
+    lastFPSupdate = 0;
     frameCounter = 0;
 
     //TODO: better solution
@@ -133,25 +133,23 @@ void Server::deletePacket(Packet* pak)
 
 void Server::update()
 {
-    //Display fps every minute
+    using namespace std::chrono;
+    long long elapsed = duration_cast<milliseconds>(steady_clock::now()-serverStart).count();
+
     frameCounter++;
-    fpsTime += timer.getElapsedTime();
-    if(fpsTime.asMilliseconds() >= 10000)
+    if( (elapsed-lastFPSupdate) >= 10000 )
     {
-        GAME_LOG_INFO("Server fps: " << ((float)frameCounter) / fpsTime.asSeconds() );
-        fpsTime -= sf::milliseconds(10000);
+        GAME_LOG_INFO("Server fps: " << float(1000*frameCounter) / float(elapsed-lastFPSupdate) );
+        lastFPSupdate += 10000;
         frameCounter = 0;
     }
 
-    timerDiff += timer.restart();
-    while(timerDiff.asMilliseconds() > 20)
-    {
-        timerDiff -= sf::milliseconds(20);
+    const int stepSize = 10; //constant 10 ms game logic frame time
+    long long count = (elapsed-lastUpdate)/stepSize;
+    lastUpdate += count*stepSize;
+    for(int i = 0; i < count; ++i)
         for(sessionIterator iter = sessionList.begin(); iter != sessionList.end(); ++iter)
-        {
-            iter->second->update(20); //constant step size of 20 ms
-        }
-    }
+            iter->second->update(stepSize);
 }
 
 void Server::newClient(ServerClientHandler* clientHandler)
