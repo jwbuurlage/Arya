@@ -60,8 +60,8 @@ class Game : public Arya::InputListener , public Arya::FrameListener, public Eve
 
         int clientId;
 
-        std::chrono::steady_clock::time_point prevTime;
-        int extraTime;
+        std::chrono::steady_clock::time_point gameStart;
+        int lastUpdate;
 
         //We want to check the network
         //every 5 frames

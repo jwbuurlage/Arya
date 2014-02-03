@@ -289,9 +289,6 @@ void Unit::setCellFromList(CellList* cl)
 
 void Unit::update(int timeElapsed2, int gameTime)
 {
-    float timeElapsed = 0.001f*(gameTime - lastActionTime);
-    lastActionTime = gameTime;
-
 	//For any units referenced by this unit we must check if they are obsolete
 	//Currently the only referenced unit is targetUnit
 	if(targetUnit && !targetUnit->isAlive())
@@ -301,6 +298,10 @@ void Unit::update(int timeElapsed2, int gameTime)
 		if(unitState == UNIT_ATTACKING || unitState == UNIT_ATTACKING_OUT_OF_RANGE)
 			setUnitState(UNIT_IDLE);
 	}
+
+    if( gameTime <= lastActionTime ) return;
+    float timeElapsed = 0.001f*(gameTime - lastActionTime);
+    lastActionTime = gameTime;
 
 	timeSinceLastAttackRequest += timeElapsed;
 	timeSinceLastAttack += timeElapsed;

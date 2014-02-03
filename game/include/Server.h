@@ -1,6 +1,7 @@
 #pragma once
 #include <map>
 #include <vector>
+#include <chrono>
 
 #include "SFML/System.hpp"
 #include "Poco/Thread.h"
@@ -53,10 +54,10 @@ class Server
         int port;
         void prepareServer();
 
-        sf::Clock timer;
-        sf::Time timerDiff;
-        unsigned int frameCounter;
-        sf::Time fpsTime;
+        std::chrono::steady_clock::time_point serverStart;
+        long long lastUpdate;
+        long long lastFPSupdate;
+        int frameCounter;
 
         Scripting* scripting;
 

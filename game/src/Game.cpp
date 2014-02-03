@@ -21,8 +21,8 @@ Game::Game()
 	network = 0;
 	clientId = 0;
 
-    prevTime = std::chrono::steady_clock::now();
-    extraTime = 0;
+    gameStart = std::chrono::steady_clock::now();
+    lastUpdate = 0;
 
     timeSinceNetworkPoll = 0;
     timeSincePing = 0;
@@ -208,24 +208,6 @@ bool Game::keyDown(int key, bool keyDown)
 {
 	bool keyHandled = true;
 	switch(key) {
-		case 'P':
-			if(keyDown) {
-				if(session) delete session;
-				session = new ClientGameSession;
-				if(!session->init()) {
-					GAME_LOG_ERROR("Could not start a new session");
-					Root::shared().stopRendering();
-				}
-			}
-			break;
-
-		case 'L':
-			if(keyDown)
-			{
-				if(session) delete session;
-				session = 0;
-			}
-			break;
 		case 'O': glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
 		case 'I': glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
 		case GLFW_KEY_F11: Root::shared().setFullscreen(!Root::shared().getFullscreen()); break;
@@ -264,14 +246,10 @@ void Game::onFrame(float elapsedTime)
 
     network->update();
 
-    steady_clock::time_point nextTime = steady_clock::now();
-    extraTime += duration_cast<milliseconds>(nextTime-prevTime).count();
-    prevTime = nextTime;
-
-    while(extraTime >= 10){
-        if(session) session->update(10);
-        extraTime -= 10;
-    }
+    int elapsed = duration_cast<milliseconds>(steady_clock::now()-gameStart).count();
+    int count = (elapsed-lastUpdate)/10;
+    lastUpdate += count*10;
+    if(session) for(int i = 0; i < count; ++i) session->update(10);
 }
 
 void Game::handleEvent(Packet& packet)
