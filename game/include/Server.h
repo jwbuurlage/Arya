@@ -3,7 +3,6 @@
 #include <vector>
 #include <chrono>
 
-#include "SFML/System.hpp"
 #include "Poco/Thread.h"
 #include "Poco/Net/ServerSocket.h"
 

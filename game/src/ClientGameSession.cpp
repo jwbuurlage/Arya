@@ -167,7 +167,8 @@ void ClientGameSession::handleEvent(Packet& packet)
 
                 GAME_LOG_DEBUG("Full game state received. Old gametimer = " << gameTimer << ". New server gametime = " << newGameTime << ". Estimated delay = " << Game::shared().getNetworkDelay());
 
-                gameTimer = newGameTime + (int)(Game::shared().getNetworkDelay()*1000);
+                //Round the delay to 10 ms so that the game timer is always a multiple of 10 ms
+                gameTimer = newGameTime + ((int)(Game::shared().getNetworkDelay()*1000)/10)*10;
 
 				int count;
 				packet >> count;

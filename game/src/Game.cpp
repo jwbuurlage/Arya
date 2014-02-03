@@ -273,7 +273,7 @@ void Game::handleEvent(Packet& packet)
                 }
                 total /= i;
                 networkDelay = total*0.5;
-                //GAME_LOG_DEBUG("Ping " << 1000.0*(timeSincePing) << " ms. Average of last 10 pings: " << 1000.0*total);
+                GAME_LOG_DEBUG("Ping " << 1000.0*(timeSincePing) << " ms. Average of last 10 pings: " << 1000.0*total);
             }
             break;
 		case EVENT_CLIENT_ID:
