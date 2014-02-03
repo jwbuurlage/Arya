@@ -522,11 +522,12 @@ void Unit::setUnitState(UnitState state)
 #endif
 }
 
-void Unit::setTargetUnit(Unit* target)
+void Unit::setTargetUnit(int startTime, Unit* target)
 {
 	if(targetUnit)
 		targetUnit->release();
 
+    lastActionTime = startTime;
 	targetUnit = target;
 	targetUnit->retain();
 
@@ -536,7 +537,7 @@ void Unit::setTargetUnit(Unit* target)
 	setUnitState(UNIT_ATTACKING_OUT_OF_RANGE);
 }
 
-void Unit::setUnitMovement(float startTime, const vec2& startPos, float startYaw, const std::vector<vec2>& newPath)
+void Unit::setUnitMovement(int startTime, const vec2& startPos, float startYaw, const std::vector<vec2>& newPath)
 {
     if(targetUnit)
         targetUnit->release();

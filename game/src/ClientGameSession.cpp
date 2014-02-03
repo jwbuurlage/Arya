@@ -351,6 +351,9 @@ void ClientGameSession::handleEvent(Packet& packet)
 
 		case EVENT_ATTACK_MOVE_UNIT:
 							  {
+                                  int timeStamp;
+                                  packet >> timeStamp;
+
 								  int numUnits;
 								  packet >> numUnits;
 
@@ -359,7 +362,7 @@ void ClientGameSession::handleEvent(Packet& packet)
 									  packet >> unitId >> targetUnitId;
 									  Unit* unit = getUnitById(unitId);
 									  Unit* targetUnit = getUnitById(targetUnitId);
-									  if(unit && targetUnit) unit->setTargetUnit(targetUnit);
+									  if(unit && targetUnit) unit->setTargetUnit(timeStamp, targetUnit);
 								  }
 
 								  break;
@@ -498,7 +501,7 @@ void ClientGameSession::initPathfinding()
                     else
                     {
                         float newHeight = heightMap[newI*amountOfPixels+newJ];
-                        float slope = (newHeight - curHeight)/(xChange*glm::sqrt(dx*dx+dz*dz));
+                        float slope = (newHeight - curHeight)/(xChange*glm::sqrt(float(dx*dx+dz*dz)));
                         canWalk = glm::abs(slope) < 1;
                     }
                     if(canWalk) pathfindingMap[i*amountOfPixels+j] |= (1 << bitnum);
@@ -523,7 +526,7 @@ struct pathnode
         {
             int di = i - parent->i;
             int dj = j - parent->j;
-            dist = parent->dist + glm::sqrt(di*di+dj*dj);
+            dist = parent->dist + glm::sqrt(float(di*di+dj*dj));
         }
         else
         {
@@ -540,7 +543,7 @@ struct pathnode
     void update(const pathnode& endnode)
     {
         int di = endnode.i - i, dj = endnode.j - j;
-        dist_estimate = dist + glm::sqrt(di*di+dj*dj);
+        dist_estimate = dist + glm::sqrt(float(di*di+dj*dj));
     }
 
     int i, j;

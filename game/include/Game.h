@@ -1,5 +1,6 @@
 #include "Arya.h"
 #include "../include/Events.h"
+#include <chrono>
 
 using Arya::Root;
 using Arya::Scene;
@@ -59,8 +60,9 @@ class Game : public Arya::InputListener , public Arya::FrameListener, public Eve
 
         int clientId;
 
-        float totalTime;
-        int totalTimems;
+        std::chrono::steady_clock::time_point prevTime;
+        int extraTime;
+
         //We want to check the network
         //every 5 frames
         float timeSinceNetworkPoll;

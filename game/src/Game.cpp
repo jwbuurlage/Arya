@@ -4,6 +4,7 @@
 #include "../include/Network.h"
 #include "../include/Events.h"
 #include "../include/Scripting.h"
+#include <chrono>
 #include <GLFW/glfw3.h>
 #include "Arya.h"
 
@@ -20,8 +21,9 @@ Game::Game()
 	network = 0;
 	clientId = 0;
 
-    totalTime = 0;
-    totalTimems = 0;
+    prevTime = std::chrono::steady_clock::now();
+    extraTime = 0;
+
     timeSinceNetworkPoll = 0;
     timeSincePing = 0;
     networkDelay = 0;
@@ -248,6 +250,8 @@ bool Game::mouseMoved(int x, int y, int dx, int dy)
 	return false; 
 }
 
+using namespace std::chrono;
+
 void Game::onFrame(float elapsedTime)
 {
     timeSincePing += elapsedTime;
@@ -260,10 +264,14 @@ void Game::onFrame(float elapsedTime)
 
     network->update();
 
-    totalTime += elapsedTime;
-    int elapsedms = (int)(totalTime*1000.0) - totalTimems;
-    totalTimems += elapsedms;
-    if(session) session->update(elapsedms);
+    steady_clock::time_point nextTime = steady_clock::now();
+    extraTime += duration_cast<milliseconds>(nextTime-prevTime).count();
+    prevTime = nextTime;
+
+    while(extraTime >= 10){
+        if(session) session->update(10);
+        extraTime -= 10;
+    }
 }
 
 void Game::handleEvent(Packet& packet)

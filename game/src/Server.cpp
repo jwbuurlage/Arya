@@ -144,12 +144,12 @@ void Server::update()
     }
 
     timerDiff += timer.restart();
-    while(timerDiff.asMilliseconds() > 20)
+    while(timerDiff.asMilliseconds() >= 10)
     {
-        timerDiff -= sf::milliseconds(20);
+        timerDiff -= sf::milliseconds(10);
         for(sessionIterator iter = sessionList.begin(); iter != sessionList.end(); ++iter)
         {
-            iter->second->update(20); //constant step size of 20 ms
+            iter->second->update(10); //constant step size of 10 ms
         }
     }
 }

@@ -76,10 +76,10 @@ class Unit
 
         void update(int timeElapsed, int gameTime); //in ms
 
-        void setUnitMovement(float startTime, const vec2& startPos, float startYaw, const std::vector<vec2>& newPath);
+        void setUnitMovement(int startTime, const vec2& startPos, float startYaw, const std::vector<vec2>& newPath);
         const std::vector<vec2>& getTargetPath() const { return pathNodes; }
         Unit* getTargetUnit() const { return targetUnit; }
-        void setTargetUnit(Unit* unit);
+        void setTargetUnit(int startTime, Unit* unit);
 
         void setUnitState(UnitState state);
         UnitState getUnitState() const { return unitState; }
@@ -120,7 +120,7 @@ class Unit
         //scripting functions
         LuaScriptData* customData;
     private:
-        Object* object; //object->position and object->yaw are always the same as Unit::position and Unit::yaw
+        Object* object; //object->position and object->yaw are predicted values, not always the same as Unit::position and Unit::yaw
         vec3 position; //since server has no Object, position is stored here
         vec2 position2; // we want to hold this reference for vision
         float yaw;
