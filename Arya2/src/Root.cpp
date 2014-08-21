@@ -138,6 +138,9 @@ namespace Arya
                     case SDL_MOUSEBUTTONUP:
                     case SDL_MOUSEMOTION:
                         break;
+                    case SDL_QUIT:
+                        stopGameLoop();
+                        break;
                     default:
                         LogDebug << "Unkown SDL event: " << event.type << endLog;
                         break;
