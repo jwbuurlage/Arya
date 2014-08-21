@@ -5,6 +5,8 @@ using std::list;
 
 namespace Arya
 {
+    class Entity;
+
     class EntitySystem
     {
         public:

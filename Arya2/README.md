@@ -12,6 +12,14 @@ Additionally, the following tools are needed for building
 - make
 - cmake
 
+### Installation of packages on Arch based systems
+
+For gcc and make, simply run
+    $ sudo pacman -S base-devel
+
+For the other packages:
+    $ sudo pacman -S cmake glew glm sdl2
+
 To build, simply navigate to the root directory of the repository and run
 
     $ cd build

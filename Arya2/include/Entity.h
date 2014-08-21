@@ -7,6 +7,9 @@ using glm::mat4;
 
 namespace Arya
 {
+    class Mesh;
+    class AnimationState;
+
     class Entity
     {
         private:
