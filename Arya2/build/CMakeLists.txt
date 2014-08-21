@@ -4,11 +4,12 @@ PROJECT(Arya)
 
 #-- Where to search for the Arya lib
 LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/..bin/)
-#-- Where to output the Arya lib and the game
 
+#-- Where to output the Arya lib and the game
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
+
 #-- Display warnings and compile with debug information and optimize
 SET(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS} -Wall -Wextra -g -O3")
 
@@ -16,9 +17,6 @@ IF(APPLE)
     SET(
         LIB_LIBRARIES
         "GLEW"
-        "glfw"
-        "sfml-system"
-        "sfml-audio"
         ) 
     SET(
         CMAKE_CXX_LINK_FLAGS
@@ -43,7 +41,6 @@ SET(
 SET(
     LIB_INCLUDES
     "../include"
-    "../ext"
     )
 
 ADD_DEFINITIONS(-DGLEW_STATIC)
