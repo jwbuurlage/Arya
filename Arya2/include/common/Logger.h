@@ -54,7 +54,7 @@ namespace Arya
 
         private:
             std::function<void(const std::string&)> callbackFunc;
-            std::ofstream filesteam;
+            std::ofstream filestream;
 
             //TODO: THIS SHOULD BE THREAD-LOCAL
             std::stringstream streambuff;

@@ -1,4 +1,4 @@
-#include "Logger.h"
+#include "common/Logger.h"
 #include <iostream>
 
 namespace Arya
@@ -8,11 +8,11 @@ namespace Arya
 
     Logger::Logger()
     {
-		consoleLogLevel = L_INFO | L_WARNING | L_ERROR | L_CRITICALERROR | L_DEBUG;
+		stdoutLogLevel = L_INFO | L_WARNING | L_ERROR | L_CRITICALERROR | L_DEBUG;
 		fileLogLevel = L_WARNING | L_ERROR | L_CRITICALERROR;
         callbackLogLevel = L_INFO | L_WARNING | L_ERROR | L_CRITICALERROR | L_DEBUG;
 		currentLogLevel = L_NONE;
-        callbackFunc = std::nullptr;
+        callbackFunc = nullptr;
     }
 
     Logger::~Logger()
@@ -39,7 +39,7 @@ namespace Arya
 
     void Logger::flush()
     {
-		if( consoleLogLevel & currentLogLevel ){
+		if( stdoutLogLevel & currentLogLevel ){
 			std::cout << streambuff.str() << std::endl;
 		}
 		if( fileLogLevel & currentLogLevel ){

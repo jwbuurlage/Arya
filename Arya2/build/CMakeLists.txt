@@ -35,10 +35,12 @@ SET(LIB_NAME "Arya")
 
 SET(
     LIB_SOURCES
+    "../src/common/Logger.cpp"
     "../src/Entity.cpp"
     "../src/EntitySystem.cpp"
     "../src/Graphics.cpp"
     "../src/InputSystem.cpp"
+    "../src/Interface.cpp"
     "../src/Renderer.cpp"
     "../src/Root.cpp"
     "../src/Terrain.cpp"
