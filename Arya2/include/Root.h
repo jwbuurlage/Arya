@@ -7,20 +7,22 @@ namespace Arya
     class Graphics;
     class Interface;
 
+    struct SDLValues; //This prevents including SDL headers here
+
     class Root
     {
         public:
             Root();
             ~Root();
 
-            //Parameters?
-            //fullscreen, width, height
-            bool init();
+            //! If init returns false, Root or one of its subsystems failed to initialize
+            //! In this case, the Root class must be deleted
+            bool init(const char* windowTitle, int _width, int _height, bool _fullscreen);
 
             void startGameLoop();
             void stopGameLoop();
 
-            bool getFullscreen() const;
+            bool getFullscreen() const { return fullscreen; }
             void setFullscreen(bool fullscreen = true);
 
             int getWindowWidth() const;
@@ -37,5 +39,13 @@ namespace Arya
             Graphics*    graphics;
             InputSystem* inputSystem;
 
+
+            int windowWidth;
+            int windowHeight;
+            bool fullscreen;
+
+            bool initGLEW();
+
+            SDLValues* sdlValues;
     };
 }
