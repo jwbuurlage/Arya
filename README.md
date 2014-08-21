@@ -28,3 +28,15 @@ Put the required resources in `bin/`, these are currently in a private dropbox f
 Where the number should be between 10101-10104
 
 Then open `./bin/AryaGame` to run the game, and start a local game.
+
+# Linux: simulating network delay for debugging synchronization issues
+
+Find name of network device, on recent linux distributions:
+$ ip link
+Usually something like eth0
+
+Add a delay:
+$ tc qdisc add dev eth0 root netem delay 100ms
+
+Remove delay:
+$ tc qdisc delete dev eht0 root
