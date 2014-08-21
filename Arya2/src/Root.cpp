@@ -100,6 +100,7 @@ namespace Arya
     void Root::gameLoop( std::function<void(float)> callback )
     {
         LogInfo << "Game loop started." << endLog;
+        loopRunning = true;
         while(loopRunning) {
             //Calling OpenGL draw functions will queueu instructions for the GPU
             //When calling SwapBuffers the program waits untill the GPU is done
