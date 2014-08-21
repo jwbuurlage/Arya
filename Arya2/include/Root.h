@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 namespace Arya
 {
     class World;
@@ -19,7 +21,7 @@ namespace Arya
             //! In this case, the Root class must be deleted
             bool init(const char* windowTitle, int _width, int _height, bool _fullscreen);
 
-            void startGameLoop();
+            void gameLoop( std::function<void(float)> callback );
             void stopGameLoop();
 
             bool getFullscreen() const { return fullscreen; }
@@ -39,13 +41,16 @@ namespace Arya
             Graphics*    graphics;
             InputSystem* inputSystem;
 
+            bool loopRunning;
+
+            void render();
 
             int windowWidth;
             int windowHeight;
             bool fullscreen;
 
             bool initGLEW();
-
             SDLValues* sdlValues;
     };
 }
+
