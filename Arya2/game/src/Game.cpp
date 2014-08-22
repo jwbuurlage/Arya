@@ -18,6 +18,8 @@ bool Game::init()
                 1024, 768, false)) {
         return false;
     }
+
+    return true;
 }
 
 void Game::run()
