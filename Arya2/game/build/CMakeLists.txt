@@ -8,7 +8,7 @@ SET(
 SET(
     PROJECT_SOURCES
     "../src/main.cpp"
-#   "../src/Game.cpp"
+    "../src/Game.cpp"
 )
 
 SET(
