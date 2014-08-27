@@ -34,12 +34,8 @@ Then open `./bin/AryaGame` to run the game, and start a local game.
 ## Debugging
 ### Linux: simulating network delay for debugging synchronization issues
 
-Find name of network device, on recent linux distributions:
-$ ip link
-Usually something like eth0
+Find name of network device (usually eth0), on recent linux distributions: `$ ip link`
 
-Add a delay:
-$ tc qdisc add dev eth0 root netem delay 100ms
+Add a delay: `$ tc qdisc add dev eth0 root netem delay 100ms`
 
-Remove delay:
-$ tc qdisc delete dev eht0 root
+Remove delay: `$ tc qdisc delete dev eht0 root`
