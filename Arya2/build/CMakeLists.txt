@@ -44,6 +44,7 @@ SET(
     "../src/Interface.cpp"
     "../src/Renderer.cpp"
     "../src/Root.cpp"
+    "../src/Shaders.cpp"
     "../src/Terrain.cpp"
     "../src/World.cpp"
     )
