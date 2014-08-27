@@ -1,11 +1,11 @@
-#include "Root.h"
-#include "World.h"
-#include "Interface.h"
+#include "common/Logger.h"
+#include "Camera.h"
 #include "Graphics.h"
 #include "InputSystem.h"
-#include "common/Logger.h"
+#include "Interface.h"
+#include "Root.h"
+#include "World.h"
 
-#include <GL/glew.h>
 #include <SDL2/SDL.h>
 
 namespace Arya
@@ -33,6 +33,7 @@ namespace Arya
         windowWidth = 0;
         windowHeight = 0;
         fullscreen = false;
+        timer = 0;
     }
 
     Root::~Root()
@@ -89,7 +90,7 @@ namespace Arya
             return false;
         }
 
-        //if( !graphics->init() ) return false;
+        if( !graphics->init() ) return false;
         //if( !inputSystem->init() ) return false;
         //if( !interface->init() ) return false;
         //if( !world->init() ) return false;
@@ -101,6 +102,7 @@ namespace Arya
     {
         LogInfo << "Game loop started." << endLog;
         loopRunning = true;
+        timer = SDL_GetTicks();
         while(loopRunning) {
             //Calling OpenGL draw functions will queueu instructions for the GPU
             //When calling SwapBuffers the program waits untill the GPU is done
@@ -108,45 +110,15 @@ namespace Arya
             //and so on and do the buffer swap afterwards.
             render();
 
-//			if(!oldTime)
-//				oldTime = glfwGetTime();
-//			else {
-//				double pollTime = glfwGetTime();
-//				double elapsed = pollTime - oldTime;
-//
-//				//Note: it can happen that the list is modified
-//				//during a call to onFrame()
-//				//Some framelisteners (network update) add other framelisteners
-//				for(std::list<FrameListener*>::iterator it = frameListeners.begin(); it != frameListeners.end();++it)
-//					(*it)->onFrame((float)elapsed);
-//
-                float elapsed = 10.0f;
-                callback(elapsed);
-//
-//				oldTime = pollTime;
-//			}
+            int pollTime = SDL_GetTicks();
+            float elapsed = pollTime - timer;
+            timer = pollTime;
 
-            //Handle input
-            SDL_Event event;
-            while(SDL_PollEvent(&event)) {
-                switch(event.type) {
-                    case SDL_KEYDOWN:
-                        break;
-                    case SDL_KEYUP:
-                        break;
-                    case SDL_MOUSEBUTTONDOWN:
-                    case SDL_MOUSEBUTTONUP:
-                    case SDL_MOUSEMOTION:
-                        break;
-                    case SDL_QUIT:
-                        stopGameLoop();
-                        break;
-                    default:
-                        LogDebug << "Unkown SDL event: " << event.type << endLog;
-                        break;
-                }
-            }
-            //Swap buffers
+            callback(elapsed);
+            graphics->getCamera()->update(elapsed);
+
+            handleEvents();
+
             SDL_GL_SwapWindow(sdlValues->window);
         }
     }
@@ -167,20 +139,55 @@ namespace Arya
         return;
     }
 
+    void Root::handleEvents()
+    {
+        SDL_Event event;
+        while(SDL_PollEvent(&event)) {
+            switch(event.type) {
+                case SDL_KEYDOWN:
+                case SDL_KEYUP:
+                case SDL_MOUSEBUTTONDOWN:
+                case SDL_MOUSEBUTTONUP:
+                case SDL_MOUSEMOTION:
+                case SDL_MOUSEWHEEL:
+                    inputSystem->handleInputEvent(event);
+                    break;
+                case SDL_QUIT:
+                    stopGameLoop();
+                    break;
+                case SDL_WINDOWEVENT:
+                    switch(event.window.event) {
+                        case SDL_WINDOWEVENT_RESIZED:
+                            windowResized(event.window.data1, event.window.data2);
+                            break;
+                        case SDL_WINDOWEVENT_CLOSE:
+                            stopGameLoop();
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                default:
+                    LogDebug << "Unkown SDL event: " << event.type << endLog;
+                    break;
+            }
+        }
+
+    }
+
     void Root::render()
     {
-
+        graphics->clear(getWindowWidth(), getWindowHeight());
     }
 
-    bool Root::initGLEW()
+    void Root::windowResized(int newWidth, int newHeight)
     {
-        glewExperimental = GL_TRUE; 
-        glewInit();
-
-        if (!GLEW_VERSION_3_1)
-            LogWarning << "No OpenGL 3.1 support! Continuing" << endLog;
-
-        return true;
+		windowWidth = newWidth;
+		windowHeight = newHeight;
+        //TODO:
+        //graphics->getCamera()
+        //cam->setProjectionMatrix(45.0f windowWidth/((float)windowHeight), 0.1f, 2000.0f);
+        //
+        //interface->recalculatePositions()
     }
-
 }

@@ -27,8 +27,8 @@ namespace Arya
             bool getFullscreen() const { return fullscreen; }
             void setFullscreen(bool fullscreen = true);
 
-            int getWindowWidth() const;
-            int getWindowHeight() const;
+            int getWindowWidth() const { return windowWidth; }
+            int getWindowHeight() const { return windowHeight; }
 
             World*       getWorld() const { return world; }
             Interface*   getInterface() const { return interface; }
@@ -44,13 +44,17 @@ namespace Arya
             bool loopRunning;
 
             void render();
+            void handleEvents();
 
             int windowWidth;
             int windowHeight;
             bool fullscreen;
 
-            bool initGLEW();
+            void windowResized(int newWidth, int newHeight);
+
             SDLValues* sdlValues;
+
+            int timer;
     };
 }
 
