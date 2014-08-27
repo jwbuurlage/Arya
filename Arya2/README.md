@@ -5,26 +5,26 @@ Building on Linux requires the following libraries (latest releases should work)
 - `OpenGL` (>= 3.0, with GLSL >= 4.0)
 - `GLEW`
 - `glm`
--  SDL2
+- `SDL2`
 
 Additionally, the following tools are needed for building
-- gcc
-- make
-- cmake
+- `gcc`
+- `make`
+- `cmake`
 
 ### Installation of packages on Arch based systems
 
-For gcc and make, simply run
-    $ sudo pacman -S base-devel
+For `gcc` and `make`, simply run
+    `$ sudo pacman -S base-devel`
 
 For the other packages:
-    $ sudo pacman -S cmake glew glm sdl2
+    `$ sudo pacman -S cmake glew glm sdl2`
 
 To build, simply navigate to the root directory of the repository and run
 
-    $ cd build
-    $ cmake .
-    $ make
+    `$ cd build`
+    `$ cmake .`
+    `$ make`
 
 ## Running on Linux
 
