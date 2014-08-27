@@ -152,6 +152,13 @@ namespace Arya
                 case SDL_MOUSEWHEEL:
                     inputSystem->handleInputEvent(event);
                     break;
+                case SDL_TEXTINPUT:
+                    //TODO
+                    //If the key pressed is a letter or any other
+                    //text based input, SDL gives this event
+                    //which can be used for properly using textboxes
+                    //so that keys like ^ ' ~ work as expected
+                    break;
                 case SDL_QUIT:
                     stopGameLoop();
                     break;

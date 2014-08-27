@@ -1,4 +1,5 @@
 #include "Game.h"
+using namespace Arya;
 
 Game::Game()
 {
@@ -18,6 +19,9 @@ bool Game::init()
                 1024, 768, false)) {
         return false;
     }
+
+    root->getInputSystem()->bind(INPUT_KEYDOWN, [](int key){ LogInfo << "Game got keydown: " << key << endLog; });
+    root->getInputSystem()->bind(INPUT_KEYUP, [](int key){ LogInfo << "Game got keyup: " << key << endLog; });
 
     return true;
 }
