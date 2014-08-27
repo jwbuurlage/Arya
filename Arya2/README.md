@@ -22,9 +22,9 @@ For the other packages:
 
 To build, simply navigate to the root directory of the repository and run
 
-    `$ cd build`
-    `$ cmake .`
-    `$ make`
+    $ cd build
+    $ cmake .
+    $ make
 
 ## Running on Linux
 
