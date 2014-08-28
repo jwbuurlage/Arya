@@ -1,8 +1,10 @@
 #include "common/Logger.h"
 #include "Camera.h"
+#include "Files.h"
 #include "Graphics.h"
 #include "InputSystem.h"
 #include "Interface.h"
+#include "Locator.h"
 #include "Root.h"
 #include "World.h"
 
@@ -24,6 +26,9 @@ namespace Arya
     {
         sdlValues = new SDLValues;
 
+        fileSystem = new FileSystem();
+        Locator::provide(fileSystem);
+
         world = new World;
         interface = new Interface;
         graphics = new Graphics;
@@ -42,6 +47,10 @@ namespace Arya
         delete graphics;
         delete interface;
         delete world;
+
+        delete fileSystem;
+        fileSystem = 0;
+        Locator::provide(fileSystem);
 
         if( sdlValues->context ) SDL_GL_DeleteContext(sdlValues->context);
         if( sdlValues->window ) SDL_DestroyWindow(sdlValues->window);

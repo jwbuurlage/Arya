@@ -8,6 +8,7 @@ namespace Arya
     class InputSystem;
     class Graphics;
     class Interface;
+    class FileSystem;
 
     struct SDLValues; //This prevents including SDL headers here
 
@@ -40,6 +41,7 @@ namespace Arya
             Interface*   interface;
             Graphics*    graphics;
             InputSystem* inputSystem;
+            FileSystem*  fileSystem;
 
             bool loopRunning;
 

@@ -1,6 +1,7 @@
 #include "common/Logger.h"
 #include "Shaders.h"
-//#include "Files.h"
+#include "Files.h"
+#include "Locator.h"
 #include <GL/glew.h>
 
 namespace Arya
@@ -25,7 +26,7 @@ namespace Arya
 
     bool Shader::addSourceFile(string f)
     {
-        File* source = FileSystem::shared().getFile(f);
+        File* source = Locator::getFileSystem().getFile(f);
         if(!source) return false;
         sources.push_back(source);
         return true;
