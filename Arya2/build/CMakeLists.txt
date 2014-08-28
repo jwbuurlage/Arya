@@ -17,6 +17,7 @@ IF(APPLE)
     SET(
         LIB_LIBRARIES
         "GLEW"
+        "SDL2"
         ) 
     SET(
         CMAKE_CXX_LINK_FLAGS
