@@ -1,5 +1,4 @@
 #include "common/Logger.h"
-#include "Camera.h"
 #include "Files.h"
 #include "Graphics.h"
 #include "InputSystem.h"
@@ -124,7 +123,7 @@ namespace Arya
             timer = pollTime;
 
             callback(elapsed);
-            graphics->getCamera()->update(elapsed);
+            graphics->update(elapsed);
 
             handleEvents();
 

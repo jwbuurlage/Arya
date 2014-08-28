@@ -21,6 +21,9 @@ namespace Arya
             //TODO: World* or some list of GraphicsComponent as argument
             void render();
 
+            //! Update camera
+            void update(float elapsed);
+
             Renderer*       getRenderer() const { return renderer; }
             Camera*         getCamera() const { return camera; }
             MaterialSystem* getMaterialSystem() const { return materialSystem; }

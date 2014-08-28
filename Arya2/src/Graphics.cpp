@@ -43,4 +43,9 @@ namespace Arya
     {
     }
 
+    void Graphics::update(float elapsed)
+    {
+        camera->update(elapsed);
+    }
+
 }
